@@ -10,11 +10,60 @@ function [] = include_3DCheckGrid()
     
 end
 
+%% Grid Connectivity methods
 
 
+function [vertInSurf]=FindVertInSurf(grid)
+    vertInSurf=repmat(struct('vertind',[]),size(grid.surf));
+    edgeInd=[grid.edge(:).index];
+    vertInd=[grid.vert.index];
+    
+    for ii=1:numel(grid.surf)
+        currVertSub=FindObjNum([],...
+            [grid.edge(...
+            FindObjNum([],[grid.surf(ii).edgeind],edgeInd)...
+            ).vertind],vertInd);
+        [~,b,~]=unique(currVertSub);
+        currVertSub=currVertSub(sort(b));
+        vertInSurf(ii).vertind=[grid.vert(currVertSub).index];
+    end
+    
+    
+end
+
+function [voluOnRight]=FindRightVolu3D(grid)
+    voluOnRight=ones(size(grid.surf));
+    
+%     for ii=1:numel(grid.surf)
+%         
+%     end
+    
+    
+end
+
+%% Tecplot Output
+function [cellStr]=PrepareCharForTecplot(cellStr)
+    % Trims tecplot data to make sure it does not pass the maximum
+    % character length of 30000
+    numMax=30000;
+    numChar=cellfun(@numel,cellStr);
+    nNewPos=floor(numChar/numMax);
+    sumNewPos=cumsum([0,nNewPos(1:end-1)]);
+    ind=1:numel(cellStr)+sumNewPos;
+    cellStr(ind)=cellStr;
+    
+    for ii=find(nNewPos)
+        jj=ii+sumNewPos(ii);
+        for kk=jj:jj+nNewPos(ii)
+            indCut=regexp(cellStr{kk}(numMax+1:end),' ','once')+numMax;
+            cellStr{kk+1}=cellStr{kk}(indCut);
+        end
+        
+    end
+    
+end
 
 %% Plot Generated grid
-
 
 function []=Check3Dgrid(grid,textLevel)
     
@@ -177,8 +226,8 @@ function []=Plot3DVolume(grid,textLevel)
             
         case 'all'
             for ii=1:numel(cellStr)
-                cellStr{ii}=[int2str(voluInd{ii}),' (',int2str(surfVoluInd{ii}),' ; ',...
-                    int2str(voluFillInd{ii}),')'];
+                cellStr{ii}=[int2str(voluInd{ii}),' (',int2str(surfVoluInd{ii})...
+                    ,' ; ',int2str(voluFillInd{ii}),')'];
             end
         case 'ind'
             for ii=1:numel(cellStr)

@@ -1,6 +1,6 @@
 %#codegen
 
-function [cubegrid]=GridStructConstructor()
+function [blockgrid]=GridStructConstructor()
     % This function generates a sample grid for 2D and 3D RSVS.
     % Naming convention: 4 letters + 3 letter prefix
     %close all
@@ -324,12 +324,5 @@ function [cubegrid]=BuildBlockVertices(cubegrid,dimGrid,edgeProp,nEdge)
     %figure, hold on
     %Plot3DVert(cubegrid);
 end
-
-
-
-
-
-
-
 
 
