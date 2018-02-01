@@ -1,6 +1,6 @@
 %#codegen
 
-function [blockgrid]=GridStructConstructor()
+function [grid]=GridStructConstructor(dimGrid,outType)
     % This function generates a sample grid for 2D and 3D RSVS.
     % Naming convention: 4 letters + 3 letter prefix
     %close all
@@ -14,10 +14,28 @@ function [blockgrid]=GridStructConstructor()
         zeros([0 2]));
     grid.volu=struct('index',[],'fill',[],'surfind',zeros([1 0]));
     
-    [squaregrid]=BuildSquare(grid);
-    [cubegrid]=BuildCube(grid);
-    [blockgrid]=BuildBlock(grid,[2 3 4]);
-    Check3Dgrid(blockgrid)
+    switch numel(dimGrid)
+        case 2
+            error('Not coded yet')
+            [grid]=BuildSquare(grid);
+%     [cubegrid]=BuildCube(grid);
+        case 3
+            [grid]=BuildBlock(grid,dimGrid);
+    end
+    
+    
+    switch outType
+        case 'fig'
+            Check3Dgrid(grid)
+        case 'tecplot'
+            fileName=sprintf('TESTOUT\\TestGrid3D%s.plt',num2str(dimGrid,'%i_'));
+            fid=fopen(fileName,'w');
+            Grid2Tecplot(grid,fid);
+        case ''
+        case 'none'
+        otherwise
+            warning('Output Type not recognised')
+    end
 end
 
 function [squaregrid]=BuildSquare(squaregrid)

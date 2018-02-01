@@ -32,12 +32,12 @@ function [vertInSurf]=FindVertInSurf(grid)
 end
 
 function [voluOnRight]=FindRightVolu3D(grid)
+    % Does not do anything at the moment simply returns one for each
+    % surface. Tecplot survives without
+    % To be updated if necessary.
+    
     voluOnRight=ones(size(grid.surf));
-    
-%     for ii=1:numel(grid.surf)
-%         
-%     end
-    
+
     
 end
 
@@ -49,18 +49,19 @@ function [cellStr]=PrepareCharForTecplot(cellStr)
     numChar=cellfun(@numel,cellStr);
     nNewPos=floor(numChar/numMax);
     sumNewPos=cumsum([0,nNewPos(1:end-1)]);
-    ind=1:numel(cellStr)+sumNewPos;
+    ind=(1:numel(cellStr))+sumNewPos;
+    %cellStr2=cell([1,numel(cellStr)+sum(nNewPos)]);
     cellStr(ind)=cellStr;
-    
     for ii=find(nNewPos)
         jj=ii+sumNewPos(ii);
-        for kk=jj:jj+nNewPos(ii)
+        for kk=jj:jj+nNewPos(ii)-1
             indCut=regexp(cellStr{kk}(numMax+1:end),' ','once')+numMax;
-            cellStr{kk+1}=cellStr{kk}(indCut);
+            cellStr{kk+1}=cellStr{kk}(indCut:end);
+            cellStr{kk}(indCut:end)='';
         end
         
     end
-    
+    cellStr=cellStr(~cellfun(@isempty,cellStr));
 end
 
 %% Plot Generated grid

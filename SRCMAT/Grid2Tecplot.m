@@ -6,7 +6,7 @@ function [cellStr]=Grid2Tecplot(grid,fid)
         [cellStr]=Grid2DTecplot(grid);
     end
     [cellStr]=PrepareCharForTecplot(cellStr);
-    WriteToFile(cellStr,fid)
+    WriteToFile(cellStr,fid);
     fclose(fid);
 end
 
@@ -30,7 +30,7 @@ function [cellHeader]=BuildPolyhedronHeader(grid,nVertDat,nCellDat)
     kk=0;
     kk=kk+1;cellHeader{kk}='VARIABLES = "X" ,"Y" , "Z" ,"v1" ,"v2", "v3"';
     kk=kk+1;cellHeader{kk}='ZONE';
-    kk=kk+1;cellHeader{kk}='ZONETYPE = POLYHEDRON';
+    kk=kk+1;cellHeader{kk}='ZONETYPE = FEPOLYHEDRON';
     kk=kk+1;cellHeader{kk}=['NODES = ',int2str(numel(grid.vert))];
     kk=kk+1;cellHeader{kk}=['ELEMENTS = ',int2str(numel(grid.volu))];
     kk=kk+1;cellHeader{kk}=['FACES = ',int2str(numel(grid.surf))];
@@ -39,7 +39,7 @@ function [cellHeader]=BuildPolyhedronHeader(grid,nVertDat,nCellDat)
     kk=kk+1;cellHeader{kk}='NUMCONNECTEDBOUNDARYFACES = 0'; % unused
     kk=kk+1;cellHeader{kk}='TOTALNUMBOUNDARYCONNECTIONS = 0'; % unused
     
-    kk=kk+1;cellHeader{kk}=sprintf('VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)]'...
+    kk=kk+1;cellHeader{kk}=sprintf('VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)'...
         ,1,nVertDat,nVertDat+1,nVertDat+nCellDat);
     kk=kk+1;cellHeader{kk}='DATAPACKING=BLOCK';
     
