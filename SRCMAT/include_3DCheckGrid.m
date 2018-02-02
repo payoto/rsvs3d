@@ -10,8 +10,40 @@ function [] = include_3DCheckGrid()
     
 end
 
-%% Grid Connectivity methods
+%% Base Grid operation
 
+function [grid]=GridStructInit(varargin)
+    
+    grid=struct('vert',struct([]),'edge',struct([]),'surf',struct([]),...
+        'volu',struct([]));
+    grid.vert=struct('index',[],'coord',zeros([0 2]),'edgeind',zeros([1 0]));
+    grid.edge=struct('index',[],'vertind',zeros([0 2]),'surfind',zeros([1 0]));
+    grid.surf=struct('index',[],'fill',[],'edgeind',zeros([1 0]),'voluind',...
+        zeros([0 2]));
+    grid.volu=struct('index',[],'fill',[],'surfind',zeros([1 0]));
+    
+    if nargin==0
+        grid.vert=repmat(grid.vert,[1,0]);
+        grid.edge=repmat(grid.edge,[1,0]);
+        grid.surf=repmat(grid.surf,[1,0]);
+        grid.volu=repmat(grid.volu,[1,0]);
+    elseif nargin==1
+        grid.vert=repmat(grid.vert,[1,varargin{1}(1)]);
+        grid.edge=repmat(grid.edge,[1,varargin{1}(2)]);
+        grid.surf=repmat(grid.surf,[1,varargin{1}(3)]);
+        grid.volu=repmat(grid.volu,[1,varargin{1}(4)]);
+    elseif nargin==4
+        grid.vert=repmat(grid.vert,[1,varargin{1}]);
+        grid.edge=repmat(grid.edge,[1,varargin{2}]);
+        grid.surf=repmat(grid.surf,[1,varargin{3}]);
+        grid.volu=repmat(grid.volu,[1,varargin{4}]);
+    else
+        error('Unrecognised number of arguments.')
+    end
+    
+end
+
+%% Grid Connectivity methods
 
 function [vertInSurf]=FindVertInSurf(grid)
     vertInSurf=repmat(struct('vertind',[]),size(grid.surf));
@@ -37,11 +69,21 @@ function [voluOnRight]=FindRightVolu3D(grid)
     % To be updated if necessary.
     
     voluOnRight=ones(size(grid.surf));
+    
+end
+
+function [voluOnRight]=FindRightSurface2D(grid)
+    % Does not do anything at the moment simply returns one for each
+    % surface. Tecplot survives without
+    % To be updated if necessary.
+    
+    voluOnRight=ones(size(grid.edge));
 
     
 end
 
 %% Tecplot Output
+
 function [cellStr]=PrepareCharForTecplot(cellStr)
     % Trims tecplot data to make sure it does not pass the maximum
     % character length of 30000
@@ -263,4 +305,3 @@ function []=Plot3DVolume(grid,textLevel)
         end
     end
 end
-

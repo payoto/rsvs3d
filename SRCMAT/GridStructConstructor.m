@@ -5,22 +5,15 @@ function [grid]=GridStructConstructor(dimGrid,outType)
     % Naming convention: 4 letters + 3 letter prefix
     %close all
     
-    grid=struct('vert',struct([]),'edge',struct([]),'surf',struct([]),...
-        'volu',struct([]));
-    
-    grid.vert=struct('index',[],'coord',zeros([0 2]),'edgeind',zeros([1 0]));
-    grid.edge=struct('index',[],'vertind',zeros([0 2]),'surfind',zeros([1 0]));
-    grid.surf=struct('index',[],'fill',[],'edgeind',zeros([1 0]),'voluind',...
-        zeros([0 2]));
-    grid.volu=struct('index',[],'fill',[],'surfind',zeros([1 0]));
+    [grid]=GridStructInit();
     
     switch numel(dimGrid)
         case 2
-            error('Not coded yet')
-            [grid]=BuildSquare(grid);
+            dimGrid=[dimGrid,0];
+            [grid]=BuildBlock(dimGrid);
 %     [cubegrid]=BuildCube(grid);
         case 3
-            [grid]=BuildBlock(grid,dimGrid);
+            [grid]=BuildBlock(dimGrid);
     end
     
     
@@ -138,7 +131,7 @@ function [cubegrid]=BuildCube(cubegrid)
     
 end
 
-function [cubegrid]=BuildBlock(cubegrid,dimGrid)
+function [cubegrid]=BuildBlock(dimGrid)
     % takes in dimGrid a vector specifying the number of cells in each
     % dimension [l m n] for (x y z) all growth is handled first along x
     % then y then z
@@ -153,10 +146,7 @@ function [cubegrid]=BuildBlock(cubegrid,dimGrid)
     nEdge=reshape(prod(repmat(dimGrid,flip(size(dimGrid)))...
         +edgeProp,2),size(dimGrid));
     
-    cubegrid.vert=repmat(cubegrid.vert,[1,nVert]);
-    cubegrid.edge=repmat(cubegrid.edge,[1,sum(nEdge)]);
-    cubegrid.surf=repmat(cubegrid.surf,[1,sum(nSurf)]);
-    cubegrid.volu=repmat(cubegrid.volu,[1,nVolu]);
+    [cubegrid]=GridStructInit([nVert,sum(nEdge),sum(nSurf),nVolu]);
     
     % Volumes
     [cubegrid]=BuildBlockVolumes(cubegrid,dimGrid,nSurf,surfProp);
@@ -218,16 +208,18 @@ function [cubegrid]=BuildBlockSurfaces(cubegrid,dimGrid,nSurf,surfProp,edgeProp,
     incPos=cumprod([ones([6,1]),[matEdge(:,1:2);matEdge(:,1:2)]],2);
     pos=zeros([1,3]);
     ind=1:3;
+    isFill=find(any(dimGrid==0));
     for ii=1:numel(cubegrid.surf)
         cubegrid.surf(ii).index=ii;
+        cubegrid.surf(ii).fill=rand*isFill;
+        
         jplane=1+sum((ii)>cumsum(nSurf));
         dimGridCur=matSurf(jplane,:);
         pos(1)=mod(ii-1-incrSurf(jplane),dimGridCur(1))+1;
         pos(2)=mod(floor((ii-incrSurf(jplane)-1)/dimGridCur(1)),dimGridCur(2))+1;
         pos(3)=mod(floor((ii-incrSurf(jplane)-1)/(dimGridCur(1)*dimGridCur(2))),dimGridCur(3))+1;
         
-        
-         cubegrid.surf(ii).coord=(pos-(1+surfProp(jplane,:))*0.5)./dimGrid;
+        % cubegrid.surf(ii).coord=(pos-(1+surfProp(jplane,:))*0.5)./dimGrid;
         % Volumeind assignement done
         boundaryFlag=~any(pos>dimGrid);
         cubegrid.surf(ii).voluind(1)=(((pos-1)*cumprod(...
@@ -289,7 +281,7 @@ function [cubegrid]=BuildBlockEdges(cubegrid,dimGrid,nEdge,edgeProp,nSurf,surfPr
         % Volumeind assignement done
         cubegrid.edge(ii).vertind=((([pos;(pos+1-edgeProp(jplane,:))]-1)*cumprod(...
             [1,dimGrid(1:2)+1])')+1)';
-        cubegrid.edge(ii).coord=(pos-1+(1-edgeProp(jplane,:))*0.5)./dimGrid;
+        %cubegrid.edge(ii).coord=(pos-1+(1-edgeProp(jplane,:))*0.5)./dimGrid;
         
         pos=pos-1;
         mask=zeros(3);
@@ -300,6 +292,9 @@ function [cubegrid]=BuildBlockEdges(cubegrid,dimGrid,nEdge,edgeProp,nSurf,surfPr
         surfLog=[repmat(pos,[3,1]);repmat(pos,[3,1])+mask];
         surfLog=any((surfLog<0) | (surfLog>[matSurf;matSurf]-1) ,2)' | flip([1:3,1:3])==jplane;
         cubegrid.edge(ii).surfind(surfLog)=[];
+        if numel(cubegrid.edge(ii).surfind)==1
+           cubegrid.edge(ii).surfind(2)=0; 
+        end
     end
     
     %     Check Surface Ordering
@@ -317,7 +312,8 @@ function [cubegrid]=BuildBlockVertices(cubegrid,dimGrid,edgeProp,nEdge)
     dimGridVert=dimGrid+1;
     matEdge=repmat(dimGrid,flip(size(dimGrid)))+edgeProp;
     edgeProp=1-edgeProp;
-    
+    dimGridAct=dimGrid;
+    dimGridAct(dimGridAct==0)=1;
     incPos=cumprod([ones([6,1]),[matEdge(:,1:2);matEdge(:,1:2)]],2);
     %incPos=cumprod([1,dimGrid(1:2)]);
     
@@ -330,7 +326,7 @@ function [cubegrid]=BuildBlockVertices(cubegrid,dimGrid,edgeProp,nEdge)
         %cubegrid.volu(ii).coord=pos-0.5;
         
         pos=pos-1;
-        cubegrid.vert(ii).coord=pos./(dimGrid);
+        cubegrid.vert(ii).coord=pos./(dimGridAct);
         cubegrid.vert(ii).edgeind=(sum([repmat(pos,[3,1]);repmat(pos,[3,1])-...
             edgeProp].*incPos,2)+[incrEdge,incrEdge]')'+1;
         
@@ -339,6 +335,8 @@ function [cubegrid]=BuildBlockVertices(cubegrid,dimGrid,edgeProp,nEdge)
         edgeLog=any(edgeLog<0 | edgeLog>[matEdge;matEdge]-1,2)';
         cubegrid.vert(ii).edgeind(edgeLog)=[];
     end
+    
+        
     %figure, hold on
     %Plot3DVert(cubegrid);
 end
