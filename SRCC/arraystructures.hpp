@@ -75,6 +75,6 @@ public:
 	}
 };
 
-
+int test_arraystructures();
 
 #endif

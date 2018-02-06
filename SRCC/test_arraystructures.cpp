@@ -1,14 +1,7 @@
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <string>
-#include <stdexcept>
-
 #include "arraystructures.hpp"
 
 
-
-int main() { 
+int test_arraystructures() { 
 	ArrayStruct<int>         intStack;  // stack of ints 
     ArrayStruct<cell>         cellStack;  // stack of ints 
    int i;
@@ -55,4 +48,5 @@ int main() {
       cerr << "Exception: " << ex.what() <<endl; 
       return -1;
    } 
+   return(0);
 } 
