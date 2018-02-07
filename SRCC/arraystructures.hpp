@@ -34,11 +34,12 @@
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 using namespace std;
-typedef unsigned int unsigned_int;
-class cell;
-//template <class T> class ArrayStruct;
 
-typedef ArrayStruct<cell> cellarray;
+class volu;
+template <class T> class ArrayStruct;
+typedef unsigned int unsigned_int;
+
+typedef ArrayStruct<volu> voluarray;
 
 // Templates
 template <class T> // Template for array of structures
@@ -61,27 +62,27 @@ class ArrayStruct {
 
 
 // Classes
-class cell {
+class volu {
 public:
 	int index;
 	double fill;
 
-	cell(){ // Constructor
+	volu(){ // Constructor
 		index=0;
 		fill=0;
-		cout << "Cell #" << index << " Was created" << endl;
+		cout << "volu #" << index << " Was created" << endl;
 	}
-	~cell(){ // Destructor
-		cout << "Cell #" << index << " Was deleted" << endl;
+	~volu(){ // Destructor
+		cout << "volu #" << index << " Was deleted" << endl;
 	}
 
-	void disp(){cout << "Cell #" << index << " Fill " << fill << endl;}
+	void disp(){cout << "volu #" << index << " Fill " << fill << endl;}
 	int Key()    {return(index);}
 
-	void operator=( cell* otherCell){
-		index=otherCell->index;
-		fill=otherCell->fill;
-		cout << "HELLO"  << " Other #" << otherCell->index << " Fill " << otherCell->fill << endl;
+	void operator=( volu* othervolu){
+		index=othervolu->index;
+		fill=othervolu->fill;
+		cout << "HELLO"  << " Other #" << othervolu->index << " Fill " << othervolu->fill << endl;
 	}
 
 };
