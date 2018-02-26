@@ -51,12 +51,9 @@ int test_volu(){
       cellStack.elems[0]=cellStack.elems[i-1]; 
 
       cout << "Display each volu in stack" << endl;
-      for ( i = 0; i < 4; ++i)
-      {
-         cellStack[i]->disp() ;
-         cellStack.elems[i].disp() ;
-      }
-      cellStack.disp2();
+      
+      cellStack.disp();
+      
       cout << cellStack.elems.capacity() << endl;
 
       cout << "HashCellArrayStack" << endl;
@@ -73,19 +70,16 @@ int test_volu(){
 
 }
 
-// member function definition template <class T> : "ArrayStruct"
-template<class T> void ArrayStruct <T>::HashArray(){
-   hashTable.reserve(elems.size());
-   for (int i = 0; i < int(elems.size()); ++i)
-   {
-      hashTable.emplace(elems[i].Key(),i);
+
+// Class function definitions
+
+void volu::disp(){
+   int i;
+   cout << "volu : index " << index << " | fill " << fill << " | surfind " << surfind.size();
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      cout << "-" << surfind[i];
    }
-   cout << "Array Struct Succesfully Hashed" << endl;
+   cout << endl;
 }
 
-template<class T> void ArrayStruct <T>::disp2(){
-   for (int ii ; unsigned_int(ii)<elems.size();ii++){
-      cout << "D2:" ;
-      elems[ii].disp();
-   }
-}
+

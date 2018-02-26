@@ -35,7 +35,13 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
+class meshpart;
+
 class volu;
+class surf;
+class vert;
+class edge;
+
 template <class T> class ArrayStruct;
 typedef unsigned int unsigned_int;
 
@@ -48,7 +54,7 @@ class ArrayStruct {
 		vector<T> elems;    // vector of elements (structures) 
 		unordered_map<int,int> hashTable; // Hash Table of indexed elements
 		void HashArray();
-		void disp2();
+		void disp();
 		
 
 		T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
@@ -60,17 +66,25 @@ class ArrayStruct {
 			return(&(elems[a]));
 		}
 
-
-
 }; 
 
-
-// Classes
-class volu {
-public:
+// Base class
+class meshpart{
+	public : 
 	int index;
+	virtual void disp() =0 ;
+	virtual int Key() =0 ;
+
+};
+
+// Derived Classes
+class volu : public meshpart {
+public:
+
 	double fill;
 	vector<int> surfind;
+
+	void disp();
 
 	volu(){ // Constructor
 		index=0;
@@ -108,29 +122,22 @@ public:
 		#endif
 	}
 
-	void disp(){
-		cout << "volu : index " << index << " | fill " << fill << " | surfind " << surfind.size();
-		for (int i=0; unsigned_int(i)<surfind.size();i++){
-			cout << "-" << surfind[i];
-		}
-		cout << endl;
-	}
-	int Key()    {return(index);}
-
-
+	
+	int Key() {return(index);}
 };
 
 
-class surf {
+
+class surf : public meshpart {
 public:
-	int index;
+
 	double fill;
 	vector<int> edgeind;
 	vector<int> voluind;
 
 	surf(){ // Constructor
 		index=0;
-		fill=0;
+		fill=1;
 		voluind.reserve(2); // reserves 2 as this is the size of the array
 	}
 	~surf(){ // Destructor
@@ -139,10 +146,6 @@ public:
 		voluind.clear();
 	
 	}
-
-	void disp(){cout << "surf #" << index << " Fill " << fill ;}
-	int Key()    {return(index);}
-
 	void operator=( surf* other){
 		index=other->index;
 		fill=other->fill;
@@ -150,8 +153,29 @@ public:
 		voluind=other->voluind;
 	}
 
+	int Key()    {return(index);}
+
 };
 // functions
 int test_arraystructures();
 int test_volu();
+int test_surf();
+
+// member function definition template <class T> : "ArrayStruct"
+template<class T> void ArrayStruct <T>::HashArray(){
+   hashTable.reserve(elems.size());
+   for (int i = 0; i < int(elems.size()); ++i)
+   {
+      hashTable.emplace(elems[i].Key(),i);
+   }
+   cout << "Array Struct Succesfully Hashed" << endl;
+}
+
+template<class T> void ArrayStruct <T>::disp(){
+   for (int ii ; unsigned_int(ii)<elems.size();ii++){
+      cout << "Array " << ii << " " ;
+      elems[ii].disp();
+   }
+}
+
 #endif
