@@ -10,7 +10,7 @@ int test_arraystructures() {
 
 	ArrayStruct<int>         intStack;  // stack of ints 
    voluarray         cellStack;  // stack of ints 
-   cell singleCell;
+   volu singleCell;
 
    try {
 
