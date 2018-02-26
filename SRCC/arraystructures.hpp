@@ -48,6 +48,7 @@ class ArrayStruct {
 		vector<T> elems;    // vector of elements (structures) 
 		unordered_map<int,int> hashTable; // Hash Table of indexed elements
 		void HashArray();
+		void disp2();
 		
 
 		T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
@@ -58,6 +59,9 @@ class ArrayStruct {
 			#endif
 			return(&(elems[a]));
 		}
+
+
+
 }; 
 
 
@@ -66,28 +70,88 @@ class volu {
 public:
 	int index;
 	double fill;
+	vector<int> surfind;
 
 	volu(){ // Constructor
 		index=0;
 		fill=0;
-		cout << "volu #" << index << " Was created" << endl;
+
+		#ifdef TEST_ARRAYSTRUCT
+			cout << "volu #" << index << " Was created " << surfind.size() << endl;
+		#endif
+	}
+	volu(const volu& oldVolu){ // Copy-Constructor
+		index=oldVolu.index;
+		fill=oldVolu.fill;
+		surfind=oldVolu.surfind;
+
+		#ifdef TEST_ARRAYSTRUCT
+			cout << "copyvolu #" << index << " Was created " << surfind.size() << endl;
+		#endif
 	}
 	~volu(){ // Destructor
-		cout << "volu #" << index << " Was deleted" << endl;
+
+		surfind.clear();
+
+		#ifdef TEST_ARRAYSTRUCT
+			cout << "volu #" << index << " Was deleted " << surfind.size() << endl;
+		#endif
+	
+	}
+	void operator=( volu* other){
+		index=other->index;
+		fill=other->fill;
+		surfind=other->surfind;
+
+		#ifdef TEST_ARRAYSTRUCT
+			cout << "OTHER: " ; other->disp();
+		#endif
 	}
 
-	void disp(){cout << "volu #" << index << " Fill " << fill << endl;}
+	void disp(){
+		cout << "volu : index " << index << " | fill " << fill << " | surfind " << surfind.size();
+		for (int i=0; unsigned_int(i)<surfind.size();i++){
+			cout << "-" << surfind[i];
+		}
+		cout << endl;
+	}
 	int Key()    {return(index);}
 
-	void operator=( volu* othervolu){
-		index=othervolu->index;
-		fill=othervolu->fill;
-		cout << "HELLO"  << " Other #" << othervolu->index << " Fill " << othervolu->fill << endl;
-	}
 
 };
 
+
+class surf {
+public:
+	int index;
+	double fill;
+	vector<int> edgeind;
+	vector<int> voluind;
+
+	surf(){ // Constructor
+		index=0;
+		fill=0;
+		voluind.reserve(2); // reserves 2 as this is the size of the array
+	}
+	~surf(){ // Destructor
+
+		edgeind.clear();
+		voluind.clear();
+	
+	}
+
+	void disp(){cout << "surf #" << index << " Fill " << fill ;}
+	int Key()    {return(index);}
+
+	void operator=( surf* other){
+		index=other->index;
+		fill=other->fill;
+		edgeind=other->edgeind;
+		voluind=other->voluind;
+	}
+
+};
 // functions
 int test_arraystructures();
-
+int test_volu();
 #endif

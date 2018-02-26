@@ -6,46 +6,60 @@
 
 int test_arraystructures() { 
    // Test the functionality provided by arraystructures
+   int errFlag,errTest;
+
+   errFlag=0;
+
+   errTest=test_volu();
+   errFlag= errFlag | (errTest!=0);
+
+   return(0);
+} 
+
+int test_volu(){
    int i;
 
-	ArrayStruct<int>         intStack;  // stack of ints 
-   voluarray         cellStack;  // stack of ints 
+   voluarray cellStack;  // stack of ints 
    volu singleCell;
 
    try {
 
       
+      singleCell.surfind.push_back(3);
+      singleCell.surfind.push_back(4);
 
-      cout << "reserve" << endl;
-      //cellStack.elems.reserve(2);
-      cout << "assign" << endl;
+      cout << "assign 3 in cellStack" << endl;
       cellStack.elems.assign(3,singleCell); 
       cout << "=" << endl;
       singleCell.index=1;
-      cout << "push_back" << endl;
+      cout << "push_back of a volu in cellStack" << endl;
       cellStack.elems.push_back(singleCell); 
 
       // manipulate int stack 
-      intStack.elems.push_back(7); 
 
       cout << "Calls to display" << endl;
-      cout << intStack.elems[0] <<endl; 
-      for ( i = 0; i < 4; ++i)
-      {
-      	cellStack.elems[i].index=i;
-      	cellStack[i]->disp() ;
-      }
-      cout << "GAP" << endl;
-      singleCell.index=0;
-      cellStack[0]->disp();
-      cellStack.elems[0]=cellStack[i-1]; 
+      cout << "Display each volu in stack" << endl;
 
       for ( i = 0; i < 4; ++i)
       {
-      	cellStack[i]->disp() ;
+         cellStack.elems[i].index=i;
+         cellStack.elems[i].surfind[0]=i;
+         cellStack[i]->disp() ;
       }
+
+      cout << "Assign last volu to first volu" << endl;
+      cellStack.elems[0]=cellStack.elems[i-1]; 
+
+      cout << "Display each volu in stack" << endl;
+      for ( i = 0; i < 4; ++i)
+      {
+         cellStack[i]->disp() ;
+         cellStack.elems[i].disp() ;
+      }
+      cellStack.disp2();
       cout << cellStack.elems.capacity() << endl;
 
+      cout << "HashCellArrayStack" << endl;
       cellStack.HashArray();
       
 
@@ -55,7 +69,9 @@ int test_arraystructures() {
       return -1;
    } 
    return(0);
-} 
+
+
+}
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){
@@ -65,4 +81,11 @@ template<class T> void ArrayStruct <T>::HashArray(){
       hashTable.emplace(elems[i].Key(),i);
    }
    cout << "Array Struct Succesfully Hashed" << endl;
+}
+
+template<class T> void ArrayStruct <T>::disp2(){
+   for (int ii ; unsigned_int(ii)<elems.size();ii++){
+      cout << "D2:" ;
+      elems[ii].disp();
+   }
 }

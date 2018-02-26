@@ -19,8 +19,8 @@ TESTOBJECTS=$(TESTSOURCES:.cpp=.o)
 
 #.PHONY : all
 all : $(SOURCES) $(EXECUTABLE)
+cleantest : clean test
 test : $(TESTSOURCES) $(TESTEXECUTABLE)
-
   
 # Compile the source files into object files
  
