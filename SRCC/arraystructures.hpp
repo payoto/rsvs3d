@@ -36,6 +36,7 @@
 using namespace std;
 
 class meshpart;
+class mesh;
 
 class volu;
 class surf;
@@ -46,6 +47,9 @@ template <class T> class ArrayStruct;
 typedef unsigned int unsigned_int;
 
 typedef ArrayStruct<volu> voluarray;
+typedef ArrayStruct<surf> surfarray;
+typedef ArrayStruct<edge> edgearray;
+typedef ArrayStruct<vert> vertarray;
 
 // Templates
 template <class T> // Template for array of structures
@@ -69,7 +73,16 @@ class ArrayStruct {
 }; 
 
 // Base class
-class meshpart{
+class mesh {
+public:
+	class vertarray;
+	class edgearray;
+	class surfarray;
+	class voluarray;
+
+};
+
+class meshpart{ // Abstract class to ensure interface is correct
 	public : 
 	int index;
 	virtual void disp() =0 ;
@@ -78,9 +91,9 @@ class meshpart{
 };
 
 // Derived Classes
-class volu : public meshpart {
+class volu: public meshpart {
 public:
-
+	int index;
 	double fill;
 	vector<int> surfind;
 
@@ -104,7 +117,6 @@ public:
 		#endif
 	}
 	~volu(){ // Destructor
-
 		surfind.clear();
 
 		#ifdef TEST_ARRAYSTRUCT
@@ -122,23 +134,26 @@ public:
 		#endif
 	}
 
-	
 	int Key() {return(index);}
 };
 
 
 
-class surf : public meshpart {
+class surf: public meshpart {
 public:
-
+	int index;
 	double fill;
 	vector<int> edgeind;
 	vector<int> voluind;
+	 // reserves 2 as this is the size of the array
+
+	void disp();
 
 	surf(){ // Constructor
 		index=0;
 		fill=1;
 		voluind.reserve(2); // reserves 2 as this is the size of the array
+
 	}
 	~surf(){ // Destructor
 
@@ -153,13 +168,79 @@ public:
 		voluind=other->voluind;
 	}
 
-	int Key()    {return(index);}
+	int Key() {return(index);}
 
 };
+
+
+class edge: public meshpart {
+public:
+	int index;
+
+	vector<int> vertind;
+	vector<int> surfind;
+	 // reserves 2 as this is the size of the array
+
+	void disp();
+
+	edge(){ // Constructor
+		index=0;
+		vertind.reserve(2); // reserves 2 as this is the size of the array
+
+	}
+	~edge(){ // Destructor
+
+		vertind.clear();
+		surfind.clear();
+	
+	}
+	void operator=( edge* other){
+		index=other->index;
+
+		vertind=other->vertind;
+		surfind=other->surfind;
+	}
+
+	int Key() {return(index);}
+};
+
+class vert: public meshpart {
+public:
+	int index;
+
+	vector<int> edgeind;
+	vector<double> coord;
+	 // reserves 2 as this is the size of the array
+
+	void disp();
+
+	vert(){ // Constructor
+		index=0;
+		coord.reserve(2); // reserves 2 as this is the size of the array
+
+	}
+	~vert(){ // Destructor
+
+		edgeind.clear();
+		coord.clear();
+	
+	}
+	void operator=( vert* other){
+		index=other->index;
+
+		edgeind=other->edgeind;
+		coord=other->coord;
+	}
+
+	int Key() {return(index);}
+};
+
 // functions
-int test_arraystructures();
-int test_volu();
-int test_surf();
+int Test_ArrayStructures();
+int Test_Volu();
+int Test_Surf();
+int Test_Vert();
+int Test_Edge();
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){
