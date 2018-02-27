@@ -8,10 +8,11 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
+#define TEST_ARRAYSTRUCT
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_ARRAYSTRUCT
+
 #endif
 
 //=================================
@@ -161,6 +162,12 @@ public:
 		voluind.clear();
 	
 	}
+	surf(const surf& oldSurf){ // Copy-Constructor
+		index=oldSurf.index;
+		fill=oldSurf.fill;
+		edgeind=oldSurf.edgeind;
+		voluind=oldSurf.voluind;
+	}
 	void operator=( surf* other){
 		index=other->index;
 		fill=other->fill;
@@ -187,6 +194,11 @@ public:
 		index=0;
 		vertind.reserve(2); // reserves 2 as this is the size of the array
 
+	}
+	edge(const edge& oldEdge){ // Copy-Constructor
+		index=oldEdge.index;
+		vertind=oldEdge.vertind;
+		surfind=oldEdge.surfind;
 	}
 	~edge(){ // Destructor
 
@@ -218,6 +230,11 @@ public:
 		index=0;
 		coord.reserve(2); // reserves 2 as this is the size of the array
 
+	}
+	vert(const vert& oldEdge){ // Copy-Constructor
+		index=oldEdge.index;
+		edgeind=oldEdge.edgeind;
+		coord=oldEdge.coord;
 	}
 	~vert(){ // Destructor
 

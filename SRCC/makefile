@@ -5,7 +5,7 @@ LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
 CFLAGS=-c -Wall -DDEBUGLVL2
-LDFLAGS=
+LDFLAGS=-lstdc++
 
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
@@ -27,10 +27,10 @@ test : $(TESTSOURCES) $(TESTEXECUTABLE)
  
 
 main : $(OBJECTS) 
-    $(LINK) $(LDFLAGS) $(OBJECTS) -o $@ -lstdc++
+    $(LINK) $(LDFLAGS) $(OBJECTS) -o $@ 
 
 main_test : $(TESTOBJECTS) 
-    $(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ -lstdc++
+    $(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
 .cpp.o :
 	$(CC) $(CFLAGS) $< -o $@
