@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <Eigen/Dense>
 
 #include "arraystructures.hpp"
 
@@ -58,10 +59,41 @@ void vert::disp(){
    cout << endl;
 }
 
+void mesh::HashArray(){
+   verts.HashArray();
+   edges.HashArray();
+   surfs.HashArray();
+   volus.HashArray();
+}
+
+void mesh::Init(int nVe,int nE, int nS, int nVo){
+
+   vert singleVert;
+   edge singleEdge;
+   surf singleSurf;
+   volu singleVolu;
+
+   verts.elems.reserve(nVe);
+   verts.elems.assign(nVe,singleVert);
+
+   edges.elems.reserve(nE);
+   edges.elems.assign(nE,singleEdge);
+
+   surfs.elems.reserve(nS);
+   surfs.elems.assign(nS,singleSurf);
+
+   volus.elems.reserve(nVo);
+   volus.elems.assign(nVo,singleVolu);
+
+   cout << "Mesh Correctly Assigned!" << endl;
+
+}
 // Test code
 int Test_ArrayStructures() { 
    // Test the functionality provided by arraystructures
+
    int errFlag,errTest;
+
 
    errFlag=0;
 
@@ -87,6 +119,8 @@ int Test_ArrayStructures() {
    cout << "      testing edge" << endl;
    cout << "--------------------------------------------" << endl;
    errTest=Test_Edge();
+   errFlag= errFlag | (errTest!=0);
+
    errFlag= errFlag | (errTest!=0);
 
    return(errFlag);

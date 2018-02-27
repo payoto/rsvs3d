@@ -4,12 +4,13 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -Wall -DDEBUGLVL2
+CFLAGS=-c -Wall -DDEBUGLVL2 -ggdb
 LDFLAGS=-lstdc++
+INCLDIR= -I"C:\ap1949include\Eigen_all"
 
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
-TESTSOURCES=test.cpp arraystructures.cpp
+TESTSOURCES=test.cpp arraystructures.cpp voxel.cpp
 TESTEXECUTABLE=main_test
 
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -33,7 +34,7 @@ main_test : $(TESTOBJECTS)
     $(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
 .cpp.o :
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(INCLDIR) $< -o $@
 
 
 # Clean target

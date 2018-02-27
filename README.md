@@ -44,7 +44,7 @@ If the tests run;
 		make      (linux)
 		main
 
-## 2D Instructions not yet implemented ##
+## 2D Instructions not yet implemented in 3D##
 (Any - At the start of a new MATLAB session) 
 	in matlab:
 	

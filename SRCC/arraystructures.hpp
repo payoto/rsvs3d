@@ -36,6 +36,7 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
+
 class meshpart;
 class mesh;
 
@@ -76,11 +77,13 @@ class ArrayStruct {
 // Base class
 class mesh {
 public:
-	class vertarray;
-	class edgearray;
-	class surfarray;
-	class voluarray;
+	vertarray verts;
+	edgearray edges;
+	surfarray surfs;
+	voluarray volus;
 
+	void HashArray();
+	void Init(int nVe,int nE, int nS, int nVo);
 };
 
 class meshpart{ // Abstract class to ensure interface is correct
@@ -253,6 +256,8 @@ public:
 };
 
 // functions
+
+//test functions
 int Test_ArrayStructures();
 int Test_Volu();
 int Test_Surf();
@@ -276,4 +281,4 @@ template<class T> void ArrayStruct <T>::disp(){
    }
 }
 
-#endif
+#endif // ARRAYSTRUCTS_H_INCLUDED
