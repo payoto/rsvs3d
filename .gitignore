@@ -1,0 +1,19 @@
+# Ignore git ignore
+
+*NOGIT*
+*TESTOUT*
+
+# ignore matlab executables
+*.mexw64
+*.mexw64.pdb
+*Automated_Function_Directory*
+
+# ignore compiled files
+
+*.exe
+*.s
+*.o
+
+# Sublime text 
+*.sublime-workspace
+
