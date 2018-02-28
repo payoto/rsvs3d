@@ -1,0 +1,18 @@
+%YAML 1.2
+%TAG ! tag:yaml-macros:YAMLMacros.lib.extend:
+---
+!extend
+_base: C++.sublime-syntax
+name: C++proj
+
+contexts: !merge
+
+  user-types:
+    - match: \b(Matrix|RowVector[1,2,3,4,X][i,f,d,b]|Matrix[1,2,3,4,X][i,f,d,b]|Vector[1,2,3,4,X][i,f,d,b]|Array[1,2,3,4,X][i,f,d,b])\b
+      scope: variable.language.c++
+    - match: \b(mesh|meshpart|volu|surf|edge|vert|voluarray|surfarray|edgearray|vertarray)\b
+      scope: variable.language.c++
+
+  types: !prepend
+    - include: user-types
+

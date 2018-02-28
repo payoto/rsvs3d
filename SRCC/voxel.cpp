@@ -235,14 +235,16 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	RowVector2i currDim;
 	Matrix3i matSurf, matEdge;
 	Matrix<bool, 1,3> maskVec;
+	Matrix<bool, 6,1> surfLog;
 	Matrix<int,3,3> incPos;
-	Matrix<int,6,1> incrSurf2;
-	Matrix<int,4,3> mask,incPosTemp;
+	Matrix<int,6,1> incrSurf2,surfIndTemp;
+	Matrix<int,6,3> mask, surfLogTemp;
+	Matrix<int,4,3> incPosTemp;
 	Matrix<int,4,1> tempEdgeInd,incrEdge2;
-	Matrix<int,2,1> vertIndTemp;
+	Matrix<int,2,1> vertIndTemp,indTemp1,indTemp2;
 	Matrix<int,2,3> posMatTemp;
 
-	int  isFill,jPlane, boundaryFlag, jj, kk;
+	int  jPlane, jj, kk, nSurfEdge;
 
 	// Calculate arrays which can be precalculated
 	matSurf=(dimGrid.colwise().replicate(3).array())+surfProp.array();
@@ -262,35 +264,83 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 
 	cumSurfDim=cumsum(nSurfDim,0);
 
-	cumProdDimGrid << 1 , dimGrid.head(2).array()+1;
+	cumProdDimGrid << 1 , dimGrid.head(2).array()+1; // Warning ! Not the same as for Surf
 	cumProdDimGrid=cumprod(cumProdDimGrid,0);
-	isFill=1-(dimGrid.all());
+
+	
 	ind << 0,1,2;
 
 	
 	for (int ii=0; ii<nEdge; ii++){
-		blockGrid->surfs.elems[ii].index=ii+1;
-		jPlane=(incrEdge.array()<ii).cast<int>().sum();
+
+		blockGrid->edges.elems[ii].index=ii+1;
+		jPlane=(incrEdge.array()<=ii).cast<int>().sum()-1;
 		dimGridCur=matEdge.row(jPlane);
 
 		pos(0)=(ii-incrEdge[jPlane])%(dimGridCur[0]);
 		pos(1)=int(floor(double(ii-incrEdge[jPlane])/double(dimGridCur[0])))%dimGridCur[1];
 		pos(2)=int(floor(double(ii-incrEdge[jPlane])/double(dimGridCur[0]*dimGridCur[1])))%dimGridCur[2];
 
-		posMatTemp << pos , (pos.array()+1)-edgeProp.row(jPlane).array();
+		//cout << ii << " | " << pos << " | " << jPlane << endl;
+		// Assign vertind
+		posMatTemp.row(0)=pos ;
+		posMatTemp.row(1)=(pos.array()+1)-edgeProp.row(jPlane).array();
 		vertIndTemp=(posMatTemp*cumProdDimGrid.transpose()).array()+1;
+
+		blockGrid->edges.elems[ii].vertind.reserve(vertIndTemp.size());
+		blockGrid->edges.elems[ii].vertind.assign(vertIndTemp.size(),0);
+		for (jj=0;jj<vertIndTemp.size();jj++){
+			blockGrid->edges.elems[ii].vertind[jj]=vertIndTemp[jj];
+		}
+
+		// Assign surfind values
+		mask=mask.setZero();
+		maskVec=(ind.reverse().array()!=jPlane);
+		kk=0;
+		for(jj=0;jj<3;jj++){
+			indTemp1(kk)=ind(jj);
+			kk=kk+maskVec(jj);
+			if (kk==2) {break;}
+		}
+		maskVec=(ind.array()!=jPlane);
+		kk=0;
+		for(jj=0;jj<3;jj++){
+			indTemp2(kk)=ind(jj);
+			kk=kk+maskVec(jj);
+			if (kk==2) {break;}
+		}
+		for (jj=0;jj<2;jj++){
+			mask(indTemp1(jj)+3,indTemp2(jj))=-1;
+		}
+
+		surfLogTemp=pos.colwise().replicate(6)+mask;
+
+		surfIndTemp=(surfLogTemp.cwiseProduct(incPos.colwise().replicate(2)).rowwise().sum()
+				+incrSurf2).array()+1;
+
+		surfLog=!(((surfLogTemp.array()<0) || 
+				(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
+				|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
+		nSurfEdge=surfLog.cast<int>().sum();
+		blockGrid->edges.elems[ii].surfind.reserve(nSurfEdge);
+		blockGrid->edges.elems[ii].surfind.assign(nSurfEdge,0);
+		kk=0;
+		for (jj=0;jj<surfLog.size();jj++){
+			if (surfLog(jj)){
+				blockGrid->edges.elems[ii].surfind[kk]=surfIndTemp[jj];
+				kk++;
+			}
+		}
 	}
 
 	#ifdef TEST_VOXEL_EDGE
 	cout << "--------------------------------------------" << endl << "Test BuildBlockSurf" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
-	cout << "incrSurf2: " << endl << incrSurf2 << endl;
 	cout << "incrEdge: " << endl << incrEdge << endl;
-	cout << "incrEdge2: " << endl << incrEdge2 << endl;
 	cout << "incPos: " << endl << incPos << endl;
-	cout << "tempEdgeInd: " << endl << tempEdgeInd << endl;
-	blockGrid->surfs.disp();
+	cout << "vertIndTemp: " << endl << vertIndTemp << endl;
+	blockGrid->edges.disp();
 	#endif //TEST_VOXEL_EDGE
 
 	return(0);
