@@ -4,5 +4,10 @@
 		{
 			"path": "SRCC"
 		}
-	]
+	],
+
+	"syntax_override": {
+        "\\.cpp$": ["User", "C++RSVS3D"],
+        "\\.hpp$": ["User", "C++RSVS3D"],
+    }
 }

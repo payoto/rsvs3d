@@ -8,10 +8,13 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
+#define TEST_VOXEL_SURF
+#define TEST_VOXEL_VOLU
+#define TEST_EIGENEXT
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-
+#define TEST_VOXEL_EDGE
 #define TEST_VOXEL
 //#define TEST_EIGENEXT
 #endif
@@ -84,8 +87,15 @@ template <class T> T cumprod(T mat, int d) {
 // functions
 int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid);
 int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid);
-int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid);
-int BuildBlockSurf(RowVector3i dimGrid, mesh* blockGrid);
+
+int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,
+	RowVector3i nEdgeDim,  RowVector3i nSurfDim, Matrix3i edgeProp,
+	Matrix3i surfProp );
+
+int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
+	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim,
+	 RowVector3i nEdgeDim, int nEdge);
+
 int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh* blockGrid,
 	RowVector3i nSurfDim, Matrix3i surfProp);
 //test functions
@@ -97,3 +107,4 @@ int Test_BuildBlockGrid();
 
 
 #endif // VOXEL_H_INCLUDED
+

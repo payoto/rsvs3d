@@ -278,7 +278,7 @@ function [cubegrid]=BuildBlockEdges(cubegrid,dimGrid,nEdge,edgeProp,nSurf,surfPr
             dimGridCur(3))+1;
         
         
-        % Volumeind assignement done
+        % vertind assignement done
         cubegrid.edge(ii).vertind=((([pos;(pos+1-edgeProp(jplane,:))]-1)*cumprod(...
             [1,dimGrid(1:2)+1])')+1)';
         %cubegrid.edge(ii).coord=(pos-1+(1-edgeProp(jplane,:))*0.5)./dimGrid;

@@ -68,11 +68,7 @@ void mesh::HashArray(){
 
 void mesh::Init(int nVe,int nE, int nS, int nVo){
 
-   vert singleVert;
-   edge singleEdge;
-   surf singleSurf;
-   volu singleVolu;
-
+   /*
    verts.elems.reserve(nVe);
    verts.elems.assign(nVe,singleVert);
 
@@ -84,7 +80,12 @@ void mesh::Init(int nVe,int nE, int nS, int nVo){
 
    volus.elems.reserve(nVo);
    volus.elems.assign(nVo,singleVolu);
-
+   */
+   verts.Init(nVe);
+   edges.Init(nE);
+   surfs.Init(nS);
+   volus.Init(nVo);
+   
    cout << "Mesh Correctly Assigned!" << endl;
 
 }

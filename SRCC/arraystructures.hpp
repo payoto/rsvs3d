@@ -8,11 +8,11 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
-#define TEST_ARRAYSTRUCT
+
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-
+#define TEST_ARRAYSTRUCT
 #endif
 
 //=================================
@@ -72,6 +72,12 @@ class ArrayStruct {
 			return(&(elems[a]));
 		}
 
+		void Init(int n){
+			T sT;
+			elems.reserve(n);
+			elems.assign(n,sT);
+		}
+
 }; 
 
 // Base class
@@ -85,6 +91,7 @@ public:
 	void HashArray();
 	void Init(int nVe,int nE, int nS, int nVo);
 };
+
 
 class meshpart{ // Abstract class to ensure interface is correct
 	public : 
@@ -157,7 +164,7 @@ public:
 		index=0;
 		fill=1;
 		voluind.reserve(2); // reserves 2 as this is the size of the array
-
+		voluind.assign(2,0);
 	}
 	~surf(){ // Destructor
 
@@ -195,7 +202,8 @@ public:
 
 	edge(){ // Constructor
 		index=0;
-		vertind.reserve(2); // reserves 2 as this is the size of the array
+		vertind.reserve(2);
+		vertind.assign(2,0); // reserves 2 as this is the size of the array
 
 	}
 	edge(const edge& oldEdge){ // Copy-Constructor
@@ -232,7 +240,7 @@ public:
 	vert(){ // Constructor
 		index=0;
 		coord.reserve(2); // reserves 2 as this is the size of the array
-
+		coord.assign(2,0);
 	}
 	vert(const vert& oldEdge){ // Copy-Constructor
 		index=oldEdge.index;
@@ -280,5 +288,6 @@ template<class T> void ArrayStruct <T>::disp(){
       elems[ii].disp();
    }
 }
+
 
 #endif // ARRAYSTRUCTS_H_INCLUDED
