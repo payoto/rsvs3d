@@ -239,8 +239,8 @@ public:
 
 	vert(){ // Constructor
 		index=0;
-		coord.reserve(2); // reserves 2 as this is the size of the array
-		coord.assign(2,0);
+		coord.reserve(3); // reserves 2 as this is the size of the array
+		coord.assign(3,0);
 	}
 	vert(const vert& oldEdge){ // Copy-Constructor
 		index=oldEdge.index;

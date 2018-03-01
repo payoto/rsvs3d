@@ -60,6 +60,8 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 	 surfProp,  edgeProp,  nSurfDim,  nEdgeDim, nEdge);
    BuildBlockEdge(dimGrid,  blockGrid,  nEdge , nEdgeDim,nSurfDim,
      edgeProp, surfProp);
+   BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
+
    return(0);
 }
 
@@ -321,7 +323,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 		surfLog=!(((surfLogTemp.array()<0) || 
 				(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
 				|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
-		nSurfEdge=surfLog.cast<int>().sum();
+		nSurfEdge=max(surfLog.cast<int>().sum(),2);
 		blockGrid->edges.elems[ii].surfind.reserve(nSurfEdge);
 		blockGrid->edges.elems[ii].surfind.assign(nSurfEdge,0);
 		kk=0;
@@ -331,10 +333,11 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 				kk++;
 			}
 		}
+		//if (kk==1){blockGrid->edges.elems[ii].surfind[kk]=0;} // not needed as already initialised
 	}
 
 	#ifdef TEST_VOXEL_EDGE
-	cout << "--------------------------------------------" << endl << "Test BuildBlockSurf" << endl;
+	cout << "--------------------------------------------" << endl << "Test BuildBlockEdge" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
 	cout << "incrEdge: " << endl << incrEdge << endl;
@@ -346,6 +349,70 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	return(0);
 }
 
+int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert, 
+	Matrix3i edgeProp, RowVector3i nEdgeDim){
+	// Builds vertices for block grid
+	RowVector3i  cumSurfDim,dimGridVert,dimGridAct, pos, cumProdDimGrid, incrEdge;
+	RowVector3d coordTemp;
+	RowVector2i currDim;
+	Matrix3i  matEdge, incPos;
+	Matrix<int, 6,1> edgeIndTemp;
+	Matrix<bool, 6,1> edgeLog;
+	Matrix<int, 6,3> edgeLogTemp;
+
+	int ii,jj,kk;
+
+	incrEdge << 0 , nEdgeDim.head<2>() ;
+	incrEdge=cumsum(incrEdge,0);
+
+	dimGridVert=dimGrid.array()+1;
+	dimGridAct=dimGrid.cwiseMax(1);
+
+	matEdge=(dimGrid.colwise().replicate(3).array())+edgeProp.array();
+	edgeProp=1-edgeProp.array();
+	incPos << Matrix<int,3,1>::Ones() ,  matEdge.leftCols<2>();
+	incPos=cumprod(incPos,0);
+
+
+	for(ii=0;ii<nVert;ii++){
+		blockGrid->verts.elems[ii].index=ii+1;
+
+		pos(0)=ii%(dimGridVert[0]);
+		pos(1)=int(floor(float(ii)/float(dimGridVert[0])))%(dimGridVert[1]);
+		pos(2)=int(floor(double(ii)/double(dimGridVert[0]*dimGridVert[1])))%dimGridVert[2];
+
+		coordTemp=pos.cast<double>().array()/dimGridAct.cast<double>().array();
+		for (jj=0;jj<3;jj++){
+			blockGrid->verts.elems[ii].coord[jj]=coordTemp[jj];
+		}
+
+		edgeLogTemp << pos.colwise().replicate(3).cwiseProduct(incPos)
+		 , (pos.colwise().replicate(3).array()-edgeProp.array())*incPos.array();
+		edgeIndTemp=(edgeLogTemp.rowwise().sum()+(incrEdge.rowwise().replicate(2).transpose())).array()+1;
+
+		edgeLog=!((edgeLogTemp.array()<0) 
+			|| (edgeLogTemp.array()>(matEdge.colwise().replicate(2).array()-1))).rowwise().any();
+		blockGrid->verts.elems[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
+		kk=0;
+		cout << int(edgeLog.cast<int>().sum()) << " - " ;
+		for (jj=0;jj<6;jj++){
+			if(edgeLog[jj]){
+				blockGrid->verts.elems[ii].edgeind[kk]=edgeIndTemp[jj];
+				++kk;
+			}
+		}
+
+	}
+
+	#ifdef TEST_VOXEL_VERT
+	cout << "--------------------------------------------" << endl << "Test BuildBlockVert" << endl;
+	cout << "matEdge: " << endl << matEdge << endl;
+	cout << "incPos: " << endl << incPos << endl;
+
+	blockGrid->verts.disp();
+	#endif
+	return(0);
+}
 
 // Test code
 int Test_BuildBlockGrid() { 

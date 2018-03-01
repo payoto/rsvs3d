@@ -11,10 +11,11 @@
 #define TEST_VOXEL_SURF
 #define TEST_VOXEL_VOLU
 #define TEST_EIGENEXT
+#define TEST_VOXEL_EDGE
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_VOXEL_EDGE
+#define TEST_VOXEL_VERT
 #define TEST_VOXEL
 //#define TEST_EIGENEXT
 #endif
@@ -86,7 +87,8 @@ template <class T> T cumprod(T mat, int d) {
 
 // functions
 int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid);
-int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid);
+int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert, 
+	Matrix3i edgeProp, RowVector3i nEdgeDim);
 
 int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,
 	RowVector3i nEdgeDim,  RowVector3i nSurfDim, Matrix3i edgeProp,
