@@ -28,9 +28,10 @@
 
 //=================================
 // included dependencies
+#include "precompile.hpp"
 #include <iostream>
-#include <Eigen/Dense>
-#include <numeric>      // std::partial_sum
+#include <numeric>   
+
 #include "arraystructures.hpp"
 
 

@@ -6,7 +6,9 @@ LINK=g++
 # Warnings all and Define DEBUGLVL2 to include all check code
 CFLAGS=-c -Wall -DDEBUGLVL1 -ggdb
 LDFLAGS=-lstdc++
-INCLDIR= -I"C:\ap1949include\Eigen_all"
+#INCLDIR=-include Eigen.gch
+#-include other/Eigen.gch
+INCLDIR= -I"gch" -I"C:\ap1949include\Eigen_all\Eigen"
 
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
@@ -20,9 +22,9 @@ TESTOBJECTS=$(TESTSOURCES:.cpp=.o)
 
 
 #.PHONY : all
-all : $(SOURCES) $(EXECUTABLE)
+all : precompile  $(SOURCES) $(EXECUTABLE)
 
-test : $(TESTSOURCES) $(TESTEXECUTABLE) 
+test : precompile $(TESTSOURCES) $(TESTEXECUTABLE) 
   
 # Compile the source files into object files
  
@@ -33,9 +35,11 @@ main : $(OBJECTS)
 main_test : $(TESTOBJECTS) 
     $(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
+precompile : 
+	$(CC) $(CFLAGS) $(INCLDIR) -x c++-header precompile.hpp
+
 .cpp.o :
 	$(CC) $(CFLAGS) $(INCLDIR) $< -o $@
-
 
 # Clean target
 #.PHONY : clean

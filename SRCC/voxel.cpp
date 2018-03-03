@@ -1,10 +1,25 @@
-#include <iostream>
+/*#include <iostream>
 #include <stdexcept>
-#include <Eigen/Dense>
+#include <Eigen>
 
 #include "voxel.hpp"
 #include "arraystructures.hpp"
+*/
+#include <iostream>
+#include <numeric>      // std::partial_sum
+
+#include "precompile.hpp"
+#include "arraystructures.hpp"
+#include "voxel.hpp"
+
+
+// Namespaces
+using namespace std;
+using namespace Eigen;
 // Implementation of features
+
+
+
 
 int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 

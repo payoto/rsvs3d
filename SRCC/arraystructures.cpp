@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include <Eigen/Dense>
+
 
 #include "arraystructures.hpp"
 
