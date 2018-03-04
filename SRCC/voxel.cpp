@@ -5,13 +5,16 @@
 #include "voxel.hpp"
 #include "arraystructures.hpp"
 */
+//#pragma GCC diagnostic ignored "-Wignored-attributes" // Added because the precompiled voxel error throws this a lot
+
 #include <iostream>
 #include <numeric>      // std::partial_sum
+#include <Eigen>
 
-#include "precompile.hpp"
 #include "arraystructures.hpp"
 #include "voxel.hpp"
-
+#include "postprocessing.hpp"
+#include <ctime>// include this header
 
 // Namespaces
 using namespace std;
@@ -77,6 +80,7 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
      edgeProp, surfProp);
    BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
 
+   blockGrid->HashArray();
    return(0);
 }
 
@@ -98,7 +102,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	incPos << Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
-	cout << "Size of volus: " << blockGrid->volus.elems.capacity() << endl;
+	//cout << "Size of volus: " << blockGrid->volus.elems.capacity() << endl;
 
 	for (int ii=0;ii<nVolu;++ii){
 		blockGrid->volus.elems[ii].index=ii+1;
@@ -401,15 +405,16 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 			blockGrid->verts.elems[ii].coord[jj]=coordTemp[jj];
 		}
 
-		edgeLogTemp << pos.colwise().replicate(3).cwiseProduct(incPos)
-		 , (pos.colwise().replicate(3).array()-edgeProp.array())*incPos.array();
-		edgeIndTemp=(edgeLogTemp.rowwise().sum()+(incrEdge.rowwise().replicate(2).transpose())).array()+1;
+		edgeLogTemp << pos.colwise().replicate(3), (pos.colwise().replicate(3)-edgeProp);
+		edgeIndTemp=(edgeLogTemp.cwiseProduct(incPos.colwise().replicate(2))
+			.rowwise().sum()+(incrEdge.rowwise().replicate(2).transpose())).array()+1;
 
-		edgeLog=!((edgeLogTemp.array()<0) 
-			|| (edgeLogTemp.array()>(matEdge.colwise().replicate(2).array()-1))).rowwise().any();
+		edgeLog=!(((edgeLogTemp.array()<0) 
+			|| (edgeLogTemp.array()>(matEdge.colwise().replicate(2).array()-1))).rowwise().any());
+
 		blockGrid->verts.elems[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
 		kk=0;
-		cout << int(edgeLog.cast<int>().sum()) << " - " ;
+
 		for (jj=0;jj<6;jj++){
 			if(edgeLog[jj]){
 				blockGrid->verts.elems[ii].edgeind[kk]=edgeIndTemp[jj];
@@ -430,7 +435,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 }
 
 // Test code
-int Test_BuildBlockGrid() { 
+int Test_BuildBlockGrid_noout() { 
    // Test the functionality provided by arraystructures
 
    int errFlag,errTest;
@@ -447,3 +452,46 @@ int Test_BuildBlockGrid() {
 
    return(errFlag);
 } 
+
+
+int Test_MeshOut(){
+	int errFlag,errTest, start_s,stop_s;
+    RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,20,20);
+    mesh blockGrid;
+	const char *fileToOpen;
+	tecplotfile outmesh1, outmesh3, outmesh2;
+
+	errFlag=0;
+	errTest=BuildBlockGrid(dimGrid1,&blockGrid);
+	errFlag= errFlag | (errTest!=0);
+	fileToOpen="..\\TESTOUT\\tecout234.plt";
+
+	errTest=outmesh1.OpenFile(fileToOpen);
+	errFlag= errFlag | (errTest!=0);
+
+	errTest=outmesh1.PrintMesh(&blockGrid);
+	errFlag= errFlag | (errTest!=0);
+
+	errTest=BuildBlockGrid(dimGrid2,&blockGrid);
+	fileToOpen="..\\TESTOUT\\tecout230.plt";
+
+	errTest=outmesh2.OpenFile(fileToOpen);
+	errFlag= errFlag | (errTest!=0);
+
+	errTest=outmesh2.PrintMesh(&blockGrid);
+	errFlag= errFlag | (errTest!=0);
+	start_s=clock();
+	errTest=BuildBlockGrid(dimGrid3,&blockGrid);
+	// the code you wish to time goes here
+	stop_s=clock();
+	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+	fileToOpen="..\\TESTOUT\\tecout202020.plt";
+
+	errTest=outmesh3.OpenFile(fileToOpen);
+	errFlag= errFlag | (errTest!=0);
+
+	errTest=outmesh3.PrintMesh(&blockGrid);
+	errFlag= errFlag | (errTest!=0);
+
+	return(errFlag);
+}

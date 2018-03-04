@@ -12,11 +12,11 @@
 #define TEST_VOXEL_VOLU
 #define TEST_EIGENEXT
 #define TEST_VOXEL_EDGE
+#define TEST_VOXEL_VERT
+#define TEST_VOXEL
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_VOXEL_VERT
-#define TEST_VOXEL
 //#define TEST_EIGENEXT
 #endif
 
@@ -28,11 +28,15 @@
 
 //=================================
 // included dependencies
-#include "precompile.hpp"
+
 #include <iostream>
-#include <numeric>   
+#include <numeric>      // std::partial_sum
+#include <Eigen>
 
 #include "arraystructures.hpp"
+#include "postprocessing.hpp"
+
+
 
 
 //==================================
@@ -102,7 +106,8 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh* blockGrid,
 	RowVector3i nSurfDim, Matrix3i surfProp);
 //test functions
-int Test_BuildBlockGrid();
+int Test_BuildBlockGrid_noout();
+int Test_MeshOut();
 
 
 // member function definition template <class T> : "ArrayStruct"

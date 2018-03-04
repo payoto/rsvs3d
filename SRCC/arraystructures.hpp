@@ -9,10 +9,10 @@
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
 
+#define TEST_ARRAYSTRUCT
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_ARRAYSTRUCT
 #endif
 
 //=================================
@@ -77,6 +77,16 @@ class ArrayStruct {
 			elems.reserve(n);
 			elems.assign(n,sT);
 		}
+		int size(){
+			return(int(elems.size()));
+		}
+		int find(int key){
+			auto search=hashTable.find(key);
+			if (search==hashTable.end()){
+				return(-1);
+			}
+			return(search->second);
+		}
 
 }; 
 
@@ -105,7 +115,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 class volu: public meshpart {
 public:
 	int index;
-	double fill;
+	double fill,target,error;
 	vector<int> surfind;
 
 	void disp();
@@ -113,6 +123,8 @@ public:
 	volu(){ // Constructor
 		index=0;
 		fill=0;
+		target=1;
+		error=1;
 
 		#ifdef TEST_ARRAYSTRUCT
 			cout << "volu #" << index << " Was created " << surfind.size() << endl;
@@ -138,6 +150,8 @@ public:
 	void operator=( volu* other){
 		index=other->index;
 		fill=other->fill;
+		target=other->target;
+		error=other->error;
 		surfind=other->surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
@@ -153,7 +167,7 @@ public:
 class surf: public meshpart {
 public:
 	int index;
-	double fill;
+	double fill,target,error;
 	vector<int> edgeind;
 	vector<int> voluind;
 	 // reserves 2 as this is the size of the array
@@ -163,6 +177,8 @@ public:
 	surf(){ // Constructor
 		index=0;
 		fill=1;
+		target=1;
+		error=1;
 		voluind.reserve(2); // reserves 2 as this is the size of the array
 		voluind.assign(2,0);
 	}
@@ -175,12 +191,16 @@ public:
 	surf(const surf& oldSurf){ // Copy-Constructor
 		index=oldSurf.index;
 		fill=oldSurf.fill;
+		target=oldSurf.target;
+		error=oldSurf.error;
 		edgeind=oldSurf.edgeind;
 		voluind=oldSurf.voluind;
 	}
 	void operator=( surf* other){
 		index=other->index;
 		fill=other->fill;
+		error=other->error;
+		target=other->target;
 		edgeind=other->edgeind;
 		voluind=other->voluind;
 	}
@@ -283,7 +303,7 @@ template<class T> void ArrayStruct <T>::HashArray(){
 }
 
 template<class T> void ArrayStruct <T>::disp(){
-   for (int ii ; unsigned_int(ii)<elems.size();ii++){
+   for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
       cout << "Array " << ii << " " ;
       elems[ii].disp();
    }

@@ -4,15 +4,13 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -Wall -DDEBUGLVL1 -ggdb
+CFLAGS=-c -Wall -DDEBUGLVL1 -O3
 LDFLAGS=-lstdc++
-#INCLDIR=-include Eigen.gch
-#-include other/Eigen.gch
-INCLDIR= -I"gch" -I"C:\ap1949include\Eigen_all\Eigen"
+INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
 
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
-TESTSOURCES=test.cpp arraystructures.cpp voxel.cpp
+TESTSOURCES=test.cpp arraystructures.cpp voxel.cpp postprocessing.cpp
 TESTEXECUTABLE=main_test
 
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -22,9 +20,9 @@ TESTOBJECTS=$(TESTSOURCES:.cpp=.o)
 
 
 #.PHONY : all
-all : precompile  $(SOURCES) $(EXECUTABLE)
+all : $(SOURCES) $(EXECUTABLE)
 
-test : precompile $(TESTSOURCES) $(TESTEXECUTABLE) 
+test : $(TESTSOURCES) $(TESTEXECUTABLE) 
   
 # Compile the source files into object files
  
@@ -35,8 +33,6 @@ main : $(OBJECTS)
 main_test : $(TESTOBJECTS) 
     $(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
-precompile : 
-	$(CC) $(CFLAGS) $(INCLDIR) -x c++-header precompile.hpp
 
 .cpp.o :
 	$(CC) $(CFLAGS) $(INCLDIR) $< -o $@
@@ -45,3 +41,6 @@ precompile :
 #.PHONY : clean
 clean :
 	rm *.o *.exe
+
+#precompile.hpp : 
+#	$(CC) -c -H -DDEBUGLVL1 -ggdb $(INCLDIR) -x c++-header precompile.hpp

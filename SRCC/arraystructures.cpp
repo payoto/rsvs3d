@@ -13,7 +13,8 @@
 
 void volu::disp(){
    int i;
-   cout << "volu : index " << index << " | fill " << fill << " | surfind " << surfind.size();
+   cout << "volu : index " << index << " | fill " << fill << ", " << 
+   target << ", "<< error << " | surfind " << surfind.size();
    for (i=0; unsigned_int(i)<surfind.size();i++){
       cout << "-" << surfind[i];
    }
@@ -22,7 +23,8 @@ void volu::disp(){
 
 void surf::disp(){
    int i;
-   cout << "surf : index " << index << " | fill " << fill << " | voluind " << voluind.size();
+   cout << "surf : index " << index << " | fill " << fill << ", " << 
+   target << ", "<< error << " | voluind " << voluind.size();
    for (i=0; unsigned_int(i)<voluind.size();i++){
       cout << "-" << voluind[i];
    }
@@ -68,19 +70,6 @@ void mesh::HashArray(){
 
 void mesh::Init(int nVe,int nE, int nS, int nVo){
 
-   /*
-   verts.elems.reserve(nVe);
-   verts.elems.assign(nVe,singleVert);
-
-   edges.elems.reserve(nE);
-   edges.elems.assign(nE,singleEdge);
-
-   surfs.elems.reserve(nS);
-   surfs.elems.assign(nS,singleSurf);
-
-   volus.elems.reserve(nVo);
-   volus.elems.assign(nVo,singleVolu);
-   */
    verts.Init(nVe);
    edges.Init(nE);
    surfs.Init(nS);
@@ -340,6 +329,7 @@ int Test_Vert(){
       cout << "HashCellArrayStack" << endl;
       cellStack.HashArray();
       
+      cout << "Test Find " << cellStack.find(1) << endl;
 
 
    } catch (exception const& ex) { 

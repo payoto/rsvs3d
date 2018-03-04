@@ -12,7 +12,7 @@
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-
+#define TEST_POSTPROCESSING
 #endif
 
 //=================================
@@ -20,10 +20,12 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
+class mesh;
 
 //=================================
 // included dependencies
 #include <iostream>
+#include <stdarg.h>
 #include "arraystructures.hpp"
 
 
@@ -37,18 +39,57 @@ using namespace std;
 // Base classes
 
 class tecplotfile {
+	private:
+		FILE *fid;
+		int lengthLine;
 	public:
-		FILE *fid=NULL;
-		int OpenFile();
+		int OpenFile(const char *str);
+		void CloseFile();
 		int PrintMesh(mesh *meshout);
+		int MeshDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, int nCellDat);
+		int MeshFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu);
+		void ZoneHeaderPolyHedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
+			int nVertDat, int nCellDat);
 
-}
+		tecplotfile(){
+			fid=NULL;
+			lengthLine=0;
+			cout << "tecplot file object created" << endl;
+		}
+		~tecplotfile(){
+			if (fid!=NULL){
+				this->CloseFile();
+				cout << "Object deleted - File Closed" << endl;
+			} else {
+				cout << "Object deleted - No File Closed" << endl;
+			}
+		}
+
+		void NewZone(){
+			fprintf(fid, "ZONE\n");
+		}
+		int Print(const char *format, ...){ // Mimics the printf function hides fid
+
+			va_list arg;
+			int i;
+
+			va_start (arg, format);
+			i = vfprintf (fid, format, arg);
+			va_end (arg);
+			lengthLine+=i;
+			if (lengthLine>25000){fprintf(fid, " \n");lengthLine=0;}
+			return(lengthLine);
+		}
+
+		void ResetLine(){lengthLine=0;}
+
+};
 
 // Derived Classes
 
 // functions
 
-
+int Test_tecplotfile();
 
 // member function definition template <class T> 
 
