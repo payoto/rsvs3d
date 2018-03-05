@@ -4,20 +4,21 @@
 
 
 // Functions
-void ExtractMeshData(mesh *grid,int *nVert, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractMeshData(mesh *grid,int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 	int ii;
 
 	*nVert=grid->verts.size();
 	*nVolu=grid->volus.size();
 	*nSurf=grid->surfs.size();
+	*nEdge=grid->edges.size();
 	*totNumFaceNode=0;
 	for (ii=0;ii<*nSurf;++ii){
 		*totNumFaceNode=*totNumFaceNode+grid->surfs[ii]->edgeind.size();
 	}
 }
 
-int tecplotfile::MeshDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, int nCellDat){
+int tecplotfile::VolDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, int nCellDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj;
@@ -50,7 +51,64 @@ int tecplotfile::MeshDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, 
 	return(0);
 }
 
-int tecplotfile::MeshFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu){
+int tecplotfile::SurfDataBlock(mesh *meshout,int nVert,int nSurf, int nVertDat, int nCellDat){
+	// Prints the Coord and Fill Data blocks to the tecplot file
+
+	int ii,jj;
+	// Print vertex Data
+	for (jj=0;jj<int(meshout->verts[0]->coord.size());++jj){
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%.16lf ",meshout->verts[ii]->coord[jj]);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	for (jj=int(meshout->verts[0]->coord.size());jj<nVertDat;++jj){
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%lf ",0);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	// Print Cell Data
+	for ( ii = 0; ii<nSurf; ++ii){
+		this->Print("%.16lf ",meshout->volus[ii]->fill);
+	}
+	fprintf(fid,"\n");this->ResetLine();
+	for ( ii = 0; ii<nSurf; ++ii){
+		this->Print("%.16lf ",meshout->volus[ii]->target);
+	}
+	fprintf(fid,"\n");this->ResetLine();
+	for ( ii = 0; ii<nSurf; ++ii){
+		this->Print("%.16lf ",meshout->volus[ii]->error);
+	}
+	fprintf(fid,"\n");this->ResetLine();
+	return(0);
+}
+int tecplotfile::SurfFaceMap(mesh *meshout,int nVert,int nEdge,int nSurf,int nVolu){
+	int ii,jj,actVert;
+	int verts[2];
+
+	for (ii=0;ii<nEdge;++ii){ // Print Number of vertices per face
+		verts[0]=meshout->edges[ii]->vertind[0];
+		verts[1]=meshout->edges[ii]->vertind[1];
+		this->Print("%i %i\n",meshout->verts.find(verts[0])+1,meshout->verts.find(verts[1])+1);
+		this->ResetLine();
+	}
+	
+
+
+	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
+		for (ii=0;ii<nEdge;++ii){
+			//cout << ii << "," << jj << endl ;
+			actVert=meshout->edges[ii]->surfind[jj];
+			this->Print("%i ",meshout->surfs.find(actVert)+1);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+
+	return(0);
+}
+
+int tecplotfile::VolFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu){
 	int ii,jj,actVert,edgeCurr;
 	int verts[2],vertsPast[2];
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
@@ -108,27 +166,34 @@ int tecplotfile::MeshFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu){
 
 	return(0);
 }
-
 // Class function Implementation
 
 int tecplotfile::PrintMesh(mesh *meshout){
 
-	int nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
+	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
 	fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
 	this->NewZone();
-	ExtractMeshData(meshout,&nVert, &nVolu, &nSurf, &totNumFaceNode);
+	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
 	nCellDat=3;
-	this->ZoneHeaderPolyHedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
-	this->MeshDataBlock(meshout,nVert,nVolu, nVertDat, nCellDat);
-	this->MeshFaceMap(meshout,nVert,nSurf,nVolu);
+
+	if (nVolu>0){
+		this->ZoneHeaderPolyhedron(nVert, nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
+		this->VolDataBlock(meshout,nVert,nVolu, nVertDat, nCellDat);
+		this->VolFaceMap(meshout,nVert,nSurf,nVolu);
+	}
+	else{
+		this->ZoneHeaderPolygon(nVert, nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
+		this->SurfDataBlock(meshout,nVert,nSurf, nVertDat, nCellDat);
+		this->SurfFaceMap(meshout,nVert,nEdge,nSurf,nVolu);
+	}
 	return(0);
 }
 
 
-void tecplotfile::ZoneHeaderPolyHedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
+void tecplotfile::ZoneHeaderPolyhedron(int nVert,int nEdge, int nVolu, int nSurf, int totNumFaceNode,
 	int nVertDat, int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
@@ -136,6 +201,21 @@ void tecplotfile::ZoneHeaderPolyHedron(int nVert, int nVolu, int nSurf, int totN
 	fprintf(fid, "ELEMENTS = %i\n",nVolu);
 	this->Print( "FACES = %i\n",nSurf);
 	fprintf(fid, "TOTALNUMFACENODES = %i\n",totNumFaceNode);
+	fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
+	fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n",1,nVertDat, nVertDat+1,nVertDat+nCellDat);
+	fprintf(fid, "DATAPACKING=BLOCK\n");
+
+}
+
+void tecplotfile::ZoneHeaderPolygon(int nVert,int nEdge, int nVolu, int nSurf, int totNumFaceNode,
+	int nVertDat, int nCellDat){
+
+	fprintf(fid, "ZONETYPE = FEPOLYGON\n");
+	fprintf(fid, "NODES = %i\n", nVert);
+	fprintf(fid, "ELEMENTS = %i\n",nSurf);
+	this->Print( "FACES = %i\n",nEdge);
+	fprintf(fid, "TOTALNUMFACENODES = %i\n",2*nEdge);
 	fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
 	fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
 	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n",1,nVertDat, nVertDat+1,nVertDat+nCellDat);

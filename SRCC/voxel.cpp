@@ -456,7 +456,7 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-    RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,20,20);
+    RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
     mesh blockGrid;
 	const char *fileToOpen;
 	tecplotfile outmesh1, outmesh3, outmesh2;
@@ -480,6 +480,7 @@ int Test_MeshOut(){
 
 	errTest=outmesh2.PrintMesh(&blockGrid);
 	errFlag= errFlag | (errTest!=0);
+	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
 	start_s=clock();
 	errTest=BuildBlockGrid(dimGrid3,&blockGrid);
 	// the code you wish to time goes here

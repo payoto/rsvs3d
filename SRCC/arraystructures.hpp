@@ -299,7 +299,7 @@ template<class T> void ArrayStruct <T>::HashArray(){
    {
       hashTable.emplace(elems[i].Key(),i);
    }
-   cout << "Array Struct Succesfully Hashed" << endl;
+   //cout << "Array Struct Succesfully Hashed" << endl;
 }
 
 template<class T> void ArrayStruct <T>::disp(){
