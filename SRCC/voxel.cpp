@@ -24,62 +24,62 @@ using namespace Eigen;
 // Implementation of Cartesian Block grids
 int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 
-   int nVolu, nVert, nSurf,nEdge;
-   RowVector3i nSurfDim,nEdgeDim;
-   Matrix3i surfProp, edgeProp;
+	int nVolu, nVert, nSurf,nEdge;
+	RowVector3i nSurfDim,nEdgeDim;
+	Matrix3i surfProp, edgeProp;
    //int ii;
 
    // Calculate Number of Elements
 
-   nVolu=dimGrid.prod();
-   nVert=(dimGrid.array()+1).prod();
+	nVolu=dimGrid.prod();
+	nVert=(dimGrid.array()+1).prod();
 
-   surfProp=(MatrixXi::Identity(3,3)).rowwise().reverse();
-   edgeProp=(1-MatrixXi::Identity(3,3).array());
+	surfProp=(MatrixXi::Identity(3,3)).rowwise().reverse();
+	edgeProp=(1-MatrixXi::Identity(3,3).array());
 
-   nSurfDim=((dimGrid.colwise().replicate(3).array())+surfProp.array()).rowwise().prod();
-   nEdgeDim=((dimGrid.colwise().replicate(3).array())+edgeProp.array()).rowwise().prod();
+	nSurfDim=((dimGrid.colwise().replicate(3).array())+surfProp.array()).rowwise().prod();
+	nEdgeDim=((dimGrid.colwise().replicate(3).array())+edgeProp.array()).rowwise().prod();
 
-   nSurf=nSurfDim.sum();
-   nEdge=nEdgeDim.sum();
+	nSurf=nSurfDim.sum();
+	nEdge=nEdgeDim.sum();
 
-   blockGrid->Init(nVert,nEdge,nSurf,nVolu);
+	blockGrid->Init(nVert,nEdge,nSurf,nVolu);
 
-   #ifdef TEST_VOXEL
-   cout << "nVert: " << nVert << " nVolu: " << nVolu 
-      << " nEdge: " << nEdge << " nSurf: " << nSurf << endl; 
-   cout << "surfProp: " << endl << surfProp << endl;
-   cout << "edgeProp: " << endl << edgeProp << endl;
-   cout << "nSurfDim: " << endl << nSurfDim << endl;
-   cout << "nEdgeDim: " << endl << nEdgeDim << endl;
-   cout << endl;
-   
-   #endif //TEST_VOXEL
+#ifdef TEST_VOXEL
+	cout << "nVert: " << nVert << " nVolu: " << nVolu 
+	<< " nEdge: " << nEdge << " nSurf: " << nSurf << endl; 
+	cout << "surfProp: " << endl << surfProp << endl;
+	cout << "edgeProp: " << endl << edgeProp << endl;
+	cout << "nSurfDim: " << endl << nSurfDim << endl;
+	cout << "nEdgeDim: " << endl << nEdgeDim << endl;
+	cout << endl;
 
-   #ifdef TEST_EIGENEXT
-   cout << "cumprod(nSurfDim): " << endl << cumprod(nSurfDim,0) << endl;
-   cout << "nSurfDim: " << endl << nSurfDim << endl;
-   cout << "cumsum(nSurfDim): " << endl << cumsum(nSurfDim,0) << endl;
-   cout << "nSurfDim: " << endl << nSurfDim << endl;
-   cout << "cumsum(surfProp) : " << endl << cumsum(surfProp,0) << endl;
-   cout << "cumprod(edgeProp): " << endl << cumprod(edgeProp,0) << endl;
-   cout << "edgeProp: " << endl << edgeProp << endl;
-   cout << "cumsum(edgeProp')'' : " << endl << cumsum(edgeProp,1)<< endl;
-   cout << "edgeProp: " << endl << edgeProp << endl;
-   cout << "cumprod(edgeProp')': " << endl << cumprod(edgeProp,1) << endl;
-   cout << "edgeProp: " << endl << edgeProp << endl;
-   cout << endl << "------------------------" << endl << endl;
-   #endif // TEST_EIGENEXT
+#endif //TEST_VOXEL
 
-   BuildBlockVolu(dimGrid, nVolu, blockGrid, nSurfDim, surfProp);
-   BuildBlockSurf( dimGrid,  nSurf , blockGrid ,
-	 surfProp,  edgeProp,  nSurfDim,  nEdgeDim, nEdge);
-   BuildBlockEdge(dimGrid,  blockGrid,  nEdge , nEdgeDim,nSurfDim,
-     edgeProp, surfProp);
-   BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
+#ifdef TEST_EIGENEXT
+	cout << "cumprod(nSurfDim): " << endl << cumprod(nSurfDim,0) << endl;
+	cout << "nSurfDim: " << endl << nSurfDim << endl;
+	cout << "cumsum(nSurfDim): " << endl << cumsum(nSurfDim,0) << endl;
+	cout << "nSurfDim: " << endl << nSurfDim << endl;
+	cout << "cumsum(surfProp) : " << endl << cumsum(surfProp,0) << endl;
+	cout << "cumprod(edgeProp): " << endl << cumprod(edgeProp,0) << endl;
+	cout << "edgeProp: " << endl << edgeProp << endl;
+	cout << "cumsum(edgeProp')'' : " << endl << cumsum(edgeProp,1)<< endl;
+	cout << "edgeProp: " << endl << edgeProp << endl;
+	cout << "cumprod(edgeProp')': " << endl << cumprod(edgeProp,1) << endl;
+	cout << "edgeProp: " << endl << edgeProp << endl;
+	cout << endl << "------------------------" << endl << endl;
+#endif // TEST_EIGENEXT
 
-   blockGrid->HashArray();
-   return(0);
+	BuildBlockVolu(dimGrid, nVolu, blockGrid, nSurfDim, surfProp);
+	BuildBlockSurf( dimGrid,  nSurf , blockGrid ,
+		surfProp,  edgeProp,  nSurfDim,  nEdgeDim, nEdge);
+	BuildBlockEdge(dimGrid,  blockGrid,  nEdge , nEdgeDim,nSurfDim,
+		edgeProp, surfProp);
+	BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
+
+	blockGrid->HashArray();
+	return(0);
 }
 
 int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
@@ -123,7 +123,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 
 	}
 
-	#ifdef TEST_VOXEL_VOLU
+#ifdef TEST_VOXEL_VOLU
 	cout << "--------------------------------------------" << endl << "Test BuildBlockVolu" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -131,15 +131,14 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempSurfInd: " << endl << tempSurfInd << endl;
 	blockGrid->volus.disp();
-	#endif //TEST_VOXEL_VOLU
+#endif //TEST_VOXEL_VOLU
 
 	return(0);
-
 }
 
 int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim, RowVector3i nEdgeDim,
-	 int nEdge){
+	int nEdge){
 	/*Builds the surface information for the generation of block grids of size dimGrid*/
 
 	RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;
@@ -198,7 +197,7 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 		blockGrid->surfs.elems[ii].voluind[0]=boundaryFlag*((pos*cumProdDimGrid.transpose())+1);
 		boundaryFlag=!(((pos-surfProp.row(jPlane)).array()<0).any());
 		blockGrid->surfs.elems[ii].voluind[1]=boundaryFlag*
-			(((pos-surfProp.row(jPlane))*cumProdDimGrid.transpose())+1);
+		(((pos-surfProp.row(jPlane))*cumProdDimGrid.transpose())+1);
 
 		//define edgeind
 		maskVec=(ind.reverse().array()!=jPlane);
@@ -229,7 +228,7 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 		}
 	}
 
-	#ifdef TEST_VOXEL_SURF
+#ifdef TEST_VOXEL_SURF
 	cout << "--------------------------------------------" << endl << "Test BuildBlockSurf" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -239,14 +238,14 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempEdgeInd: " << endl << tempEdgeInd << endl;
 	blockGrid->surfs.disp();
-	#endif //TEST_VOXEL_SURF
+#endif //TEST_VOXEL_SURF
 
 
 	return(0);
 }
 
 int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i nEdgeDim,
-  RowVector3i nSurfDim, Matrix3i edgeProp,Matrix3i surfProp ){
+	RowVector3i nSurfDim, Matrix3i edgeProp,Matrix3i surfProp ){
 	/*Function to build the Edges of a simple cartesian block grid*/
 
 	RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;
@@ -334,11 +333,11 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 		surfLogTemp=pos.colwise().replicate(6)+mask;
 
 		surfIndTemp=(surfLogTemp.cwiseProduct(incPos.colwise().replicate(2)).rowwise().sum()
-				+incrSurf2).array()+1;
+			+incrSurf2).array()+1;
 
 		surfLog=!(((surfLogTemp.array()<0) || 
-				(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
-				|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
+			(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
+		|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
 		nSurfEdge=max(surfLog.cast<int>().sum(),2);
 		blockGrid->edges.elems[ii].surfind.reserve(nSurfEdge);
 		blockGrid->edges.elems[ii].surfind.assign(nSurfEdge,0);
@@ -352,7 +351,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 		//if (kk==1){blockGrid->edges.elems[ii].surfind[kk]=0;} // not needed as already initialised
 	}
 
-	#ifdef TEST_VOXEL_EDGE
+#ifdef TEST_VOXEL_EDGE
 	cout << "--------------------------------------------" << endl << "Test BuildBlockEdge" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -360,7 +359,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "vertIndTemp: " << endl << vertIndTemp << endl;
 	blockGrid->edges.disp();
-	#endif //TEST_VOXEL_EDGE
+#endif //TEST_VOXEL_EDGE
 
 	return(0);
 }
@@ -421,13 +420,13 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 
 	}
 
-	#ifdef TEST_VOXEL_VERT
+#ifdef TEST_VOXEL_VERT
 	cout << "--------------------------------------------" << endl << "Test BuildBlockVert" << endl;
 	cout << "matEdge: " << endl << matEdge << endl;
 	cout << "incPos: " << endl << incPos << endl;
 
 	blockGrid->verts.disp();
-	#endif
+#endif
 	return(0);
 }
 
@@ -437,26 +436,26 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 int Test_BuildBlockGrid_noout() { 
    // Test the functionality provided by arraystructures
 
-   int errFlag,errTest;
-   RowVector3i dimGrid(2,3,4);
-   mesh blockGrid;
+	int errFlag,errTest;
+	RowVector3i dimGrid(2,3,4);
+	mesh blockGrid;
 
-   errFlag=0;
+	errFlag=0;
 
-   cout << "--------------------------------------------" << endl;
-   cout << "      testing BuildBlockGrid" << endl;
-   cout << "--------------------------------------------" << endl;
-   errTest=BuildBlockGrid(dimGrid,&blockGrid);
-   errFlag= errFlag | (errTest!=0);
+	cout << "--------------------------------------------" << endl;
+	cout << "      testing BuildBlockGrid" << endl;
+	cout << "--------------------------------------------" << endl;
+	errTest=BuildBlockGrid(dimGrid,&blockGrid);
+	errFlag= errFlag | (errTest!=0);
 
-   return(errFlag);
+	return(errFlag);
 } 
 
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-    RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
-    mesh blockGrid;
+	RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
+	mesh blockGrid;
 	const char *fileToOpen;
 	tecplotfile outmesh1, outmesh3, outmesh2;
 

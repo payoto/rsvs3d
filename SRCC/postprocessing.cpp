@@ -70,15 +70,15 @@ int tecplotfile::SurfDataBlock(mesh *meshout,int nVert,int nSurf, int nVertDat, 
 	}
 	// Print Cell Data
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->fill);
+		this->Print("%.16lf ",meshout->surfs[ii]->fill);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->target);
+		this->Print("%.16lf ",meshout->surfs[ii]->target);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->error);
+		this->Print("%.16lf ",meshout->surfs[ii]->error);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	return(0);

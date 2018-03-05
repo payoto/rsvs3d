@@ -61,12 +61,62 @@ void vert::disp(){
    cout << endl;
 }
 
+void volu::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+   int i;
+   index+=nVolu;
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      surfind[i]=surfind[i]+nSurf;
+   }
+}
+void surf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+   int i;
+   index+=nSurf;
+   for (i=0; unsigned_int(i)<voluind.size();i++){
+      voluind[i]=voluind[i]=nVolu;
+   }
+
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      edgeind[i]=edgeind[i]+nEdge;
+   }
+}
+void edge::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+   int i;
+   index+=nEdge;
+   for (i=0; unsigned_int(i)<vertind.size();i++){
+      vertind[i]=vertind[i]+nVert;
+   }
+
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      surfind[i]=surfind[i]+nSurf;
+   }
+}
+void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+   int i;
+   index+=nVert;
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      edgeind[i]=edgeind[i]+nEdge;
+   }
+}
+
 void mesh::HashArray(){
    verts.HashArray();
    edges.HashArray();
    surfs.HashArray();
    volus.HashArray();
 }
+void mesh::SetMaxIndex(){
+   verts.SetMaxIndex();
+   edges.SetMaxIndex();
+   surfs.SetMaxIndex();
+   volus.SetMaxIndex();
+}
+void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu){
+   *nVert=verts.GetMaxIndex();
+   *nEdge=edges.GetMaxIndex();
+   *nSurf=surfs.GetMaxIndex();
+   *nVolu=volus.GetMaxIndex();
+}
+
 
 void mesh::Init(int nVe,int nE, int nS, int nVo){
 
@@ -74,9 +124,47 @@ void mesh::Init(int nVe,int nE, int nS, int nVo){
    edges.Init(nE);
    surfs.Init(nS);
    volus.Init(nVo);
-   
+   #ifdef TEST_ARRAYSTRUCTURES
    cout << "Mesh Correctly Assigned!" << endl;
+   #endif // TEST_ARRAYSTRUCTURES
 
+}
+
+void mesh::MakeCompatible_inplace(mesh *other){
+   // Makes other mesh compatible with this to be 
+   // merged without index crashes
+
+   int nVert,nEdge,nVolu,nSurf;
+
+   // Define Max indices in current mesh
+   this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
+   other->ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   
+}
+
+void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+   int ii;
+   // Volumes
+   for(ii=0;ii<volus.size();++ii){
+      volus.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   }
+   // Surfaces
+   for(ii=0;ii<surfs.size();++ii){
+      surfs.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   }
+   // Volumes
+   for(ii=0;ii<edges.size();++ii){
+      edges.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   }
+   // Surfaces
+   for(ii=0;ii<verts.size();++ii){
+      verts.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   }
+}
+
+mesh mesh::MakeCompatible(mesh other){
+   MakeCompatible_inplace(&other);
+   return(other);
 }
 // Test code
 int Test_ArrayStructures() { 
@@ -124,7 +212,7 @@ int Test_Volu(){
 
    try {
 
-      
+
       singleCell.surfind.push_back(3);
       singleCell.surfind.push_back(4);
 
@@ -158,8 +246,10 @@ int Test_Volu(){
 
       cout << "HashCellArrayStack" << endl;
       cellStack.HashArray();
-      
-
+      cellStack.SetMaxIndex();
+      cout << "Max Index in Array: " << cellStack.GetMaxIndex() <<  endl;
+      cellStack.Concatenate(&cellStack);
+      cellStack.disp();
 
    } catch (exception const& ex) { 
       cerr << "Exception: " << ex.what() <<endl; 

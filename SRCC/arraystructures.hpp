@@ -8,11 +8,11 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
-
 #define TEST_ARRAYSTRUCT
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
+#define TEST_RANGE
 #endif
 
 //=================================
@@ -54,52 +54,65 @@ typedef ArrayStruct<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
 // Templates
-template <class T> // Template for array of structures
+template <class T> 
 class ArrayStruct { 
-    public: 
-		vector<T> elems;    // vector of elements (structures) 
-		unordered_map<int,int> hashTable; // Hash Table of indexed elements
-		void HashArray();
-		void disp();
-		
+protected: 
+	int maxIndex;
+public: 
+	vector<T> elems;    // vector of elements (structures) 
+	unordered_map<int,int> hashTable; // Hash Table of indexed elements
+	void HashArray();
+	void disp();
+	void Concatenate(ArrayStruct<T> *other);
+	void SetMaxIndex();
+	inline int GetMaxIndex();
 
-		T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
-			#ifdef TEST_ARRAYSTRUCT // adds a check in debug mode
-				if ((unsigned_int(a)>=elems.size()) | (0>a)){
-					throw range_error ("Index is out of range");
-				}
-			#endif
-			return(&(elems[a]));
+	T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
+		#ifdef TEST_RANGE // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			throw range_error ("Index is out of range");
 		}
+		#endif
+		return(&(elems[a]));
+	}
 
-		void Init(int n){
-			T sT;
-			elems.reserve(n);
-			elems.assign(n,sT);
+	void Init(int n){
+		T sT;
+		elems.reserve(n);
+		elems.assign(n,sT);
+	}
+	int size(){
+		return(int(elems.size()));
+	}
+	int find(int key){
+		auto search=hashTable.find(key);
+		if (search==hashTable.end()){
+			return(-1);
 		}
-		int size(){
-			return(int(elems.size()));
-		}
-		int find(int key){
-			auto search=hashTable.find(key);
-			if (search==hashTable.end()){
-				return(-1);
-			}
-			return(search->second);
-		}
+		return(search->second);
+	}
 
 }; 
 
 // Base class
+
 class mesh {
+private:
+
 public:
 	vertarray verts;
 	edgearray edges;
 	surfarray surfs;
 	voluarray volus;
-
+// basic operations grouped from each field
 	void HashArray();
+	void SetMaxIndex();
+	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu);
 	void Init(int nVe,int nE, int nS, int nVo);
+// Mesh merging
+	void MakeCompatible_inplace(mesh *other);
+	mesh MakeCompatible(mesh other);
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 };
 
 
@@ -108,6 +121,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	int index;
 	virtual void disp() =0 ;
 	virtual int Key() =0 ;
+	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 
 };
 
@@ -118,6 +132,7 @@ public:
 	double fill,target,error;
 	vector<int> surfind;
 
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp();
 
 	volu(){ // Constructor
@@ -127,7 +142,7 @@ public:
 		error=1;
 
 		#ifdef TEST_ARRAYSTRUCT
-			cout << "volu #" << index << " Was created " << surfind.size() << endl;
+		cout << "volu #" << index << " Was created " << surfind.size() << endl;
 		#endif
 	}
 	volu(const volu& oldVolu){ // Copy-Constructor
@@ -136,16 +151,16 @@ public:
 		surfind=oldVolu.surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
-			cout << "copyvolu #" << index << " Was created " << surfind.size() << endl;
+		cout << "copyvolu #" << index << " Was created " << surfind.size() << endl;
 		#endif
 	}
 	~volu(){ // Destructor
 		surfind.clear();
 
 		#ifdef TEST_ARRAYSTRUCT
-			cout << "volu #" << index << " Was deleted " << surfind.size() << endl;
+		cout << "volu #" << index << " Was deleted " << surfind.size() << endl;
 		#endif
-	
+
 	}
 	void operator=( volu* other){
 		index=other->index;
@@ -155,7 +170,7 @@ public:
 		surfind=other->surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
-			cout << "OTHER: " ; other->disp();
+		cout << "OTHER: " ; other->disp();
 		#endif
 	}
 
@@ -173,6 +188,7 @@ public:
 	 // reserves 2 as this is the size of the array
 
 	void disp();
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 
 	surf(){ // Constructor
 		index=0;
@@ -186,7 +202,7 @@ public:
 
 		edgeind.clear();
 		voluind.clear();
-	
+
 	}
 	surf(const surf& oldSurf){ // Copy-Constructor
 		index=oldSurf.index;
@@ -218,6 +234,7 @@ public:
 	vector<int> surfind;
 	 // reserves 2 as this is the size of the array
 
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp();
 
 	edge(){ // Constructor
@@ -235,7 +252,7 @@ public:
 
 		vertind.clear();
 		surfind.clear();
-	
+
 	}
 	void operator=( edge* other){
 		index=other->index;
@@ -256,6 +273,7 @@ public:
 	 // reserves 2 as this is the size of the array
 
 	void disp();
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 
 	vert(){ // Constructor
 		index=0;
@@ -271,7 +289,7 @@ public:
 
 		edgeind.clear();
 		coord.clear();
-	
+
 	}
 	void operator=( vert* other){
 		index=other->index;
@@ -294,20 +312,43 @@ int Test_Edge();
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){
-   hashTable.reserve(elems.size());
-   for (int i = 0; i < int(elems.size()); ++i)
-   {
-      hashTable.emplace(elems[i].Key(),i);
-   }
+hashTable.reserve(elems.size());
+for (int i = 0; i < int(elems.size()); ++i)
+{
+	hashTable.emplace(elems[i].Key(),i);
+}
    //cout << "Array Struct Succesfully Hashed" << endl;
 }
 
 template<class T> void ArrayStruct <T>::disp(){
-   for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
-      cout << "Array " << ii << " " ;
-      elems[ii].disp();
-   }
+for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
+	cout << "Array " << ii << " " ;
+	elems[ii].disp();
+}
 }
 
+template<class T> void ArrayStruct <T>::Concatenate(ArrayStruct <T> *other){
+int nCurr,nNew,nTot,ii;
+nCurr=this->size();
+nNew=other->size();
+nTot=nCurr+nNew;
+elems.reserve(nTot);
+
+for (ii=0; ii<nNew;ii++){
+	elems.push_back(other->elems[ii]);
+}
+this->HashArray();
+}
+
+
+template<class T> void ArrayStruct <T>::SetMaxIndex(){
+int n=elems.size();
+maxIndex=-1;
+for(int ii=0;ii<n;++ii){
+	maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
+}
+}
+
+template<class T> inline int ArrayStruct <T>::GetMaxIndex(){return(maxIndex);}
 
 #endif // ARRAYSTRUCTS_H_INCLUDED
