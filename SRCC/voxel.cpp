@@ -10,20 +10,18 @@
 #include <iostream>
 #include <numeric>      // std::partial_sum
 #include <Eigen>
+#include <ctime>
 
 #include "arraystructures.hpp"
 #include "voxel.hpp"
 #include "postprocessing.hpp"
-#include <ctime>// include this header
 
 // Namespaces
 using namespace std;
 using namespace Eigen;
-// Implementation of features
 
 
-
-
+// Implementation of Cartesian Block grids
 int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 
    int nVolu, nVert, nSurf,nEdge;
@@ -133,7 +131,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempSurfInd: " << endl << tempSurfInd << endl;
 	blockGrid->volus.disp();
-	#endif //TEST_VOXEL
+	#endif //TEST_VOXEL_VOLU
 
 	return(0);
 
@@ -246,7 +244,6 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 
 	return(0);
 }
-
 
 int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i nEdgeDim,
   RowVector3i nSurfDim, Matrix3i edgeProp,Matrix3i surfProp ){
@@ -433,6 +430,8 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 	#endif
 	return(0);
 }
+
+// Implementation of Refinement of block grids
 
 // Test code
 int Test_BuildBlockGrid_noout() { 

@@ -47,7 +47,7 @@ class tecplotfile {
 		void CloseFile();
 		int PrintMesh(mesh *meshout);
 		int VolDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, int nCellDat);
-		int SurfDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, int nCellDat);
+		int SurfDataBlock(mesh *meshout,int nVert,int nSurf, int nVertDat, int nCellDat);
 		int VolFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu);
 		int SurfFaceMap(mesh *meshout,int nVert,int nEdge,int nSurf,int nVolu);
 		void ZoneHeaderPolyhedron(int nVert,int nEdge, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
