@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-
+#include <sstream>
 
 #include "arraystructures.hpp"
 
@@ -10,7 +10,7 @@
 
 
 // Class function definitions
-
+// Methods of meshpart : volu surf edge vert
 void volu::disp(){
    int i;
    cout << "volu : index " << index << " | fill " << fill << ", " << 
@@ -97,7 +97,7 @@ void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
       edgeind[i]=edgeind[i]+nEdge;
    }
 }
-
+// methods for mesh
 void mesh::HashArray(){
    verts.HashArray();
    edges.HashArray();
@@ -116,7 +116,12 @@ void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu){
    *nSurf=surfs.GetMaxIndex();
    *nVolu=volus.GetMaxIndex();
 }
-
+void mesh::disp(){
+   verts.disp();
+   edges.disp();
+   surfs.disp();
+   volus.disp();
+}
 
 void mesh::Init(int nVe,int nE, int nS, int nVo){
 
@@ -124,10 +129,10 @@ void mesh::Init(int nVe,int nE, int nS, int nVo){
    edges.Init(nE);
    surfs.Init(nS);
    volus.Init(nVo);
+
    #ifdef TEST_ARRAYSTRUCTURES
    cout << "Mesh Correctly Assigned!" << endl;
    #endif // TEST_ARRAYSTRUCTURES
-
 }
 
 void mesh::MakeCompatible_inplace(mesh *other){
@@ -139,7 +144,6 @@ void mesh::MakeCompatible_inplace(mesh *other){
    // Define Max indices in current mesh
    this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
    other->ChangeIndices(nVert,nEdge,nVolu,nSurf);
-   
 }
 
 void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
@@ -166,6 +170,15 @@ mesh mesh::MakeCompatible(mesh other){
    MakeCompatible_inplace(&other);
    return(other);
 }
+
+void PopulateIndices(mesh *meshin){
+   
+   meshin->volus.PopulateIndices();
+   meshin->edges.PopulateIndices();
+   meshin->verts.PopulateIndices();
+   meshin->surfs.PopulateIndices();
+}
+
 // Test code
 int Test_ArrayStructures() { 
    // Test the functionality provided by arraystructures
@@ -198,6 +211,13 @@ int Test_ArrayStructures() {
    cout << "--------------------------------------------" << endl;
    errTest=Test_Edge();
    errFlag= errFlag | (errTest!=0);
+
+   cout << "--------------------------------------------" << endl;
+   cout << "      testing Mesh" << endl;
+   cout << "--------------------------------------------" << endl;
+   errTest=Test_Mesh();
+   errFlag= errFlag | (errTest!=0);
+
 
    errFlag= errFlag | (errTest!=0);
 
@@ -248,6 +268,7 @@ int Test_Volu(){
       cellStack.HashArray();
       cellStack.SetMaxIndex();
       cout << "Max Index in Array: " << cellStack.GetMaxIndex() <<  endl;
+      
       cellStack.Concatenate(&cellStack);
       cellStack.disp();
 
@@ -428,6 +449,61 @@ int Test_Vert(){
    } 
    return(0);
 
+}
+
+bool CompareMesh(mesh *mesh1,mesh *mesh2){
+   bool compFlag;
+   stringstream ss1,ss2;
+   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+
+   mesh1->disp();
+   cout.rdbuf(ss2.rdbuf()); 
+   mesh2->disp();
+   std::cout.rdbuf(old_buf);
+
+   compFlag=ss1.str().compare(ss2.str())==0;
+   return(compFlag);
+}
+
+int Test_Mesh(){
+   mesh mesh1,mesh2,mesh3;
+   int errFlag=0;
+
+   try {
+
+      mesh1.Init(8,12,6,1);
+      mesh2.Init(14,20,11,2);
+
+      PopulateIndices(&mesh1);
+      PopulateIndices(&mesh2);
+
+      cout << "mesh1 " << endl;
+      mesh1.disp() ;
+
+      mesh3=mesh1.MakeCompatible(mesh2);
+      cout << "Compatible mesh #3  generated displaying ";
+      cout << "mesh2 " << endl;
+
+      mesh2.disp() ;
+
+      mesh1.MakeCompatible_inplace(&mesh2);
+      cout << "mesh2 made compatible inplace: ";
+      cout << "mesh2 " << endl;
+      mesh2.disp() ;
+      cout << "mesh3 " << endl;
+      mesh3.disp() ;
+      
+      cout << "Result of Comparison 2&3: " << CompareMesh(&mesh2,&mesh3) << endl;
+      cout << "Result of Comparison 1&2: " << CompareMesh(&mesh1,&mesh2) << endl; 
+
+
+
+
+   } catch (exception const& ex) { 
+      cerr << "Exception: " << ex.what() <<endl; 
+      errFlag= -1;
+   } 
+   return(errFlag);
 }
 
 

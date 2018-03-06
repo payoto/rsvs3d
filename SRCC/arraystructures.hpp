@@ -65,6 +65,7 @@ public:
 	void disp();
 	void Concatenate(ArrayStruct<T> *other);
 	void SetMaxIndex();
+	void PopulateIndices();
 	inline int GetMaxIndex();
 
 	T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
@@ -109,6 +110,7 @@ public:
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu);
 	void Init(int nVe,int nE, int nS, int nVo);
+	void disp();
 // Mesh merging
 	void MakeCompatible_inplace(mesh *other);
 	mesh MakeCompatible(mesh other);
@@ -148,6 +150,8 @@ public:
 	volu(const volu& oldVolu){ // Copy-Constructor
 		index=oldVolu.index;
 		fill=oldVolu.fill;
+		target=oldVolu.target;
+		error=oldVolu.error;
 		surfind=oldVolu.surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
@@ -309,6 +313,9 @@ int Test_Volu();
 int Test_Surf();
 int Test_Vert();
 int Test_Edge();
+int Test_Mesh();
+void PopulateIndices(mesh *meshin);
+bool CompareMesh();
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){
@@ -349,6 +356,16 @@ for(int ii=0;ii<n;++ii){
 }
 }
 
-template<class T> inline int ArrayStruct <T>::GetMaxIndex(){return(maxIndex);}
+template<class T> inline int ArrayStruct <T>::GetMaxIndex(){
+return(maxIndex);
+}
 
+template<class T> void ArrayStruct <T>::PopulateIndices(){
+int n=elems.size();
+maxIndex=-1;
+for(int ii=0;ii<n;++ii){
+	elems[ii].index=ii+1;
+}
+maxIndex=n;
+}
 #endif // ARRAYSTRUCTS_H_INCLUDED
