@@ -7,6 +7,20 @@
 // Implementation of features
 
 
+template <class T> bool CompareDisp(T *mesh1,T *mesh2){
+   bool compFlag;
+   stringstream ss1,ss2;
+   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+
+   mesh1->disp();
+   cout.rdbuf(ss2.rdbuf()); 
+   mesh2->disp();
+   std::cout.rdbuf(old_buf);
+
+   compFlag=ss1.str().compare(ss2.str())==0;
+   return(compFlag);
+}
+
 
 
 // Class function definitions
@@ -451,20 +465,6 @@ int Test_Vert(){
 
 }
 
-bool CompareMesh(mesh *mesh1,mesh *mesh2){
-   bool compFlag;
-   stringstream ss1,ss2;
-   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
-
-   mesh1->disp();
-   cout.rdbuf(ss2.rdbuf()); 
-   mesh2->disp();
-   std::cout.rdbuf(old_buf);
-
-   compFlag=ss1.str().compare(ss2.str())==0;
-   return(compFlag);
-}
-
 int Test_Mesh(){
    mesh mesh1,mesh2,mesh3;
    int errFlag=0;
@@ -493,8 +493,8 @@ int Test_Mesh(){
       cout << "mesh3 " << endl;
       mesh3.disp() ;
       
-      cout << "Result of Comparison 2&3: " << CompareMesh(&mesh2,&mesh3) << endl;
-      cout << "Result of Comparison 1&2: " << CompareMesh(&mesh1,&mesh2) << endl; 
+      cout << "Result of Comparison 2&3: " << CompareDisp(&mesh2,&mesh3) << endl;
+      cout << "Result of Comparison 1&2: " << CompareDisp(&mesh1,&mesh2) << endl; 
 
 
 

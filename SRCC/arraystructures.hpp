@@ -315,7 +315,7 @@ int Test_Vert();
 int Test_Edge();
 int Test_Mesh();
 void PopulateIndices(mesh *meshin);
-bool CompareMesh();
+template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){
