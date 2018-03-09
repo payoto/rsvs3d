@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <functional>
 
 #include "arraystructures.hpp"
 
@@ -15,6 +16,21 @@ template <class T> bool CompareDisp(T *mesh1,T *mesh2){
    mesh1->disp();
    cout.rdbuf(ss2.rdbuf()); 
    mesh2->disp();
+   std::cout.rdbuf(old_buf);
+
+   compFlag=ss1.str().compare(ss2.str())==0;
+   return(compFlag);
+}
+
+
+bool CompareFuncOut(function<void()> func1, function<void()> func2){
+   bool compFlag;
+   stringstream ss1,ss2;
+   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+
+   func1();
+   cout.rdbuf(ss2.rdbuf()); 
+   func2();
    std::cout.rdbuf(old_buf);
 
    compFlag=ss1.str().compare(ss2.str())==0;
@@ -183,6 +199,14 @@ void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 mesh mesh::MakeCompatible(mesh other){
    MakeCompatible_inplace(&other);
    return(other);
+}
+
+void mesh::Concatenate(mesh *other){
+
+   this->volus.Concatenate(&other->volus);
+   this->edges.Concatenate(&other->edges);
+   this->verts.Concatenate(&other->verts);
+   this->surfs.Concatenate(&other->surfs);
 }
 
 void PopulateIndices(mesh *meshin){
@@ -468,6 +492,7 @@ int Test_Vert(){
 int Test_Mesh(){
    mesh mesh1,mesh2,mesh3;
    int errFlag=0;
+   bool test1;
 
    try {
 
@@ -476,27 +501,37 @@ int Test_Mesh(){
 
       PopulateIndices(&mesh1);
       PopulateIndices(&mesh2);
-
+      mesh3=mesh1.MakeCompatible(mesh2);
+#ifdef TEST_ARRAYSTRUCT_MESH
       cout << "mesh1 " << endl;
       mesh1.disp() ;
-
-      mesh3=mesh1.MakeCompatible(mesh2);
       cout << "Compatible mesh #3  generated displaying ";
       cout << "mesh2 " << endl;
-
       mesh2.disp() ;
+#endif
 
       mesh1.MakeCompatible_inplace(&mesh2);
+
+#ifdef TEST_ARRAYSTRUCT_MESH
       cout << "mesh2 made compatible inplace: ";
       cout << "mesh2 " << endl;
-      mesh2.disp() ;
-      cout << "mesh3 " << endl;
-      mesh3.disp() ;
       
-      cout << "Result of Comparison 2&3: " << CompareDisp(&mesh2,&mesh3) << endl;
-      cout << "Result of Comparison 1&2: " << CompareDisp(&mesh1,&mesh2) << endl; 
+      cout << "mesh3 " << endl;
+      mesh2.disp() ;
+      mesh3.disp() ;
+#endif
+      test1=CompareDisp(&mesh2,&mesh3);
+      errFlag=errFlag || (!test1);
+      cout << "Result of Comparison 2&3: " << test1 << endl;
+      test1=CompareDisp(&mesh1,&mesh2);
+      cout << "Result of Comparison 1&2: " << test1 << endl; 
+      errFlag=errFlag || (test1);
 
+      cout << "Result of Comparison Test_Volu&Test_Volu: " << CompareFuncOut(Test_Volu,Test_Volu) << endl;
 
+      cout << "Concatenate mesh 1 and 2" << endl;
+      mesh1.Concatenate(&mesh2);
+      mesh1.disp();
 
 
    } catch (exception const& ex) { 

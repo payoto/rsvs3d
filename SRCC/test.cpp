@@ -1,11 +1,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <functional>
 
+#include "test.hpp"
 #include "arraystructures.hpp"
 #include "voxel.hpp"
 #include "postprocessing.hpp"
-#include "test.hpp"
 
 int main(){
 	customtest gridTest;

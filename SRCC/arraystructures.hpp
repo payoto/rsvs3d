@@ -9,6 +9,7 @@
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
 #define TEST_ARRAYSTRUCT
+#define 
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
@@ -29,6 +30,7 @@
 #include <string>
 #include <stdexcept>
 #include <unordered_map>
+#include <functional>
 
 //==================================
 // Code
@@ -111,6 +113,7 @@ public:
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu);
 	void Init(int nVe,int nE, int nS, int nVo);
 	void disp();
+	void Concatenate(mesh *other);
 // Mesh merging
 	void MakeCompatible_inplace(mesh *other);
 	mesh MakeCompatible(mesh other);
@@ -122,7 +125,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	public : 
 	int index;
 	virtual void disp() =0 ;
-	virtual int Key() =0 ;
+	virtual int Key() =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 
 };
@@ -315,7 +318,8 @@ int Test_Vert();
 int Test_Edge();
 int Test_Mesh();
 void PopulateIndices(mesh *meshin);
-template <class T> bool CompareDisp(T *mesh1,T *mesh2);
+//template <class T> bool CompareDisp(T *mesh1,T *mesh2);
+//bool CompareFuncOut(function<void()> mesh1, function<void()> mesh2);
 
 // member function definition template <class T> : "ArrayStruct"
 template<class T> void ArrayStruct <T>::HashArray(){

@@ -24,6 +24,7 @@
 //=================================
 // included dependencies
 #include <iostream>
+#include <stdarg.h>
 
 //==================================
 // Code
