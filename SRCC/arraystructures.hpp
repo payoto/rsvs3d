@@ -28,6 +28,7 @@
 #include <vector>
 #include <cstdlib>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
@@ -64,11 +65,14 @@ public:
 	vector<T> elems;    // vector of elements (structures) 
 	unordered_map<int,int> hashTable; // Hash Table of indexed elements
 	void HashArray();
-	void disp();
-	void Concatenate(ArrayStruct<T> *other);
+	void disp() const;
+	int size() const;
+	void Concatenate(const ArrayStruct<T> &other);
 	void SetMaxIndex();
 	void PopulateIndices();
-	inline int GetMaxIndex();
+	inline int GetMaxIndex() const;
+	inline void Init(int n);
+	inline int find(int key) const ;
 
 	T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
 		#ifdef TEST_RANGE // adds a check in debug mode
@@ -79,21 +83,6 @@ public:
 		return(&(elems[a]));
 	}
 
-	void Init(int n){
-		T sT;
-		elems.reserve(n);
-		elems.assign(n,sT);
-	}
-	int size(){
-		return(int(elems.size()));
-	}
-	int find(int key){
-		auto search=hashTable.find(key);
-		if (search==hashTable.end()){
-			return(-1);
-		}
-		return(search->second);
-	}
 
 }; 
 
@@ -110,13 +99,13 @@ public:
 // basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();
-	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu);
+	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
-	void disp();
-	void Concatenate(mesh *other);
+	void disp() const;
+	void Concatenate(const mesh &other);
 // Mesh merging
-	void MakeCompatible_inplace(mesh *other);
-	mesh MakeCompatible(mesh other);
+	void MakeCompatible_inplace(mesh *other) const;
+	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 };
 
@@ -124,8 +113,8 @@ public:
 class meshpart{ // Abstract class to ensure interface is correct
 	public : 
 	int index;
-	virtual void disp() =0 ;
-	virtual int Key() =0 ; 
+	virtual void disp() const =0 ;
+	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 
 };
@@ -138,7 +127,7 @@ public:
 	vector<int> surfind;
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void disp();
+	void disp() const;
 
 	volu(){ // Constructor
 		index=0;
@@ -181,7 +170,7 @@ public:
 		#endif
 	}
 
-	int Key() {return(index);}
+	int Key() const {return(index);}
 };
 
 
@@ -194,7 +183,7 @@ public:
 	vector<int> voluind;
 	 // reserves 2 as this is the size of the array
 
-	void disp();
+	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 
 	surf(){ // Constructor
@@ -228,7 +217,7 @@ public:
 		voluind=other->voluind;
 	}
 
-	int Key() {return(index);}
+	int Key() const {return(index);}
 
 };
 
@@ -242,7 +231,7 @@ public:
 	 // reserves 2 as this is the size of the array
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void disp();
+	void disp() const;
 
 	edge(){ // Constructor
 		index=0;
@@ -268,7 +257,7 @@ public:
 		surfind=other->surfind;
 	}
 
-	int Key() {return(index);}
+	int Key() const {return(index);}
 };
 
 class vert: public meshpart {
@@ -279,7 +268,7 @@ public:
 	vector<double> coord;
 	 // reserves 2 as this is the size of the array
 
-	void disp();
+	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 
 	vert(){ // Constructor
@@ -305,11 +294,12 @@ public:
 		coord=other->coord;
 	}
 
-	int Key() {return(index);}
+	int Key() const {return(index);}
 };
 
 // functions
-
+template <class T> bool CompareDisp(T *mesh1,T *mesh2);
+bool CompareFuncOut(function<void()> func1, function<void()> func2);
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();
@@ -321,55 +311,6 @@ void PopulateIndices(mesh *meshin);
 //template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 //bool CompareFuncOut(function<void()> mesh1, function<void()> mesh2);
 
-// member function definition template <class T> : "ArrayStruct"
-template<class T> void ArrayStruct <T>::HashArray(){
-hashTable.reserve(elems.size());
-for (int i = 0; i < int(elems.size()); ++i)
-{
-	hashTable.emplace(elems[i].Key(),i);
-}
-   //cout << "Array Struct Succesfully Hashed" << endl;
-}
+#include "arraystructures_incl.cpp"
 
-template<class T> void ArrayStruct <T>::disp(){
-for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
-	cout << "Array " << ii << " " ;
-	elems[ii].disp();
-}
-}
-
-template<class T> void ArrayStruct <T>::Concatenate(ArrayStruct <T> *other){
-int nCurr,nNew,nTot,ii;
-nCurr=this->size();
-nNew=other->size();
-nTot=nCurr+nNew;
-elems.reserve(nTot);
-
-for (ii=0; ii<nNew;ii++){
-	elems.push_back(other->elems[ii]);
-}
-this->HashArray();
-}
-
-
-template<class T> void ArrayStruct <T>::SetMaxIndex(){
-int n=elems.size();
-maxIndex=-1;
-for(int ii=0;ii<n;++ii){
-	maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
-}
-}
-
-template<class T> inline int ArrayStruct <T>::GetMaxIndex(){
-return(maxIndex);
-}
-
-template<class T> void ArrayStruct <T>::PopulateIndices(){
-int n=elems.size();
-maxIndex=-1;
-for(int ii=0;ii<n;++ii){
-	elems[ii].index=ii+1;
-}
-maxIndex=n;
-}
 #endif // ARRAYSTRUCTS_H_INCLUDED
