@@ -2,6 +2,7 @@
 
 *NOGIT*
 *TESTOUT*
+.gitattributes
 
 # ignore matlab executables
 *.mexw64
@@ -14,6 +15,9 @@
 *.s
 *.o
 
+SRCC/gch/*
+
 # Sublime text 
 *.sublime-workspace
+*.sublime-syntax
 
