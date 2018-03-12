@@ -10,7 +10,7 @@ INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
 
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
-TESTSOURCES=test.cpp arraystructures.cpp arraystructures_test.cpp voxel.cpp postprocessing.cpp
+TESTSOURCES=test.cpp arraystructures.cpp arraystructures_test.cpp snakstruct.cpp voxel.cpp postprocessing.cpp
 TESTEXECUTABLE=main_test
 
 OBJECTS=$(SOURCES:.cpp=.o)

@@ -12,7 +12,7 @@ contexts: !merge
       scope: variable.language.c++
     - match: \b(mesh|meshpart|volu|surf|edge|vert|voluarray|surfarray|edgearray|vertarray)\b
       scope: variable.language.c++
-    - match: \b(snax|snake|snaxarray)\b
+    - match: \b(snax|snake|snaxarray|snaxedge|snaxsurf|snaxedgearray|snaxsurfarray|coordvec)\b
       scope: variable.language.c++
 
   types: !prepend
