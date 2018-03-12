@@ -126,6 +126,7 @@ int Test_coordvec(){
 		cout << "base vector: ";
 		testCoord.disp();
 
+
 		unitCoord=testCoord.Unit();
 		cout << "unit vector: ";
 		unitCoord.disp();

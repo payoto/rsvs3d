@@ -100,11 +100,11 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	incPos << Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
-	//cout << "Size of volus: " << blockGrid->volus.elems.capacity() << endl;
+	//cout << "Size of volus: " << blockGrid->volus.capacity() << endl;
 
 	for (int ii=0;ii<nVolu;++ii){
-		blockGrid->volus.elems[ii].index=ii+1;
-		blockGrid->volus.elems[ii].fill=double(rand()%1000+1)/1000.0;
+		blockGrid->volus[ii].index=ii+1;
+		blockGrid->volus[ii].fill=double(rand()%1000+1)/1000.0;
 
 		pos(0)=ii%(dimGrid(0));
 		pos(1)=int(floor(float(ii)/float(dimGrid(0))))%(dimGrid(1));
@@ -115,9 +115,9 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 		tempSurfInd=(tempSurfInd+incrSurf2).array()+1;
 
 
-		blockGrid->volus.elems[ii].surfind.assign(tempSurfInd.size(),0);
+		blockGrid->volus[ii].surfind.assign(tempSurfInd.size(),0);
 		for (jj=0;jj<tempSurfInd.size();jj++){
-			blockGrid->volus.elems[ii].surfind[jj]=tempSurfInd(jj);
+			blockGrid->volus[ii].surfind[jj]=tempSurfInd(jj);
 
 		}
 
@@ -176,8 +176,8 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 	// Assign content to Array
 	for (int ii=0;ii<nSurf;++ii){
 
-		blockGrid->surfs.elems[ii].index=ii+1;
-		blockGrid->surfs.elems[ii].fill=isFill*double(rand()%1000+1)/1000.0;
+		blockGrid->surfs[ii].index=ii+1;
+		blockGrid->surfs[ii].fill=isFill*double(rand()%1000+1)/1000.0;
 
 		/*jPlane=0;
 		for (jj=0;jj<3;++jj){
@@ -194,9 +194,9 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 
 		// define voluind
 		boundaryFlag=!((pos.array()>=dimGrid.array()).any());
-		blockGrid->surfs.elems[ii].voluind[0]=boundaryFlag*((pos*cumProdDimGrid.transpose())+1);
+		blockGrid->surfs[ii].voluind[0]=boundaryFlag*((pos*cumProdDimGrid.transpose())+1);
 		boundaryFlag=!(((pos-surfProp.row(jPlane)).array()<0).any());
-		blockGrid->surfs.elems[ii].voluind[1]=boundaryFlag*
+		blockGrid->surfs[ii].voluind[1]=boundaryFlag*
 		(((pos-surfProp.row(jPlane))*cumProdDimGrid.transpose())+1);
 
 		//define edgeind
@@ -221,10 +221,10 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 			.rowwise().sum()+incrEdge2).array()+1;
 		
 
-		blockGrid->surfs.elems[ii].edgeind.reserve(tempEdgeInd.size());
-		blockGrid->surfs.elems[ii].edgeind.assign(tempEdgeInd.size(),0);
+		blockGrid->surfs[ii].edgeind.reserve(tempEdgeInd.size());
+		blockGrid->surfs[ii].edgeind.assign(tempEdgeInd.size(),0);
 		for (jj=0;jj<tempEdgeInd.size();jj++){
-			blockGrid->surfs.elems[ii].edgeind[jj]=tempEdgeInd[jj];
+			blockGrid->surfs[ii].edgeind[jj]=tempEdgeInd[jj];
 		}
 	}
 
@@ -290,7 +290,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	
 	for (int ii=0; ii<nEdge; ii++){
 
-		blockGrid->edges.elems[ii].index=ii+1;
+		blockGrid->edges[ii].index=ii+1;
 		jPlane=(incrEdge.array()<=ii).cast<int>().sum()-1;
 		dimGridCur=matEdge.row(jPlane);
 
@@ -304,10 +304,10 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 		posMatTemp.row(1)=(pos.array()+1)-edgeProp.row(jPlane).array();
 		vertIndTemp=(posMatTemp*cumProdDimGrid.transpose()).array()+1;
 
-		blockGrid->edges.elems[ii].vertind.reserve(vertIndTemp.size());
-		blockGrid->edges.elems[ii].vertind.assign(vertIndTemp.size(),0);
+		blockGrid->edges[ii].vertind.reserve(vertIndTemp.size());
+		blockGrid->edges[ii].vertind.assign(vertIndTemp.size(),0);
 		for (jj=0;jj<vertIndTemp.size();jj++){
-			blockGrid->edges.elems[ii].vertind[jj]=vertIndTemp[jj];
+			blockGrid->edges[ii].vertind[jj]=vertIndTemp[jj];
 		}
 
 		// Assign surfind values
@@ -339,16 +339,16 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 			(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
 		|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
 		nSurfEdge=max(surfLog.cast<int>().sum(),2);
-		blockGrid->edges.elems[ii].surfind.reserve(nSurfEdge);
-		blockGrid->edges.elems[ii].surfind.assign(nSurfEdge,0);
+		blockGrid->edges[ii].surfind.reserve(nSurfEdge);
+		blockGrid->edges[ii].surfind.assign(nSurfEdge,0);
 		kk=0;
 		for (jj=0;jj<surfLog.size();jj++){
 			if (surfLog(jj)){
-				blockGrid->edges.elems[ii].surfind[kk]=surfIndTemp[jj];
+				blockGrid->edges[ii].surfind[kk]=surfIndTemp[jj];
 				kk++;
 			}
 		}
-		//if (kk==1){blockGrid->edges.elems[ii].surfind[kk]=0;} // not needed as already initialised
+		//if (kk==1){blockGrid->edges[ii].surfind[kk]=0;} // not needed as already initialised
 	}
 
 #ifdef TEST_VOXEL_EDGE
@@ -390,7 +390,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 
 
 	for(ii=0;ii<nVert;ii++){
-		blockGrid->verts.elems[ii].index=ii+1;
+		blockGrid->verts[ii].index=ii+1;
 
 		pos(0)=ii%(dimGridVert[0]);
 		pos(1)=int(floor(float(ii)/float(dimGridVert[0])))%(dimGridVert[1]);
@@ -398,7 +398,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 
 		coordTemp=pos.cast<double>().array()/dimGridAct.cast<double>().array();
 		for (jj=0;jj<3;jj++){
-			blockGrid->verts.elems[ii].coord[jj]=coordTemp[jj];
+			blockGrid->verts[ii].coord[jj]=coordTemp[jj];
 		}
 
 		edgeLogTemp << pos.colwise().replicate(3), (pos.colwise().replicate(3)-edgeProp);
@@ -408,12 +408,12 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 		edgeLog=!(((edgeLogTemp.array()<0) 
 			|| (edgeLogTemp.array()>(matEdge.colwise().replicate(2).array()-1))).rowwise().any());
 
-		blockGrid->verts.elems[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
+		blockGrid->verts[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
 		kk=0;
 
 		for (jj=0;jj<6;jj++){
 			if(edgeLog[jj]){
-				blockGrid->verts.elems[ii].edgeind[kk]=edgeIndTemp[jj];
+				blockGrid->verts[ii].edgeind[kk]=edgeIndTemp[jj];
 				++kk;
 			}
 		}
@@ -480,7 +480,7 @@ int Test_MeshOut(){
 	errFlag= errFlag | (errTest!=0);
 	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
 	start_s=clock();
-	errTest=BuildBlockGrid(dimGrid3,&blockGrid);
+	//errTest=BuildBlockGrid(dimGrid3,&blockGrid);
 	// the code you wish to time goes here
 	stop_s=clock();
 	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;

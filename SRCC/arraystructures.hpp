@@ -8,12 +8,13 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
-#define TEST_ARRAYSTRUCT
 
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
 #define TEST_RANGE
+#define SAFE_ACCESS
+#define TEST_ARRAYSTRUCT
 #endif
 
 //=================================
@@ -61,28 +62,45 @@ template <class T>
 class ArrayStruct { 
 protected: 
 	int maxIndex;
-public: 
+	int isHash=0;
+	int isSetMI=0;
 	vector<T> elems;    // vector of elements (structures) 
+public: 
 	unordered_map<int,int> hashTable; // Hash Table of indexed elements
 	void HashArray();
 	void disp() const;
-	int size() const;
 	void Concatenate(const ArrayStruct<T> &other);
 	void SetMaxIndex();
 	void PopulateIndices();
+	void ReadyForUse();
 	inline int GetMaxIndex() const;
 	inline void Init(int n);
 	inline int find(int key) const ;
-
-	T* operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
-		#ifdef TEST_RANGE // adds a check in debug mode
+	// methods needed from vector
+	inline int size() const;
+	inline int capacity() const;
+	inline void assign(int n, T& newelem);
+	inline void push_back(T& newelem);
+	inline void reserve(int n);
+	// Operators
+	T& operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			throw range_error ("Index is out of range");
 		}
-		#endif
+		#endif //SAFE_ACCESS
+		isHash=0;
+		isSetMI=0;
+		return((elems[a]));
+	}
+	T* operator()(const int& a){ // [] Operator returns a pointer to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			throw range_error ("Index is out of range");
+		}
+		#endif //SAFE_ACCESS
 		return(&(elems[a]));
 	}
-
 
 }; 
 
@@ -101,6 +119,7 @@ public:
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
+	void ReadyForUse();
 	void disp() const;
 	void Concatenate(const mesh &other);
 // Mesh merging
@@ -116,6 +135,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual void disp() const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
+	//virtual operator=( meshpart* other)=0 ;
 
 };
 

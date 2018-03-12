@@ -13,7 +13,7 @@ int main(){
 	customtest gridTest;
 
 	gridTest.Run(Test_ArrayStructures,"arraystructures");
-
+	
 	gridTest.Run(Test_BuildBlockGrid_noout,"Voxel");
 
 	gridTest.Run(Test_tecplotfile,"post-processing");
@@ -21,7 +21,7 @@ int main(){
 	gridTest.Run(Test_tecplotfile,"post-processing class");
 
 	gridTest.Run(Test_MeshOut,"Mesh output");
-
+	
 	gridTest.Run(Test_SnakeStructures,"Snake containers");
 
 	gridTest.PrintSummary();

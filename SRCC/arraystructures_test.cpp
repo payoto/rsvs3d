@@ -41,8 +41,9 @@ int Test_ArrayStructures() {
    cout << "--------------------------------------------" << endl;
    cout << "      testing Mesh" << endl;
    cout << "--------------------------------------------" << endl;
-   errTest=Test_Mesh();
+   //errTest=Test_Mesh();
    errFlag= errFlag | (errTest!=0);
+
 
 
    errFlag= errFlag | (errTest!=0);
@@ -55,6 +56,7 @@ int Test_Volu(){
 
    voluarray cellStack;  // stack of ints 
    volu singleCell;
+   volu *cellPtr;
 
    try {
 
@@ -63,32 +65,38 @@ int Test_Volu(){
       singleCell.surfind.push_back(4);
 
       cout << "assign 3 in cellStack" << endl;
-      cellStack.elems.assign(3,singleCell); 
+      cellStack.assign(3,singleCell); 
       
       singleCell.index=1;
       cout << "push_back in cellStack" << endl;
-      cellStack.elems.push_back(singleCell); 
+      cellStack.push_back(singleCell); 
 
       // manipulate int stack 
 
       cout << "Calls to display" << endl;
       cout << "Display each volu in stack" << endl;
 
+
       for ( i = 0; i < 4; ++i)
       {
-         cellStack.elems[i].index=i;
-         cellStack.elems[i].surfind[0]=i;
-         cellStack[i]->disp() ;
+         cellStack[i].index=i;
+         cellStack[i].surfind[0]=i;
+         cellStack[i].disp() ;
       }
 
       cout << "Assign last volu to first volu" << endl;
-      cellStack.elems[0]=cellStack.elems[i-1]; 
-
+      cellStack[0]=cellStack[i-1]; 
+      cellStack.disp();
+      cellStack[0]=cellStack(i-2); 
+      cellPtr=cellStack(i-2);
+      cellStack.disp();
+      cout << "output cellptr" << endl;
+      cellPtr->disp();
       cout << "Display each volu in stack" << endl;
       
-      cellStack.disp();
       
-      cout << cellStack.elems.capacity() << endl;
+      
+      cout << cellStack.capacity() << endl;
 
       cout << "HashCellArrayStack" << endl;
       cellStack.HashArray();
@@ -124,11 +132,11 @@ int Test_Surf(){
       
 
       cout << "assign 3 in cellStack" << endl;
-      cellStack.elems.assign(3,singleCell); 
+      cellStack.assign(3,singleCell); 
       
       singleCell.index=1;
       cout << "push_back in cellStack" << endl;
-      cellStack.elems.push_back(singleCell); 
+      cellStack.push_back(singleCell); 
 
       // manipulate int stack 
 
@@ -137,13 +145,13 @@ int Test_Surf(){
 
       for ( i = 0; i < 4; ++i)
       {
-         cellStack.elems[i].index=i;
-         cellStack.elems[i].edgeind[0]=i;
-         cellStack[i]->disp() ;
+         cellStack[i].index=i;
+         cellStack[i].edgeind[0]=i;
+         cellStack[i].disp() ;
       }
 
       cout << "Assign last volu to first volu" << endl;
-      cellStack.elems[0]=cellStack[i-1]; 
+      cellStack[0]=cellStack[i-1]; 
 
       cout << "Display each volu in stack" << endl;
       
@@ -181,11 +189,11 @@ int Test_Edge(){
       
 
       cout << "assign 3 in cellStack" << endl;
-      cellStack.elems.assign(3,singleCell); 
+      cellStack.assign(3,singleCell); 
       
       singleCell.index=1;
       cout << "push_back in cellStack" << endl;
-      cellStack.elems.push_back(singleCell); 
+      cellStack.push_back(singleCell); 
 
       // manipulate int stack 
 
@@ -194,13 +202,13 @@ int Test_Edge(){
 
       for ( i = 0; i < 4; ++i)
       {
-         cellStack.elems[i].index=i;
-         cellStack.elems[i].surfind[0]=i;
-         cellStack[i]->disp() ;
+         cellStack[i].index=i;
+         cellStack[i].surfind[0]=i;
+         cellStack[i].disp() ;
       }
 
       cout << "Assign last volu to first volu" << endl;
-      cellStack.elems[0]=cellStack[i-1]; 
+      cellStack[0]=cellStack[i-1]; 
 
       cout << "Display each volu in stack" << endl;
       
@@ -238,10 +246,10 @@ int Test_Vert(){
       
 
       cout << "assign 3 in cellStack" << endl;
-      cellStack.elems.assign(3,singleCell); 
+      cellStack.assign(3,singleCell); 
       singleCell.index=1;
       cout << "push_back in cellStack" << endl;
-      cellStack.elems.push_back(singleCell); 
+      cellStack.push_back(singleCell); 
 
       // manipulate int stack 
 
@@ -250,13 +258,13 @@ int Test_Vert(){
 
       for ( i = 0; i < 4; ++i)
       {
-         cellStack.elems[i].index=i;
-         cellStack.elems[i].edgeind[0]=i;
-         cellStack[i]->disp() ;
+         cellStack[i].index=i;
+         cellStack[i].edgeind[0]=i;
+         cellStack[i].disp() ;
       }
 
       cout << "Assign last volu to first volu" << endl;
-      cellStack.elems[0]=cellStack[i-1]; 
+      cellStack[0]=cellStack[i-1]; 
 
       cout << "Display each volu in stack" << endl;
       

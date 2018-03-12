@@ -123,6 +123,13 @@ void mesh::SetMaxIndex(){
    surfs.SetMaxIndex();
    volus.SetMaxIndex();
 }
+void mesh::ReadyForUse(){
+   verts.ReadyForUse();
+   edges.ReadyForUse();
+   surfs.ReadyForUse();
+   volus.ReadyForUse();
+}
+
 void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const{
    *nVert=verts.GetMaxIndex();
    *nEdge=edges.GetMaxIndex();
@@ -163,19 +170,19 @@ void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    int ii;
    // Volumes
    for(ii=0;ii<volus.size();++ii){
-      volus.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+      volus[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Surfaces
    for(ii=0;ii<surfs.size();++ii){
-      surfs.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+      surfs[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Volumes
    for(ii=0;ii<edges.size();++ii){
-      edges.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+      edges[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Surfaces
    for(ii=0;ii<verts.size();++ii){
-      verts.elems[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+      verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
 }
 

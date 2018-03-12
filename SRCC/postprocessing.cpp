@@ -14,7 +14,7 @@ void ExtractMeshData(mesh *grid,int *nVert, int *nEdge, int *nVolu, int *nSurf, 
 	*nEdge=grid->edges.size();
 	*totNumFaceNode=0;
 	for (ii=0;ii<*nSurf;++ii){
-		*totNumFaceNode=*totNumFaceNode+grid->surfs[ii]->edgeind.size();
+		*totNumFaceNode=*totNumFaceNode+grid->surfs(ii)->edgeind.size();
 	}
 }
 
@@ -23,13 +23,13 @@ int tecplotfile::VolDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, i
 
 	int ii,jj;
 	// Print vertex Data
-	for (jj=0;jj<int(meshout->verts[0]->coord.size());++jj){
+	for (jj=0;jj<int(meshout->verts(0)->coord.size());++jj){
 		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout->verts[ii]->coord[jj]);
+			this->Print("%.16lf ",meshout->verts(ii)->coord[jj]);
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	for (jj=int(meshout->verts[0]->coord.size());jj<nVertDat;++jj){
+	for (jj=int(meshout->verts(0)->coord.size());jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
@@ -37,15 +37,15 @@ int tecplotfile::VolDataBlock(mesh *meshout,int nVert,int nVolu, int nVertDat, i
 	}
 	// Print Cell Data
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->fill);
+		this->Print("%.16lf ",meshout->volus(ii)->fill);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->target);
+		this->Print("%.16lf ",meshout->volus(ii)->target);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout->volus[ii]->error);
+		this->Print("%.16lf ",meshout->volus(ii)->error);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	return(0);
@@ -56,13 +56,13 @@ int tecplotfile::SurfDataBlock(mesh *meshout,int nVert,int nSurf, int nVertDat, 
 
 	int ii,jj;
 	// Print vertex Data
-	for (jj=0;jj<int(meshout->verts[0]->coord.size());++jj){
+	for (jj=0;jj<int(meshout->verts(0)->coord.size());++jj){
 		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout->verts[ii]->coord[jj]);
+			this->Print("%.16lf ",meshout->verts(ii)->coord[jj]);
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	for (jj=int(meshout->verts[0]->coord.size());jj<nVertDat;++jj){
+	for (jj=int(meshout->verts(0)->coord.size());jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
@@ -70,15 +70,15 @@ int tecplotfile::SurfDataBlock(mesh *meshout,int nVert,int nSurf, int nVertDat, 
 	}
 	// Print Cell Data
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->surfs[ii]->fill);
+		this->Print("%.16lf ",meshout->surfs(ii)->fill);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->surfs[ii]->target);
+		this->Print("%.16lf ",meshout->surfs(ii)->target);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout->surfs[ii]->error);
+		this->Print("%.16lf ",meshout->surfs(ii)->error);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	return(0);
@@ -88,8 +88,8 @@ int tecplotfile::SurfFaceMap(mesh *meshout,int nVert,int nEdge,int nSurf,int nVo
 	int verts[2];
 
 	for (ii=0;ii<nEdge;++ii){ // Print Number of vertices per face
-		verts[0]=meshout->edges[ii]->vertind[0];
-		verts[1]=meshout->edges[ii]->vertind[1];
+		verts[0]=meshout->edges(ii)->vertind[0];
+		verts[1]=meshout->edges(ii)->vertind[1];
 		this->Print("%i %i\n",meshout->verts.find(verts[0])+1,meshout->verts.find(verts[1])+1);
 		this->ResetLine();
 	}
@@ -99,7 +99,7 @@ int tecplotfile::SurfFaceMap(mesh *meshout,int nVert,int nEdge,int nSurf,int nVo
 	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
 		for (ii=0;ii<nEdge;++ii){
 			//cout << ii << "," << jj << endl ;
-			actVert=meshout->edges[ii]->surfind[jj];
+			actVert=meshout->edges(ii)->surfind[jj];
 			this->Print("%i ",meshout->surfs.find(actVert)+1);
 		}
 		fprintf(fid,"\n");this->ResetLine();
@@ -112,24 +112,24 @@ int tecplotfile::VolFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu){
 	int ii,jj,actVert,edgeCurr;
 	int verts[2],vertsPast[2];
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
-		this->Print("%i ",meshout->surfs[ii]->edgeind.size());
+		this->Print("%i ",meshout->surfs(ii)->edgeind.size());
 	}
 	fprintf(fid,"\n");this->ResetLine();
 
 	for (ii=0;ii<nSurf;++ii){// print ordered  list of vertices in face
-		jj=int(meshout->surfs[ii]->edgeind.size())-1;
+		jj=int(meshout->surfs(ii)->edgeind.size())-1;
 
-		edgeCurr=meshout->edges.find(meshout->surfs[ii]->edgeind[jj]);
-		verts[0]=meshout->verts.find(meshout->edges[edgeCurr]->vertind[0]);
-		verts[1]=meshout->verts.find(meshout->edges[edgeCurr]->vertind[1]);
+		edgeCurr=meshout->edges.find(meshout->surfs(ii)->edgeind[jj]);
+		verts[0]=meshout->verts.find(meshout->edges(edgeCurr)->vertind[0]);
+		verts[1]=meshout->verts.find(meshout->edges(edgeCurr)->vertind[1]);
 		vertsPast[0]=verts[0];
 		vertsPast[1]=verts[1];
 
-		for(jj=0;jj<int(meshout->surfs[ii]->edgeind.size());++jj){
-			edgeCurr=meshout->edges.find(meshout->surfs[ii]->edgeind[jj]);
+		for(jj=0;jj<int(meshout->surfs(ii)->edgeind.size());++jj){
+			edgeCurr=meshout->edges.find(meshout->surfs(ii)->edgeind[jj]);
 
-			verts[0]=meshout->verts.find(meshout->edges[edgeCurr]->vertind[0]);
-			verts[1]=meshout->verts.find(meshout->edges[edgeCurr]->vertind[1]);
+			verts[0]=meshout->verts.find(meshout->edges(edgeCurr)->vertind[0]);
+			verts[1]=meshout->verts.find(meshout->edges(edgeCurr)->vertind[1]);
 
 			if ((verts[0]==vertsPast[0]) || (verts[1]==vertsPast[0])){
 				actVert=0;
@@ -158,7 +158,7 @@ int tecplotfile::VolFaceMap(mesh *meshout,int nVert,int nSurf,int nVolu){
 	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
 		for (ii=0;ii<nSurf;++ii){
 			//cout << ii << "," << jj << endl ;
-			actVert=meshout->surfs[ii]->voluind[jj];
+			actVert=meshout->surfs(ii)->voluind[jj];
 			this->Print("%i ",meshout->volus.find(actVert)+1);
 		}
 		fprintf(fid,"\n");this->ResetLine();

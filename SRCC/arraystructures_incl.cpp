@@ -38,10 +38,6 @@ template<class T> inline int ArrayStruct <T>::find(int key) const
 	return(search->second);
 }
 
-template<class T> inline int ArrayStruct <T>::size() const 
-{
-	return(int(elems.size()));
-}
 
 
 
@@ -69,6 +65,7 @@ template<class T> void ArrayStruct <T>::HashArray()
 	{
 		hashTable.emplace(elems[i].Key(),i);
 	}
+	isHash=1;
    //cout << "Array Struct Succesfully Hashed" << endl;
 }
 
@@ -83,7 +80,10 @@ template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct <T> &other
 	for (ii=0; ii<nNew;ii++){
 		elems.push_back(other.elems[ii]);
 	}
-	this->HashArray();
+	//this->HashArray();
+	//this->SetMaxIndex();
+	isHash=0;
+	isSetMI=0;
 }
 
 template<class T> void ArrayStruct <T>::SetMaxIndex()
@@ -93,6 +93,7 @@ template<class T> void ArrayStruct <T>::SetMaxIndex()
 	for(int ii=0;ii<n;++ii){
 		maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
 	}
+	isSetMI=1;
 }
 
 template<class T> void ArrayStruct <T>::PopulateIndices()
@@ -103,6 +104,45 @@ template<class T> void ArrayStruct <T>::PopulateIndices()
 		elems[ii].index=ii+1;
 	}
 	maxIndex=n;
+	isSetMI=1;
+	isHash=0;
+}
+
+template<class T> void ArrayStruct <T>::ReadyForUse()
+{
+	if (isSetMI==0){
+		this->SetMaxIndex();
+	}
+	if (isHash==0){
+		this->HashArray();
+	}
+}
+
+// Implementation of vector member functions into the base class
+
+template<class T> inline int ArrayStruct <T>::size() const 
+{
+	return(int(elems.size()));
+}
+template<class T> inline int ArrayStruct <T>::capacity() const 
+{
+	return(int(elems.capacity()));
+}
+template<class T> inline void ArrayStruct <T>::assign(int n, T& newelem)  
+{
+	elems.assign(n,newelem);
+	isHash=0;
+	isSetMI=0;
+}
+template<class T> inline void ArrayStruct <T>::push_back(T& newelem)  
+{
+	elems.push_back(newelem);
+	isHash=0;
+	isSetMI=0;
+}
+template<class T> inline void ArrayStruct <T>::reserve(int n)  
+{
+	elems.reserve(n);
 }
 
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED
