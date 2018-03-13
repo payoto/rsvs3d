@@ -31,6 +31,9 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 
 template<class T> inline int ArrayStruct <T>::find(int key) const 
 {
+	if (isHash==0){
+
+	}
 	auto search=hashTable.find(key);
 	if (search==hashTable.end()){
 		return(-1);
@@ -60,6 +63,9 @@ template<class T> inline void ArrayStruct <T>::Init(int n)
 
 template<class T> void ArrayStruct <T>::HashArray()
 {
+	if(!hashTable.empty()){
+		hashTable.clear();
+	}
 	hashTable.reserve(elems.size());
 	for (int i = 0; i < int(elems.size()); ++i)
 	{

@@ -8,13 +8,13 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
+#define TEST_ARRAYSTRUCT
 
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
 #define TEST_RANGE
 #define SAFE_ACCESS
-#define TEST_ARRAYSTRUCT
 #endif
 
 //=================================
@@ -65,17 +65,17 @@ protected:
 	int isHash=0;
 	int isSetMI=0;
 	vector<T> elems;    // vector of elements (structures) 
-public: 
 	unordered_map<int,int> hashTable; // Hash Table of indexed elements
-	void HashArray();
+public: 
 	void disp() const;
-	void Concatenate(const ArrayStruct<T> &other);
-	void SetMaxIndex();
-	void PopulateIndices();
-	void ReadyForUse();
-	inline int GetMaxIndex() const;
-	inline void Init(int n);
 	inline int find(int key) const ;
+	inline int GetMaxIndex() const;
+	void Concatenate(const ArrayStruct<T> &other);
+	void PopulateIndices();
+	void SetMaxIndex();
+	void HashArray();
+	void ReadyForUse();
+	inline void Init(int n);
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -83,7 +83,18 @@ public:
 	inline void push_back(T& newelem);
 	inline void reserve(int n);
 	// Operators
-	T& operator[](const int& a){ // [] Operator returns a pointer to the corresponding elems.
+	const T* operator()(const int a) const{ 
+	// () Operator returns a constant pointer to the corresponding elems.
+	// Cannot be used on the left hand side and can't be used to edit data in elems
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			throw range_error ("Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		return(&(elems[a]));
+	}
+	T& operator[](const int a){ 
+	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			throw range_error ("Index is out of range");
@@ -93,15 +104,6 @@ public:
 		isSetMI=0;
 		return((elems[a]));
 	}
-	T* operator()(const int& a){ // [] Operator returns a pointer to the corresponding elems.
-		#ifdef SAFE_ACCESS // adds a check in debug mode
-		if ((unsigned_int(a)>=elems.size()) | (0>a)){
-			throw range_error ("Index is out of range");
-		}
-		#endif //SAFE_ACCESS
-		return(&(elems[a]));
-	}
-
 }; 
 
 // Base class
@@ -178,7 +180,7 @@ public:
 		#endif
 
 	}
-	void operator=( volu* other){
+	void operator=(const volu* other){
 		index=other->index;
 		fill=other->fill;
 		target=other->target;
@@ -228,7 +230,7 @@ public:
 		edgeind=oldSurf.edgeind;
 		voluind=oldSurf.voluind;
 	}
-	void operator=( surf* other){
+	void operator=(const surf* other){
 		index=other->index;
 		fill=other->fill;
 		error=other->error;
@@ -270,7 +272,7 @@ public:
 		surfind.clear();
 
 	}
-	void operator=( edge* other){
+	void operator=(const edge* other){
 		index=other->index;
 
 		vertind=other->vertind;
@@ -307,7 +309,7 @@ public:
 		coord.clear();
 
 	}
-	void operator=( vert* other){
+	void operator=(const vert* other){
 		index=other->index;
 
 		edgeind=other->edgeind;

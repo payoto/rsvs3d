@@ -4,7 +4,7 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -Wall -DDEBUGLVL1 -g
+CFLAGS=-c -Wall -DDEBUGLVL1 -ggdb
 LDFLAGS=-lstdc++
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
 

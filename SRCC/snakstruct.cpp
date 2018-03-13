@@ -76,22 +76,28 @@ void coordvec::assign(double a,double b,double c){
 	elems[2]=c;
 	this->CalcNorm();
 }
-void coordvec::disp(){
-	cout << "coord vec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] << "] norm "
+void coordvec::disp() const{
+	cout << "coordvec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] << "] norm "
 		<< norm << " utd " << isuptodate <<endl;
 }
 // -------------------------------------------------------------------------------------------
 // Implementatation of snaxedge 
 // -------------------------------------------------------------------------------------------
 void snax::disp() const{
-	
+	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind << endl;
+	cout << "        " << index << "; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << endl;
 }
+
 void snaxedge::disp() const{
-	
+	cout << "snaxedge #" << index << " ";
+	normvector.disp();
 }
+
 void snaxsurf::disp() const{
-	
+	cout << "snaxsurf #" << index << " ";
+	normvector.disp();
 }
+
 
 // -------------------------------------------------------------------------------------------
 // TEST CODE
@@ -110,8 +116,6 @@ int Test_SnakeStructures() {
 	cout << "--------------------------------------------" << endl;
 	errTest=Test_coordvec();
 	errFlag= errFlag | (errTest!=0);
-
-
 
 return(errFlag);
 } 

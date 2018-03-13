@@ -22,7 +22,7 @@ using namespace Eigen;
 
 
 // Implementation of Cartesian Block grids
-int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
+int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 
 	int nVolu, nVert, nSurf,nEdge;
 	RowVector3i nSurfDim,nEdgeDim;
@@ -43,7 +43,7 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 	nSurf=nSurfDim.sum();
 	nEdge=nEdgeDim.sum();
 
-	blockGrid->Init(nVert,nEdge,nSurf,nVolu);
+	blockGrid.Init(nVert,nEdge,nSurf,nVolu);
 
 #ifdef TEST_VOXEL
 	cout << "nVert: " << nVert << " nVolu: " << nVolu 
@@ -78,11 +78,11 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid) {
 		edgeProp, surfProp);
 	BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
 
-	blockGrid->HashArray();
+	blockGrid.ReadyForUse();
 	return(0);
 }
 
-int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
+int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 	RowVector3i nSurfDim, Matrix3i surfProp){
 
 	RowVector3i incrSurf, pos;
@@ -100,11 +100,11 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	incPos << Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
-	//cout << "Size of volus: " << blockGrid->volus.capacity() << endl;
+	//cout << "Size of volus: " << blockGrid.volus.capacity() << endl;
 
 	for (int ii=0;ii<nVolu;++ii){
-		blockGrid->volus[ii].index=ii+1;
-		blockGrid->volus[ii].fill=double(rand()%1000+1)/1000.0;
+		blockGrid.volus[ii].index=ii+1;
+		blockGrid.volus[ii].fill=double(rand()%1000+1)/1000.0;
 
 		pos(0)=ii%(dimGrid(0));
 		pos(1)=int(floor(float(ii)/float(dimGrid(0))))%(dimGrid(1));
@@ -115,9 +115,9 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 		tempSurfInd=(tempSurfInd+incrSurf2).array()+1;
 
 
-		blockGrid->volus[ii].surfind.assign(tempSurfInd.size(),0);
+		blockGrid.volus[ii].surfind.assign(tempSurfInd.size(),0);
 		for (jj=0;jj<tempSurfInd.size();jj++){
-			blockGrid->volus[ii].surfind[jj]=tempSurfInd(jj);
+			blockGrid.volus[ii].surfind[jj]=tempSurfInd(jj);
 
 		}
 
@@ -130,13 +130,13 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh* blockGrid,
 	cout << "incrSurf2: " << endl << incrSurf2 << endl;
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempSurfInd: " << endl << tempSurfInd << endl;
-	blockGrid->volus.disp();
+	blockGrid.volus.disp();
 #endif //TEST_VOXEL_VOLU
 
 	return(0);
 }
 
-int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
+int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim, RowVector3i nEdgeDim,
 	int nEdge){
 	/*Builds the surface information for the generation of block grids of size dimGrid*/
@@ -176,8 +176,8 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 	// Assign content to Array
 	for (int ii=0;ii<nSurf;++ii){
 
-		blockGrid->surfs[ii].index=ii+1;
-		blockGrid->surfs[ii].fill=isFill*double(rand()%1000+1)/1000.0;
+		blockGrid.surfs[ii].index=ii+1;
+		blockGrid.surfs[ii].fill=isFill*double(rand()%1000+1)/1000.0;
 
 		/*jPlane=0;
 		for (jj=0;jj<3;++jj){
@@ -194,9 +194,9 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 
 		// define voluind
 		boundaryFlag=!((pos.array()>=dimGrid.array()).any());
-		blockGrid->surfs[ii].voluind[0]=boundaryFlag*((pos*cumProdDimGrid.transpose())+1);
+		blockGrid.surfs[ii].voluind[0]=boundaryFlag*((pos*cumProdDimGrid.transpose())+1);
 		boundaryFlag=!(((pos-surfProp.row(jPlane)).array()<0).any());
-		blockGrid->surfs[ii].voluind[1]=boundaryFlag*
+		blockGrid.surfs[ii].voluind[1]=boundaryFlag*
 		(((pos-surfProp.row(jPlane))*cumProdDimGrid.transpose())+1);
 
 		//define edgeind
@@ -221,10 +221,10 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 			.rowwise().sum()+incrEdge2).array()+1;
 		
 
-		blockGrid->surfs[ii].edgeind.reserve(tempEdgeInd.size());
-		blockGrid->surfs[ii].edgeind.assign(tempEdgeInd.size(),0);
+		blockGrid.surfs[ii].edgeind.reserve(tempEdgeInd.size());
+		blockGrid.surfs[ii].edgeind.assign(tempEdgeInd.size(),0);
 		for (jj=0;jj<tempEdgeInd.size();jj++){
-			blockGrid->surfs[ii].edgeind[jj]=tempEdgeInd[jj];
+			blockGrid.surfs[ii].edgeind[jj]=tempEdgeInd[jj];
 		}
 	}
 
@@ -237,14 +237,14 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
 	cout << "incrEdge2: " << endl << incrEdge2 << endl;
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempEdgeInd: " << endl << tempEdgeInd << endl;
-	blockGrid->surfs.disp();
+	blockGrid.surfs.disp();
 #endif //TEST_VOXEL_SURF
 
 
 	return(0);
 }
 
-int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i nEdgeDim,
+int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i nEdgeDim,
 	RowVector3i nSurfDim, Matrix3i edgeProp,Matrix3i surfProp ){
 	/*Function to build the Edges of a simple cartesian block grid*/
 
@@ -290,7 +290,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	
 	for (int ii=0; ii<nEdge; ii++){
 
-		blockGrid->edges[ii].index=ii+1;
+		blockGrid.edges[ii].index=ii+1;
 		jPlane=(incrEdge.array()<=ii).cast<int>().sum()-1;
 		dimGridCur=matEdge.row(jPlane);
 
@@ -304,10 +304,10 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 		posMatTemp.row(1)=(pos.array()+1)-edgeProp.row(jPlane).array();
 		vertIndTemp=(posMatTemp*cumProdDimGrid.transpose()).array()+1;
 
-		blockGrid->edges[ii].vertind.reserve(vertIndTemp.size());
-		blockGrid->edges[ii].vertind.assign(vertIndTemp.size(),0);
+		blockGrid.edges[ii].vertind.reserve(vertIndTemp.size());
+		blockGrid.edges[ii].vertind.assign(vertIndTemp.size(),0);
 		for (jj=0;jj<vertIndTemp.size();jj++){
-			blockGrid->edges[ii].vertind[jj]=vertIndTemp[jj];
+			blockGrid.edges[ii].vertind[jj]=vertIndTemp[jj];
 		}
 
 		// Assign surfind values
@@ -339,16 +339,16 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 			(surfLogTemp.array()>(matSurf.colwise().replicate(2).array()-1))).rowwise().any()
 		|| (ind.rowwise().replicate(2).reverse().array()==jPlane).transpose());
 		nSurfEdge=max(surfLog.cast<int>().sum(),2);
-		blockGrid->edges[ii].surfind.reserve(nSurfEdge);
-		blockGrid->edges[ii].surfind.assign(nSurfEdge,0);
+		blockGrid.edges[ii].surfind.reserve(nSurfEdge);
+		blockGrid.edges[ii].surfind.assign(nSurfEdge,0);
 		kk=0;
 		for (jj=0;jj<surfLog.size();jj++){
 			if (surfLog(jj)){
-				blockGrid->edges[ii].surfind[kk]=surfIndTemp[jj];
+				blockGrid.edges[ii].surfind[kk]=surfIndTemp[jj];
 				kk++;
 			}
 		}
-		//if (kk==1){blockGrid->edges[ii].surfind[kk]=0;} // not needed as already initialised
+		//if (kk==1){blockGrid.edges[ii].surfind[kk]=0;} // not needed as already initialised
 	}
 
 #ifdef TEST_VOXEL_EDGE
@@ -358,13 +358,13 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,RowVector3i 
 	cout << "incrEdge: " << endl << incrEdge << endl;
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "vertIndTemp: " << endl << vertIndTemp << endl;
-	blockGrid->edges.disp();
+	blockGrid.edges.disp();
 #endif //TEST_VOXEL_EDGE
 
 	return(0);
 }
 
-int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert, 
+int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert, 
 	Matrix3i edgeProp, RowVector3i nEdgeDim){
 	// Builds vertices for block grid
 	RowVector3i  cumSurfDim,dimGridVert,dimGridAct, pos, cumProdDimGrid, incrEdge;
@@ -390,7 +390,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 
 
 	for(ii=0;ii<nVert;ii++){
-		blockGrid->verts[ii].index=ii+1;
+		blockGrid.verts[ii].index=ii+1;
 
 		pos(0)=ii%(dimGridVert[0]);
 		pos(1)=int(floor(float(ii)/float(dimGridVert[0])))%(dimGridVert[1]);
@@ -398,7 +398,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 
 		coordTemp=pos.cast<double>().array()/dimGridAct.cast<double>().array();
 		for (jj=0;jj<3;jj++){
-			blockGrid->verts[ii].coord[jj]=coordTemp[jj];
+			blockGrid.verts[ii].coord[jj]=coordTemp[jj];
 		}
 
 		edgeLogTemp << pos.colwise().replicate(3), (pos.colwise().replicate(3)-edgeProp);
@@ -408,12 +408,12 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 		edgeLog=!(((edgeLogTemp.array()<0) 
 			|| (edgeLogTemp.array()>(matEdge.colwise().replicate(2).array()-1))).rowwise().any());
 
-		blockGrid->verts[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
+		blockGrid.verts[ii].edgeind.assign(int(edgeLog.cast<int>().sum()),0);
 		kk=0;
 
 		for (jj=0;jj<6;jj++){
 			if(edgeLog[jj]){
-				blockGrid->verts[ii].edgeind[kk]=edgeIndTemp[jj];
+				blockGrid.verts[ii].edgeind[kk]=edgeIndTemp[jj];
 				++kk;
 			}
 		}
@@ -425,7 +425,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert,
 	cout << "matEdge: " << endl << matEdge << endl;
 	cout << "incPos: " << endl << incPos << endl;
 
-	blockGrid->verts.disp();
+	blockGrid.verts.disp();
 #endif
 	return(0);
 }
@@ -445,7 +445,7 @@ int Test_BuildBlockGrid_noout() {
 	cout << "--------------------------------------------" << endl;
 	cout << "      testing BuildBlockGrid" << endl;
 	cout << "--------------------------------------------" << endl;
-	errTest=BuildBlockGrid(dimGrid,&blockGrid);
+	errTest=BuildBlockGrid(dimGrid,blockGrid);
 	errFlag= errFlag | (errTest!=0);
 
 	return(errFlag);
@@ -460,27 +460,27 @@ int Test_MeshOut(){
 	tecplotfile outmesh1, outmesh3, outmesh2;
 
 	errFlag=0;
-	errTest=BuildBlockGrid(dimGrid1,&blockGrid);
+	errTest=BuildBlockGrid(dimGrid1,blockGrid);
 	errFlag= errFlag | (errTest!=0);
 	fileToOpen="..\\TESTOUT\\tecout234.plt";
 
 	errTest=outmesh1.OpenFile(fileToOpen);
 	errFlag= errFlag | (errTest!=0);
 
-	errTest=outmesh1.PrintMesh(&blockGrid);
+	errTest=outmesh1.PrintMesh(blockGrid);
 	errFlag= errFlag | (errTest!=0);
 
-	errTest=BuildBlockGrid(dimGrid2,&blockGrid);
+	errTest=BuildBlockGrid(dimGrid2,blockGrid);
 	fileToOpen="..\\TESTOUT\\tecout230.plt";
 
 	errTest=outmesh2.OpenFile(fileToOpen);
 	errFlag= errFlag | (errTest!=0);
 
-	errTest=outmesh2.PrintMesh(&blockGrid);
+	errTest=outmesh2.PrintMesh(blockGrid);
 	errFlag= errFlag | (errTest!=0);
 	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
 	start_s=clock();
-	//errTest=BuildBlockGrid(dimGrid3,&blockGrid);
+	errTest=BuildBlockGrid(dimGrid3,blockGrid);
 	// the code you wish to time goes here
 	stop_s=clock();
 	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -489,7 +489,7 @@ int Test_MeshOut(){
 	errTest=outmesh3.OpenFile(fileToOpen);
 	errFlag= errFlag | (errTest!=0);
 
-	errTest=outmesh3.PrintMesh(&blockGrid);
+	errTest=outmesh3.PrintMesh(blockGrid);
 	errFlag= errFlag | (errTest!=0);
 
 	return(errFlag);

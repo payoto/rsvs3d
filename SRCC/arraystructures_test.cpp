@@ -56,7 +56,7 @@ int Test_Volu(){
 
    voluarray cellStack;  // stack of ints 
    volu singleCell;
-   volu *cellPtr;
+   const volu *cellPtr;
 
    try {
 

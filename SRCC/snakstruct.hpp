@@ -63,7 +63,7 @@ public:
 	void assign(double a, double b, double c);
 	double& operator[](int a);
 	double operator()(int a) const;
-	void disp();
+	void disp() const;
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -103,8 +103,8 @@ public:
 
 	// interface functions
 	void disp() const;
-	int Key() const {return index;};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu) {};
+	int Key() const {return (index);};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nVert;};
 
 
 };
@@ -114,8 +114,8 @@ public:
 	int index;
 	coordvec normvector;
 	void disp() const;
-	int Key() const {return index;}; 
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu) {};
+	int Key() const {return (index);}; 
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nEdge;};
 
 };
 
@@ -124,8 +124,8 @@ public:
 	int index;
 	coordvec normvector;
 	void disp() const;
-	int Key() const {return index;};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu) {};
+	int Key() const {return (index);};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nSurf;};
 
 };
 

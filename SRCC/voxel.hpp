@@ -91,19 +91,19 @@ template <class T> T cumprod(T mat, int d) {
 // Derived Classes
 
 // functions
-int BuildBlockGrid(RowVector3i dimGrid, mesh* blockGrid);
-int BuildBlockVert(RowVector3i dimGrid, mesh* blockGrid, int nVert, 
+int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid);
+int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert, 
 	Matrix3i edgeProp, RowVector3i nEdgeDim);
 
-int BuildBlockEdge(RowVector3i dimGrid, mesh* blockGrid, int nEdge ,
+int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
 	RowVector3i nEdgeDim,  RowVector3i nSurfDim, Matrix3i edgeProp,
 	Matrix3i surfProp );
 
-int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh* blockGrid ,
+int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim,
 	 RowVector3i nEdgeDim, int nEdge);
 
-int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh* blockGrid,
+int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh& blockGrid,
 	RowVector3i nSurfDim, Matrix3i surfProp);
 //test functions
 int Test_BuildBlockGrid_noout();
