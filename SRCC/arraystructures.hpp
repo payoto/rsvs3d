@@ -74,7 +74,7 @@ public:
 	void PopulateIndices();
 	void SetMaxIndex();
 	void HashArray();
-	void ReadyForUse();
+	void PrepareForUse();
 	inline void Init(int n);
 	// methods needed from vector
 	inline int size() const;
@@ -104,6 +104,7 @@ public:
 		isSetMI=0;
 		return((elems[a]));
 	}
+
 }; 
 
 // Base class
@@ -121,7 +122,7 @@ public:
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
-	void ReadyForUse();
+	void PrepareForUse();
 	void disp() const;
 	void Concatenate(const mesh &other);
 // Mesh merging
@@ -137,6 +138,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual void disp() const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
+	void PrepareForUse(){};
 	//virtual operator=( meshpart* other)=0 ;
 
 };

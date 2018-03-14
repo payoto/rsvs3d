@@ -8,19 +8,88 @@ compiled on its own.
 #ifndef ARRAYSTRUCTS_INCL_H_INCLUDED
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
-template <class T> bool CompareDisp(T *mesh1,T *mesh2){
-   bool compFlag;
-   stringstream ss1,ss2;
-   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+template <class T> bool CompareDisp(T &mesh1,T &mesh2){
+bool compFlag;
+stringstream ss1,ss2;
+auto old_buf = cout.rdbuf(ss1.rdbuf()); 
 
-   mesh1->disp();
-   cout.rdbuf(ss2.rdbuf()); 
-   mesh2->disp();
-   std::cout.rdbuf(old_buf);
+mesh1.disp();
+cout.rdbuf(ss2.rdbuf()); 
+mesh2.disp();
+std::cout.rdbuf(old_buf);
 
-   compFlag=ss1.str().compare(ss2.str())==0;
-   return(compFlag);
+compFlag=ss1.str().compare(ss2.str())==0;
+return(compFlag);
 }
+
+
+// Templated test for all types that need to be derived from ArrayStruct<T>
+
+template <class T> int TestTemplate_ArrayStruct()
+{
+	ArrayStruct<T> stackT,stackT2;
+	T singleT;
+	int i=0,j=0;
+	int errFlag=0;
+	bool errTest;
+
+	try {
+		// Test Initialisation
+		stackT.assign(5,singleT);
+		stackT.PopulateIndices();
+		stackT2.Init(5);
+		stackT2.PopulateIndices();
+
+		errTest=CompareDisp(stackT,stackT2);
+		if (!errTest){
+			cerr << "Error Displays were not the same (Stage 1)" << endl;
+			errFlag++;
+		} 
+		// Test ASsignement
+		singleT.index=10;
+		stackT[2]=singleT;
+		errTest=CompareDisp(stackT,stackT2);
+		if (errTest){
+			cerr << "Error Displays were not the same - assignement not working (Stage 2)" << endl;
+			errFlag++;
+		} 
+
+		// Test prepare
+		stackT.PrepareForUse();
+		stackT2.PrepareForUse();
+
+		// Test Find
+		i=stackT.find(10);
+		j=stackT.find(7);
+
+		if (i!=2 || j!=-1){
+			cerr << "FIND did not Succesfully identify the indices" << endl;
+			errFlag++;
+		}
+
+		try{
+			stackT[2].index=7;
+			i=stackT.find(10);
+			// If this does not throw an error with have an issue
+			#ifdef SAFE_ACCESS
+			cerr << "FIND did not throw an error at the unsafe access" << endl;
+			errFlag++;
+			#endif //SAFE_ACCESS
+		}  catch (exception const& ex) { }
+		// Test Concatenation of arrays
+
+		stackT.Concatenate(stackT2);
+		stackT.PopulateIndices();
+		stackT.PrepareForUse();
+		stackT.disp();
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errFlag);
+}
+
 
 // member function definition template <class T> : "ArrayStruct"
 
@@ -32,12 +101,19 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 template<class T> inline int ArrayStruct <T>::find(int key) const 
 {
 	if (isHash==0){
-
+		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
+		cerr << "          in ArrayStruct <T>::find(int key)" << endl; 
+		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
 	}
 	auto search=hashTable.find(key);
 	if (search==hashTable.end()){
 		return(-1);
 	}
+	#ifdef SAFE_ACCESS
+	if (elems[search->second].index!=key){
+		throw  invalid_argument ("FIND returned an invalid output ");
+	}
+	#endif //SAFE_ACCESS
 	return(search->second);
 }
 
@@ -46,10 +122,12 @@ template<class T> inline int ArrayStruct <T>::find(int key) const
 
 template<class T> void ArrayStruct <T>::disp() const 
 {
+
 	for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
 		cout << "Array " << ii << " " ;
 		elems[ii].disp();
 	}
+	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << endl;
 }
 
 
@@ -114,8 +192,12 @@ template<class T> void ArrayStruct <T>::PopulateIndices()
 	isHash=0;
 }
 
-template<class T> void ArrayStruct <T>::ReadyForUse()
+template<class T> void ArrayStruct <T>::PrepareForUse()
 {
+	for (int ii = 0; ii < this->size(); ++ii)
+	{
+		this->elems[ii].PrepareForUse();
+	}
 	if (isSetMI==0){
 		this->SetMaxIndex();
 	}
@@ -151,4 +233,5 @@ template<class T> inline void ArrayStruct <T>::reserve(int n)
 	elems.reserve(n);
 }
 
-#endif // ARRAYSTRUCTS_INCL_H_INCLUDED
+
+#endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

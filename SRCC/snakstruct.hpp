@@ -57,7 +57,8 @@ protected:
 
 public:
 	double CalcNorm();
-	inline double GetNorm();
+	double GetNorm();
+	void PrepareForUse();
 	coordvec Unit() const ;
 	double Unit(const int a) const;
 	void assign(double a, double b, double c);
@@ -70,6 +71,9 @@ public:
 		elems.assign(3,0);
 		norm=0;
 		isuptodate=0;
+		#ifdef TEST_SNAKSTRUCT
+		cout << "constructor called for coordvec" << endl;
+		#endif
 	}
 };
 
@@ -92,30 +96,42 @@ public:
 
 class snax : public meshpart {	
 public:
-	int index;
-	double d;
-	double v;
-	int fromvert; 	// root vertex of *snakemesh
-	int tovert; 	// destination vertex of *snakemesh
-	int edgeind; 	// edge of snakemesh
-	int isfreeze; 	// freeze status 
-	int orderedge;	// order on the edge
+	int index=0;
+	double d=0;
+	double v=0;
+	int fromvert=0; 	// root vertex of *snakemesh
+	int tovert=0; 	// destination vertex of *snakemesh
+	int edgeind=0; 	// edge of snakemesh
+	int isfreeze=0; 	// freeze status 
+	int orderedge=0;	// order on the edge
 
 	// interface functions
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nVert;};
-
+	/*snax(){
+	 index=0;
+	 d=0;
+	 v=0;
+	 fromvert=0; 	// root vertex of *snakemesh
+	 tovert=0; 		// destination vertex of *snakemesh
+	 edgeind=0; 	// edge of snakemesh
+	 isfreeze=0; 	// freeze status 
+	 orderedge=0;	// order on the edge
+	}*/
 
 };
 
 class snaxedge : public meshpart {
 public:
-	int index;
+	int index=0;
+	double c=0;
 	coordvec normvector;
+	void PrepareForUse();
 	void disp() const;
 	int Key() const {return (index);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nEdge;};
+
 
 };
 
@@ -123,6 +139,7 @@ class snaxsurf : public meshpart {
 public: 
 	int index;
 	coordvec normvector;
+	void PrepareForUse(); 
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nSurf;};
@@ -132,5 +149,9 @@ public:
 // Function prototypes
 int Test_SnakeStructures();
 int Test_coordvec();
+int Test_snax();
+int Test_snaxedge();
+int Test_snaxsurf();
+int Test_snake();
 
 #endif //SNAKSTRUCT_H_INCLUDED

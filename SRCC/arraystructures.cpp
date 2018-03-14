@@ -123,11 +123,11 @@ void mesh::SetMaxIndex(){
    surfs.SetMaxIndex();
    volus.SetMaxIndex();
 }
-void mesh::ReadyForUse(){
-   verts.ReadyForUse();
-   edges.ReadyForUse();
-   surfs.ReadyForUse();
-   volus.ReadyForUse();
+void mesh::PrepareForUse(){
+   verts.PrepareForUse();
+   edges.PrepareForUse();
+   surfs.PrepareForUse();
+   volus.PrepareForUse();
 }
 
 void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const{

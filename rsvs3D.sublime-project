@@ -7,7 +7,41 @@
 	],
 
 	"syntax_override": {
-        "\\.cpp$": ["User", "C++RSVS3D"],
-        "\\.hpp$": ["User", "C++RSVS3D"],
-    }
+		"\\.cpp$": ["User", "C++RSVS3D"],
+		"\\.hpp$": ["User", "C++RSVS3D"],
+	},
+
+	"build_systems":
+	[
+		
+		{
+			"name": "Custom Make",
+			"file_regex" : "^(.*):(\\d+):(\\d+):\\s*(.*)$" ,
+
+			"variants": [
+				{
+					"name" : "testall" ,
+					"shell_cmd": "make testall"
+				},
+				{
+					"name" : "testnew" ,
+					"shell_cmd": "make testnew"
+				},
+				{
+					"name" : "testall clean" ,
+					"shell_cmd": "make testall -B"
+				},
+				{
+					"name" : "testnew clean" ,
+					"shell_cmd": "make testnew -B"
+				},
+				{
+					"name" : "clean" ,
+					"shell_cmd": "make clean"
+				}
+			],
+
+			"shell_cmd": "make "
+		},
+	]
 }

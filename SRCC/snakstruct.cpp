@@ -17,22 +17,22 @@ using namespace std;
 double& coordvec::operator[](int a)
 {
 	// returns a reference to the value and can be used to set a value
-	#ifdef TEST_RANGE // adds a check in debug mode
+	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
 		throw range_error ("Index is out of range");
 	}
-	#endif
+	#endif //SAFE_ACCESS
 	isuptodate=0;
 	return(elems[a]);
 }
 double coordvec::operator()(int a) const
 {
 	// returns the value (cannot be used to set data)
-	#ifdef TEST_RANGE // adds a check in debug mode
+	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
 		throw range_error ("Index is out of range");
 	}
-	#endif
+	#endif // SAFE_ACCESS
 	return(elems[a]);
 }
 
@@ -40,28 +40,34 @@ coordvec coordvec::Unit() const
 {
 	coordvec unitCoordVec;
 	for (int ii=0;ii<3;++ii){
-	unitCoordVec.elems[ii]=elems[ii]/norm;
-}
-unitCoordVec.norm=1;
-unitCoordVec.isuptodate=1;
-return (unitCoordVec);
+		unitCoordVec.elems[ii]=elems[ii]/norm;
+	}
+	unitCoordVec.norm=1;
+	unitCoordVec.isuptodate=1;
+	return (unitCoordVec);
 }
 
 double coordvec::Unit(const int a) const
 {
-	#ifdef TEST_RANGE // adds a check in debug mode
+	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
-	throw range_error ("Index is out of range");
-}
-	#endif
-return(elems[a]/norm);
+		throw range_error ("Index is out of range");
+	}
+	#endif // SAFE_ACCESS
+	if (isuptodate==0){
+		cerr << "Warning: NORM of coordvec potentially obsolete " << endl;
+		cerr << "          in coordvec::Unit(const int a) const" << endl; 
+		cerr << "          To avoid this message perform read operations on coordvec using the () operator" << endl; 
+	}
+	return(elems[a]/norm);
 }
 
-inline double coordvec::GetNorm(){
+double coordvec::GetNorm(){
+	// TEST_RANGE
 	if (~isuptodate){
-	this->CalcNorm();
-}
-return(norm);
+		this->CalcNorm();
+	}
+	return(norm);
 }
 
 double coordvec::CalcNorm(){
@@ -70,26 +76,32 @@ double coordvec::CalcNorm(){
 	return(norm);
 }
 
+void coordvec::PrepareForUse(){
+	this->CalcNorm();
+}
+
 void coordvec::assign(double a,double b,double c){
 	elems[0]=a;
 	elems[1]=b;
 	elems[2]=c;
 	this->CalcNorm();
-}
+}	
+
 void coordvec::disp() const{
 	cout << "coordvec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] << "] norm "
-		<< norm << " utd " << isuptodate <<endl;
+	<< norm << " utd " << isuptodate <<endl;
 }
 // -------------------------------------------------------------------------------------------
 // Implementatation of snaxedge 
 // -------------------------------------------------------------------------------------------
 void snax::disp() const{
-	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind << endl;
-	cout << "        " << index << "; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << endl;
+	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind <<
+	"; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << endl;
 }
 
 void snaxedge::disp() const{
 	cout << "snaxedge #" << index << " ";
+	cout << "bogus #" << c << " ";
 	normvector.disp();
 }
 
@@ -98,66 +110,17 @@ void snaxsurf::disp() const{
 	normvector.disp();
 }
 
+void snaxedge::PrepareForUse() {
+	normvector.PrepareForUse();
+}
+
+void snaxsurf::PrepareForUse() {
+	normvector.PrepareForUse();
+}
+
 
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
 
-int Test_SnakeStructures() { 
-   // Test the functionality provided by arraystructures
-
-	int errFlag,errTest;
-
-
-	errFlag=0;
-
-	cout << "--------------------------------------------" << endl;
-	cout << "      testing coordvec" << endl;
-	cout << "--------------------------------------------" << endl;
-	errTest=Test_coordvec();
-	errFlag= errFlag | (errTest!=0);
-
-return(errFlag);
-} 
-
-
-int Test_coordvec(){
-
-	coordvec testCoord,unitCoord;
-	try {
-		testCoord.assign(1.0,2.0,3.0);
-
-		cout << "base vector: ";
-		testCoord.disp();
-
-
-		unitCoord=testCoord.Unit();
-		cout << "unit vector: ";
-		unitCoord.disp();
-
-		cout << "unit access: ";
-		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< testCoord.Unit(2) << "] norm 1" << endl;
-
-		cout << "base oper(): ";
-		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1)<< ","<< testCoord(2) << "] " << endl;
-		cout << "base oper(): ";testCoord.disp();
-		cout << "base oper[]: ";
-		cout << "coord vec [" << testCoord[0] << ","<< testCoord[1]<< ","<< testCoord[2] << "] " << endl;
-		cout << "base oper[]: ";testCoord.disp();
-
-		cout << "base ope()=: {compile error}";
-		//testCoord(0)=0;
-		testCoord.disp();
-		cout << "base ope[]=: ";
-		testCoord[0]=0;
-		testCoord.disp();
-		testCoord.GetNorm();
-		cout << "base getnor: ";testCoord.disp();
-
-	} catch (exception const& ex) { 
-		cerr << "Exception: " << ex.what() <<endl; 
-		return -1;
-	} 
-	return(0);
-
-}
+//in snakstruct_test.cpp

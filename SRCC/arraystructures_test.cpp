@@ -316,10 +316,10 @@ int Test_Mesh(){
       mesh2.disp() ;
       mesh3.disp() ;
 #endif
-      test1=CompareDisp(&mesh2,&mesh3);
+      test1=CompareDisp(mesh2,mesh3);
       errFlag=errFlag || (!test1);
       cout << "Result of Comparison 2&3: " << test1 << endl;
-      test1=CompareDisp(&mesh1,&mesh2);
+      test1=CompareDisp(mesh1,mesh2);
       cout << "Result of Comparison 1&2: " << test1 << endl; 
       errFlag=errFlag || (test1);
 

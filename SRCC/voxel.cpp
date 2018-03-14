@@ -78,7 +78,7 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 		edgeProp, surfProp);
 	BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
 
-	blockGrid.ReadyForUse();
+	blockGrid.PrepareForUse();
 	return(0);
 }
 
