@@ -27,6 +27,12 @@
 
 //=================================
 // included dependencies
+#ifdef DBG_MEMLEAK
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>
+#endif //DBG_MEMLEAK
+
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -66,12 +72,16 @@ protected:
 	int maxIndex;
 	int isHash=0;
 	int isSetMI=0;
+	bool readyforuse=false;
 	vector<T> elems;    // vector of elements (structures) 
 	unordered_map<int,int> hashTable; // Hash Table of indexed elements
+
 public: 
 	void disp() const;
 	inline int find(int key) const ;
 	inline int GetMaxIndex() const;
+	bool isready() const {return(readyforuse);};
+	bool checkready() ;
 	void Concatenate(const ArrayStruct<T> &other);
 	void PopulateIndices();
 	void SetMaxIndex();
@@ -104,13 +114,14 @@ public:
 		#endif //SAFE_ACCESS
 		isHash=0;
 		isSetMI=0;
-		return((elems[a]));
+		readyforuse=false;
+		return(elems[a]);
 	}
 
 }; 
   
 
-  
+
 // Base class
 
 class mesh {
@@ -128,7 +139,10 @@ public:
 	void Init(int nVe,int nE, int nS, int nVo);
 	void PrepareForUse();
 	void disp() const;
+	void displight() const;
 	void Concatenate(const mesh &other);
+	bool isready() const;
+
 // Mesh merging
 	void MakeCompatible_inplace(mesh *other) const;
 	mesh MakeCompatible(mesh other) const;
@@ -143,6 +157,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 	virtual void PrepareForUse()=0 ;
+	virtual bool isready() const=0;
 	//virtual operator=( meshpart* other)=0 ;
 
 };
@@ -157,6 +172,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void PrepareForUse(){};
+	bool isready() const {return(true);}
 
 	volu(){ // Constructor
 		index=0;
@@ -214,7 +230,8 @@ public:
 
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void PrepareForUse(){};
+	void PrepareForUse(){};	
+	bool isready() const {return(true);}
 
 	surf(){ // Constructor
 		index=0;
@@ -263,6 +280,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void PrepareForUse(){};
+	bool isready() const {return(true);}
 
 	edge(){ // Constructor
 		index=0;
@@ -302,6 +320,7 @@ public:
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
+	bool isready() const {return(true);}
 
 	vert(){ // Constructor
 		index=0;
@@ -331,6 +350,7 @@ public:
 
 // functions
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
+template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
 bool CompareFuncOut(function<void()> func1, function<void()> func2);
 //test functions
 int Test_ArrayStructures();

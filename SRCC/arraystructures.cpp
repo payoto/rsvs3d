@@ -142,6 +142,24 @@ void mesh::disp() const {
    surfs.disp();
    volus.disp();
 }
+bool mesh::isready() const {
+   bool readyforuse=true;
+   readyforuse=readyforuse & verts.isready();
+   readyforuse=readyforuse & edges.isready();
+   readyforuse=readyforuse & surfs.isready();
+   readyforuse=readyforuse & volus.isready();
+
+   return(readyforuse);
+}
+
+
+
+void mesh::displight() const {
+   cout << "mesh: vert " << verts.size();
+   cout << "; edges " << edges.size();
+   cout << "; surfs " << surfs.size();
+   cout << "; volus " << volus.size() << endl;
+}
 
 void mesh::Init(int nVe,int nE, int nS, int nVo){
 

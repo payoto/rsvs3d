@@ -1,3 +1,9 @@
+#ifdef DBG_MEMLEAK
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>
+#endif //DBG_MEMLEAK
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -31,12 +37,16 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<volu>,"TestTemplate_ArrayStruct<volu>");
 	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
+	
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
 
 	gridTest.Run(Test_SnakeStructures,"Snake containers");
 
 
 	gridTest.PrintSummary();
+
+
+
 	return(0);
 }
 

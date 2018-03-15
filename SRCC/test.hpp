@@ -77,6 +77,9 @@ class customtest {
 			cout << "         " << errCount << "  detected errors  " << endl;
 			cout << "----------------------------------------------------------------------------------------" << endl;
 			cout << "----------------------------------------------------------------------------------------" << endl;
+			#ifdef DBG_MEMLEAK
+			_CrtDumpMemoryLeaks();
+			#endif
 		}
 
 

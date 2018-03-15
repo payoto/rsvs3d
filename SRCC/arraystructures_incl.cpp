@@ -55,35 +55,56 @@ template <class T> int TestTemplate_ArrayStruct()
 			cerr << "Error Displays were not the same - assignement not working (Stage 2)" << endl;
 			errFlag++;
 		} 
+		errFlag+=TestReadyness(stackT," after assignement",false);
 
 		// Test prepare
 		stackT.PrepareForUse();
 		stackT2.PrepareForUse();
+		errFlag+=TestReadyness(stackT," after PrepareForUse",true);
 
 		// Test Find
 		i=stackT.find(10);
 		j=stackT.find(7);
+		errFlag+=TestReadyness(stackT," after find",true);
+
 
 		if (i!=2 || j!=-1){
-			cerr << "FIND did not Succesfully identify the indices" << endl;
+			std::cerr << "FIND did not Succesfully identify the indices" << std::endl;
 			errFlag++;
 		}
 
 		try{
 			stackT[2].index=7;
+			errFlag+=TestReadyness(stackT," after [] assignement",false);
+
 			i=stackT.find(10);
 			// If this does not throw an error with have an issue
 			#ifdef SAFE_ACCESS
-			cerr << "FIND did not throw an error at the unsafe access" << endl;
+			std::cerr << "FIND did not throw an error at the unsafe access" << std::endl;
 			errFlag++;
 			#endif //SAFE_ACCESS
-		}  catch (exception const& ex) { }
+		}  catch (exception const& ex) { 
+			i=-1;
+		}
 		// Test Concatenation of arrays
 
-		stackT.Concatenate(stackT2);
-		stackT.PopulateIndices();
 		stackT.PrepareForUse();
+		errFlag+=TestReadyness(stackT," after PrepareForUse (2nd Time)",true);
+
+		stackT.Concatenate(stackT2);
+		errFlag+=TestReadyness(stackT," after Concatenate",false);
+
+		stackT.PrepareForUse();
+		errFlag+=TestReadyness(stackT," after PrepareForUse (3nd Time)",true);
+
+		stackT.PopulateIndices();
+		errFlag+=TestReadyness(stackT," after PopulateIndices",false);
+
+		stackT.PrepareForUse();
+		errFlag+=TestReadyness(stackT," after PrepareForUse (4th Time)",true);
+		
 		stackT.disp();
+		errFlag+=TestReadyness(stackT," Disp",true);
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -92,6 +113,26 @@ template <class T> int TestTemplate_ArrayStruct()
 	return(errFlag);
 }
 
+template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg)
+{
+	// Test if the behaviour of the readyness test is as expected
+	// stackT is the class to be tested 
+	// txt is a string to be displayed telling the user where the error is occuring
+	// errTarg is 
+	bool errTest;
+	int errFlag=0;
+	errTest=stackT.isready();
+	if (!(errTest==errTarg)){
+		cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) <<" ready (isready()) " << txt << endl;
+		errFlag++;
+	} 
+	errTest=stackT.checkready();
+	if (!(errTest==errTarg)){
+		cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) << " ready (checkready())"  << txt  << endl;
+		errFlag++;
+	} 
+	return(errFlag);
+}
 
 // member function definition template <class T> : "ArrayStruct"
 
@@ -108,18 +149,36 @@ template<class T> inline int ArrayStruct <T>::find(int key) const
 		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
 	}
 	auto search=hashTable.find(key);
+	int key2;
+
 	if (search==hashTable.end()){
 		return(-1);
 	}
 	#ifdef SAFE_ACCESS
-	if (elems[search->second].index!=key){
+	key2=elems[search->second].index;
+	if (key2!=key){
 		throw  invalid_argument ("FIND returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);
 }
 
+template<class T>  bool ArrayStruct <T>::checkready()  
+{	
+	readyforuse=true;
+	int i;
+	readyforuse=((isHash==1) & (isSetMI==1));
+	if (readyforuse){
+		while ( (i < this->size()) & readyforuse)
+		{
+			readyforuse=readyforuse & elems[i].isready();
+			++i;
+		}
+	}
 
+	return(readyforuse);
+	
+}
 
 
 template<class T> void ArrayStruct <T>::disp() const 
@@ -136,8 +195,8 @@ template<class T> void ArrayStruct <T>::disp() const
 template<class T> inline void ArrayStruct <T>::Init(int n)
 {
 	T sT;
-	elems.reserve(n);
-	elems.assign(n,sT);
+	this->reserve(n);
+	this->assign(n,sT);
 }
 
 
@@ -170,6 +229,7 @@ template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct <T> &other
 	//this->SetMaxIndex();
 	isHash=0;
 	isSetMI=0;
+	readyforuse=false;
 }
 
 template<class T> void ArrayStruct <T>::SetMaxIndex()
@@ -192,10 +252,12 @@ template<class T> void ArrayStruct <T>::PopulateIndices()
 	maxIndex=n;
 	isSetMI=1;
 	isHash=0;
+	readyforuse=false;
 }
 
 template<class T> void ArrayStruct <T>::PrepareForUse()
 {
+
 	for (int ii = 0; ii < this->size(); ++ii)
 	{
 		this->elems[ii].PrepareForUse();
@@ -206,6 +268,7 @@ template<class T> void ArrayStruct <T>::PrepareForUse()
 	if (isHash==0){
 		this->HashArray();
 	}
+	readyforuse=true;
 }
 
 // Implementation of vector member functions into the base class
@@ -223,12 +286,14 @@ template<class T> inline void ArrayStruct <T>::assign(int n, T& newelem)
 	elems.assign(n,newelem);
 	isHash=0;
 	isSetMI=0;
+	readyforuse=false;
 }
 template<class T> inline void ArrayStruct <T>::push_back(T& newelem)  
 {
 	elems.push_back(newelem);
 	isHash=0;
 	isSetMI=0;
+	readyforuse=false;
 }
 template<class T> inline void ArrayStruct <T>::reserve(int n)  
 {

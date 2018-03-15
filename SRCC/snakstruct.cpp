@@ -120,6 +120,55 @@ void snaxsurf::PrepareForUse() {
 // Implementatation of snake
 // -------------------------------------------------------------------------------------------
 
+void snake::disp() const{
+
+	snaxs.disp();
+	snaxedges.disp();
+	snaxsurfs.disp();
+	snakeconn.disp();
+	cout << "Snaking Mesh with  ";
+	snakemesh->displight();
+}
+void snake::displight() const{
+
+
+	cout << "snake: snax " << snaxs.size();
+	cout << "; snaxedges " << snaxedges.size();
+	cout << "; snaxsurfs " << snaxsurfs.size() << endl;
+
+	cout << "Snake with connectivity  ";
+	snakeconn.displight();
+
+	cout << "Snaking Mesh with  ";
+	snakemesh->displight();
+}
+
+bool snake::isready() {
+	
+	readyforuse=true;
+
+	readyforuse=readyforuse & snaxs.isready();
+	readyforuse=readyforuse & snaxedges.isready();
+	readyforuse=readyforuse & snaxsurfs.isready();
+	readyforuse=readyforuse & snakeconn.isready();
+	readyforuse=readyforuse & snakemesh->isready();
+
+	return(readyforuse);
+}
+
+void snake::PrepareForUse() {
+	if (!readyforuse){
+		snaxs.PrepareForUse();
+		snaxedges.PrepareForUse();
+		snaxsurfs.PrepareForUse();
+		snakeconn.PrepareForUse();
+		snakemesh->PrepareForUse();
+		readyforuse=true;
+	}
+}
+
+
+
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------

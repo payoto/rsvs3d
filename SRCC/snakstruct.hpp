@@ -66,6 +66,7 @@ public:
 	double& operator[](int a);
 	double operator()(int a) const;
 	void disp() const;
+	bool isready() const {return(bool(isuptodate));};
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -90,9 +91,13 @@ public:
 	// Using the mesh container to store connectivity
 	mesh snakeconn;
 	// pointer to snaking mesh
-	mesh *snakemesh;
+	mesh *snakemesh=NULL;
 
 	// methods
+	void disp() const;
+	void displight() const;
+	bool isready() const ;
+	void PrepareForUse();
 };
 
 
@@ -112,6 +117,7 @@ public:
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nVert;};
 	void PrepareForUse(){};
+	bool isready() const {return(true);}
 	/*snax(){
 	 index=0;
 	 d=0;
@@ -134,6 +140,7 @@ public:
 	void disp() const;
 	int Key() const {return (index);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nEdge;};
+	bool isready() const {return(normvector.isready());}
 
 
 };
@@ -147,6 +154,8 @@ public:
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nSurf;};
+	bool isready() const {return(normvector.isready());}
+
 
 };
 
