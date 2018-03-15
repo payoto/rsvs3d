@@ -31,18 +31,18 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 #------------------------------------------------------
 #            CODE BEFORE RECIPES
 #------------------------------------------------------
+
+# testall handling
+ifeq ($(MAKECMDGOALS),testall)
+TESTSOURCES+= $(TESTALLSOURCES)
+CFLAGS+= $(CFTESTFLAG)
+endif
+CFLAGS += $(CUSERFLAGS)
 # Object definitions
 
 OBJECTS=$(addprefix $(OBJDIR),$(SOURCES:.cpp=.o))
 TESTOBJECTS=$(addprefix $(OBJDIR)/,$(TESTSOURCES:.cpp=.o))
 $(shell mkdir -p $(OBJDIR) >/dev/null)
-# testall handling
-ifeq ($(MAKECMDGOALS),testall)
-TESTOBJECTS += $(TESTALLSOURCES:.cpp=.o)
-CFLAGS+= $(CFTESTFLAG)
-endif
-CFLAGS += $(CUSERFLAGS)
-
 # Handling dependency include:
 ifeq ($(MAKECMDGOALS),testall)
 SRCS = $(TESTALLSOURCES) $(TESTSOURCES)

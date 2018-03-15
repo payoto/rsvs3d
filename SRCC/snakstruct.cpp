@@ -143,10 +143,9 @@ void snake::displight() const{
 	snakemesh->displight();
 }
 
-bool snake::isready() {
-	
-	readyforuse=true;
+bool snake::isready() const{
 
+	bool readyforuse=true;
 	readyforuse=readyforuse & snaxs.isready();
 	readyforuse=readyforuse & snaxedges.isready();
 	readyforuse=readyforuse & snaxsurfs.isready();
@@ -157,14 +156,13 @@ bool snake::isready() {
 }
 
 void snake::PrepareForUse() {
-	if (!readyforuse){
-		snaxs.PrepareForUse();
-		snaxedges.PrepareForUse();
-		snaxsurfs.PrepareForUse();
-		snakeconn.PrepareForUse();
-		snakemesh->PrepareForUse();
-		readyforuse=true;
-	}
+	
+	snaxs.PrepareForUse();
+	snaxedges.PrepareForUse();
+	snaxsurfs.PrepareForUse();
+	snakeconn.PrepareForUse();
+	snakemesh->PrepareForUse();
+	
 }
 
 

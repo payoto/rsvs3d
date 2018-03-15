@@ -41,7 +41,7 @@ int Test_ArrayStructures() {
    cout << "--------------------------------------------" << endl;
    cout << "      testing Mesh" << endl;
    cout << "--------------------------------------------" << endl;
-   //errTest=Test_Mesh();
+   errTest=Test_Mesh();
    errFlag= errFlag | (errTest!=0);
 
 
