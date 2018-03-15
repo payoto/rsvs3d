@@ -14,7 +14,6 @@
 
 #ifdef DEBUGLVL1 // Debugging of new features.
 #define TEST_SNAKSTRUCT
-#define TEST_RANGE
 #endif
 
 //=================================
@@ -44,6 +43,8 @@ class coordvec;
 typedef ArrayStruct<snax> snaxarray;
 typedef ArrayStruct<snaxedge> snaxedgearray;
 typedef ArrayStruct<snaxsurf> snaxsurfarray;
+
+
 
 
 class coordvec {
@@ -91,6 +92,7 @@ public:
 	// pointer to snaking mesh
 	mesh *snakemesh;
 
+	// methods
 };
 
 
@@ -109,6 +111,7 @@ public:
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nVert;};
+	void PrepareForUse(){};
 	/*snax(){
 	 index=0;
 	 d=0;
@@ -125,7 +128,7 @@ public:
 class snaxedge : public meshpart {
 public:
 	int index=0;
-	double c=0;
+	int surfind=0;
 	coordvec normvector;
 	void PrepareForUse();
 	void disp() const;
@@ -137,7 +140,8 @@ public:
 
 class snaxsurf : public meshpart {
 public: 
-	int index;
+	int index=0;
+	int voluind=0;
 	coordvec normvector;
 	void PrepareForUse(); 
 	void disp() const;

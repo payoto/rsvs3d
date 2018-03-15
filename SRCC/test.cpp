@@ -5,8 +5,11 @@
 
 #include "test.hpp"
 #include "arraystructures.hpp"
+
+#ifdef TEST_ALL
 #include "voxel.hpp"
 #include "postprocessing.hpp"
+#endif //TEST_ALL
 #include "snakstruct.hpp"
 
 int main(){

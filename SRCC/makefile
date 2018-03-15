@@ -1,32 +1,66 @@
+
+#------------------------------------------------------
+#                 INPUTS
+#------------------------------------------------------
 # Specify compiler
 CC=g++ 
 # Specify linker
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -Wall -DDEBUGLVL1 -ggdb
+CFLAGS=-c -Wall -ggdb 
+CUSERFLAGS= -DDEBUGLVL1 -DSAFE_ACCESS
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
-
+OBJDIR=obj
+# make all options
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
+#make testnew/testall options
 TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp 
 TESTALLSOURCES= voxel.cpp postprocessing.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 
-OBJECTS=$(SOURCES:.cpp=.o)
+# Dependency handling
+DEPDIR := .d
+$(shell mkdir -p $(DEPDIR) >/dev/null)
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
-TESTOBJECTS=$(TESTSOURCES:.cpp=.o)
 
+#------------------------------------------------------
+#            CODE BEFORE RECIPES
+#------------------------------------------------------
+# Object definitions
+
+OBJECTS=$(addprefix $(OBJDIR),$(SOURCES:.cpp=.o))
+TESTOBJECTS=$(addprefix $(OBJDIR)/,$(TESTSOURCES:.cpp=.o))
+$(shell mkdir -p $(OBJDIR) >/dev/null)
+# testall handling
 ifeq ($(MAKECMDGOALS),testall)
 TESTOBJECTS += $(TESTALLSOURCES:.cpp=.o)
 CFLAGS+= $(CFTESTFLAG)
 endif
+CFLAGS += $(CUSERFLAGS)
 
+# Handling dependency include:
+ifeq ($(MAKECMDGOALS),testall)
+SRCS = $(TESTALLSOURCES) $(TESTSOURCES)
+endif
+ifeq ($(MAKECMDGOALS),testnew)
+SRCS =  $(TESTSOURCES)
+endif
+ifeq ($(MAKECMDGOALS),testall)
+SRCS = $(SOURCES)
+endif
 
+# Compilation command
 
-
+COMPILECPP=$(CC) $(DEPFLAGS) $(CFLAGS) $(INCLDIR)
+POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
+#------------------------------------------------------
+#             RECIPES
+#------------------------------------------------------
 #.PHONY : all
 all : $(SOURCES) $(EXECUTABLE)
   
@@ -44,8 +78,10 @@ main_test : $(TESTOBJECTS)
 	$(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
 
-.cpp.o :
-	$(CC) $(CFLAGS) $(INCLDIR) $< -o $@
+$(OBJDIR)/%.o : %.cpp
+$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d
+	$(COMPILECPP) $< -o $@
+	$(POSTCOMPILE)
 
 #compileflagsalltest :
 #CFLAGS=$(CFLAGS) $(CFTESTFLAG)
@@ -54,7 +90,13 @@ main_test : $(TESTOBJECTS)
 # Clean target
 #.PHONY : clean
 clean :
-	rm *.o *.exe
+	rm *.o *.exe $(OBJDIR)/*.o $(DEPDIR)/*.d 
 
 #precompile.hpp : 
 #	$(CC) -c -H -DDEBUGLVL1 -ggdb $(INCLDIR) -x c++-header precompile.hpp
+
+
+$(DEPDIR)/%.d: ;
+.PRECIOUS: $(DEPDIR)/%.d
+
+include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS))))

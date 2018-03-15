@@ -8,13 +8,15 @@
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
+#define TEST_RANGE // deprecated
 #define TEST_ARRAYSTRUCT
 
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_RANGE
+#ifndef SAFE_ACCESS
 #define SAFE_ACCESS
+#endif
 #endif
 
 //=================================
@@ -106,7 +108,9 @@ public:
 	}
 
 }; 
+  
 
+  
 // Base class
 
 class mesh {
@@ -138,7 +142,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual void disp() const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
-	void PrepareForUse(){};
+	virtual void PrepareForUse()=0 ;
 	//virtual operator=( meshpart* other)=0 ;
 
 };
@@ -152,6 +156,7 @@ public:
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
+	void PrepareForUse(){};
 
 	volu(){ // Constructor
 		index=0;
@@ -209,6 +214,7 @@ public:
 
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void PrepareForUse(){};
 
 	surf(){ // Constructor
 		index=0;
@@ -256,6 +262,7 @@ public:
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
+	void PrepareForUse(){};
 
 	edge(){ // Constructor
 		index=0;
@@ -294,6 +301,7 @@ public:
 
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void PrepareForUse(){};
 
 	vert(){ // Constructor
 		index=0;

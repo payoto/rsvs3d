@@ -14,6 +14,8 @@
 *.exe
 *.s
 *.o
+SRCC/obj/*.o
+SRCC/.d/*
 
 SRCC/gch/*
 

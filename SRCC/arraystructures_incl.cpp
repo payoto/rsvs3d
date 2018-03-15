@@ -25,6 +25,8 @@ return(compFlag);
 
 // Templated test for all types that need to be derived from ArrayStruct<T>
 
+//
+
 template <class T> int TestTemplate_ArrayStruct()
 {
 	ArrayStruct<T> stackT,stackT2;

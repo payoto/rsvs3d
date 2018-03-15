@@ -92,7 +92,7 @@ void coordvec::disp() const{
 	<< norm << " utd " << isuptodate <<endl;
 }
 // -------------------------------------------------------------------------------------------
-// Implementatation of snaxedge 
+// Implementatation of snax - snaxedge - snaxsurf 
 // -------------------------------------------------------------------------------------------
 void snax::disp() const{
 	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind <<
@@ -101,7 +101,6 @@ void snax::disp() const{
 
 void snaxedge::disp() const{
 	cout << "snaxedge #" << index << " ";
-	cout << "bogus #" << c << " ";
 	normvector.disp();
 }
 
@@ -117,7 +116,9 @@ void snaxedge::PrepareForUse() {
 void snaxsurf::PrepareForUse() {
 	normvector.PrepareForUse();
 }
-
+// -------------------------------------------------------------------------------------------
+// Implementatation of snake
+// -------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------
 // TEST CODE
