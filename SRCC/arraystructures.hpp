@@ -152,12 +152,12 @@ public:
 
 class meshpart{ // Abstract class to ensure interface is correct
 	public : 
-	int index;
+	int index=0;
 	virtual void disp() const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 	virtual void PrepareForUse()=0 ;
-	virtual bool isready() const=0;
+	virtual bool isready() const=0 ;
 	//virtual operator=( meshpart* other)=0 ;
 
 };

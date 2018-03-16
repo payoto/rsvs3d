@@ -46,12 +46,12 @@ class tecplotfile {
 		int OpenFile(const char *str);
 		void CloseFile();
 		int PrintMesh(const mesh& meshout);
-		int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat, int nCellDat);
-		int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat, int nCellDat);
-		int VolFaceMap(const mesh& meshout,int nVert,int nSurf,int nVolu);
-		int SurfFaceMap(const mesh& meshout,int nVert,int nEdge,int nSurf,int nVolu);
-		void ZoneHeaderPolyhedron(int nVert,int nEdge, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
-		void ZoneHeaderPolygon(int nVert,int nEdge, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
+		int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
+		int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
+		int VolFaceMap(const mesh& meshout,int nSurf);
+		int SurfFaceMap(const mesh& meshout,int nEdge);
+		void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
+		void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
 
 		tecplotfile(){
 			fid=NULL;

@@ -101,7 +101,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
 
 int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim,
-	 RowVector3i nEdgeDim, int nEdge);
+	 RowVector3i nEdgeDim);
 
 int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh& blockGrid,
 	RowVector3i nSurfDim, Matrix3i surfProp);

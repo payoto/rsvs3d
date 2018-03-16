@@ -16,7 +16,7 @@
 		
 		{
 			"name": "Custom Make",
-			"file_regex" : "^(.*):(\\d+):(\\d+):\\s*(.*)$" ,
+			"file_regex" : "^([^ ]*):(\\d+):(\\d+):\\s*(.*)$" ,
 
 			"variants": [
 				{

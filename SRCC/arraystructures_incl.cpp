@@ -102,7 +102,7 @@ template <class T> int TestTemplate_ArrayStruct()
 
 		stackT.PrepareForUse();
 		errFlag+=TestReadyness(stackT," after PrepareForUse (4th Time)",true);
-		
+
 		stackT.disp();
 		errFlag+=TestReadyness(stackT," Disp",true);
 
@@ -166,7 +166,7 @@ template<class T> inline int ArrayStruct <T>::find(int key) const
 template<class T>  bool ArrayStruct <T>::checkready()  
 {	
 	readyforuse=true;
-	int i;
+	int i=0;
 	readyforuse=((isHash==1) & (isSetMI==1));
 	if (readyforuse){
 		while ( (i < this->size()) & readyforuse)

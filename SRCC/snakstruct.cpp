@@ -116,6 +116,19 @@ void snaxedge::PrepareForUse() {
 void snaxsurf::PrepareForUse() {
 	normvector.PrepareForUse();
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+void snax::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+	index+=nVert;
+}
+void snaxedge::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+	index+=nEdge;
+}
+void snaxsurf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+	index+=nSurf;
+}
+#pragma GCC diagnostic pop
 // -------------------------------------------------------------------------------------------
 // Implementatation of snake
 // -------------------------------------------------------------------------------------------

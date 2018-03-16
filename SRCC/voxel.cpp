@@ -73,7 +73,7 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 
 	BuildBlockVolu(dimGrid, nVolu, blockGrid, nSurfDim, surfProp);
 	BuildBlockSurf( dimGrid,  nSurf , blockGrid ,
-		surfProp,  edgeProp,  nSurfDim,  nEdgeDim, nEdge);
+		surfProp,  edgeProp,  nSurfDim,  nEdgeDim);
 	BuildBlockEdge(dimGrid,  blockGrid,  nEdge , nEdgeDim,nSurfDim,
 		edgeProp, surfProp);
 	BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
@@ -137,8 +137,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 }
 
 int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
-	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim, RowVector3i nEdgeDim,
-	int nEdge){
+	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim, RowVector3i nEdgeDim){
 	/*Builds the surface information for the generation of block grids of size dimGrid*/
 
 	RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;

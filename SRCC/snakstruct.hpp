@@ -101,11 +101,11 @@ public:
 };
 
 
-class snax : public meshpart {	
+class snax  : public meshpart {	
 public:
 	int index=0;
-	double d=0;
-	double v=0;
+	double d=0.0;
+	double v=0.0;
 	int fromvert=0; 	// root vertex of *snakemesh
 	int tovert=0; 	// destination vertex of *snakemesh
 	int edgeind=0; 	// edge of snakemesh
@@ -115,21 +115,13 @@ public:
 	// interface functions
 	void disp() const;
 	int Key() const {return (index);};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nVert;};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
-	/*snax(){
-	 index=0;
-	 d=0;
-	 v=0;
-	 fromvert=0; 	// root vertex of *snakemesh
-	 tovert=0; 		// destination vertex of *snakemesh
-	 edgeind=0; 	// edge of snakemesh
-	 isfreeze=0; 	// freeze status 
-	 orderedge=0;	// order on the edge
-	}*/
+
 
 };
+
 
 class snaxedge : public meshpart {
 public:
@@ -139,7 +131,7 @@ public:
 	void PrepareForUse();
 	void disp() const;
 	int Key() const {return (index);}; 
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nEdge;};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
 
 
@@ -153,7 +145,7 @@ public:
 	void PrepareForUse(); 
 	void disp() const;
 	int Key() const {return (index);};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){index+=nSurf;};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
 
 

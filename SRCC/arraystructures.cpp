@@ -73,7 +73,8 @@ void vert::disp() const{
    }
    cout << endl;
 }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void volu::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    int i;
    index+=nVolu;
@@ -110,6 +111,7 @@ void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
       edgeind[i]=edgeind[i]+nEdge;
    }
 }
+#pragma GCC diagnostic pop
 // methods for mesh
 void mesh::HashArray(){
    verts.HashArray();
