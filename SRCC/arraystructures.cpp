@@ -175,7 +175,7 @@ void mesh::Init(int nVe,int nE, int nS, int nVo){
    #endif // TEST_ARRAYSTRUCTURES
 }
 
-void mesh::MakeCompatible_inplace(mesh *other) const{
+void mesh::MakeCompatible_inplace(mesh &other) const{
    // Makes other mesh compatible with this to be 
    // merged without index crashes
 
@@ -183,11 +183,11 @@ void mesh::MakeCompatible_inplace(mesh *other) const{
 
    // Define Max indices in current mesh
    this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
-   other->ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   other.ChangeIndices(nVert,nEdge,nVolu,nSurf);
 }
 
 void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
-   int ii;
+   /*int ii;
    // Volumes
    for(ii=0;ii<volus.size();++ii){
       volus[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
@@ -203,11 +203,15 @@ void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    // Surfaces
    for(ii=0;ii<verts.size();++ii){
       verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
-   }
+   }*/
+   volus.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   edges.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   surfs.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   verts.ChangeIndices(nVert,nEdge,nVolu,nSurf);
 }
 
 mesh mesh::MakeCompatible(mesh other) const{
-   MakeCompatible_inplace(&other);
+   MakeCompatible_inplace(other);
    return(other);
 }
 
@@ -219,11 +223,11 @@ void mesh::Concatenate(const mesh &other){
    this->surfs.Concatenate(other.surfs);
 }
 
-void PopulateIndices(mesh *meshin){
+void mesh::PopulateIndices(){
    
-   meshin->volus.PopulateIndices();
-   meshin->edges.PopulateIndices();
-   meshin->verts.PopulateIndices();
-   meshin->surfs.PopulateIndices();
+   volus.PopulateIndices();
+   edges.PopulateIndices();
+   verts.PopulateIndices();
+   surfs.PopulateIndices();
 }
 

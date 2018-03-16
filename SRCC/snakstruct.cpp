@@ -128,6 +128,17 @@ void snaxedge::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 void snaxsurf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 	index+=nSurf;
 }
+void snax::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
+	fromvert+=nVert;
+	tovert+=nVert;
+	edgeind+=nEdge;
+}
+void snaxedge::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
+	surfind+=nSurf;
+}
+void snaxsurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
+	voluind+=nVolu;
+}
 #pragma GCC diagnostic pop
 // -------------------------------------------------------------------------------------------
 // Implementatation of snake
@@ -168,6 +179,11 @@ bool snake::isready() const{
 	return(readyforuse);
 }
 
+inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const
+{
+	snakeconn.GetMaxIndex(nVert,nEdge,nSurf,nVolu);
+}
+
 void snake::PrepareForUse() {
 	
 	snaxs.PrepareForUse();
@@ -177,9 +193,96 @@ void snake::PrepareForUse() {
 	snakemesh->PrepareForUse();
 	
 }
+void snake::HashArray(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
+	// Use HashArray when debugging to be sure that fields are correctly hashed
+	snaxs.HashArray();
+	snaxedges.HashArray();
+	snaxsurfs.HashArray();
+	snakeconn.HashArray();
+	snakemesh->HashArray();
 
+}
+void snake::SetMaxIndex(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
 
+	snaxs.SetMaxIndex();
+	snaxedges.SetMaxIndex();
+	snaxsurfs.SetMaxIndex();
+	snakeconn.SetMaxIndex();
+	snakemesh->SetMaxIndex();
 
+}
+
+void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
+// Initialise a 
+	is3D=snakemeshin->volus.size()>0;
+
+	snaxs.Init(nSnax);
+	snaxedges.Init(nEdge);
+	snaxsurfs.Init(nSurf);
+
+	snakeconn.Init(nSnax, nEdge, nSurf, nVolu);
+
+	snakemesh=snakemeshin;
+
+}
+
+void snake::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+	
+	snaxs.ChangeIndices(nVert,nEdge,nSurf,nVolu); 
+	snaxedges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	snaxsurfs.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	snakeconn.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+
+}
+void snake::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
+	int ii=0;
+	for(ii=0;ii<snaxs.size();++ii){
+		snaxs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu); 
+	}
+	for(ii=0;ii<snaxedges.size();++ii){
+		snaxedges[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
+	}
+	for(ii=0;ii<snaxsurfs.size();++ii){
+		snaxsurfs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
+	}
+	// Nothing to do for snakeconn
+	//snakeconn.ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
+
+	snakemesh->ChangeIndices(nVert,nEdge,nSurf,nVolu); //Maybe this one is a bad idea
+
+}
+
+void snake::Concatenate(const snake &other){
+
+	if(this->snakemesh==other.snakemesh){
+		this->snaxs.Concatenate(other.snaxs);
+		this->snaxedges.Concatenate(other.snaxedges);
+		this->snaxsurfs.Concatenate(other.snaxsurfs);
+		this->snakeconn.Concatenate(other.snakeconn);
+	} else {
+
+		throw invalid_argument("Concatenation of snakes with different base meshes not supported");
+	}
+
+}
+void snake::MakeCompatible_inplace(snake &other) const{
+   // Makes other mesh compatible with this to be 
+   // merged without index crashes
+
+   int nVert,nEdge,nVolu,nSurf;
+
+   // Define Max indices in current mesh
+   this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
+   other.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+}
+snake snake::MakeCompatible(snake other) const{
+   MakeCompatible_inplace(other);
+   return(other);
+}
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------

@@ -295,8 +295,8 @@ int Test_Mesh(){
       mesh1.Init(8,12,6,1);
       mesh2.Init(14,20,11,2);
 
-      PopulateIndices(&mesh1);
-      PopulateIndices(&mesh2);
+      mesh1.PopulateIndices();
+      mesh2.PopulateIndices();
       mesh3=mesh1.MakeCompatible(mesh2);
 #ifdef TEST_ARRAYSTRUCT_MESH
       cout << "mesh1 " << endl;
@@ -306,7 +306,7 @@ int Test_Mesh(){
       mesh2.disp() ;
 #endif
 
-      mesh1.MakeCompatible_inplace(&mesh2);
+      mesh1.MakeCompatible_inplace(mesh2);
 
 #ifdef TEST_ARRAYSTRUCT_MESH
       cout << "mesh2 made compatible inplace: ";

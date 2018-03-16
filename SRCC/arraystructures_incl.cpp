@@ -138,6 +138,12 @@ template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg)
 
 template<class T> inline int ArrayStruct <T>::GetMaxIndex() const 
 {
+	#ifdef SAFE_ACCESS
+	if (!isSetMI)
+	{
+		cerr << "warning: Potentially unsafe reading of max index - execute PrepareForUse() before access" << endl;
+	}
+	#endif //SAFE_ACCESS
 	return(maxIndex);
 }
 
@@ -183,7 +189,7 @@ template<class T>  bool ArrayStruct <T>::checkready()
 
 template<class T> void ArrayStruct <T>::disp() const 
 {
-
+	cout << "Array of size " << this->size() << endl;
 	for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
 		cout << "Array " << ii << " " ;
 		elems[ii].disp();
@@ -202,6 +208,8 @@ template<class T> inline void ArrayStruct <T>::Init(int n)
 
 template<class T> void ArrayStruct <T>::HashArray()
 {
+	// Generates a valid unordered_map for the current ArrayStruct
+	// Function should not be called repeatedly 
 	if(!hashTable.empty()){
 		hashTable.clear();
 	}
@@ -211,9 +219,21 @@ template<class T> void ArrayStruct <T>::HashArray()
 		hashTable.emplace(elems[i].Key(),i);
 	}
 	isHash=1;
+	
+	
    //cout << "Array Struct Succesfully Hashed" << endl;
 }
 
+template<class T> void ArrayStruct <T>::SetMaxIndex()
+{
+	// Sets the correct value of maxIndex
+	int n=elems.size();
+	maxIndex=-1;
+	for(int ii=0;ii<n;++ii){
+		maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
+	}
+	isSetMI=1;
+}
 template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct <T> &other)
 {
 	int nCurr,nNew,nTot,ii;
@@ -232,15 +252,6 @@ template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct <T> &other
 	readyforuse=false;
 }
 
-template<class T> void ArrayStruct <T>::SetMaxIndex()
-{
-	int n=elems.size();
-	maxIndex=-1;
-	for(int ii=0;ii<n;++ii){
-		maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
-	}
-	isSetMI=1;
-}
 
 template<class T> void ArrayStruct <T>::PopulateIndices()
 {
@@ -254,7 +265,17 @@ template<class T> void ArrayStruct <T>::PopulateIndices()
 	isHash=0;
 	readyforuse=false;
 }
+template<class T> void ArrayStruct <T>::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)
+{
+	int n=elems.size();
+	for(int ii=0;ii<n;++ii){
+		elems[ii].ChangeIndices( nVert, nEdge, nSurf, nVolu);
+	}
 
+	isSetMI=0;
+	isHash=0;
+	readyforuse=false;
+}
 template<class T> void ArrayStruct <T>::PrepareForUse()
 {
 

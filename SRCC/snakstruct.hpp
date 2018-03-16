@@ -80,9 +80,9 @@ public:
 };
 
 
-class snake : public mesh {
+class snake  {
 private:
-
+	bool is3D=true;
 public:
 	// Handling of data specific to snake
 	snaxarray snaxs; 			// properties associated with snakconn verts
@@ -93,11 +93,23 @@ public:
 	// pointer to snaking mesh
 	mesh *snakemesh=NULL;
 
-	// methods
+	// basic operations grouped from each field
 	void disp() const;
 	void displight() const;
 	bool isready() const ;
 	void PrepareForUse();
+	void Init(mesh *snakemesh,int nSnax, int nEdge, int nSurf, int nVolu);
+	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
+	void HashArray(); // Not really needed as handled by PrepareForUse
+	void SetMaxIndex(); // Not really needed as handled by PrepareForUse	
+	void Concatenate(const snake &other);
+
+	// Snake merging
+	void MakeCompatible_inplace(snake &other) const;
+	snake MakeCompatible(snake other) const;
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
+
 };
 
 
@@ -116,6 +128,7 @@ public:
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
 
@@ -132,6 +145,7 @@ public:
 	void disp() const;
 	int Key() const {return (index);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
 
 
@@ -146,6 +160,7 @@ public:
 	void disp() const;
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
 
 
@@ -156,7 +171,6 @@ int Test_SnakeStructures();
 int Test_coordvec();
 int Test_snax();
 int Test_snaxedge();
-int Test_snaxsurf();
 int Test_snake();
 
 #endif //SNAKSTRUCT_H_INCLUDED

@@ -37,7 +37,13 @@ int Test_SnakeStructures() {
 	errTest=Test_snaxedge();
 	errFlag= errFlag | (errTest!=0);
 
-return(errFlag);
+	cout << "--------------------------------------------" << endl;
+	cout << "      testing Snake" << endl;
+	cout << "--------------------------------------------" << endl;
+	errTest=Test_snake();
+	errFlag= errFlag | (errTest!=0);
+
+	return(errFlag);
 } 
 
 
@@ -141,28 +147,60 @@ int Test_snaxedge(){
 
 }
 
-int Test_snaxsurf(){
-
-	try {
-
-
-	} catch (exception const& ex) { 
-		cerr << "Exception: " << ex.what() <<endl; 
-		return -1;
-	} 
-	return(0);
-
-}
 
 int Test_snake(){
+	snake testSnake,testSnake2,testSnake3;
+	mesh snakeMesh,snakeMesh2;
 
+	bool errFlag;
+	int errTest=0;
+	//int nVert,nSurf,nEdge,nVolu;
 	try {
+		snakeMesh.Init(8,12,6,1);
+		snakeMesh2.Init(8,12,6,1);
 
+		testSnake.Init(&snakeMesh,8,12,6,1);
+		testSnake2=testSnake;
+
+		errFlag=CompareDisp(testSnake,testSnake2);
+		cout << "Compare snakes after = assignement: 1=" << errFlag << endl ; 
+		errTest=errTest+int(!errFlag);
+		testSnake.ChangeIndices( 1, 2, 3,4);
+		cout << "Succesfully changed indices (ChangeIndices)" << endl ; 
+		testSnake.ChangeIndicesSnakeMesh( 5,6,7,8);
+		cout << "Succesfully changed indices (ChangeIndicesSnakeMesh)" << endl ;
+
+		testSnake.PrepareForUse();
+
+		cout << "-----------------------testSnake1-----------------------" << endl;
+		testSnake.disp();
+		testSnake.displight();
+
+		testSnake3=testSnake.MakeCompatible(testSnake2);
+		cout << "-----------------------testSnake2-----------------------" << endl;
+		testSnake2.disp();
+		cout << "-----------------------testSnake3-----------------------" << endl;
+		testSnake3.disp();
+		testSnake.Concatenate(testSnake3);
+		testSnake.PrepareForUse();
+
+
+		testSnake3.Init(&snakeMesh2,8,12,6,1);
+		testSnake.MakeCompatible_inplace(testSnake3);
+		
+		try {
+			testSnake.Concatenate(testSnake3);
+			cerr << "Error : Concatenation between snakes on different meshes was allowed" << endl;
+		} catch (exception const& ex){
+			cout << "Succesfully generated failure" << endl;
+		}
+		cout << "-----------------------testSnake-----------------------" << endl;
+		testSnake.displight();
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 
-	return(0);
+	return(errTest);
 
 }

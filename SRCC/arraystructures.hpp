@@ -80,6 +80,7 @@ public:
 	void disp() const;
 	inline int find(int key) const ;
 	inline int GetMaxIndex() const;
+	inline void Init(int n);
 	bool isready() const {return(readyforuse);};
 	bool checkready() ;
 	void Concatenate(const ArrayStruct<T> &other);
@@ -87,7 +88,7 @@ public:
 	void SetMaxIndex();
 	void HashArray();
 	void PrepareForUse();
-	inline void Init(int n);
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -142,9 +143,9 @@ public:
 	void displight() const;
 	void Concatenate(const mesh &other);
 	bool isready() const;
-
+	void PopulateIndices();
 // Mesh merging
-	void MakeCompatible_inplace(mesh *other) const;
+	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 };
