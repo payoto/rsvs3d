@@ -31,6 +31,7 @@ template <class T> int TestTemplate_ArrayStruct()
 {
 	ArrayStruct<T> stackT,stackT2;
 	T singleT;
+	vector<int> testSub = {2,5,10,7};
 	int i=0,j=0;
 	int errFlag=0;
 	bool errTest;
@@ -65,11 +66,16 @@ template <class T> int TestTemplate_ArrayStruct()
 		// Test Find
 		i=stackT.find(10);
 		j=stackT.find(7);
+		testSub=stackT.find_list(testSub);
 		errFlag+=TestReadyness(stackT," after find",true);
 
 
 		if (i!=2 || j!=-1){
 			std::cerr << "FIND did not Succesfully identify the indices" << std::endl;
+			errFlag++;
+		}
+		if (testSub[2]!=2 || testSub[3]!=-1){
+			std::cerr << "FIND_LISTS did not Succesfully identify the indices" << std::endl;
 			errFlag++;
 		}
 
@@ -147,7 +153,7 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 	return(maxIndex);
 }
 
-template<class T> inline int ArrayStruct <T>::find(int key) const 
+template<class T>  int ArrayStruct <T>::find(int key) const 
 {
 	if (isHash==0){
 		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
@@ -167,6 +173,16 @@ template<class T> inline int ArrayStruct <T>::find(int key) const
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);
+}
+
+template<class T> vector<int> ArrayStruct <T>::find_list(vector<int> key) const 
+{
+	vector<int> returnSub=key;
+	int ii;
+	for (ii=0;ii<int(key.size());++ii){
+		returnSub[ii]=this->find(key[ii]);
+	}
+	return(returnSub);
 }
 
 template<class T>  bool ArrayStruct <T>::checkready()  

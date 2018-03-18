@@ -78,7 +78,8 @@ protected:
 
 public: 
 	void disp() const;
-	inline int find(int key) const ;
+	int find(int key) const ;
+	vector<int> find_list(vector<int> key) const ;
 	inline int GetMaxIndex() const;
 	inline void Init(int n);
 	bool isready() const {return(readyforuse);};

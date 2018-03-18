@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include "snakstruct.hpp"
 #include "arraystructures.hpp"
@@ -282,6 +283,15 @@ void snake::MakeCompatible_inplace(snake &other) const{
 snake snake::MakeCompatible(snake other) const{
    MakeCompatible_inplace(other);
    return(other);
+}
+
+void snake::SpawnAtVertex(int indVert){
+
+	int subVert;
+	vector<int> edgeInds;
+
+	subVert=snakemesh->verts.find(indVert);
+	edgeInds=snakemesh->verts[subVert].edgeind;
 }
 // -------------------------------------------------------------------------------------------
 // TEST CODE
