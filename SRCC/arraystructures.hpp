@@ -90,6 +90,8 @@ public:
 	void HashArray();
 	void PrepareForUse();
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void write(FILE *fid) const;
+	void read(FILE *fid);
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -145,6 +147,11 @@ public:
 	void Concatenate(const mesh &other);
 	bool isready() const;
 	void PopulateIndices();
+//File I/o
+	void write(FILE *fid) const;
+	void read(FILE *fid);
+	int write(const char *str) const;
+	int read(const char *str);
 // Mesh merging
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
@@ -160,6 +167,8 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 	virtual void PrepareForUse()=0 ;
 	virtual bool isready() const=0 ;
+	virtual void read(FILE * fid)=0 ;
+	virtual void write(FILE * fid) const =0 ;
 	//virtual operator=( meshpart* other)=0 ;
 
 };
@@ -175,6 +184,8 @@ public:
 	void disp() const;
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
+	void read(FILE * fid);
+	void write(FILE * fid) const;
 
 	volu(){ // Constructor
 		index=0;
@@ -234,6 +245,8 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
 	bool isready() const {return(true);}
+	void read(FILE * fid);
+	void write(FILE * fid) const;
 
 	surf(){ // Constructor
 		index=0;
@@ -275,7 +288,7 @@ class edge: public meshpart {
 public:
 	int index;
 
-	vector<int> vertind;
+	vector<int>  vertind;
 	vector<int> surfind;
 	 // reserves 2 as this is the size of the array
 
@@ -283,6 +296,8 @@ public:
 	void disp() const;
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
+	void read(FILE * fid);
+	void write(FILE * fid) const;
 
 	edge(){ // Constructor
 		index=0;
@@ -323,6 +338,8 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
+	void read(FILE * fid);
+	void write(FILE * fid) const;
 
 	vert(){ // Constructor
 		index=0;

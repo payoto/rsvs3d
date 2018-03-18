@@ -131,6 +131,8 @@ public:
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	bool isready() const {return(true);}
+	void read(FILE * fid);
+	void write(FILE * fid) const;
 
 
 };
@@ -147,6 +149,8 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
+	void read(FILE * fid);
+	void write(FILE *fid)const;
 
 
 };
@@ -162,6 +166,8 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	bool isready() const {return(normvector.isready());}
+	void read(FILE * fid);
+	void write(FILE * fid)const;
 
 
 };
@@ -172,5 +178,6 @@ int Test_coordvec();
 int Test_snax();
 int Test_snaxedge();
 int Test_snake();
-
+void SpawnAtVertex(snake snakein,int indVert);
+int Test_snakeinit();
 #endif //SNAKSTRUCT_H_INCLUDED

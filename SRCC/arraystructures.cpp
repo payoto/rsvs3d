@@ -73,6 +73,128 @@ void vert::disp() const{
    }
    cout << endl;
 }
+// Input and output
+void volu::write(FILE *fid) const{
+
+   int i;
+
+   fprintf(fid, "%i %.16lf %.16lf %.16lf ",index,fill,target, error);
+   fprintf(fid, "%i ",int(surfind.size()));
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      fprintf(fid, "%i ",surfind[i]);
+   }
+   fprintf(fid,"\n");
+}
+
+void surf::write(FILE * fid) const{
+   int i;
+
+   fprintf(fid, "%i %.16lf %.16lf %.16lf ",index,fill,target, error);
+   fprintf(fid, "%i ",int(voluind.size()));
+   for (i=0; unsigned_int(i)<voluind.size();i++){
+      fprintf(fid, "%i ",voluind[i]);
+   }
+   fprintf(fid, "%i ",int(edgeind.size()));
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      fprintf(fid, "%i ",edgeind[i]);
+   }
+   fprintf(fid,"\n");
+}
+
+void edge::write(FILE * fid) const{
+   int i;
+
+   fprintf(fid, "%i ",index);
+   fprintf(fid, "%i ",int(vertind.size()));
+   for (i=0; unsigned_int(i)<vertind.size();i++){
+      fprintf(fid, "%i ",vertind[i]);
+   }
+   fprintf(fid, "%i ",int(surfind.size()));
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      fprintf(fid, "%i ",surfind[i]);
+   }
+   fprintf(fid,"\n");
+}
+
+void vert::write(FILE * fid) const{
+   int i;
+   
+   fprintf(fid, "%i ",index);
+   fprintf(fid, "%i ",int(edgeind.size()));
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      fprintf(fid, "%i ",edgeind[i]);
+   }
+   fprintf(fid, "%i ",int(coord.size()));
+   for (i=0; unsigned_int(i)<coord.size();i++){
+      fprintf(fid, "%.16lf ",coord[i]);
+   }
+   fprintf(fid,"\n");
+}
+
+void volu::read(FILE * fid) {
+
+   int i,n;
+
+   fscanf(fid, "%i %lf %lf %lf ",&index,&fill,&target, &error);
+   fscanf(fid, "%i ",&n);
+   surfind.assign(n,0);
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      fscanf(fid, "%i ",&surfind[i]);
+   }
+
+}
+
+void surf::read(FILE * fid) {
+   int i,n;
+
+   fscanf(fid, "%i %lf %lf %lf ",&index,&fill,&target, &error);
+   fscanf(fid, "%i ",&n);
+   voluind.assign(n,0);
+   for (i=0; unsigned_int(i)<voluind.size();i++){
+      fscanf(fid, "%i ",&voluind[i]);
+   }
+   fscanf(fid, "%i ",&n);
+   edgeind.assign(n,0);
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      fscanf(fid, "%i ",&edgeind[i]);
+   }
+
+}
+
+void edge::read(FILE * fid) {
+   int i,n;
+
+   fscanf(fid, "%i ",&index);
+   fscanf(fid, "%i ",&n);
+   vertind.assign(n,0);
+   for (i=0; unsigned_int(i)<vertind.size();i++){
+      fscanf(fid, "%i ",&vertind[i]);
+   }
+   fscanf(fid, "%i ",&n);
+   surfind.assign(n,0);
+   for (i=0; unsigned_int(i)<surfind.size();i++){
+      fscanf(fid, "%i ",&surfind[i]);
+   }
+
+}
+
+void vert::read(FILE * fid) {
+   int i,n;
+   
+   fscanf(fid, "%i ",&index);
+   fscanf(fid, "%i ",&n);
+   edgeind.assign(n,0);
+   for (i=0; unsigned_int(i)<edgeind.size();i++){
+      fscanf(fid, "%i ",&edgeind[i]);
+   }
+   fscanf(fid, "%i ",&n);
+   coord.assign(n,0);
+   for (i=0; unsigned_int(i)<coord.size();i++){
+      fscanf(fid, "%lf ",&coord[i]);
+   }
+
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void volu::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
@@ -143,6 +265,43 @@ void mesh::disp() const {
    edges.disp();
    surfs.disp();
    volus.disp();
+}
+void mesh::read(FILE *fid) {
+   verts.read(fid);
+   edges.read(fid);
+   surfs.read(fid);
+   volus.read(fid);
+}
+void mesh::write(FILE *fid) const {
+   verts.write(fid);
+   edges.write(fid);
+   surfs.write(fid);
+   volus.write(fid);
+}
+int mesh::read(const char *str) {
+   // Convenience read function taking a single char argument
+   FILE *fid;
+   fid=fopen(str,"r");
+   if (fid!=NULL){
+      this->read(fid);
+      fclose(fid);
+   } else {
+      cout << "File " << str << "Could not be opened to read" << endl;
+      return(1);
+   }
+   return(0);
+}
+int mesh::write(const char *str) const {
+   FILE *fid;
+   fid=fopen(str,"w");
+   if (fid!=NULL){
+      this->write(fid);
+      fclose(fid);
+   } else {
+      cout << "File " << str << "Could not be opened to write" << endl;
+      return(1);
+   }
+   return(0);
 }
 bool mesh::isready() const {
    bool readyforuse=true;
@@ -224,7 +383,7 @@ void mesh::Concatenate(const mesh &other){
 }
 
 void mesh::PopulateIndices(){
-   
+
    volus.PopulateIndices();
    edges.PopulateIndices();
    verts.PopulateIndices();

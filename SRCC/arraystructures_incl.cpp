@@ -29,14 +29,16 @@ return(compFlag);
 
 template <class T> int TestTemplate_ArrayStruct()
 {
-	ArrayStruct<T> stackT,stackT2;
+	ArrayStruct<T> stackT,stackT2,stackT3;
 	T singleT;
 	vector<int> testSub = {2,5,10,7};
+	FILE *fidw,*fidr;
 	int i=0,j=0;
 	int errFlag=0;
 	bool errTest;
 
 	try {
+		
 		// Test Initialisation
 		stackT.assign(5,singleT);
 		stackT.PopulateIndices();
@@ -108,6 +110,31 @@ template <class T> int TestTemplate_ArrayStruct()
 
 		stackT.PrepareForUse();
 		errFlag+=TestReadyness(stackT," after PrepareForUse (4th Time)",true);
+
+		// Test Read write:
+		fidw=fopen("..\\TESTOUT\\testarray.dat","w");
+		if(fidw!=NULL){
+			stackT.write(fidw);
+			errFlag+=TestReadyness(stackT," Write out",true);
+			fclose(fidw);
+			fidr=fopen("..\\TESTOUT\\testarray.dat","r");
+			if(fidr!=NULL){
+				stackT3.read(fidr);
+				fclose(fidr);
+				stackT3.PrepareForUse();
+				errTest=CompareDisp(stackT,stackT3);
+				if (!errTest){
+					cerr << "Error Displays were not the same after write read" << endl;
+					errFlag++;
+				}
+			}else{
+				cout << "Error: Could not open file to read test arraystructures." << endl;
+				errFlag++;  
+			}
+		}else{
+			cout << "Error: Could not open file to write test arraystructures." << endl;
+			errFlag++;  
+		}
 
 		stackT.disp();
 		errFlag+=TestReadyness(stackT," Disp",true);
@@ -183,6 +210,24 @@ template<class T> vector<int> ArrayStruct <T>::find_list(vector<int> key) const
 		returnSub[ii]=this->find(key[ii]);
 	}
 	return(returnSub);
+}
+
+template<class T> void ArrayStruct <T>::write(FILE *fid) const 
+{
+	int ii;
+	fprintf(fid,"%i \n",int(this->size()));
+	for (ii=0;ii<int(this->size());++ii){
+		elems[ii].write(fid);
+	}
+}
+template<class T> void ArrayStruct <T>::read(FILE *fid) 
+{
+	int ii,n;
+	fscanf(fid,"%i ",&n);
+	this->Init(n);
+	for (ii=0;ii<n;++ii){
+		elems[ii].read(fid);
+	}
 }
 
 template<class T>  bool ArrayStruct <T>::checkready()  

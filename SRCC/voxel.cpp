@@ -454,9 +454,10 @@ int Test_BuildBlockGrid_noout() {
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
 	RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
-	mesh blockGrid;
+	mesh blockGrid,blockGrid2;
 	const char *fileToOpen;
-	tecplotfile outmesh1, outmesh3, outmesh2;
+	FILE *fid;
+	tecplotfile outmesh1, outmesh3, outmesh2,outmesh4;
 
 	errFlag=0;
 	errTest=BuildBlockGrid(dimGrid1,blockGrid);
@@ -491,5 +492,29 @@ int Test_MeshOut(){
 	errTest=outmesh3.PrintMesh(blockGrid);
 	errFlag= errFlag | (errTest!=0);
 
+	fileToOpen="..\\TESTOUT\\mesh203010.dat";
+	fid=fopen(fileToOpen,"w");
+	if(fid!=NULL){
+		blockGrid.write(fid);
+		fclose(fid);
+		fid=fopen(fileToOpen,"r");
+		if(fid!=NULL){
+			blockGrid2.read(fid);
+			fclose(fid);
+			blockGrid.PrepareForUse();
+			blockGrid2.PrepareForUse();
+
+			outmesh3.PrintMesh(blockGrid2);
+			errTest=CompareDisp(blockGrid,blockGrid2);
+			if (!errTest){
+				cerr << "Error Displays were not the same after write read" << endl;
+				errFlag=true;
+			}
+		} else {
+			cout << "File for mesh out failed to open" << endl; 
+		}
+	} else {
+		cout << "File for mesh out failed to open" << endl; 
+	}
 	return(errFlag);
 }

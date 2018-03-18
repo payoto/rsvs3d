@@ -204,3 +204,22 @@ int Test_snake(){
 	return(errTest);
 
 }
+
+int Test_snakeinit(){
+	snake testSnake;
+	mesh snakeMesh;
+
+	//bool errFlag;
+	int errTest=0;
+
+	try {
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		snakeMesh.PrepareForUse();
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+
+}

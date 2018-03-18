@@ -109,6 +109,33 @@ void snaxsurf::disp() const{
 	cout << "snaxsurf #" << index << " ";
 	normvector.disp();
 }
+// file i/o
+void snax::write(FILE *fid) const{
+
+	fprintf(fid, "%i %lf %lf %i %i %i %i %i \n",index,d,v,edgeind, fromvert, tovert, 
+		isfreeze, orderedge);
+}
+
+void snaxedge::write(FILE *fid) const{
+	fprintf(fid, "%i %i %lf %lf %lf \n",index,surfind,normvector(0),normvector(1),normvector(2));
+}
+
+void snaxsurf::write(FILE *fid) const{
+	fprintf(fid, "%i %i %lf %lf %lf \n",index,voluind,normvector(0),normvector(1),normvector(2));
+}
+void snax::read(FILE *fid) {
+
+	fscanf(fid,"%i %lf %lf %i %i %i %i %i ", &index, &d, &v, &edgeind, &fromvert, &tovert,
+		&isfreeze, &orderedge);
+}
+
+void snaxedge::read(FILE *fid) {
+	fscanf(fid,"%i %i %lf %lf %lf ",&index,&surfind,&normvector[0],&normvector[1],&normvector[2]);
+}
+
+void snaxsurf::read(FILE *fid) {
+	fscanf(fid,"%i %i %lf %lf %lf ",&index,&voluind,&normvector[0],&normvector[1],&normvector[2]);
+}
 
 void snaxedge::PrepareForUse() {
 	normvector.PrepareForUse();
@@ -285,13 +312,14 @@ snake snake::MakeCompatible(snake other) const{
    return(other);
 }
 
-void snake::SpawnAtVertex(int indVert){
+void SpawnAtVertex(snake& snakein,int indVert){
 
 	int subVert;
-	vector<int> edgeInds;
+	vector<int> vertInds,edgeInds,surfInds,voluInds;
+	vector<int> vertSubs,edgeSubs,surfSubs,voluSub;
 
-	subVert=snakemesh->verts.find(indVert);
-	edgeInds=snakemesh->verts[subVert].edgeind;
+	subVert=snakein.snakemesh->verts.find(indVert);
+	edgeInds=snakein.snakemesh->verts[subVert].edgeind;
 }
 // -------------------------------------------------------------------------------------------
 // TEST CODE
