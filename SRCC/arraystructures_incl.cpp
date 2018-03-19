@@ -8,20 +8,117 @@ compiled on its own.
 #ifndef ARRAYSTRUCTS_INCL_H_INCLUDED
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
-template <class T> bool CompareDisp(T &mesh1,T &mesh2){
-bool compFlag;
-stringstream ss1,ss2;
-auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+template <class T> bool CompareDisp(T &mesh1,T &mesh2)
+{
+	bool compFlag;
+	stringstream ss1,ss2;
+	auto old_buf = cout.rdbuf(ss1.rdbuf()); 
 
-mesh1.disp();
-cout.rdbuf(ss2.rdbuf()); 
-mesh2.disp();
-std::cout.rdbuf(old_buf);
+	mesh1.disp();
+	cout.rdbuf(ss2.rdbuf()); 
+	mesh2.disp();
+	std::cout.rdbuf(old_buf);
 
-compFlag=ss1.str().compare(ss2.str())==0;
-return(compFlag);
+	compFlag=ss1.str().compare(ss2.str())==0;
+	return(compFlag);
 }
 
+template<class T> void DisplayVector(vector<T> vec)
+{
+	cout << int(vec.size()) << " - "; 
+	for (int i = 0; i < int(vec.size()); ++i)
+	{
+		cout << vec[i] << " ";
+	}
+	cout << " | " ;
+}
+template<class T, class R> 
+R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, const vector<int> &subList)
+{
+	R surfInds;
+	int ii;
+	auto itVecInt=surfInds.begin();
+
+	for(ii=0; ii<int(subList.size());++ii){
+		surfInds.insert(itVecInt, (arrayIn(subList[ii])->*mp).begin(),
+						    (arrayIn(subList[ii])->*mp).end());
+		itVecInt=surfInds.end();
+		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+	}
+	return(surfInds);
+}
+
+template<class T, class R, class U, class  V> 
+void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,  R T::*mp , U &out , V oper)
+{
+	
+	int ii;
+
+	for(ii=0; ii<int(subList.size());++ii){
+		out=oper(out,(arrayIn(subList[ii])->*mp)());
+		
+		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+	}
+
+}
+
+template <typename T> inline void sort(vector<T> &vec)
+{
+	sort(vec.begin(),vec.end());
+}
+template <typename T> inline void unique(vector<T> &vec)
+{
+	auto itVecInt = std::unique (vec.begin(), vec.end());       
+  	vec.resize( std::distance(vec.begin(),itVecInt));
+}
+// Find option for vectors
+template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable)  
+{
+
+   auto search=hashTable.find(key);
+
+   if (search==hashTable.end()){
+      return(-1);
+   }
+   
+   return(search->second);
+}
+
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) 
+{
+   vector<int> returnSub=keyFind;
+   int ii;
+   if (hashTable.empty()){
+      HashVector(keyList,hashTable);
+   }
+
+   for (ii=0;ii<int(keyFind.size());++ii){
+      returnSub[ii]=FindSub(keyFind[ii],hashTable);
+      #ifdef SAFE_ACCESS
+      if(returnSub[ii]>=0){
+         if (keyList[returnSub[ii]]!=keyFind[ii]){
+            throw  invalid_argument ("FIND returned an invalid output ");
+         }
+      }
+      #endif //SAFE_ACCESS
+   }
+   return(returnSub);
+}
+
+
+
+template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,int> &hashTable)
+{
+   // Generates a valid unordered_map for the current ArrayStruct
+   // Function should not be called repeatedly 
+
+   hashTable.reserve(elems.size());
+   for (int i = 0; i < int(elems.size()); ++i)
+   {
+      hashTable.emplace(elems[i],i);
+   }
+
+}
 
 // Templated test for all types that need to be derived from ArrayStruct<T>
 
@@ -202,7 +299,7 @@ template<class T>  int ArrayStruct <T>::find(int key) const
 	return(search->second);
 }
 
-template<class T> vector<int> ArrayStruct <T>::find_list(vector<int> key) const 
+template<class T> vector<int> ArrayStruct <T>::find_list(const vector<int> &key) const 
 {
 	vector<int> returnSub=key;
 	int ii;
@@ -257,7 +354,15 @@ template<class T> void ArrayStruct <T>::disp() const
 	}
 	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << endl;
 }
-
+template<class T> void ArrayStruct <T>::disp(const vector<int> &subs) const
+{
+	int ii;
+	cout << "Array of size " << this->size() << " displaying subset of size " << subs.size() << endl;
+	for (ii=0 ; unsigned_int(ii)<subs.size();ii++){
+		cout << "Array " << subs[ii] << " " ;
+		elems[subs[ii]].disp();
+	}
+}
 
 template<class T> inline void ArrayStruct <T>::Init(int n)
 {
@@ -289,13 +394,13 @@ template<class T> void ArrayStruct <T>::SetMaxIndex()
 {
 	// Sets the correct value of maxIndex
 	int n=elems.size();
-	maxIndex=-1;
+	maxIndex=0;
 	for(int ii=0;ii<n;++ii){
 		maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
 	}
 	isSetMI=1;
 }
-template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct <T> &other)
+template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct<T> &other)
 {
 	int nCurr,nNew,nTot,ii;
 	nCurr=this->size();

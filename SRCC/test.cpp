@@ -30,7 +30,6 @@ int main(){
 	gridTest.Run(Test_tecplotfile,"post-processing class");
 
 	gridTest.Run(Test_MeshOut,"Mesh output");
-	#endif //TEST_ALL
 	gridTest.Run(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
 	gridTest.Run(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
 	gridTest.Run(TestTemplate_ArrayStruct<surf>,"TestTemplate_ArrayStruct<surf>");
@@ -40,6 +39,7 @@ int main(){
 	
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
 
+	#endif //TEST_ALL
 	gridTest.Run(Test_SnakeStructures,"Snake containers");
 	gridTest.Run(Test_snakeinit,"Snake spawning");
 

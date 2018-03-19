@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "snakstruct.hpp"
+#include "postprocessing.hpp"
 
 using namespace std;
 
@@ -208,13 +209,36 @@ int Test_snake(){
 int Test_snakeinit(){
 	snake testSnake;
 	mesh snakeMesh;
+	const char *fileToOpen;
+	tecplotfile outSnake;
 
 	//bool errFlag;
 	int errTest=0;
 
 	try {
+		fileToOpen="..\\TESTOUT\\TestSnake.plt";
+
+		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		snakeMesh.PrepareForUse();
+		testSnake.snakemesh=&snakeMesh;
+
+		SpawnAtVertex(testSnake,1022);
+		SpawnAtVertex(testSnake,674);
+		SpawnAtVertex(testSnake,728);
+		testSnake.displight();
+
+
+		testSnake.PrepareForUse();
+		testSnake.UpdateDistance(0.5);
+		testSnake.snakeconn.disp();
+		testSnake.UpdateCoord();
+		testSnake.PrepareForUse();
+
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(testSnake.snakeconn);
+		testSnake.snakeconn.disp();
+
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 

@@ -201,14 +201,14 @@ void volu::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    int i;
    index+=nVolu;
    for (i=0; unsigned_int(i)<surfind.size();i++){
-      surfind[i]=surfind[i]+nSurf;
+      surfind[i]= (surfind[i]>0)? (surfind[i]+nSurf) : surfind[i];
    }
 }
 void surf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    int i;
    index+=nSurf;
    for (i=0; unsigned_int(i)<voluind.size();i++){
-      voluind[i]=voluind[i]=nVolu;
+      voluind[i]= (voluind[i]>0) ? (voluind[i]+nVolu) : voluind[i];
    }
 
    for (i=0; unsigned_int(i)<edgeind.size();i++){
@@ -223,7 +223,7 @@ void edge::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    }
 
    for (i=0; unsigned_int(i)<surfind.size();i++){
-      surfind[i]=surfind[i]+nSurf;
+      surfind[i]=(surfind[i]>0) ? (surfind[i]+nSurf) : surfind[i];
    }
 }
 void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
@@ -252,6 +252,10 @@ void mesh::PrepareForUse(){
    edges.PrepareForUse();
    surfs.PrepareForUse();
    volus.PrepareForUse();
+   // Additional mesh preparation steps
+
+   this->OrderEdges();
+
 }
 
 void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const{
@@ -338,11 +342,11 @@ void mesh::MakeCompatible_inplace(mesh &other) const{
    // Makes other mesh compatible with this to be 
    // merged without index crashes
 
-   int nVert,nEdge,nVolu,nSurf;
+   int nVert,nEdge,nSurf,nVolu;
 
    // Define Max indices in current mesh
    this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
-   other.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   other.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 }
 
 void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
@@ -363,10 +367,10 @@ void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    for(ii=0;ii<verts.size();++ii){
       verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }*/
-   volus.ChangeIndices(nVert,nEdge,nVolu,nSurf);
-   edges.ChangeIndices(nVert,nEdge,nVolu,nSurf);
-   surfs.ChangeIndices(nVert,nEdge,nVolu,nSurf);
-   verts.ChangeIndices(nVert,nEdge,nVolu,nSurf);
+   volus.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   edges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   surfs.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+   verts.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 }
 
 mesh mesh::MakeCompatible(mesh other) const{
@@ -388,5 +392,61 @@ void mesh::PopulateIndices(){
    edges.PopulateIndices();
    verts.PopulateIndices();
    surfs.PopulateIndices();
+}
+
+
+// Field Specific operations
+void surf::OrderEdges(mesh *meshin)
+{
+   unordered_multimap<int,int> vert2Edge;
+   vector<int> edge2Vert,edgeSub,edgeIndOrig;
+   int vertCurr,edgeCurr;
+   int ii,jj;
+   std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
+   unordered_multimap<int,int>::iterator it;
+
+   if (edgeind.size()>0){
+      edgeIndOrig=edgeind;
+      edgeSub=meshin->edges.find_list(edgeind);
+      edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);
+
+      HashVector(edge2Vert, vert2Edge);
+
+      vertCurr=edge2Vert[0];
+      edgeCurr=edgeind[0];
+      for(ii=1;ii<int(edgeind.size());++ii){
+         range=vert2Edge.equal_range(vertCurr);
+      #ifdef SAFE_ACCESS
+         if (range.first==vert2Edge.end()){
+            cerr << ii << " vert " << vertCurr << "  ";
+            DisplayVector(edge2Vert);
+            DisplayVector(edgeind);
+            cout << it->second << " " << 1/2 << 2/3 <<  endl;
+            throw range_error ("unordered_multimap went beyond its range in OrderEdges");
+         }
+      #endif // SAFe_ACCESS
+         jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
+
+         it=range.first;
+         if (jj){++it;}
+
+         edgeCurr=edgeIndOrig[(it->second)/2];
+         jj=edge2Vert[(it->second)/2]==vertCurr;
+         vertCurr=edge2Vert[(it->second)/2+jj];
+         edgeind[ii]=edgeCurr;
+      }
+      isordered=true;
+   }
+}
+
+void mesh::OrderEdges(){
+   int ii;
+
+   for (ii = 0; ii < surfs.size(); ++ii)
+   {
+      if (!surfs(ii)->isready()){
+         surfs[ii].OrderEdges(this);
+      }
+   }
 }
 

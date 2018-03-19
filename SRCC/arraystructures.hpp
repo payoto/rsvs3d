@@ -35,6 +35,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <cstdlib>
 #include <string>
 #include <sstream>
@@ -74,12 +75,13 @@ protected:
 	int isSetMI=0;
 	bool readyforuse=false;
 	vector<T> elems;    // vector of elements (structures) 
-	unordered_map<int,int> hashTable; // Hash Table of indexed elements
+	unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
 
 public: 
 	void disp() const;
+	void disp(const vector<int> &subs) const;
 	int find(int key) const ;
-	vector<int> find_list(vector<int> key) const ;
+	vector<int> find_list(const vector<int> &key) const ;
 	inline int GetMaxIndex() const;
 	inline void Init(int n);
 	bool isready() const {return(readyforuse);};
@@ -156,6 +158,8 @@ public:
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+// Mesh Quality
+	void OrderEdges();
 };
 
 
@@ -234,6 +238,8 @@ public:
 
 
 class surf: public meshpart {
+protected:
+	bool isordered;
 public:
 	int index;
 	double fill,target,error;
@@ -244,9 +250,10 @@ public:
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
-	bool isready() const {return(true);}
+	bool isready() const {return(isordered);}
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+	void OrderEdges(mesh *meshin);
 
 	surf(){ // Constructor
 		index=0;
@@ -255,6 +262,7 @@ public:
 		error=1;
 		voluind.reserve(2); // reserves 2 as this is the size of the array
 		voluind.assign(2,0);
+		isordered=false;
 	}
 	~surf(){ // Destructor
 
@@ -269,6 +277,7 @@ public:
 		error=oldSurf.error;
 		edgeind=oldSurf.edgeind;
 		voluind=oldSurf.voluind;
+		isordered=oldSurf.isordered;
 	}
 	void operator=(const surf* other){
 		index=other->index;
@@ -277,6 +286,7 @@ public:
 		target=other->target;
 		edgeind=other->edgeind;
 		voluind=other->voluind;
+		isordered=other->isordered;
 	}
 
 	int Key() const {return(index);}
@@ -370,7 +380,19 @@ public:
 // functions
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
+template<class T> void DisplayVector(vector<T> vec);
+template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn,
+	 R T::*mp, const vector<int> &subList);
+template<class T, class R, class U, class  V> 
+void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
+  R T::*mp , U &out , V oper);
 bool CompareFuncOut(function<void()> func1, function<void()> func2);
+template <typename T> inline void sort(vector<T> &vec);
+template <typename T> inline void unique(vector<T> &vec);
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) ;
+template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
+template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable) ;
+
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();
