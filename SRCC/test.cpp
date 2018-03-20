@@ -17,6 +17,7 @@
 #include "postprocessing.hpp"
 #endif //TEST_ALL
 #include "snakstruct.hpp"
+#include "snakeengine.hpp"
 
 int main(){
 	customtest gridTest;
@@ -36,11 +37,11 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<volu>,"TestTemplate_ArrayStruct<volu>");
 	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
-	
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
-
-	#endif //TEST_ALL
+	gridTest.Run(Test_snakeOrderEdges,"Snake Order error");
 	gridTest.Run(Test_SnakeStructures,"Snake containers");
+	#endif //TEST_ALL
+
 	gridTest.Run(Test_snakeinit,"Snake spawning");
 
 

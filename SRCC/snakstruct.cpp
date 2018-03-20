@@ -1,8 +1,6 @@
 #include <iostream>
-#include <cmath>
-#include <algorithm>
 #include <vector>
-#include <unordered_map>
+#include <cmath>
 
 #include "snakstruct.hpp"
 #include "arraystructures.hpp"
@@ -171,130 +169,121 @@ void snaxsurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 }
 #pragma GCC diagnostic pop
 
-// set constructors (used to avoid a variable being unknowingly forgotten)
-inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
-	int edgeindin,int isfreezein,int orderedgein)
-{
-	index=indexin;
-	d=din;
-	v=vin;
-	 fromvert=fromvertin; 	// root vertex of *snakemesh
-	 tovert=tovertin; 	// destination vertex of *snakemesh
-	 edgeind=edgeindin; 	// edge of snakemesh
-	 isfreeze=isfreezein; 	// freeze status 
-	 orderedge=orderedgein;
-	}
 
 
 // -------------------------------------------------------------------------------------------
 // Implementatation of snake
 // -------------------------------------------------------------------------------------------
 
-	void snake::disp() const{
+void snake::disp() const{
 
-		snaxs.disp();
-		snaxedges.disp();
-		snaxsurfs.disp();
-		snakeconn.disp();
-		cout << "Snaking Mesh with  ";
-		snakemesh->displight();
-	}
-	void snake::displight() const{
+	snaxs.disp();
+	snaxedges.disp();
+	snaxsurfs.disp();
+	snakeconn.disp();
+	cout << "Snaking Mesh with  ";
+	snakemesh->displight();
+}
+void snake::displight() const{
 
 
-		cout << "snake: snax " << snaxs.size();
-		cout << "; snaxedges " << snaxedges.size();
-		cout << "; snaxsurfs " << snaxsurfs.size() << endl;
+	cout << "snake: snax " << snaxs.size();
+	cout << "; snaxedges " << snaxedges.size();
+	cout << "; snaxsurfs " << snaxsurfs.size() << endl;
 
-		cout << "Snake with connectivity  ";
-		snakeconn.displight();
+	cout << "Snake with connectivity  ";
+	snakeconn.displight();
 
-		cout << "Snaking Mesh with  ";
-		snakemesh->displight();
-	}
+	cout << "Snaking Mesh with  ";
+	snakemesh->displight();
+}
 
-	bool snake::isready() const{
+bool snake::isready() const{
 
-		bool readyforuse=true;
-		readyforuse=readyforuse & snaxs.isready();
-		readyforuse=readyforuse & snaxedges.isready();
-		readyforuse=readyforuse & snaxsurfs.isready();
-		readyforuse=readyforuse & snakeconn.isready();
-		readyforuse=readyforuse & snakemesh->isready();
+	bool readyforuse=true;
+	readyforuse=readyforuse & snaxs.isready();
+	readyforuse=readyforuse & snaxedges.isready();
+	readyforuse=readyforuse & snaxsurfs.isready();
+	readyforuse=readyforuse & snakeconn.isready();
+	readyforuse=readyforuse & snakemesh->isready();
 
-		return(readyforuse);
-	}
+	return(readyforuse);
+}
 
-	inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const
-	{
-		snakeconn.GetMaxIndex(nVert,nEdge,nSurf,nVolu);
-	}
+inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const
+{
+	snakeconn.GetMaxIndex(nVert,nEdge,nSurf,nVolu);
+}
 
-	void snake::PrepareForUse() {
+void snake::PrepareForUse() {
 
-		snaxs.PrepareForUse();
-		snaxedges.PrepareForUse();
-		snaxsurfs.PrepareForUse();
-		snakeconn.PrepareForUse();
-		snakemesh->PrepareForUse();
+	snaxs.PrepareForUse();
+	snaxedges.PrepareForUse();
+	snaxsurfs.PrepareForUse();
+	snakeconn.PrepareForUse();
+	snakemesh->PrepareForUse();
 
-	}
-	void snake::HashArray(){
+}
+void snake::HashArray(){
 	// prefer use of PrepareForUse in final code as it includes checks to 
 	// avoid unnecessary repetiion of work
 	// Use HashArray when debugging to be sure that fields are correctly hashed
-		snaxs.HashArray();
-		snaxedges.HashArray();
-		snaxsurfs.HashArray();
-		snakeconn.HashArray();
-		snakemesh->HashArray();
+	snaxs.HashArray();
+	snaxedges.HashArray();
+	snaxsurfs.HashArray();
+	snakeconn.HashArray();
+	snakemesh->HashArray();
 
-	}
-	void snake::SetMaxIndex(){
+}
+void snake::SetMaxIndex(){
 	// prefer use of PrepareForUse in final code as it includes checks to 
 	// avoid unnecessary repetiion of work
 
-		snaxs.SetMaxIndex();
-		snaxedges.SetMaxIndex();
-		snaxsurfs.SetMaxIndex();
-		snakeconn.SetMaxIndex();
-		snakemesh->SetMaxIndex();
+	snaxs.SetMaxIndex();
+	snaxedges.SetMaxIndex();
+	snaxsurfs.SetMaxIndex();
+	snakeconn.SetMaxIndex();
+	snakemesh->SetMaxIndex();
 
-	}
+}
 
-	void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
+void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 // Initialise a 
-		is3D=snakemeshin->volus.size()>0;
+	is3D=snakemeshin->volus.size()>0;
 
-		snaxs.Init(nSnax);
-		snaxedges.Init(nEdge);
-		snaxsurfs.Init(nSurf);
+	snaxs.Init(nSnax);
+	snaxedges.Init(nEdge);
+	snaxsurfs.Init(nSurf);
+	
+	snaxs.isInMesh=true;
+	snaxedges.isInMesh=true;
+	snaxsurfs.isInMesh=true;
 
-		snakeconn.Init(nSnax, nEdge, nSurf, nVolu);
+	snakeconn.Init(nSnax, nEdge, nSurf, nVolu);
 
-		snakemesh=snakemeshin;
+	snakemesh=snakemeshin;
 
+}
+
+void snake::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
+
+	snaxs.ChangeIndices(nVert,nEdge,nSurf,nVolu); 
+	snaxedges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	snaxsurfs.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	snakeconn.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+
+}
+void snake::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
+	int ii=0;
+	for(ii=0;ii<snaxs.size();++ii){
+		snaxs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu); 
 	}
-
-	void snake::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
-
-		snaxs.ChangeIndices(nVert,nEdge,nSurf,nVolu); 
-		snaxedges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
-		snaxsurfs.ChangeIndices(nVert,nEdge,nSurf,nVolu);
-		snakeconn.ChangeIndices(nVert,nEdge,nSurf,nVolu);
-
+	for(ii=0;ii<snaxedges.size();++ii){
+		snaxedges[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
 	}
-	void snake::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
-		int ii=0;
-		for(ii=0;ii<snaxs.size();++ii){
-			snaxs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu); 
-		}
-		for(ii=0;ii<snaxedges.size();++ii){
-			snaxedges[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
-		}
-		for(ii=0;ii<snaxsurfs.size();++ii){
-			snaxsurfs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
-		}
+	for(ii=0;ii<snaxsurfs.size();++ii){
+		snaxsurfs[ii].ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
+	}
 	// Nothing to do for snakeconn
 	//snakeconn.ChangeIndicesSnakeMesh(nVert,nEdge,nSurf,nVolu);
 
@@ -330,6 +319,50 @@ snake snake::MakeCompatible(snake other) const{
 	return(other);
 }
 
+// ArrayStruct extension for snax:
+
+bool snaxarray::checkready() 
+{	
+	readyforuse=ArrayStruct<snax>::checkready();
+	
+	readyforuse=(readyforuse && isHashEdge);
+
+	return(readyforuse);
+	
+}
+
+void snaxarray::HashArrayEdge()
+{
+	// Generates a valid unordered_map for the current ArrayStruct
+	// Function should not be called repeatedly 
+	if(!hashEdge.empty()){
+		hashEdge.clear();
+	}
+	hashEdge.reserve(elems.size());
+	for (int i = 0; i < int(elems.size()); ++i)
+	{
+		hashEdge.emplace(KeyEdge(i),i);
+	}
+	isHashEdge=1;
+	
+	
+   //cout << "Array Struct Succesfully Hashed" << endl;
+}
+void snaxarray::PrepareForUse()
+{
+
+	ArrayStruct<snax>::PrepareForUse();
+
+	if (isHashEdge==0){
+		this->HashArrayEdge();
+	}
+	if (isOrderedOnEdge==0){
+
+		this->ReorderOnEdge();
+	}
+	readyforuse=true;
+}
+
 // Snake Movement
 void snake::UpdateDistance(double dt){
 	int ii;
@@ -353,154 +386,70 @@ void snake::UpdateCoord(){
 		for(jj=0;jj<3;++jj){
 			snakeconn.verts[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
 				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
-				+snakemesh->verts(fromVertSub)->coord[jj];
+			+snakemesh->verts(fromVertSub)->coord[jj];
 		}
 	}
 }
 
-// Snake Spawning at Vertex.
-void SpawnAtVertex(snake& snakein,int indVert){
+// snaxarray extension
 
-	snake newsnake;
-	int subVert,nVert, nEdge,nSurf,nVolu;
-
-	vector<int> vertInds,edgeInds,surfInds,voluInds,edgeInds2;
-	vector<int> vertSubs,edgeSubs,surfSubs,voluSubs;
-	vector<int> vertSubsTemp,edgeSubsTemp,surfSubsTemp,voluSubsTemp;
-	vector<int>::iterator itVecInt; 
-	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds,hashVertInds;
-
-
-	// Extract Data corresponding to vertex from Mesh
-	subVert=snakein.snakemesh->verts.find(indVert);
-
-	
-	edgeInds=snakein.snakemesh->verts(subVert)->edgeind;
-	edgeSubs=snakein.snakemesh->edges.find_list(edgeInds);
-	surfInds=ConcatenateVectorField(snakein.snakemesh->edges, &edge::surfind, edgeSubs);
-	sort(surfInds);
-	unique(surfInds);
-
-	surfSubs=snakein.snakemesh->surfs.find_list(surfInds);
-	voluInds=ConcatenateVectorField(snakein.snakemesh->surfs, &surf::voluind, surfSubs);
-	sort(voluInds);
-	unique(voluInds);
-	voluSubs=snakein.snakemesh->volus.find_list(voluInds);
-
-	//OperArrayStructMethod(snakein.snakemesh->surfs, surfSubs, &surf::isready, 
-	//	ii, std::logical_and<bool>());
-	nVert=edgeInds.size();
-	nEdge=surfInds.size();
-	nSurf=voluInds.size();
-	nVolu=1;
-
-	newsnake.Init(snakein.snakemesh,nVert,nEdge,nSurf,nVolu);
-	// Generates snaxels and vertices
-	SpawnAtVertexVert(newsnake,nVert, indVert,subVert, surfInds,edgeInds,
-		edgeSubs,hashSurfInds);
-	// Generate snake edges
-	SpawnAtVertexEdge(newsnake, nEdge ,surfInds, edgeInds,	voluInds,
-		surfSubs, hashEdgeInds,hashVoluInds);
-	// Generate Snake surfaces
-	SpawnAtVertexSurf(newsnake,nSurf,surfInds ,voluInds,voluSubs,hashSurfInds);
-	// Generate Volume
-	SpawnAtVertexVolu(newsnake,nSurf);
-
-	
-
-	snakein.PrepareForUse();
-	newsnake.PrepareForUse();
-
-	snakein.MakeCompatible_inplace(newsnake);
-	newsnake.PrepareForUse();
-	snakein.Concatenate(newsnake);
-
-}
-
-void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, const vector<int> &surfInds,
-	const vector<int> &edgeInds,const vector<int> &edgeSubs, unordered_multimap<int,int> &hashSurfInds){
-	int ii,jj;
-	vector<int> edgeSubsTemp;
-
-	newsnake.snakeconn.verts.PopulateIndices();
-	newsnake.snaxs.PopulateIndices();
-	for (ii=0;ii<nVert;++ii){
-		// Finds the to vertex
-		jj=int(newsnake.snakemesh->edges(edgeSubs[ii])->vertind[0]==indVert);
-		newsnake.snaxs[ii].set(newsnake.snaxs(ii)->index,0.0,0.5,indVert,
-			newsnake.snakemesh->edges(edgeSubs[ii])->vertind[jj],edgeInds[ii],0,1);
-
-		edgeSubsTemp=FindSubList(newsnake.snakemesh->edges(edgeSubs[ii])->surfind,
-			surfInds,hashSurfInds);
-		newsnake.snakeconn.verts[ii].edgeind=edgeSubsTemp;
-		newsnake.snakeconn.verts[ii].coord=newsnake.snakemesh->verts(subVert)->coord;
+int snaxarray::findedge(int key) const 
+{
+	if (isHashEdge==0){
+		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
+		cerr << "          in snaxarray::findedge(int key)" << endl; 
 	}
-	newsnake.snakeconn.verts.ChangeIndices(0,1,0,0);
+	auto search=hashEdge.find(key);
+	int key2;
+
+	if (search==hashEdge.end()){
+		return(-1);
+	}
+	#ifdef SAFE_ACCESS
+	key2=elems[search->second].edgeind;
+	if (key2!=key){
+		throw  invalid_argument ("FIND returned an invalid output ");
+	}
+	#endif //SAFE_ACCESS
+	return(search->second);
 }
 
-void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,const vector<int> &edgeInds,
-	const vector<int> &voluInds,const vector<int> &surfSubs,unordered_multimap<int,int> &hashEdgeInds, unordered_multimap<int,int> &hashVoluInds){
-	int ii,jj,kk;
-	vector<int> surfSubsTemp,vertSubsTemp;
 
-	newsnake.snakeconn.edges.PopulateIndices();
-	newsnake.snaxedges.PopulateIndices();
-	for (ii=0;ii<nEdge;++ii){
-		newsnake.snaxedges[ii].surfind=surfInds[ii];
+void snaxarray::ReorderOnEdge(){
 
-		surfSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->voluind,
-			voluInds,hashVoluInds);
-		newsnake.snakeconn.edges[ii].surfind=surfSubsTemp;
+	vector<int> edgeInds,snaxSubs,orderSubs;
+	vector<double> orderSnax,unorderSnax;
+	unordered_multimap<double,int> hashOrder;
+	int isBwd;
+	int ii, jj, nEdge;
 
-		// Assign vertind (can be done WAY more efficiently the other way round)
-		// But liek this we can check the logic
-		vertSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->edgeind,
-			edgeInds,hashEdgeInds);
-		kk=0;
-		for(jj=0;jj<int(vertSubsTemp.size());++jj){
-			if (vertSubsTemp[jj]>=0){
-				newsnake.snakeconn.edges[ii].vertind[kk]=vertSubsTemp[jj];
-				kk++;
+	edgeInds=ConcatenateScalarField(*this,&snax::edgeind,0,elems.size());
+	sort(edgeInds);
+	unique(edgeInds);
+	for(ii=0;ii<int(edgeInds.size());++ii){
+		nEdge=hashEdge.count(edgeInds[ii]);
+
+		if (nEdge>1){
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			orderSnax.resize(snaxSubs.size());
+			for(jj=0;jj<int(snaxSubs.size());++jj){
+				isBwd=elems[snaxSubs[jj]].fromvert>elems[snaxSubs[jj]].tovert;
+				orderSnax[jj]= isBwd ? (1.0-elems[snaxSubs[jj]].d) : elems[snaxSubs[jj]].d ;
+			}
+			unorderSnax=orderSnax;
+			sort(orderSnax);
+
+			orderSubs=FindSubList(orderSnax,unorderSnax,hashOrder);
+			for(jj=0;jj<int(snaxSubs.size());++jj){
+				elems[snaxSubs[orderSubs[jj]]].orderedge=jj+1;
 			}
 		}
-	}
-	newsnake.snakeconn.edges.ChangeIndices(1,0,1,0);
-}
-void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds, const vector<int> &voluInds,
-	const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds){
 
-	int ii,jj;
-	vector<int> surfSubsTemp;
-
-	newsnake.snakeconn.surfs.PopulateIndices();
-	newsnake.snaxsurfs.PopulateIndices();
-	for(ii=0;ii<nSurf;++ii){
-		newsnake.snaxsurfs[ii].voluind=voluInds[ii];
-		newsnake.snakeconn.surfs[ii].voluind[0]=1;
-		// Assign edgeind (can be done WAY more efficiently the other way round)
-		// But liek this we can check the logic
-		surfSubsTemp=FindSubList(newsnake.snakemesh->volus(voluSubs[ii])->surfind,
-			surfInds,hashSurfInds);
-		
-		for(jj=0;jj<int(surfSubsTemp.size());++jj){
-			if (surfSubsTemp[jj]>=0){
-				newsnake.snakeconn.surfs[ii].edgeind.push_back(surfSubsTemp[jj]);
-				
-			}
-		}
 	}
-	newsnake.snakeconn.surfs.ChangeIndices(0,1,0,0);
+
+	isOrderedOnEdge=1;
 }
 
-void SpawnAtVertexVolu(snake& newsnake, int nSurf){
-	int ii;
-
-	newsnake.snakeconn.volus.PopulateIndices();
-	newsnake.snakeconn.volus[0].surfind.reserve(nSurf);
-	for (ii=0;ii<nSurf;++ii){
-		newsnake.snakeconn.volus[0].surfind.push_back(ii+1);
-	}
-}
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------

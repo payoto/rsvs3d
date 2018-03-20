@@ -41,8 +41,50 @@ R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, const vector<i
 
 	for(ii=0; ii<int(subList.size());++ii){
 		surfInds.insert(itVecInt, (arrayIn(subList[ii])->*mp).begin(),
-						    (arrayIn(subList[ii])->*mp).end());
+			(arrayIn(subList[ii])->*mp).end());
 		itVecInt=surfInds.end();
+		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+	}
+	return(surfInds);
+}
+
+template<class T, class R> 
+vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp, const vector<int> &subList)
+{
+	vector<R> surfInds;
+	int ii;
+	surfInds.reserve(subList.size());
+	for(ii=0; ii<int(subList.size());++ii){
+		surfInds.push_back((arrayIn(subList[ii])->*mp));
+		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+	}
+	return(surfInds);
+}
+
+template<class T, class R> 
+R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, int rStart,int rEnd)
+{
+	R surfInds;
+	int ii;
+	auto itVecInt=surfInds.begin();
+
+	for(ii=rStart; ii<rEnd;++ii){
+		surfInds.insert(itVecInt, (arrayIn(ii)->*mp).begin(),
+			(arrayIn(ii)->*mp).end());
+		itVecInt=surfInds.end();
+		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+	}
+	return(surfInds);
+}
+
+template<class T, class R> 
+vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp, int rStart,int rEnd)
+{
+	vector<R> surfInds;
+	int ii;
+	surfInds.reserve((rStart-rEnd)>0?(rStart-rEnd):0);
+	for(ii=rStart; ii<rEnd;++ii){
+		surfInds.push_back((arrayIn(ii)->*mp));
 		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
 	}
 	return(surfInds);
@@ -61,7 +103,19 @@ void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subL
 	}
 
 }
+template<class T, class R> vector<R> ReturnDataEqualRange(T key, unordered_multimap<T,R> &hashTable)
+{
+	vector<R> subList;
+	
+	subList.reserve(5);
+	auto range=hashTable.equal_range(key);
+	for (auto it = range.first; it != range.second; ++it) {
 
+		subList.push_back(it->second);
+	}
+
+	return(subList);
+}
 template <typename T> inline void sort(vector<T> &vec)
 {
 	sort(vec.begin(),vec.end());
@@ -69,40 +123,43 @@ template <typename T> inline void sort(vector<T> &vec)
 template <typename T> inline void unique(vector<T> &vec)
 {
 	auto itVecInt = std::unique (vec.begin(), vec.end());       
-  	vec.resize( std::distance(vec.begin(),itVecInt));
+	vec.resize( std::distance(vec.begin(),itVecInt));
 }
 // Find option for vectors
 template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable)  
 {
 
-   auto search=hashTable.find(key);
+	auto search=hashTable.find(key);
 
-   if (search==hashTable.end()){
-      return(-1);
-   }
-   
-   return(search->second);
+	if (search==hashTable.end()){
+		return(-1);
+	}
+
+	return(search->second);
 }
 
 template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) 
 {
-   vector<int> returnSub=keyFind;
-   int ii;
-   if (hashTable.empty()){
-      HashVector(keyList,hashTable);
-   }
+	vector<int> returnSub;
+	int ii;
 
-   for (ii=0;ii<int(keyFind.size());++ii){
-      returnSub[ii]=FindSub(keyFind[ii],hashTable);
+	returnSub.reserve(int(keyFind.size()));
+
+	if (hashTable.empty()){
+		HashVector(keyList,hashTable);
+	}
+
+	for (ii=0;ii<int(keyFind.size());++ii){
+		returnSub.push_back(FindSub(keyFind[ii],hashTable));
       #ifdef SAFE_ACCESS
-      if(returnSub[ii]>=0){
-         if (keyList[returnSub[ii]]!=keyFind[ii]){
-            throw  invalid_argument ("FIND returned an invalid output ");
-         }
-      }
+		if(returnSub[ii]>=0){
+			if (keyList[returnSub[ii]]!=keyFind[ii]){
+				throw  invalid_argument ("FIND returned an invalid output ");
+			}
+		}
       #endif //SAFE_ACCESS
-   }
-   return(returnSub);
+	}
+	return(returnSub);
 }
 
 
@@ -112,11 +169,11 @@ template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,i
    // Generates a valid unordered_map for the current ArrayStruct
    // Function should not be called repeatedly 
 
-   hashTable.reserve(elems.size());
-   for (int i = 0; i < int(elems.size()); ++i)
-   {
-      hashTable.emplace(elems[i],i);
-   }
+	hashTable.reserve(elems.size());
+	for (int i = 0; i < int(elems.size()); ++i)
+	{
+		hashTable.emplace(elems[i],i);
+	}
 
 }
 
@@ -335,7 +392,7 @@ template<class T>  bool ArrayStruct <T>::checkready()
 	if (readyforuse){
 		while ( (i < this->size()) & readyforuse)
 		{
-			readyforuse=readyforuse & elems[i].isready();
+			readyforuse=readyforuse & elems[i].isready(isInMesh);
 			++i;
 		}
 	}
@@ -352,7 +409,7 @@ template<class T> void ArrayStruct <T>::disp() const
 		cout << "Array " << ii << " " ;
 		elems[ii].disp();
 	}
-	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << endl;
+	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << "; isInMesh "  << isInMesh << endl;
 }
 template<class T> void ArrayStruct <T>::disp(const vector<int> &subs) const
 {

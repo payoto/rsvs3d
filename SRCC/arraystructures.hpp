@@ -74,10 +74,12 @@ protected:
 	int isHash=0;
 	int isSetMI=0;
 	bool readyforuse=false;
+
 	vector<T> elems;    // vector of elements (structures) 
 	unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
 
 public: 
+	bool isInMesh=false; // used to change behaviour if not in a mesh.
 	void disp() const;
 	void disp(const vector<int> &subs) const;
 	int find(int key) const ;
@@ -125,7 +127,7 @@ public:
 	}
 
 }; 
-  
+
 
 
 // Base class
@@ -159,7 +161,7 @@ public:
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 // Mesh Quality
-	void OrderEdges();
+	int OrderEdges();
 };
 
 
@@ -170,7 +172,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 	virtual void PrepareForUse()=0 ;
-	virtual bool isready() const=0 ;
+	virtual bool isready(bool isInMesh) const=0 ;
 	virtual void read(FILE * fid)=0 ;
 	virtual void write(FILE * fid) const =0 ;
 	//virtual operator=( meshpart* other)=0 ;
@@ -187,7 +189,10 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void PrepareForUse(){};
-	bool isready() const {return(true);}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(true);}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 
@@ -250,7 +255,7 @@ public:
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
-	bool isready() const {return(isordered);}
+	bool isready(bool isInMesh) const {return(isInMesh? isordered : true);}
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void OrderEdges(mesh *meshin);
@@ -305,7 +310,10 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void PrepareForUse(){};
-	bool isready() const {return(true);}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(true);}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 
@@ -347,7 +355,10 @@ public:
 	void disp() const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
-	bool isready() const {return(true);}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(true);}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 
@@ -381,15 +392,26 @@ public:
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
 template<class T> void DisplayVector(vector<T> vec);
+
 template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn,
-	 R T::*mp, const vector<int> &subList);
+R T::*mp, const vector<int> &subList);
+template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn,
+R T::*mp, const vector<int> &subList);
+template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, 
+int rStart,int rEnd);
+
+template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, 
+R T::*mp, int rStart,int rEnd);
+template<class T, class R> vector<R> ReturnDataEqualRange(T key, unordered_multimap<T,R> &hashTable);
+
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
-  R T::*mp , U &out , V oper);
+	R T::*mp , U &out , V oper);
 bool CompareFuncOut(function<void()> func1, function<void()> func2);
 template <typename T> inline void sort(vector<T> &vec);
 template <typename T> inline void unique(vector<T> &vec);
-template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) ;
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,
+unordered_multimap<T,int> &hashTable) ;
 template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
 template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable) ;
 

@@ -92,7 +92,7 @@ class tecplotfile {
 // functions
 
 int Test_tecplotfile();
-
+int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid, tecplotfile &outmesh1);
 // member function definition template <class T> 
 
 

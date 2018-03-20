@@ -8,7 +8,7 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -ggdb 
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -ggdb
 CUSERFLAGS= -DDEBUGLVL1 -DSAFE_ACCESS  
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
@@ -18,7 +18,7 @@ OBJDIR=obj
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
 #make testnew/testall options
-TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp 
+TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp snakeengine.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 

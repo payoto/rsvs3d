@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cmath>
+#include <ctime>
 
 #include "snakstruct.hpp"
+#include "snakeengine.hpp"
 #include "postprocessing.hpp"
 
 using namespace std;
@@ -174,14 +176,14 @@ int Test_snake(){
 		testSnake.PrepareForUse();
 
 		cout << "-----------------------testSnake1-----------------------" << endl;
-		testSnake.disp();
+		//testSnake.disp();
 		testSnake.displight();
 
 		testSnake3=testSnake.MakeCompatible(testSnake2);
 		cout << "-----------------------testSnake2-----------------------" << endl;
-		testSnake2.disp();
+		//testSnake2.disp();
 		cout << "-----------------------testSnake3-----------------------" << endl;
-		testSnake3.disp();
+		//testSnake3.disp();
 		testSnake.Concatenate(testSnake3);
 		testSnake.PrepareForUse();
 
@@ -211,7 +213,7 @@ int Test_snakeinit(){
 	mesh snakeMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
-
+	int start_s,stop_s;
 	//bool errFlag;
 	int errTest=0;
 
@@ -223,21 +225,62 @@ int Test_snakeinit(){
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
 
+		start_s=clock();
+		testSnake.PrepareForUse();
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
+		SpawnAtVertex(testSnake,675);
 		SpawnAtVertex(testSnake,728);
+		SpawnAtVertex(testSnake,729);
+		SpawnAtVertex(testSnake,730);
 		testSnake.displight();
 
 
 		testSnake.PrepareForUse();
 		testSnake.UpdateDistance(0.5);
-		testSnake.snakeconn.disp();
+
 		testSnake.UpdateCoord();
 		testSnake.PrepareForUse();
 
+	// the code you wish to time goes here
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(testSnake.snakeconn);
-		testSnake.snakeconn.disp();
+		//testSnake.disp();
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+
+}
+
+
+int Test_snakeOrderEdges(){
+
+	mesh snakeMesh;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	
+	//bool errFlag;
+	int errTest=0;
+
+	try {
+		fileToOpen="..\\TESTOUT\\TestOrderEdges.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh234.dat");
+		snakeMesh.HashArray();
+		snakeMesh.SetMaxIndex();
+		
+		outSnake.PrintMesh(snakeMesh);
+		
+		snakeMesh.OrderEdges();
+		outSnake.PrintMesh(snakeMesh);
+		//testSnake.disp();
 
 
 	} catch (exception const& ex) { 

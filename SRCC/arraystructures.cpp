@@ -19,6 +19,7 @@ bool CompareFuncOut(function<void()> func1, function<void()> func2){
 
    compFlag=ss1.str().compare(ss2.str())==0;
    return(compFlag);
+   
 }
 
 
@@ -248,13 +249,18 @@ void mesh::SetMaxIndex(){
    volus.SetMaxIndex();
 }
 void mesh::PrepareForUse(){
+   bool needRePrep;
+
    verts.PrepareForUse();
    edges.PrepareForUse();
    surfs.PrepareForUse();
    volus.PrepareForUse();
    // Additional mesh preparation steps
 
-   this->OrderEdges();
+   needRePrep=this->OrderEdges();
+   if (needRePrep){
+      surfs.PrepareForUse();
+   }
 
 }
 
@@ -275,6 +281,11 @@ void mesh::read(FILE *fid) {
    edges.read(fid);
    surfs.read(fid);
    volus.read(fid);
+
+   verts.isInMesh=true;
+   edges.isInMesh=true;
+   surfs.isInMesh=true;
+   volus.isInMesh=true;
 }
 void mesh::write(FILE *fid) const {
    verts.write(fid);
@@ -326,12 +337,18 @@ void mesh::displight() const {
    cout << "; volus " << volus.size() << endl;
 }
 
-void mesh::Init(int nVe,int nE, int nS, int nVo){
+void mesh::Init(int nVe,int nE, int nS, int nVo)
+{
 
    verts.Init(nVe);
    edges.Init(nE);
    surfs.Init(nS);
    volus.Init(nVo);
+
+   verts.isInMesh=true;
+   edges.isInMesh=true;
+   surfs.isInMesh=true;
+   volus.isInMesh=true;
 
    #ifdef TEST_ARRAYSTRUCTURES
    cout << "Mesh Correctly Assigned!" << endl;
@@ -431,22 +448,25 @@ void surf::OrderEdges(mesh *meshin)
          if (jj){++it;}
 
          edgeCurr=edgeIndOrig[(it->second)/2];
-         jj=edge2Vert[(it->second)/2]==vertCurr;
-         vertCurr=edge2Vert[(it->second)/2+jj];
+         jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal
+         vertCurr=edge2Vert[((it->second)/2)*2+jj];
          edgeind[ii]=edgeCurr;
       }
       isordered=true;
    }
 }
 
-void mesh::OrderEdges(){
+int mesh::OrderEdges(){
    int ii;
+   bool kk;
 
    for (ii = 0; ii < surfs.size(); ++ii)
    {
-      if (!surfs(ii)->isready()){
+      if (!surfs(ii)->isready(true)){
          surfs[ii].OrderEdges(this);
+         kk=true;
       }
    }
+   return(kk);
 }
 

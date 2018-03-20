@@ -142,6 +142,9 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			else {
 				actVert=1;
 				#ifdef TEST_POSTPROCESSING
+				cerr << "Warning: postprocessing.cpp:tecplotfile::VolFaceMap"<< endl ;
+				cerr << "		Mesh Output failed in output of facemap data" << endl;
+				cerr << "		Surface is not ordered " << endl;
 				return(-1);
 				#endif
 			}
@@ -255,4 +258,40 @@ int Test_tecplotfile(){
 
 
 	return(0);
+}
+
+int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid, tecplotfile &outmesh1){
+	
+	int errFlag=0;
+	int errTest=0;
+	mesh blockGrid2;
+	FILE *fid;
+
+	fid=fopen(fileToOpen,"w");
+	if(fid!=NULL){
+		blockGrid.PrepareForUse();
+		blockGrid.write(fid);
+		fclose(fid);
+		fid=fopen(fileToOpen,"r");
+		if(fid!=NULL){
+			blockGrid2.read(fid);
+			fclose(fid);
+			blockGrid.PrepareForUse();
+			blockGrid2.PrepareForUse();
+
+			outmesh1.PrintMesh(blockGrid2);
+			errTest=CompareDisp(blockGrid,blockGrid2);
+			if (!errTest){
+				//blockGrid.disp();
+				//blockGrid2.disp();
+				cerr << "Error: Displays were not the same after write read" << endl;
+				errFlag++;
+			}
+		} else {
+			cout << "File for mesh out failed to open" << endl; 
+		}
+	} else {
+		cout << "File for mesh out failed to open" << endl; 
+	}
+	return(errFlag);
 }

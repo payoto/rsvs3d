@@ -451,33 +451,37 @@ int Test_BuildBlockGrid_noout() {
 } 
 
 
+
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
 	RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
-	mesh blockGrid,blockGrid2;
+	mesh blockGrid;
 	const char *fileToOpen;
-	FILE *fid;
+	
 	tecplotfile outmesh1, outmesh3, outmesh2,outmesh4;
 
 	errFlag=0;
 	errTest=BuildBlockGrid(dimGrid1,blockGrid);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
+
 	fileToOpen="..\\TESTOUT\\tecout234.plt";
-
 	errTest=outmesh1.OpenFile(fileToOpen);
-	errFlag= errFlag | (errTest!=0);
-
+	errFlag+= (errTest!=0);
 	errTest=outmesh1.PrintMesh(blockGrid);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
+	fileToOpen="..\\TESTOUT\\mesh234.dat";
+	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh1);
 
 	errTest=BuildBlockGrid(dimGrid2,blockGrid);
-	fileToOpen="..\\TESTOUT\\tecout230.plt";
 
+	fileToOpen="..\\TESTOUT\\tecout230.plt";
 	errTest=outmesh2.OpenFile(fileToOpen);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
+	fileToOpen="..\\TESTOUT\\mesh230.dat";
+	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh2);
 
 	errTest=outmesh2.PrintMesh(blockGrid);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
 	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
 	start_s=clock();
 	errTest=BuildBlockGrid(dimGrid3,blockGrid);
@@ -487,34 +491,13 @@ int Test_MeshOut(){
 	fileToOpen="..\\TESTOUT\\tecout202020.plt";
 
 	errTest=outmesh3.OpenFile(fileToOpen);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
 
 	errTest=outmesh3.PrintMesh(blockGrid);
-	errFlag= errFlag | (errTest!=0);
+	errFlag+= (errTest!=0);
 
 	fileToOpen="..\\TESTOUT\\mesh203010.dat";
-	fid=fopen(fileToOpen,"w");
-	if(fid!=NULL){
-		blockGrid.write(fid);
-		fclose(fid);
-		fid=fopen(fileToOpen,"r");
-		if(fid!=NULL){
-			blockGrid2.read(fid);
-			fclose(fid);
-			blockGrid.PrepareForUse();
-			blockGrid2.PrepareForUse();
+	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh3);
 
-			outmesh3.PrintMesh(blockGrid2);
-			errTest=CompareDisp(blockGrid,blockGrid2);
-			if (!errTest){
-				cerr << "Error Displays were not the same after write read" << endl;
-				errFlag=true;
-			}
-		} else {
-			cout << "File for mesh out failed to open" << endl; 
-		}
-	} else {
-		cout << "File for mesh out failed to open" << endl; 
-	}
 	return(errFlag);
 }

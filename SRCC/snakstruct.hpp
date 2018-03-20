@@ -1,8 +1,8 @@
 
 //===============================================
 // Include Guards
-#ifndef SNAKSTRUCT_H_INCLUDED
-#define SNAKSTRUCT_H_INCLUDED
+#ifndef SNAKEENGINE_H_INCLUDED
+#define SNAKEENGINE_H_INCLUDED
 
 //===============================================
 // Levels of debuging Guards
@@ -26,6 +26,7 @@
 // included dependencies
 #include <iostream>
 #include <vector>
+
 #include "arraystructures.hpp"
 
 //==================================
@@ -39,8 +40,8 @@ class snax;
 class snaxedge;
 class snaxsurf;
 class coordvec;
+class snaxarray;
 
-typedef ArrayStruct<snax> snaxarray;
 typedef ArrayStruct<snaxedge> snaxedgearray;
 typedef ArrayStruct<snaxsurf> snaxsurfarray;
 
@@ -79,6 +80,27 @@ public:
 	}
 };
 
+class snaxarray : public ArrayStruct<snax> 
+{
+protected:
+	unordered_multimap<int,int> hashEdge;
+	int isHashEdge=0;
+	int isOrderedOnEdge=0;
+
+public: 
+	inline int KeyEdge(int a) const ;
+	int findedge(int key) const; 
+	void HashArrayEdge();
+	void ReorderOnEdge();
+	// Functions that need modification
+	bool checkready();
+	void PrepareForUse();
+	snax& operator[](const int a){ 
+		isOrderedOnEdge=0;
+		isHashEdge=0;
+		return(ArrayStruct<snax>::operator[](a));
+	}
+};
 
 class snake  {
 private:
@@ -117,7 +139,7 @@ public:
 };
 
 
-class snax  : public meshpart {	
+class snax : public meshpart {	
 public:
 	int index=0;
 	double d=0.0;
@@ -134,7 +156,10 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
-	bool isready() const {return(true);}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(true);}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	inline void set(int index, double d,double v,int fromvert,
@@ -154,7 +179,10 @@ public:
 	int Key() const {return (index);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
-	bool isready() const {return(normvector.isready());}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(normvector.isready());}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE *fid)const;
 
@@ -171,7 +199,10 @@ public:
 	int Key() const {return (index);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
-	bool isready() const {return(normvector.isready());}
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(normvector.isready());}
+	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid)const;
 
@@ -179,17 +210,7 @@ public:
 };
 
 // Function prototypes
-void SpawnAtVertex(snake &snakein,int indVert);
-void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, 
-	const vector<int> &surfInds, const vector<int> &edgeInds, const vector<int> &edgeSubs,
-	unordered_multimap<int,int> &hashSurfInds);
-void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
-	const vector<int> &edgeInds,const vector<int> &voluInds,const vector<int> &surfSubs,
-	unordered_multimap<int,int> &hashEdgeInds, unordered_multimap<int,int> &hashVoluInds);
 
-void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds,
- const vector<int> &voluInds,const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds);
-void SpawnAtVertexVolu(snake& newsnake, int nSurf);
 
 // Test Function prototypes
 int Test_SnakeStructures();
@@ -198,4 +219,27 @@ int Test_snax();
 int Test_snaxedge();
 int Test_snake();
 int Test_snakeinit();
-#endif //SNAKSTRUCT_H_INCLUDED
+int Test_snakeOrderEdges();
+
+// Functions needed at Compile time
+
+// set constructors (used to avoid a variable being unknowingly forgotten)
+inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
+	int edgeindin,int isfreezein,int orderedgein)
+{
+	index=indexin;
+	d=din;
+	v=vin;
+	fromvert=fromvertin; 	// root vertex of *snakemesh
+	tovert=tovertin; 	// destination vertex of *snakemesh
+	edgeind=edgeindin; 	// edge of snakemesh
+	isfreeze=isfreezein; 	// freeze status 
+	orderedge=orderedgein;
+}
+
+inline int snaxarray::KeyEdge(int a) const 
+{
+	return((*this)(a)->edgeind);
+}
+
+#endif //SNAKEENGINE_H_INCLUDED
