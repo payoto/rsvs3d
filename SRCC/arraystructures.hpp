@@ -136,7 +136,7 @@ public:
 
 class mesh {
 private:
-
+	bool borderIsSet=false;
 public:
 	vertarray verts;
 	edgearray edges;
@@ -170,6 +170,8 @@ public:
 class meshpart{ // Abstract class to ensure interface is correct
 	public : 
 	int index=0;
+	bool isBorder=false;
+
 	virtual void disp() const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;

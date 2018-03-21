@@ -39,51 +39,54 @@ using namespace std;
 // Base classes
 
 class tecplotfile {
-	private:
-		FILE *fid;
-		int lengthLine;
-	public:
-		int OpenFile(const char *str);
-		void CloseFile();
-		int PrintMesh(const mesh& meshout);
-		int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
-		int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
-		int VolFaceMap(const mesh& meshout,int nSurf);
-		int SurfFaceMap(const mesh& meshout,int nEdge);
-		void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
-		void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
+private:
+	FILE *fid;
+	int lengthLine;
+public:
+	int OpenFile(const char *str);
+	void CloseFile();
+	int PrintMesh(const mesh& meshout);
+	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
+	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
+	int VolFaceMap(const mesh& meshout,int nSurf);
+	int SurfFaceMap(const mesh& meshout,int nEdge);
+	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
+	void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
 
-		tecplotfile(){
-			fid=NULL;
-			lengthLine=0;
-			cout << "tecplot file object created" << endl;
+	tecplotfile(){
+		fid=NULL;
+		lengthLine=0;
+		cout << "tecplot file object created" << endl;
+	}
+	~tecplotfile(){
+		if (fid!=NULL){
+			this->CloseFile();
+			cout << "Object deleted - File Closed" << endl;
+		} else {
+			cout << "Object deleted - No File Closed" << endl;
 		}
-		~tecplotfile(){
-			if (fid!=NULL){
-				this->CloseFile();
-				cout << "Object deleted - File Closed" << endl;
-			} else {
-				cout << "Object deleted - No File Closed" << endl;
-			}
+	}
+
+	void NewZone(){
+		fprintf(fid, "ZONE\n");
+	}
+	
+	int Print(const char *format, ...){ // Mimics the printf function hides fid
+
+		va_list arg;
+		int i;
+
+		va_start (arg, format);
+		i = vfprintf (fid, format, arg);
+		va_end (arg);
+		lengthLine+=i;
+		if (lengthLine>25000){
+			fprintf(fid, " \n");lengthLine=0;
 		}
+		return(lengthLine);
+	}
 
-		void NewZone(){
-			fprintf(fid, "ZONE\n");
-		}
-		int Print(const char *format, ...){ // Mimics the printf function hides fid
-
-			va_list arg;
-			int i;
-
-			va_start (arg, format);
-			i = vfprintf (fid, format, arg);
-			va_end (arg);
-			lengthLine+=i;
-			if (lengthLine>25000){fprintf(fid, " \n");lengthLine=0;}
-			return(lengthLine);
-		}
-
-		void ResetLine(){lengthLine=0;}
+	void ResetLine(){lengthLine=0;}
 
 };
 

@@ -27,7 +27,7 @@ bool CompareFuncOut(function<void()> func1, function<void()> func2){
 // Methods of meshpart : volu surf edge vert
 void volu::disp() const{
    int i;
-   cout << "volu : index " << index << " | fill " << fill << ", " << 
+   cout << "volu : index " << index << " | fill " << fill << ", " << " | isBorder " << isBorder <<
    target << ", "<< error << " | surfind " << surfind.size();
    for (i=0; unsigned_int(i)<surfind.size();i++){
       cout << "-" << surfind[i];
@@ -37,7 +37,7 @@ void volu::disp() const{
 
 void surf::disp() const{
    int i;
-   cout << "surf : index " << index << " | fill " << fill << ", " << 
+   cout << "surf : index " << index << " | fill " << fill << " | isBorder " << isBorder << ", " << 
    target << ", "<< error << " | voluind " << voluind.size();
    for (i=0; unsigned_int(i)<voluind.size();i++){
       cout << "-" << voluind[i];
@@ -51,7 +51,7 @@ void surf::disp() const{
 
 void edge::disp() const{
    int i;
-   cout << "edge : index " << index <<  " | vertind " << vertind.size();
+   cout << "edge : index " << index << " | isBorder " << isBorder << " | vertind " << vertind.size();
    for (i=0; unsigned_int(i)<vertind.size();i++){
       cout << "-" << vertind[i];
    }
@@ -64,7 +64,7 @@ void edge::disp() const{
 
 void vert::disp() const{
    int i;
-   cout << "vert : index " << index <<  " | edgeind " << edgeind.size();
+   cout << "vert : index " << index << " | isBorder " << isBorder << " | edgeind " << edgeind.size();
    for (i=0; unsigned_int(i)<edgeind.size();i++){
       cout << "-" << edgeind[i];
    }
@@ -468,5 +468,49 @@ int mesh::OrderEdges(){
       }
    }
    return(kk);
+}
+
+void mesh::SetBorders(){
+   int ii,jj,nT;
+
+   // Update border status of edges
+   for(ii=0;ii<surfs.size();++ii){
+      jj=0;
+      nT=surfs(ii)->voluind.size();
+      surfs[ii].isBorder=false;
+      while(jj<nT && !surfs(ii)->isBorder){
+         surfs[ii].isBorder=surfs[ii].voluind[jj]==0;
+         jj++;
+      }
+   }
+   // Update border status of volus
+   for(ii=0;ii<volus.size();++ii){
+      jj=0;
+      nT=volus(ii)->surfind.size();
+      while(jj<nT && !volus(ii)->isBorder){
+         volus[ii].isBorder=surfs(surfs.find(volus[ii].surfind[jj]))->isBorder;
+         jj++;
+      }
+   }
+   // Update border status of edges
+   for(ii=0;ii<edges.size();++ii){
+      jj=0;
+      nT=edges(ii)->surfind.size();
+      while(jj<nT && !edges(ii)->isBorder){
+         edges[ii].isBorder=surfs(surfs.find(edges[ii].surfind[jj]))->isBorder;
+         jj++;
+      }
+   }
+   // Update border status of edges
+   for(ii=0;ii<verts.size();++ii){
+      jj=0;
+      nT=verts(ii)->edgeind.size();
+      while(jj<nT && !verts(ii)->isBorder){
+         verts[ii].isBorder=surfs(edges.find(verts[ii].edgeind[jj]))->isBorder;
+         jj++;
+      }
+   }
+
+
 }
 

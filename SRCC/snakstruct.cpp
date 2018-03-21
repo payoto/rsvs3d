@@ -97,16 +97,16 @@ void coordvec::disp() const{
 // -------------------------------------------------------------------------------------------
 void snax::disp() const{
 	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind <<
-	"; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << endl;
+	"; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << " | isBorder " << isBorder << endl;
 }
 
 void snaxedge::disp() const{
-	cout << "snaxedge #" << index << " ";
+	cout << "snaxedge #" << index << " | isBorder " << isBorder << " ";
 	normvector.disp();
 }
 
 void snaxsurf::disp() const{
-	cout << "snaxsurf #" << index << " ";
+	cout << "snaxsurf #" << index << " | isBorder " << isBorder << " ";
 	normvector.disp();
 }
 // file i/o
@@ -254,7 +254,7 @@ void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 	snaxs.Init(nSnax);
 	snaxedges.Init(nEdge);
 	snaxsurfs.Init(nSurf);
-	
+
 	snaxs.isInMesh=true;
 	snaxedges.isInMesh=true;
 	snaxsurfs.isInMesh=true;
