@@ -108,7 +108,8 @@ public:
 	// Cannot be used on the left hand side and can't be used to edit data in elems
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
-			throw range_error ("Index is out of range");
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));
@@ -117,7 +118,8 @@ public:
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
-			throw range_error ("Index is out of range");
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		isHash=0;

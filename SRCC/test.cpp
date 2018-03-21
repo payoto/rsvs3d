@@ -43,6 +43,7 @@ int main(){
 	#endif //TEST_ALL
 
 	gridTest.Run(Test_snakeinit,"Snake spawning");
+	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 
 
 	gridTest.PrintSummary();

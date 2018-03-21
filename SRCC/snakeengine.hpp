@@ -47,15 +47,10 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
 	const vector<int> &edgeInds,const vector<int> &voluInds,const vector<int> &surfSubs,
 	unordered_multimap<int,int> &hashEdgeInds, unordered_multimap<int,int> &hashVoluInds);
 
-void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds,
+void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds,
  const vector<int> &voluInds,const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds);
+void SpawnAtVertexSurf2D(snake& newsnake,int nEdge,const vector<int> &voluInds);
 void SpawnAtVertexVolu(snake& newsnake, int nSurf);
 
 // Test Function prototypes
-int Test_SnakeStructures();
-int Test_coordvec();
-int Test_snax();
-int Test_snaxedge();
-int Test_snake();
-int Test_snakeinit();
 #endif //SNAKSTRUCT_H_INCLUDED

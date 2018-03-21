@@ -257,6 +257,51 @@ int Test_snakeinit(){
 	return(errTest);
 
 }
+int Test_snakeinitflat(){
+	snake testSnake;
+	mesh snakeMesh;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	int start_s,stop_s;
+	//bool errFlag;
+	int errTest=0;
+
+	try {
+		fileToOpen="..\\TESTOUT\\TestSnake2.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
+		snakeMesh.PrepareForUse();
+		testSnake.snakemesh=&snakeMesh;
+
+		start_s=clock();
+		testSnake.PrepareForUse();
+		SpawnAtVertex(testSnake,5);
+		SpawnAtVertex(testSnake,8);
+		testSnake.displight();
+
+
+		testSnake.PrepareForUse();
+		testSnake.UpdateDistance(0.5);
+
+		testSnake.UpdateCoord();
+		testSnake.PrepareForUse();
+		testSnake.disp();
+	// the code you wish to time goes here
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(testSnake.snakeconn);
+		//testSnake.disp();
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+
+}
 
 
 int Test_snakeOrderEdges(){
@@ -277,7 +322,7 @@ int Test_snakeOrderEdges(){
 		snakeMesh.SetMaxIndex();
 		
 		outSnake.PrintMesh(snakeMesh);
-		
+
 		snakeMesh.OrderEdges();
 		outSnake.PrintMesh(snakeMesh);
 		//testSnake.disp();

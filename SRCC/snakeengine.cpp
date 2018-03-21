@@ -16,13 +16,14 @@ void SpawnAtVertex(snake& snakein,int indVert){
 
 	snake newsnake;
 	int subVert,nVert, nEdge,nSurf,nVolu;
-
+	bool is3D;
 	vector<int> vertInds,edgeInds,surfInds,voluInds,edgeInds2;
 	vector<int> vertSubs,edgeSubs,surfSubs,voluSubs;
 	vector<int> vertSubsTemp,edgeSubsTemp,surfSubsTemp,voluSubsTemp;
 	vector<int>::iterator itVecInt; 
 	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds,hashVertInds;
 
+	is3D=snakein.snakemesh->volus.size()>0;
 	// Extract Data corresponding to vertex from Mesh
 	subVert=snakein.snakemesh->verts.find(indVert);
 
@@ -37,14 +38,18 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	voluInds=ConcatenateVectorField(snakein.snakemesh->surfs, &surf::voluind, surfSubs);
 	sort(voluInds);
 	unique(voluInds);
-	voluSubs=snakein.snakemesh->volus.find_list(voluInds);
+	if(is3D){
+		voluSubs=snakein.snakemesh->volus.find_list(voluInds);
+	} else {
 
+		voluSubs=snakein.snakemesh->volus.find_list(voluInds);
+	}
 	//OperArrayStructMethod(snakein.snakemesh->surfs, surfSubs, &surf::isready, 
 	//	ii, std::logical_and<bool>());
 	nVert=edgeInds.size();
 	nEdge=surfInds.size();
 	nSurf=voluInds.size();
-	nVolu=int(snakein.snakemesh->volus.size()>0);
+	nVolu=int(is3D);
 
 	newsnake.Init(snakein.snakemesh,nVert,nEdge,nSurf,nVolu);
 	// Generates snaxels and vertices
@@ -54,10 +59,13 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	SpawnAtVertexEdge(newsnake, nEdge ,surfInds, edgeInds,	voluInds,
 		surfSubs, hashEdgeInds,hashVoluInds);
 	// Generate Snake surfaces
-	SpawnAtVertexSurf(newsnake,nSurf,surfInds ,voluInds,voluSubs,hashSurfInds);
+	if (is3D){
+		SpawnAtVertexSurf3D(newsnake,nSurf,surfInds ,voluInds,voluSubs,hashSurfInds);
 	// Generate Volume
-	SpawnAtVertexVolu(newsnake,nSurf);
-
+		SpawnAtVertexVolu(newsnake,nSurf);
+	} else {
+		SpawnAtVertexSurf2D( newsnake, nEdge, voluInds);
+	}
 	
 
 	snakein.PrepareForUse();
@@ -116,8 +124,13 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 		}
 	}
 	newsnake.snakeconn.edges.ChangeIndices(1,0,1,0);
+	if(!newsnake.Check3D()){
+		for (ii=0;ii<nEdge;++ii){
+			newsnake.snakeconn.edges[ii].surfind[0]=1;
+		}
+	}
 }
-void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds, const vector<int> &voluInds,
+void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds, const vector<int> &voluInds,
 	const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds){
 
 	int ii,jj;
@@ -132,7 +145,7 @@ void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds, co
 		// But liek this we can check the logic
 		surfSubsTemp=FindSubList(newsnake.snakemesh->volus(voluSubs[ii])->surfind,
 			surfInds,hashSurfInds);
-		
+		// Needs to be modified to work with 2D (surfSubsTemps does not come out right) 
 		for(jj=0;jj<int(surfSubsTemp.size());++jj){
 			if (surfSubsTemp[jj]>=0){
 				newsnake.snakeconn.surfs[ii].edgeind.push_back(surfSubsTemp[jj]);
@@ -141,6 +154,24 @@ void SpawnAtVertexSurf(snake& newsnake,int nSurf,const vector<int> &surfInds, co
 		}
 	}
 	newsnake.snakeconn.surfs.ChangeIndices(0,1,0,0);
+}
+
+void SpawnAtVertexSurf2D(snake& newsnake,int nEdge, const vector<int> &voluInds){
+
+	int ii,jj;
+	vector<int> surfSubsTemp;
+
+	newsnake.snakeconn.surfs.PopulateIndices();
+	newsnake.snaxsurfs.PopulateIndices();
+	ii=0;
+	newsnake.snaxsurfs[ii].voluind=voluInds[ii];
+	newsnake.snakeconn.surfs[ii].voluind[0]=0;
+
+	for(jj=0;jj<int(nEdge);++jj){
+		newsnake.snakeconn.surfs[ii].edgeind.push_back(jj+1);
+	}
+	
+	//newsnake.snakeconn.surfs.ChangeIndices(0,1,0,0);
 }
 
 void SpawnAtVertexVolu(snake& newsnake, int nSurf){

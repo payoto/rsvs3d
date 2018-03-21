@@ -329,6 +329,7 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 	if (!isSetMI)
 	{
 		cerr << "warning: Potentially unsafe reading of max index - execute PrepareForUse() before access" << endl;
+		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
 	}
 	#endif //SAFE_ACCESS
 	return(maxIndex);
@@ -338,7 +339,7 @@ template<class T>  int ArrayStruct <T>::find(int key) const
 {
 	if (isHash==0){
 		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
-		cerr << "          in ArrayStruct <T>::find(int key)" << endl; 
+		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
 		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
 	}
 	auto search=hashTable.find(key);
@@ -350,6 +351,7 @@ template<class T>  int ArrayStruct <T>::find(int key) const
 	#ifdef SAFE_ACCESS
 	key2=elems[search->second].index;
 	if (key2!=key){
+       cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
 		throw  invalid_argument ("FIND returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS

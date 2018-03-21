@@ -125,7 +125,7 @@ public:
 	void HashArray(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse	
 	void Concatenate(const snake &other);
-
+	bool Check3D(){return(is3D);}
 	// Snake merging
 	void MakeCompatible_inplace(snake &other) const;
 	snake MakeCompatible(snake other) const;
@@ -220,6 +220,7 @@ int Test_snaxedge();
 int Test_snake();
 int Test_snakeinit();
 int Test_snakeOrderEdges();
+int Test_snakeinitflat();
 
 // Functions needed at Compile time
 
