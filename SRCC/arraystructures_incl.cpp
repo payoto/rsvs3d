@@ -371,7 +371,7 @@ template<class T> vector<int> ArrayStruct <T>::find_list(const vector<int> &key)
 template<class T> void ArrayStruct <T>::write(FILE *fid) const 
 {
 	int ii;
-	fprintf(fid,"%i \n",int(this->size()));
+	fprintf(fid,"%i %i \n",int(this->size()),int(isInMesh));
 	for (ii=0;ii<int(this->size());++ii){
 		elems[ii].write(fid);
 	}
@@ -379,7 +379,8 @@ template<class T> void ArrayStruct <T>::write(FILE *fid) const
 template<class T> void ArrayStruct <T>::read(FILE *fid) 
 {
 	int ii,n;
-	fscanf(fid,"%i ",&n);
+	fscanf(fid,"%i %i ",&n,&ii);
+	isInMesh=bool(ii);
 	this->Init(n);
 	for (ii=0;ii<n;++ii){
 		elems[ii].read(fid);
@@ -402,7 +403,11 @@ template<class T>  bool ArrayStruct <T>::checkready()
 	return(readyforuse);
 	
 }
-
+template<class T>  void ArrayStruct <T>::ForceArrayReady(){
+	isHash=1;
+	isSetMI=1;
+	readyforuse=true;
+}
 
 template<class T> void ArrayStruct <T>::disp() const 
 {

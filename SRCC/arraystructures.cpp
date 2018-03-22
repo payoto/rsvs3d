@@ -27,8 +27,8 @@ bool CompareFuncOut(function<void()> func1, function<void()> func2){
 // Methods of meshpart : volu surf edge vert
 void volu::disp() const{
    int i;
-   cout << "volu : index " << index << " | fill " << fill << ", " << " | isBorder " << isBorder <<
-   target << ", "<< error << " | surfind " << surfind.size();
+   cout << "volu : index " << index << " | fill " << fill << ", "  <<
+   target << ", "<< error << " | isBorder " << isBorder << " | surfind " << surfind.size();
    for (i=0; unsigned_int(i)<surfind.size();i++){
       cout << "-" << surfind[i];
    }
@@ -37,8 +37,8 @@ void volu::disp() const{
 
 void surf::disp() const{
    int i;
-   cout << "surf : index " << index << " | fill " << fill << " | isBorder " << isBorder << ", " << 
-   target << ", "<< error << " | voluind " << voluind.size();
+   cout << "surf : index " << index << " | fill " << fill  << ", " << 
+   target << ", "<< error << " | isBorder " << isBorder << " | voluind " << voluind.size();
    for (i=0; unsigned_int(i)<voluind.size();i++){
       cout << "-" << voluind[i];
    }
@@ -79,7 +79,7 @@ void volu::write(FILE *fid) const{
 
    int i;
 
-   fprintf(fid, "%i %.16lf %.16lf %.16lf ",index,fill,target, error);
+   fprintf(fid, "%i %.16lf %.16lf %.16lf %i ",index,fill,target, error,int(isBorder));
    fprintf(fid, "%i ",int(surfind.size()));
    for (i=0; unsigned_int(i)<surfind.size();i++){
       fprintf(fid, "%i ",surfind[i]);
@@ -90,7 +90,7 @@ void volu::write(FILE *fid) const{
 void surf::write(FILE * fid) const{
    int i;
 
-   fprintf(fid, "%i %.16lf %.16lf %.16lf ",index,fill,target, error);
+   fprintf(fid, "%i %.16lf %.16lf %.16lf %i ",index,fill,target, error,int(isBorder));
    fprintf(fid, "%i ",int(voluind.size()));
    for (i=0; unsigned_int(i)<voluind.size();i++){
       fprintf(fid, "%i ",voluind[i]);
@@ -105,7 +105,7 @@ void surf::write(FILE * fid) const{
 void edge::write(FILE * fid) const{
    int i;
 
-   fprintf(fid, "%i ",index);
+   fprintf(fid, "%i %i ",index,int(isBorder));
    fprintf(fid, "%i ",int(vertind.size()));
    for (i=0; unsigned_int(i)<vertind.size();i++){
       fprintf(fid, "%i ",vertind[i]);
@@ -120,7 +120,7 @@ void edge::write(FILE * fid) const{
 void vert::write(FILE * fid) const{
    int i;
    
-   fprintf(fid, "%i ",index);
+   fprintf(fid, "%i %i ",index,int(isBorder));
    fprintf(fid, "%i ",int(edgeind.size()));
    for (i=0; unsigned_int(i)<edgeind.size();i++){
       fprintf(fid, "%i ",edgeind[i]);
@@ -136,7 +136,8 @@ void volu::read(FILE * fid) {
 
    int i,n;
 
-   fscanf(fid, "%i %lf %lf %lf ",&index,&fill,&target, &error);
+   fscanf(fid, "%i %lf %lf %lf %i ",&index,&fill,&target, &error, &i);
+   isBorder=bool(i);
    fscanf(fid, "%i ",&n);
    surfind.assign(n,0);
    for (i=0; unsigned_int(i)<surfind.size();i++){
@@ -148,7 +149,8 @@ void volu::read(FILE * fid) {
 void surf::read(FILE * fid) {
    int i,n;
 
-   fscanf(fid, "%i %lf %lf %lf ",&index,&fill,&target, &error);
+   fscanf(fid, "%i %lf %lf %lf %i ",&index,&fill,&target, &error, &i);
+   isBorder=bool(i);
    fscanf(fid, "%i ",&n);
    voluind.assign(n,0);
    for (i=0; unsigned_int(i)<voluind.size();i++){
@@ -165,7 +167,8 @@ void surf::read(FILE * fid) {
 void edge::read(FILE * fid) {
    int i,n;
 
-   fscanf(fid, "%i ",&index);
+   fscanf(fid, "%i %i ",&index, &i);
+   isBorder=bool(i);
    fscanf(fid, "%i ",&n);
    vertind.assign(n,0);
    for (i=0; unsigned_int(i)<vertind.size();i++){
@@ -182,7 +185,8 @@ void edge::read(FILE * fid) {
 void vert::read(FILE * fid) {
    int i,n;
    
-   fscanf(fid, "%i ",&index);
+   fscanf(fid, "%i %i ",&index, &i);
+   isBorder=bool(i);
    fscanf(fid, "%i ",&n);
    edgeind.assign(n,0);
    for (i=0; unsigned_int(i)<edgeind.size();i++){
@@ -249,19 +253,28 @@ void mesh::SetMaxIndex(){
    volus.SetMaxIndex();
 }
 void mesh::PrepareForUse(){
-   bool needRePrep;
+
+   verts.isInMesh=true;
+   edges.isInMesh=true;
+   surfs.isInMesh=true;
+   volus.isInMesh=true;
+
 
    verts.PrepareForUse();
    edges.PrepareForUse();
    surfs.PrepareForUse();
    volus.PrepareForUse();
    // Additional mesh preparation steps
-
-   needRePrep=this->OrderEdges();
-   if (needRePrep){
-      surfs.PrepareForUse();
+   if (!borderIsSet){
+      this->SetBorders();
    }
 
+   this->OrderEdges();
+
+   verts.ForceArrayReady();
+   edges.ForceArrayReady();
+   surfs.ForceArrayReady();
+   volus.ForceArrayReady();
 }
 
 void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const{
@@ -483,6 +496,7 @@ void mesh::SetBorders(){
          jj++;
       }
    }
+   surfs.ForceArrayReady();
    // Update border status of volus
    for(ii=0;ii<volus.size();++ii){
       jj=0;
@@ -492,6 +506,7 @@ void mesh::SetBorders(){
          jj++;
       }
    }
+   volus.ForceArrayReady();
    // Update border status of edges
    for(ii=0;ii<edges.size();++ii){
       jj=0;
@@ -501,15 +516,18 @@ void mesh::SetBorders(){
          jj++;
       }
    }
+
+   edges.ForceArrayReady();
    // Update border status of edges
    for(ii=0;ii<verts.size();++ii){
       jj=0;
       nT=verts(ii)->edgeind.size();
       while(jj<nT && !verts(ii)->isBorder){
-         verts[ii].isBorder=surfs(edges.find(verts[ii].edgeind[jj]))->isBorder;
+         verts[ii].isBorder=edges(edges.find(verts[ii].edgeind[jj]))->isBorder;
          jj++;
       }
    }
+   verts.ForceArrayReady();
 
 
 }

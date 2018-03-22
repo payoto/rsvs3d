@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 #include <cmath>
 
@@ -217,6 +218,10 @@ inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) cons
 
 void snake::PrepareForUse() {
 
+	snaxs.isInMesh=true;
+	snaxedges.isInMesh=true;
+	snaxsurfs.isInMesh=true;
+	
 	snaxs.PrepareForUse();
 	snaxedges.PrepareForUse();
 	snaxsurfs.PrepareForUse();
@@ -370,8 +375,23 @@ void snake::UpdateDistance(double dt){
 	for (ii = 0; ii < int(snaxs.size()); ++ii)
 	{
 		snaxs[ii].d=snaxs[ii].d+snaxs[ii].v*dt;
-		snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : snaxs[ii].d;
-		snaxs[ii].d=snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d;
+		snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
+		
+	}
+}
+void snake::UpdateDistance(const vector<double> &dt){
+	int ii;
+	if (int(dt.size())!=snaxs.size()){
+		for (ii = 0; ii < int(snaxs.size()); ++ii)
+		{
+			snaxs[ii].d=snaxs[ii].d+snaxs[ii].v*dt[ii];
+			snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
+
+		}
+	} else {
+		cerr << "Error : Mismatching sizes passed to Uptdate distance of snake"  << endl;
+		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+		throw length_error("Snake and Dt had mismatched sizes at snake::UpdateDistance");
 	}
 }
 
@@ -448,6 +468,15 @@ void snaxarray::ReorderOnEdge(){
 	}
 
 	isOrderedOnEdge=1;
+}
+
+void CalculateTimeStep(vector<double> &dt, double dtDefault){
+
+	if(!snaxs.checkready()){
+		snaxs.PrepareForUse();
+	}
+
+
 }
 
 // -------------------------------------------------------------------------------------------

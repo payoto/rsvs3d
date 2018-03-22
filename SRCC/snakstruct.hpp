@@ -134,6 +134,8 @@ public:
 
 	// Snake Movement
 	void UpdateDistance(double dt);
+	void UpdateDistance(const vector<double> &dt);
+	void CalculateTimeStep(vector<double> &dt, double dtDefault);
 	void UpdateCoord();
 
 };

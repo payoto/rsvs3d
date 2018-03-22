@@ -74,12 +74,16 @@ protected:
 	int isHash=0;
 	int isSetMI=0;
 	bool readyforuse=false;
+	bool isInMesh=false; // used to change behaviour if not in a mesh.
 
 	vector<T> elems;    // vector of elements (structures) 
 	unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
+	void ForceArrayReady();
 
 public: 
-	bool isInMesh=false; // used to change behaviour if not in a mesh.
+	friend class mesh;
+	friend class snake;
+
 	void disp() const;
 	void disp(const vector<int> &subs) const;
 	int find(int key) const ;
@@ -164,6 +168,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 // Mesh Quality
 	int OrderEdges();
+	void SetBorders();
 };
 
 
