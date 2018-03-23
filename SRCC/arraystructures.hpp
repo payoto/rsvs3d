@@ -100,6 +100,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void write(FILE *fid) const;
 	void read(FILE *fid);
+	
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -166,6 +167,7 @@ public:
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void SwitchIndex(int typeInd, int oldInd, int newInd);
 // Mesh Quality
 	int OrderEdges();
 	void SetBorders();
@@ -184,6 +186,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual bool isready(bool isInMesh) const=0 ;
 	virtual void read(FILE * fid)=0 ;
 	virtual void write(FILE * fid) const =0 ;
+
 	//virtual operator=( meshpart* other)=0 ;
 
 };
@@ -204,6 +207,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+
 
 	volu(){ // Constructor
 		index=0;
@@ -312,7 +316,7 @@ class edge: public meshpart {
 public:
 	int index;
 
-	vector<int>  vertind;
+	vector<int> vertind;
 	vector<int> surfind;
 	 // reserves 2 as this is the size of the array
 
@@ -325,6 +329,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+
 
 	edge(){ // Constructor
 		index=0;
@@ -370,6 +375,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+
 
 	vert(){ // Constructor
 		index=0;

@@ -238,6 +238,35 @@ void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
       edgeind[i]=edgeind[i]+nEdge;
    }
 }
+
+
+void mesh::SwitchIndex(int typeInd, int oldInd, int newInd){
+
+   int ii,jj,newSub;
+   vector<int> subList;
+
+   if(typeInd==1){
+      newSub=verts.find(newInd);
+      subList=edges.find_list(verts[verts.find(oldInd)].edgeind);
+      for (ii=0;ii<int(subList.size());++ii){ // update vertind
+         jj=edges(subList[ii])->vertind[1]==oldInd;
+         edges[subList[ii]].vertind[jj]=newInd;
+         verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
+      }
+
+   } else if (typeInd==2){
+      cerr << "Not coded mesh::SwitchIndex(2" << endl;
+      throw;
+   } else if (typeInd==3){
+      cerr << "Not coded mesh::SwitchIndex(3" << endl;
+      throw;
+   } else if (typeInd==4){
+      cerr << "Not coded mesh::SwitchIndex(4" << endl;
+      throw;
+   }
+
+}
+
 #pragma GCC diagnostic pop
 // methods for mesh
 void mesh::HashArray(){
@@ -507,7 +536,7 @@ void mesh::SetBorders(){
       }
    }
    volus.ForceArrayReady();
-   // Update border status of edges
+   // Update border status of edges  
    for(ii=0;ii<edges.size();++ii){
       jj=0;
       nT=edges(ii)->surfind.size();

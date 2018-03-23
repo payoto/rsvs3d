@@ -213,7 +213,9 @@ int Test_snakeinit(){
 	mesh snakeMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
-	int start_s,stop_s;
+	vector<double> dt;
+	double totT=0.0;
+	int start_s,stop_s,ii;
 	//bool errFlag;
 	int errTest=0;
 
@@ -224,6 +226,7 @@ int Test_snakeinit(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
+		outSnake.PrintMesh(*(testSnake.snakemesh));
 
 		start_s=clock();
 		testSnake.PrepareForUse();
@@ -234,19 +237,25 @@ int Test_snakeinit(){
 		SpawnAtVertex(testSnake,729);
 		SpawnAtVertex(testSnake,730);
 		testSnake.displight();
-
-
-		testSnake.PrepareForUse();
-		testSnake.UpdateDistance(0.5);
-
-		testSnake.UpdateCoord();
-		testSnake.PrepareForUse();
-
-	// the code you wish to time goes here
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
-		outSnake.PrintMesh(testSnake.snakeconn);
+
+		start_s=clock();
+		testSnake.PrepareForUse();
+		for(ii=0;ii<5;++ii){
+			cout << ii << endl;
+			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			testSnake.CalculateTimeStep(dt,0.5);
+			testSnake.UpdateDistance(dt);
+			testSnake.UpdateCoord();
+			testSnake.PrepareForUse();
+			totT=totT+0.5;
+		}
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+
+	// the code you wish to time goes here
+		
 		//testSnake.disp();
 
 
@@ -262,7 +271,10 @@ int Test_snakeinitflat(){
 	mesh snakeMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
-	int start_s,stop_s;
+	int start_s,stop_s,ii;
+	vector<double> dt;
+	vector<int> isImpact;
+	double totT=0.0;
 	//bool errFlag;
 	int errTest=0;
 
@@ -273,6 +285,7 @@ int Test_snakeinitflat(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
+		outSnake.PrintMesh(*(testSnake.snakemesh));;
 
 		start_s=clock();
 		testSnake.PrepareForUse();
@@ -282,16 +295,25 @@ int Test_snakeinitflat(){
 
 
 		testSnake.PrepareForUse();
-		testSnake.UpdateDistance(0.5);
+		for(ii=0;ii<5;++ii){
+			cout << ii << endl;
+			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			testSnake.CalculateTimeStep(dt,0.5);
+			testSnake.UpdateDistance(dt);
+			testSnake.UpdateCoord();
+			testSnake.PrepareForUse();
+			testSnake.SnaxImpactDetection(isImpact);
+			DisplayVector(isImpact);
+			cout << endl;
+			totT=totT+0.5;
+		}
 
-		testSnake.UpdateCoord();
-		testSnake.PrepareForUse();
 		testSnake.disp();
 	// the code you wish to time goes here
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
-		outSnake.PrintMesh(testSnake.snakeconn);
+
+		
 		//testSnake.disp();
 
 

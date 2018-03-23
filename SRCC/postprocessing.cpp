@@ -136,7 +136,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			} 
 			#ifdef TEST_POSTPROCESSING
 			else if ((verts[0]==vertsPast[1]) || (verts[1]==vertsPast[1])) {
-					actVert=1;
+				actVert=1;
 			}
 			#endif //TEST_POSTPROCESSING
 			else {
@@ -170,13 +170,19 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 	return(0);
 }
 // Class function Implementation
-
-int tecplotfile::PrintMesh(const mesh& meshout){
+int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
-	fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
+	if(nZones==0){
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
+	}
+
 	this->NewZone();
+
+	if(strandID>0){
+		this->StrandTime(strandID, timeStep);
+	}
 	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
@@ -194,6 +200,8 @@ int tecplotfile::PrintMesh(const mesh& meshout){
 	}
 	return(0);
 }
+
+
 
 
 void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,

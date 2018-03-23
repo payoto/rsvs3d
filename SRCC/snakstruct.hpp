@@ -26,6 +26,8 @@
 // included dependencies
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <cfloat>
 
 #include "arraystructures.hpp"
 
@@ -90,11 +92,16 @@ protected:
 public: 
 	inline int KeyEdge(int a) const ;
 	int findedge(int key) const; 
+	int countedge(int key) const {return(hashEdge.count(key));}; 
 	void HashArrayEdge();
 	void ReorderOnEdge();
+	void OrderOnEdge();
+	void CalculateTimeStepOnEdge(vector<double> &dt, 	vector<bool> &isSnaxDone, int edgeInd);
+	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd);
 	// Functions that need modification
 	bool checkready();
 	void PrepareForUse();
+	void Concatenate(const snaxarray &other);
 	snax& operator[](const int a){ 
 		isOrderedOnEdge=0;
 		isHashEdge=0;
@@ -136,6 +143,7 @@ public:
 	void UpdateDistance(double dt);
 	void UpdateDistance(const vector<double> &dt);
 	void CalculateTimeStep(vector<double> &dt, double dtDefault);
+	void SnaxImpactDetection(vector<int> &isImpact);
 	void UpdateCoord();
 
 };
@@ -166,6 +174,7 @@ public:
 	void write(FILE * fid) const;
 	inline void set(int index, double d,double v,int fromvert,
 		int tovert,int edgeind,int isfreeze,int orderedge);
+	void SwitchIndex(int typeInd, int oldInd, int newInd);
 
 
 };
@@ -187,6 +196,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE *fid)const;
+	void SwitchIndex(int typeInd, int oldInd, int newInd);
 
 
 };
@@ -207,13 +217,14 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid)const;
+	void SwitchIndex(int typeInd, int oldInd, int newInd);
 
 
 };
 
 // Function prototypes
-
-
+double SnaxImpactDt(const snax &snax1,const snax &snax2);
+inline bool IsAproxEqual(double d1,double d2) {return(fabs(d1-d2)<DBL_EPSILON);}
 // Test Function prototypes
 int Test_SnakeStructures();
 int Test_coordvec();

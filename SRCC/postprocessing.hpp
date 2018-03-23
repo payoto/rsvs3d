@@ -42,10 +42,11 @@ class tecplotfile {
 private:
 	FILE *fid;
 	int lengthLine;
+	int nZones=0;
 public:
 	int OpenFile(const char *str);
 	void CloseFile();
-	int PrintMesh(const mesh& meshout);
+	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
 	int VolFaceMap(const mesh& meshout,int nSurf);
@@ -69,6 +70,10 @@ public:
 
 	void NewZone(){
 		fprintf(fid, "ZONE\n");
+		nZones++;
+	}
+	void StrandTime(int strandID, double timeStep){
+		fprintf(fid, "STRANDID = %i \nSOLUTIONTIME = %.10lf \n",strandID,timeStep);
 	}
 	
 	int Print(const char *format, ...){ // Mimics the printf function hides fid

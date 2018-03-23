@@ -87,7 +87,7 @@ void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, cons
 		// Finds the to vertex
 		jj=int(newsnake.snakemesh->edges(edgeSubs[ii])->vertind[0]==indVert);
 		newsnake.snaxs[ii].set(newsnake.snaxs(ii)->index,0.0,0.5,indVert,
-			newsnake.snakemesh->edges(edgeSubs[ii])->vertind[jj],edgeInds[ii],0,1);
+			newsnake.snakemesh->edges(edgeSubs[ii])->vertind[jj],edgeInds[ii],0,-1);
 
 		edgeSubsTemp=FindSubList(newsnake.snakemesh->edges(edgeSubs[ii])->surfind,
 			surfInds,hashSurfInds);

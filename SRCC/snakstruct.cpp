@@ -368,6 +368,13 @@ void snaxarray::PrepareForUse()
 	readyforuse=true;
 }
 
+void snaxarray::Concatenate(const snaxarray &other)
+{
+	ArrayStruct<snax>::Concatenate(other);
+	isHashEdge=0;
+	isOrderedOnEdge=0;
+}
+
 // Snake Movement
 void snake::UpdateDistance(double dt){
 	int ii;
@@ -381,7 +388,7 @@ void snake::UpdateDistance(double dt){
 }
 void snake::UpdateDistance(const vector<double> &dt){
 	int ii;
-	if (int(dt.size())!=snaxs.size()){
+	if (int(dt.size())==snaxs.size()){
 		for (ii = 0; ii < int(snaxs.size()); ++ii)
 		{
 			snaxs[ii].d=snaxs[ii].d+snaxs[ii].v*dt[ii];
@@ -435,7 +442,7 @@ int snaxarray::findedge(int key) const
 }
 
 
-void snaxarray::ReorderOnEdge(){
+void snaxarray::OrderOnEdge(){
 
 	vector<int> edgeInds,snaxSubs,orderSubs;
 	vector<double> orderSnax,unorderSnax;
@@ -457,6 +464,7 @@ void snaxarray::ReorderOnEdge(){
 				orderSnax[jj]= isBwd ? (1.0-elems[snaxSubs[jj]].d) : elems[snaxSubs[jj]].d ;
 			}
 			unorderSnax=orderSnax;
+			// This will break with snakes in same place
 			sort(orderSnax);
 
 			orderSubs=FindSubList(orderSnax,unorderSnax,hashOrder);
@@ -470,15 +478,203 @@ void snaxarray::ReorderOnEdge(){
 	isOrderedOnEdge=1;
 }
 
-void CalculateTimeStep(vector<double> &dt, double dtDefault){
+
+void snaxarray::ReorderOnEdge()
+{
+
+	vector<int> edgeInds,snaxSubs,orderSubs;
+	vector<double> orderSnax,unorderSnax;
+	unordered_multimap<double,int> hashOrder;
+	int isBwd;
+	int ii, jj, nEdge, maxOrd=0;
+	bool needIncrement;
+
+	edgeInds=ConcatenateScalarField(*this,&snax::edgeind,0,elems.size());
+	sort(edgeInds);
+	unique(edgeInds);
+	for(ii=0;ii<int(edgeInds.size());++ii){
+
+		nEdge=hashEdge.count(edgeInds[ii]);
+
+		if (nEdge>1){
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			orderSnax.resize(snaxSubs.size());
+			needIncrement=false;
+			maxOrd=0;
+			for(jj=0;jj<int(snaxSubs.size());++jj){
+
+				maxOrd=(maxOrd<=elems[snaxSubs[jj]].orderedge) ? elems[snaxSubs[jj]].orderedge : maxOrd;
+			}
+			for(jj=0;jj<int(snaxSubs.size());++jj){
+				if (elems[snaxSubs[jj]].orderedge==-1){
+					isBwd=elems[snaxSubs[jj]].fromvert>elems[snaxSubs[jj]].tovert;
+
+					elems[snaxSubs[jj]].orderedge= (isBwd && (elems[snaxSubs[jj]].d==0.0)) ? maxOrd+1 
+					:  ((!isBwd && (elems[snaxSubs[jj]].d==0.0)) ? 0 
+						: ((isBwd && (elems[snaxSubs[jj]].d==1.0)) ? 0 
+							:  ((!isBwd && (elems[snaxSubs[jj]].d==1.0)) ? maxOrd+1 
+								: elems[snaxSubs[jj]].orderedge ))); 
+					if (elems[snaxSubs[jj]].orderedge==-1){
+						cerr << "Error Order not correctly assigned" << endl;
+					}
+					if (elems[snaxSubs[jj]].orderedge==0){
+						needIncrement=true;
+					}
+				}
+			}
+			if(needIncrement){
+				for(jj=0;jj<int(snaxSubs.size());++jj){
+					elems[snaxSubs[jj]].orderedge++;
+				}
+			}
+		} else {
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			elems[snaxSubs[0]].orderedge=1;
+		}
+
+	}
+
+	isOrderedOnEdge=1;
+}
+
+void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnaxDone, int edgeInd){
+	int nSnax,ii,jj;
+	vector<int> snaxSubs;
+	double impactTime;
+	snaxSubs=ReturnDataEqualRange(edgeInd, hashEdge);
+	nSnax=snaxSubs.size();
+	for(ii=0;ii<nSnax;++ii){
+		isSnaxDone[snaxSubs[ii]]=true;
+		for(jj=ii+1;jj<nSnax;++jj){
+			impactTime=SnaxImpactDt(elems[snaxSubs[ii]],elems[snaxSubs[jj]]);
+			if (impactTime>=0.0){
+				dt[snaxSubs[ii]]= (dt[snaxSubs[ii]]>impactTime) ? impactTime : dt[snaxSubs[ii]];
+				dt[snaxSubs[jj]]= (dt[snaxSubs[jj]]>impactTime) ? impactTime : dt[snaxSubs[jj]];
+			}
+		}
+	}
+
+}
+
+
+
+void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
+
+	int nSnax,ii,nEdge;
+	vector<bool> isSnaxDone;
+
+	nSnax=snaxs.size();
+	isSnaxDone.assign(nSnax,false);
+	dt.assign(nSnax,dtDefault);
+	dt.resize(nSnax);
 
 	if(!snaxs.checkready()){
 		snaxs.PrepareForUse();
 	}
 
+	for(ii=0;ii<nSnax;++ii){
+		if(!isSnaxDone[ii]){
+			nEdge=snaxs.countedge(snaxs(ii)->edgeind);
+			if (nEdge==1){
+				//dt[ii]=dtDefault;
+				isSnaxDone[ii]=true;
+			} else if (nEdge>1){
+				snaxs.CalculateTimeStepOnEdge(dt,isSnaxDone,snaxs(ii)->edgeind);
+			} else {
+				cerr << "Error: hashEdge was not up to date" << endl;
+				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+				throw range_error ("Incorrect hash table provided");
+			}
+		}
+	}
+
 
 }
 
+
+double SnaxImpactDt(const snax &snax1,const snax &snax2){
+
+	int isSameDir;
+	double dD, dV;
+
+	isSameDir=snax1.fromvert==snax2.fromvert;
+
+	dD=((1.0*!isSameDir)+(1.0+(-2.0)*!isSameDir)*snax2.d)-snax1.d;
+	dV=(1.0+(-2.0)*!isSameDir)*snax2.v-snax1.v;
+
+	if (IsAproxEqual(dD,0.0)){
+		return(0.0);
+	}
+	if (IsAproxEqual(dV,0.0)){
+		return(-1.0);
+	}
+
+	return(-dD/dV);
+}
+
+
+
+void snake::SnaxImpactDetection(vector<int> &isImpact){
+
+	int nSnax,ii,nEdge;
+	vector<bool> isSnaxDone;
+
+	nSnax=snaxs.size();
+	isSnaxDone.assign(nSnax,false);
+	isImpact.assign(nSnax,0);
+	isImpact.resize(nSnax);
+
+	if(!snaxs.checkready()){
+		snaxs.PrepareForUse();
+	}
+
+	for(ii=0;ii<nSnax;++ii){
+		if(!isSnaxDone[ii]){
+			nEdge=snaxs.countedge(snaxs(ii)->edgeind);
+			if (nEdge==1){
+				isImpact[ii]= (IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<=0.0)) ? -1 : 0;
+				isImpact[ii]= (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>=0.0)) ? -2 : 0; 
+				isSnaxDone[ii]=true;
+			} else if (nEdge>1){
+				snaxs.DetectImpactOnEdge(isImpact,isSnaxDone,snaxs(ii)->edgeind);
+			} else {
+				cerr << "Error: hashEdge was not up to date" << endl;
+				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+				throw range_error ("Incorrect hash table provided");
+			}
+		}
+	}
+
+}
+
+void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd){
+	int nSnax,ii,jj, dOrd;
+	vector<int> snaxSubs;
+	double impactTime;
+	snaxSubs=ReturnDataEqualRange(edgeInd, hashEdge);
+	nSnax=snaxSubs.size();
+	for(ii=0;ii<nSnax;++ii){
+
+		isSnaxDone[snaxSubs[ii]]=true;
+
+		for(jj=ii+1; jj<nSnax; ++jj){
+			impactTime=SnaxImpactDt(elems[snaxSubs[ii]],elems[snaxSubs[jj]]);
+			dOrd=abs(elems[snaxSubs[ii]].orderedge-elems[snaxSubs[jj]].orderedge);
+
+			if (IsAproxEqual(impactTime,0.0) && dOrd==1){
+
+				isImpact[snaxSubs[ii]]=elems[snaxSubs[jj]].index;
+				isImpact[snaxSubs[jj]]=elems[snaxSubs[ii]].index;
+
+			}
+		}
+		if (isImpact[snaxSubs[ii]]==0){
+			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[ii].d,0.0) && (elems[ii].v<=0.0)) ? -1 : 0;
+			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[ii].d,1.0) && (elems[ii].v>=0.0)) ? -2 : 0; 
+		}
+	}
+
+}
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
