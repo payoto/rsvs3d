@@ -107,6 +107,7 @@ public:
 		isHashEdge=0;
 		return(ArrayStruct<snax>::operator[](a));
 	}
+
 };
 
 class snake  {

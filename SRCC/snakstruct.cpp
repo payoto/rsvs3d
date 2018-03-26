@@ -313,11 +313,14 @@ void snake::MakeCompatible_inplace(snake &other) const{
    // Makes other mesh compatible with this to be 
    // merged without index crashes
 
-	int nVert,nEdge,nVolu,nSurf;
+	int nVert,nEdge,nVolu,nSurf,ii;
 
    // Define Max indices in current mesh
 	this->GetMaxIndex(&nVert,&nEdge,&nSurf,&nVolu);
 	other.ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	for(ii=0;ii<other.snaxs.size();++ii){
+		other.snaxs[ii].orderedge=-1;
+	}
 }
 snake snake::MakeCompatible(snake other) const{
 	MakeCompatible_inplace(other);
@@ -669,8 +672,10 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 			}
 		}
 		if (isImpact[snaxSubs[ii]]==0){
-			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[ii].d,0.0) && (elems[ii].v<=0.0)) ? -1 : 0;
-			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[ii].d,1.0) && (elems[ii].v>=0.0)) ? -2 : 0; 
+			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[snaxSubs[ii]].d,0.0) 
+				&& (elems[snaxSubs[ii]].v<=0.0) && elems[snaxSubs[ii]].orderedge==1) ? -1 : 0;
+			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) 
+				&& (elems[snaxSubs[ii]].v>=0.0) && elems[snaxSubs[ii]].orderedge==nSnax) ? -2 : 0; 
 		}
 	}
 

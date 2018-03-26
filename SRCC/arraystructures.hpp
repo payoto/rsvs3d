@@ -59,6 +59,7 @@ class vert;
 class edge;
 
 template <class T> class ArrayStruct;
+template <class T,class Q> class HashedVector;
 typedef unsigned int unsigned_int;
 
 typedef ArrayStruct<volu> voluarray;
@@ -66,6 +67,7 @@ typedef ArrayStruct<surf> surfarray;
 typedef ArrayStruct<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
+template <class T> int TestTemplate_ArrayStruct();
 // Templates
 template <class T> 
 class ArrayStruct { 
@@ -83,6 +85,7 @@ protected:
 public: 
 	friend class mesh;
 	friend class snake;
+	friend int TestTemplate_ArrayStruct<T>();
 
 	void disp() const;
 	void disp(const vector<int> &subs) const;
@@ -100,7 +103,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void write(FILE *fid) const;
 	void read(FILE *fid);
-	
+	void remove(vector<int> delInd);
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -135,7 +138,18 @@ public:
 
 }; 
 
+template <class T,class Q>  
+class HashedVector { // container for 
+public:
+	vector<T> vec;
+	unordered_multimap<T,int> hashTable;
 
+	inline void GenerateHash();
+	inline int find(T key) const;
+	inline vector<int> find_list(vector<T> &key) const;
+	bool operator()(Q key) const;
+	inline bool IsInVec(Q key) const;
+};
 
 // Base class
 
@@ -428,7 +442,7 @@ template <typename T> inline void unique(vector<T> &vec);
 template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,
 unordered_multimap<T,int> &hashTable) ;
 template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
-template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable) ;
+template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable) ;
 
 //test functions
 int Test_ArrayStructures();

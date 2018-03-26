@@ -71,7 +71,8 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	snakein.PrepareForUse();
 	newsnake.PrepareForUse();
 	snakein.MakeCompatible_inplace(newsnake);
-	newsnake.PrepareForUse();
+
+	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	snakein.Concatenate(newsnake);
 
 }

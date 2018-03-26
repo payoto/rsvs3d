@@ -126,56 +126,7 @@ template <typename T> inline void unique(vector<T> &vec)
 	vec.resize( std::distance(vec.begin(),itVecInt));
 }
 // Find option for vectors
-template<class T>  int FindSub(T key,unordered_multimap<T,int> hashTable)  
-{
 
-	auto search=hashTable.find(key);
-
-	if (search==hashTable.end()){
-		return(-1);
-	}
-
-	return(search->second);
-}
-
-template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) 
-{
-	vector<int> returnSub;
-	int ii;
-
-	returnSub.reserve(int(keyFind.size()));
-
-	if (hashTable.empty()){
-		HashVector(keyList,hashTable);
-	}
-
-	for (ii=0;ii<int(keyFind.size());++ii){
-		returnSub.push_back(FindSub(keyFind[ii],hashTable));
-      #ifdef SAFE_ACCESS
-		if(returnSub[ii]>=0){
-			if (keyList[returnSub[ii]]!=keyFind[ii]){
-				throw  invalid_argument ("FIND returned an invalid output ");
-			}
-		}
-      #endif //SAFE_ACCESS
-	}
-	return(returnSub);
-}
-
-
-
-template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,int> &hashTable)
-{
-   // Generates a valid unordered_map for the current ArrayStruct
-   // Function should not be called repeatedly 
-
-	hashTable.reserve(elems.size());
-	for (int i = 0; i < int(elems.size()); ++i)
-	{
-		hashTable.emplace(elems[i],i);
-	}
-
-}
 
 // Templated test for all types that need to be derived from ArrayStruct<T>
 
@@ -186,6 +137,7 @@ template <class T> int TestTemplate_ArrayStruct()
 	ArrayStruct<T> stackT,stackT2,stackT3;
 	T singleT;
 	vector<int> testSub = {2,5,10,7};
+	vector<int> delInd={1,2};
 	FILE *fidw,*fidr;
 	int i=0,j=0;
 	int errFlag=0;
@@ -246,6 +198,8 @@ template <class T> int TestTemplate_ArrayStruct()
 			errFlag++;
 			#endif //SAFE_ACCESS
 		}  catch (exception const& ex) { 
+			cout << "Previous Call should have thrown the following warning:" << endl;
+			cout << "Warning: reading from potentially obsolete unordered_map" << endl;
 			i=-1;
 		}
 		// Test Concatenation of arrays
@@ -290,6 +244,23 @@ template <class T> int TestTemplate_ArrayStruct()
 			errFlag++;  
 		}
 
+
+		stackT2=stackT;
+		errTest=CompareDisp(stackT,stackT2);
+		if (!errTest){
+			cerr << "Error Displays were not the same after full assignement" << endl;
+			errFlag++;
+		}
+		stackT.elems.erase(stackT.elems.begin(),++(++stackT.elems.begin()));
+		stackT2.remove(delInd);
+
+		errTest=CompareDisp(stackT,stackT2);
+		if (!errTest){
+			stackT.disp();
+			stackT2.disp();
+			cerr << "Error Displays were not the same erase" << endl;
+			errFlag++;
+		}
 		stackT.disp();
 		errFlag+=TestReadyness(stackT," Disp",true);
 
@@ -351,7 +322,7 @@ template<class T>  int ArrayStruct <T>::find(int key) const
 	#ifdef SAFE_ACCESS
 	key2=elems[search->second].index;
 	if (key2!=key){
-       cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
+		cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
 		throw  invalid_argument ("FIND returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
@@ -404,9 +375,9 @@ template<class T>  bool ArrayStruct <T>::checkready()
 	
 }
 template<class T>  void ArrayStruct <T>::ForceArrayReady(){
-	isHash=1;
-	isSetMI=1;
-	readyforuse=true;
+isHash=1;
+isSetMI=1;
+readyforuse=true;
 }
 
 template<class T> void ArrayStruct <T>::disp() const 
@@ -522,6 +493,16 @@ template<class T> void ArrayStruct <T>::PrepareForUse()
 	readyforuse=true;
 }
 
+template<class T> void ArrayStruct<T>::remove(vector<int> delInd){
+HashedVector<int,T> delHash;
+delHash.vec=delInd;
+delHash.GenerateHash();
+
+elems.erase(std::remove_if(elems.begin(),elems.end(),delHash),elems.end());
+
+
+}
+
 // Implementation of vector member functions into the base class
 
 template<class T> inline int ArrayStruct <T>::size() const 
@@ -550,6 +531,71 @@ template<class T> inline void ArrayStruct <T>::reserve(int n)
 {
 	elems.reserve(n);
 }
+// Hashed Vector Template class implementations
+
+template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){
+HashVector(vec, hashTable);
+}
+template <class T,class Q> inline int HashedVector<T,Q>::find(T key) const{
+return(FindSub(key, hashTable) );
+}
+template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(vector<T> &key) const{
+return(FindSubList(key, vec, hashTable) );
+}
+template <class T,class Q> inline bool HashedVector<T,Q>::IsInVec(Q key) const{
+return(FindSub(key.Key(), hashTable)!=-1);
+}
+template <class T,class Q>  bool HashedVector<T,Q>::operator()(Q key) const{
+return(FindSub(key.Key(), hashTable)!=-1);
+}
+template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &hashTable)  
+{
+
+	auto search=hashTable.find(key);
+
+	if (search==hashTable.end()){
+		return(-1);
+	}
+
+	return(search->second);
+}
+
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) 
+{
+	vector<int> returnSub;
+	int ii;
+
+	returnSub.reserve(int(keyFind.size()));
+
+	if (hashTable.empty()){
+		HashVector(keyList,hashTable);
+	}
+
+	for (ii=0;ii<int(keyFind.size());++ii){
+		returnSub.push_back(FindSub(keyFind[ii],hashTable));
+      #ifdef SAFE_ACCESS
+		if(returnSub[ii]>=0){
+			if (keyList[returnSub[ii]]!=keyFind[ii]){
+				throw  invalid_argument ("FIND returned an invalid output ");
+			}
+		}
+      #endif //SAFE_ACCESS
+	}
+	return(returnSub);
+}
 
 
+
+template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,int> &hashTable)
+{
+   // Generates a valid unordered_map for the current ArrayStruct
+   // Function should not be called repeatedly 
+
+	hashTable.reserve(elems.size());
+	for (int i = 0; i < int(elems.size()); ++i)
+	{
+		hashTable.emplace(elems[i],i);
+	}
+
+}
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 
