@@ -51,6 +51,9 @@ void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds,
  const vector<int> &voluInds,const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds);
 void SpawnAtVertexSurf2D(snake& newsnake,int nEdge,const vector<int> &voluInds);
 void SpawnAtVertexVolu(snake& newsnake, int nSurf);
+void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact);
 
+void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
+void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

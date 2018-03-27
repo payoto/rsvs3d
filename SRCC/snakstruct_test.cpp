@@ -213,8 +213,9 @@ int Test_snakeinit(){
 	mesh snakeMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
-	vector<double> dt;
 	double totT=0.0;
+	vector<double> dt;
+	vector<int> isImpact;
 	int start_s,stop_s,ii;
 	//bool errFlag;
 	int errTest=0;
@@ -242,18 +243,18 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<5;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << endl;
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
-			testSnake.CalculateTimeStep(dt,0.5);
-			testSnake.UpdateDistance(dt);
-			testSnake.UpdateCoord();
-			testSnake.PrepareForUse();
-			totT=totT+0.5;
+
+			Test_stepalgo(testSnake, dt, isImpact);
+			
+			cout << endl;
+			totT=totT+1;
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-
+		testSnake.displight();
 	// the code you wish to time goes here
 		
 		//testSnake.disp();
@@ -284,31 +285,32 @@ int Test_snakeinitflat(){
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
 		snakeMesh.PrepareForUse();
+		snakeMesh.SetBorders();
+		snakeMesh.PrepareForUse();
+
 		testSnake.snakemesh=&snakeMesh;
-		outSnake.PrintMesh(*(testSnake.snakemesh));;
+		outSnake.PrintMesh(*(testSnake.snakemesh));
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		SpawnAtVertex(testSnake,5);
-		SpawnAtVertex(testSnake,8);
+		SpawnAtVertex(testSnake,13);
+		SpawnAtVertex(testSnake,16);
+		SpawnAtVertex(testSnake,32);
 		testSnake.displight();
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<5;++ii){
+		for(ii=0;ii<10;++ii){
 			cout << ii << endl;
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
-			testSnake.CalculateTimeStep(dt,0.5);
-			testSnake.UpdateDistance(dt);
-			testSnake.UpdateCoord();
-			testSnake.PrepareForUse();
-			testSnake.SnaxImpactDetection(isImpact);
-			DisplayVector(isImpact);
+
+			Test_stepalgo(testSnake, dt, isImpact);
+			
 			cout << endl;
-			totT=totT+0.5;
+			totT=totT+1;
 		}
 
-		testSnake.disp();
+		//testSnake.disp();
 	// the code you wish to time goes here
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -325,6 +327,28 @@ int Test_snakeinitflat(){
 
 }
 
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
+
+	testSnake.CalculateTimeStep(dt,1);
+
+	testSnake.UpdateDistance(dt);
+
+	testSnake.UpdateCoord();
+
+	testSnake.PrepareForUse();
+
+	testSnake.SnaxImpactDetection(isImpact);
+
+	MergeAllContactVertices(testSnake, isImpact);
+
+	testSnake.PrepareForUse();
+	
+	SpawnArrivedSnaxels(testSnake,isImpact);
+	testSnake.SnaxImpactDetection(isImpact);
+	testSnake.PrepareForUse();
+	MergeAllContactVertices(testSnake, isImpact);
+	testSnake.PrepareForUse();
+}
 
 int Test_snakeOrderEdges(){
 

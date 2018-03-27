@@ -251,7 +251,12 @@ template <class T> int TestTemplate_ArrayStruct()
 			cerr << "Error Displays were not the same after full assignement" << endl;
 			errFlag++;
 		}
+		stackT.disp();
+		errFlag+=TestReadyness(stackT," Disp",true);
+		
 		stackT.elems.erase(stackT.elems.begin(),++(++stackT.elems.begin()));
+		stackT.isHash=0;
+		stackT.isSetMI=0;
 		stackT2.remove(delInd);
 
 		errTest=CompareDisp(stackT,stackT2);
@@ -261,8 +266,6 @@ template <class T> int TestTemplate_ArrayStruct()
 			cerr << "Error Displays were not the same erase" << endl;
 			errFlag++;
 		}
-		stackT.disp();
-		errFlag+=TestReadyness(stackT," Disp",true);
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -314,12 +317,13 @@ template<class T>  int ArrayStruct <T>::find(int key) const
 		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
 	}
 	auto search=hashTable.find(key);
-	int key2;
+	
 
 	if (search==hashTable.end()){
 		return(-1);
 	}
 	#ifdef SAFE_ACCESS
+	int key2;
 	key2=elems[search->second].index;
 	if (key2!=key){
 		cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
@@ -374,10 +378,11 @@ template<class T>  bool ArrayStruct <T>::checkready()
 	return(readyforuse);
 	
 }
-template<class T>  void ArrayStruct <T>::ForceArrayReady(){
-isHash=1;
-isSetMI=1;
-readyforuse=true;
+template<class T>  void ArrayStruct <T>::ForceArrayReady()
+{
+	isHash=1;
+	isSetMI=1;
+	readyforuse=true;
 }
 
 template<class T> void ArrayStruct <T>::disp() const 
@@ -493,13 +498,25 @@ template<class T> void ArrayStruct <T>::PrepareForUse()
 	readyforuse=true;
 }
 
-template<class T> void ArrayStruct<T>::remove(vector<int> delInd){
-HashedVector<int,T> delHash;
-delHash.vec=delInd;
-delHash.GenerateHash();
+template<class T> void ArrayStruct<T>::remove(vector<int> delInd)
+{
 
-elems.erase(std::remove_if(elems.begin(),elems.end(),delHash),elems.end());
+	HashedVector<int,T> delHash;
+	//int isHashCurr=isHash;
 
+	delHash.vec=delInd;
+	delHash.GenerateHash();
+
+	elems.erase(std::remove_if(elems.begin(),elems.end(),delHash),elems.end());
+
+	isHash=0;
+	isSetMI=0;
+	// This part of the code lets remove maintain the hashTable up to date.
+	/*for (int i = 0; i < int(delInd.size()); ++i)
+	{
+		this->hashTable.erase(delInd[i]);
+	}
+	isHash=isHashCurr;*/
 
 }
 

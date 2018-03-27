@@ -184,3 +184,145 @@ void SpawnAtVertexVolu(snake& newsnake, int nSurf){
 		newsnake.snakeconn.volus[0].surfind.push_back(ii+1);
 	}
 }
+
+// Merge vertices in contact
+
+void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact){
+
+	// in isImpact needs to be hashed to rapidly check
+	int ii,jj,nImpacts;
+	vector<int>  snaxToRemove, vertSameSub,subVelTo0;
+	vector<bool> isImpactDone;
+	HashedVector<int,snax> impactInd, impactTarg;
+	
+	nImpacts=isImpact.size()/2;
+	impactInd.vec.reserve(nImpacts);
+	impactTarg.vec.reserve(nImpacts);
+	snaxToRemove.reserve(nImpacts);
+	isImpactDone.assign(nImpacts,false);
+
+	for(ii=0;ii<int(isImpact.size());ii=ii+2){
+		impactInd.vec.push_back(isImpact[ii]);
+	}
+	for(ii=1;ii<int(isImpact.size());ii=ii+2){
+		impactTarg.vec.push_back(isImpact[ii]);
+	}
+	impactInd.GenerateHash();
+	impactTarg.GenerateHash();
+
+
+	for(ii=0; ii<nImpacts; ++ii){
+		if(!isImpactDone[ii]){
+			isImpactDone[ii]=true;
+			if(impactTarg.vec[ii]>0){
+				fullsnake.snakeconn.SwitchIndex(1,impactInd.vec[ii],impactTarg.vec[ii]);
+				subVelTo0.push_back(fullsnake.snaxs.find(impactTarg.vec[ii])); 
+
+				snaxToRemove.push_back(impactInd.vec[ii]);
+				vertSameSub=ReturnDataEqualRange(impactTarg.vec[ii], impactInd.hashTable);
+				
+				for(jj=0;jj< int(vertSameSub.size()) ; jj++){
+					isImpactDone[vertSameSub[jj]]=true;
+				}
+				vertSameSub=ReturnDataEqualRange(impactTarg.vec[ii], impactTarg.hashTable);
+				for(jj=0;jj< int(vertSameSub.size()) ; jj++){
+					isImpactDone[vertSameSub[jj]]=true;
+				}
+			}
+		}
+	}
+	for (ii=0;ii<int(subVelTo0.size());ii++){
+		fullsnake.snaxs[subVelTo0[ii]].v=0.0; 
+	}
+	fullsnake.snaxs.remove(snaxToRemove);
+	fullsnake.snakeconn.verts.remove(snaxToRemove);
+	
+}
+
+void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
+
+	snake fwdSnake, bwdSnake;
+
+	fwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
+	bwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
+
+	// Generate fwd spawn
+	SpawnArrivedSnaxelsDir(fullsnake,bwdSnake,isImpact,-1);
+	SpawnArrivedSnaxelsDir(fullsnake,fwdSnake,isImpact,-2);
+
+
+
+	bwdSnake.Flip();
+	bwdSnake.PrepareForUse();
+	fwdSnake.PrepareForUse();
+	fwdSnake.MakeCompatible_inplace(bwdSnake);
+	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
+	fwdSnake.Concatenate(bwdSnake);
+	fwdSnake.PrepareForUse();
+	fullsnake.PrepareForUse();
+	fullsnake.MakeCompatible_inplace(fwdSnake);
+	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
+	fullsnake.Concatenate(fwdSnake);
+
+	fullsnake.PrepareForUse();
+
+}
+
+void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector<int> &isImpact,int dir){
+
+	int nVert, nEdge, nSurf, nVolu,ii,jj,kk;
+	vector<int> vertSpawn,subList;
+	nVert=0; nEdge=0; nSurf=0; nVolu=0;jj=-1;
+	if(dir==-1){
+		for(ii=0;ii<int(isImpact.size());ii=ii+2){
+			if(isImpact[ii+1]==dir){
+				if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->fromvert)->isBorder){
+					jj=fullsnake.snaxs.find(isImpact[ii]);
+					vertSpawn.push_back(fullsnake.snaxs(jj)->fromvert);
+					nVolu++;
+					nVert=nVert+fullsnake.snakemesh->verts(jj)->edgeind.size();
+
+
+					subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts(jj)->edgeind);
+
+					for(kk=0;kk<int(subList.size());kk++){
+						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
+					}
+				}
+
+			}
+		}
+	}
+
+	if(dir==-2){
+		for(ii=0;ii<int(isImpact.size());ii=ii+2){
+			if(isImpact[ii+1]==dir){
+				jj=fullsnake.snaxs.find(isImpact[ii]);
+				if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->tovert)->isBorder){
+					vertSpawn.push_back(fullsnake.snaxs(jj)->tovert);
+					nVolu++;
+					nVert=nVert+fullsnake.snakemesh->verts(jj)->edgeind.size();
+
+
+					subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts(jj)->edgeind);
+
+					for(kk=0;kk<int(subList.size());kk++){
+						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
+					}
+				}
+
+			}
+		}
+	}
+
+	nSurf=nEdge/2;
+	partSnake.reserve(nVert, nEdge, nSurf, nVolu);
+
+	sort(vertSpawn);
+	unique(vertSpawn);
+
+	for (ii=0;ii<int(vertSpawn.size());ii++){
+		SpawnAtVertex(partSnake,vertSpawn[ii]);
+	}
+
+}

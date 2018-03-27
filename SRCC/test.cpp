@@ -33,7 +33,6 @@ int main(){
 	gridTest.Run(Test_MeshOut,"Mesh output");
 	gridTest.Run(Test_snakeOrderEdges,"Snake Order error");
 	gridTest.Run(Test_SnakeStructures,"Snake containers");
-	#endif //TEST_ALL
 	gridTest.Run(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
 	gridTest.Run(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
 	gridTest.Run(TestTemplate_ArrayStruct<surf>,"TestTemplate_ArrayStruct<surf>");
@@ -41,6 +40,7 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
+	#endif //TEST_ALL
 
 	gridTest.Run(Test_snakeinit,"Snake spawning");
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");

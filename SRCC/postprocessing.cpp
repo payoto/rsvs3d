@@ -278,6 +278,7 @@ int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid, tecplotfile &o
 	fid=fopen(fileToOpen,"w");
 	if(fid!=NULL){
 		blockGrid.PrepareForUse();
+		blockGrid.SetBorders();
 		blockGrid.write(fid);
 		fclose(fid);
 		fid=fopen(fileToOpen,"r");

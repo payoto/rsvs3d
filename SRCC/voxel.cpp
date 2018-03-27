@@ -454,7 +454,7 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-	RowVector3i dimGrid1(2,3,4), dimGrid2(2,3,0), dimGrid3(20,30,10);
+	RowVector3i dimGrid1(2,3,4), dimGrid2(10,10,0), dimGrid3(20,30,10);
 	mesh blockGrid;
 	const char *fileToOpen;
 	

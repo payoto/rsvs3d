@@ -9,11 +9,11 @@
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
 
+#define TEST_SNAKSTRUCT
 #define 
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
-#define TEST_SNAKSTRUCT
 #endif
 
 //=================================
@@ -90,6 +90,8 @@ protected:
 	int isOrderedOnEdge=0;
 
 public: 
+	friend class snake;
+
 	inline int KeyEdge(int a) const ;
 	int findedge(int key) const; 
 	int countedge(int key) const {return(hashEdge.count(key));}; 
@@ -100,6 +102,7 @@ public:
 	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd);
 	// Functions that need modification
 	bool checkready();
+	void ForceArrayReady();
 	void PrepareForUse();
 	void Concatenate(const snaxarray &other);
 	snax& operator[](const int a){ 
@@ -129,6 +132,7 @@ public:
 	bool isready() const ;
 	void PrepareForUse();
 	void Init(mesh *snakemesh,int nSnax, int nEdge, int nSurf, int nVolu);
+	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void HashArray(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse	
@@ -146,6 +150,7 @@ public:
 	void CalculateTimeStep(vector<double> &dt, double dtDefault);
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void UpdateCoord();
+	void Flip(); // reverses snake directions
 
 };
 
@@ -235,6 +240,7 @@ int Test_snake();
 int Test_snakeinit();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
 
 // Functions needed at Compile time
 

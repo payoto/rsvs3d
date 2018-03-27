@@ -122,6 +122,19 @@ public:
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));
 	}
+	const T* isearch(const int b) const{ 
+	// () Operator returns a constant pointer to the corresponding elems.
+	// Cannot be used on the left hand side and can't be used to edit data in elems
+		int a=this->find(b);
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		return(&(elems[a]));
+	}
+
 	T& operator[](const int a){ 
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
@@ -166,6 +179,7 @@ public:
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
+	void reserve(int nVe,int nE, int nS, int nVo);
 	void PrepareForUse();
 	void disp() const;
 	void displight() const;

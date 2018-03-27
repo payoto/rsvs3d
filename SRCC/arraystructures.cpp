@@ -253,6 +253,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd){
          edges[subList[ii]].vertind[jj]=newInd;
          verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
       }
+      // Hashing has not been invalidated
+      edges.isHash=1;
+      verts.isHash=1;
 
    } else if (typeInd==2){
       cerr << "Not coded mesh::SwitchIndex(2" << endl;
@@ -330,6 +333,7 @@ void mesh::read(FILE *fid) {
    volus.isInMesh=true;
 }
 void mesh::write(FILE *fid) const {
+   //fprintf(fid,"%i \n",int(borderIsSet));
    verts.write(fid);
    edges.write(fid);
    surfs.write(fid);
@@ -381,7 +385,8 @@ void mesh::displight() const {
 
 void mesh::Init(int nVe,int nE, int nS, int nVo)
 {
-
+   borderIsSet=false;
+   
    verts.Init(nVe);
    edges.Init(nE);
    surfs.Init(nS);
@@ -395,6 +400,21 @@ void mesh::Init(int nVe,int nE, int nS, int nVo)
    #ifdef TEST_ARRAYSTRUCTURES
    cout << "Mesh Correctly Assigned!" << endl;
    #endif // TEST_ARRAYSTRUCTURES
+}
+
+void mesh::reserve(int nVe,int nE, int nS, int nVo)
+{
+
+   verts.reserve(nVe);
+   edges.reserve(nE);
+   surfs.reserve(nS);
+   volus.reserve(nVo);
+
+   verts.isInMesh=true;
+   edges.isInMesh=true;
+   surfs.isInMesh=true;
+   volus.isInMesh=true;
+
 }
 
 void mesh::MakeCompatible_inplace(mesh &other) const{
@@ -514,43 +534,73 @@ int mesh::OrderEdges(){
 
 void mesh::SetBorders(){
    int ii,jj,nT;
+   if (int(volus.size())>0){
+      // Update border status of edges
+      for(ii=0;ii<surfs.size();++ii){
+         jj=0;
+         nT=surfs(ii)->voluind.size();
+         surfs[ii].isBorder=false;
+         while(jj<nT && !surfs(ii)->isBorder){
+            surfs[ii].isBorder=surfs[ii].voluind[jj]==0;
+            jj++;
+         }
+      }
+      surfs.ForceArrayReady();
 
-   // Update border status of edges
-   for(ii=0;ii<surfs.size();++ii){
-      jj=0;
-      nT=surfs(ii)->voluind.size();
-      surfs[ii].isBorder=false;
-      while(jj<nT && !surfs(ii)->isBorder){
-         surfs[ii].isBorder=surfs[ii].voluind[jj]==0;
-         jj++;
+      // Update border status of volus
+      for(ii=0;ii<volus.size();++ii){
+         jj=0;
+         nT=volus(ii)->surfind.size();
+         volus[ii].isBorder=false;
+         while(jj<nT && !volus(ii)->isBorder){
+            volus[ii].isBorder=surfs(surfs.find(volus[ii].surfind[jj]))->isBorder;
+            jj++;
+         }
       }
-   }
-   surfs.ForceArrayReady();
-   // Update border status of volus
-   for(ii=0;ii<volus.size();++ii){
-      jj=0;
-      nT=volus(ii)->surfind.size();
-      while(jj<nT && !volus(ii)->isBorder){
-         volus[ii].isBorder=surfs(surfs.find(volus[ii].surfind[jj]))->isBorder;
-         jj++;
+      volus.ForceArrayReady();
+
+      // Update border status of edges  
+      for(ii=0;ii<edges.size();++ii){
+         jj=0;
+         nT=edges(ii)->surfind.size();
+         edges[ii].isBorder=false;
+         while(jj<nT && !edges(ii)->isBorder){
+            edges[ii].isBorder=surfs(surfs.find(edges[ii].surfind[jj]))->isBorder;
+            jj++;
+         }
       }
-   }
-   volus.ForceArrayReady();
-   // Update border status of edges  
-   for(ii=0;ii<edges.size();++ii){
-      jj=0;
-      nT=edges(ii)->surfind.size();
-      while(jj<nT && !edges(ii)->isBorder){
-         edges[ii].isBorder=surfs(surfs.find(edges[ii].surfind[jj]))->isBorder;
-         jj++;
+      edges.ForceArrayReady();
+
+   } else {
+      for(ii=0;ii<edges.size();++ii){
+         jj=0;
+         nT=edges(ii)->surfind.size();
+         edges[ii].isBorder=false;
+         while(jj<nT && !edges(ii)->isBorder){
+            edges[ii].isBorder=(edges[ii].surfind[jj]==0);
+            jj++;
+         }
       }
+      edges.ForceArrayReady();
+
+      for(ii=0;ii<surfs.size();++ii){
+         jj=0;
+         nT=surfs(ii)->voluind.size();
+         surfs[ii].isBorder=false;
+         while(jj<nT && !surfs(ii)->isBorder){
+            surfs[ii].isBorder=edges(edges.find(surfs[ii].edgeind[jj]))->isBorder;
+            jj++;
+         }
+      }
+      surfs.ForceArrayReady();
    }
 
-   edges.ForceArrayReady();
+
    // Update border status of edges
    for(ii=0;ii<verts.size();++ii){
       jj=0;
       nT=verts(ii)->edgeind.size();
+      verts[ii].isBorder=false;
       while(jj<nT && !verts(ii)->isBorder){
          verts[ii].isBorder=edges(edges.find(verts[ii].edgeind[jj]))->isBorder;
          jj++;
@@ -558,6 +608,6 @@ void mesh::SetBorders(){
    }
    verts.ForceArrayReady();
 
-
+   borderIsSet=true;
 }
 

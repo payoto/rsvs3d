@@ -270,6 +270,22 @@ void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 
 }
 
+void snake::reserve(int nSnax, int nEdge, int nSurf, int nVolu){
+// Initialise a 
+
+	snaxs.reserve(nSnax);
+	snaxedges.reserve(nEdge);
+	snaxsurfs.reserve(nSurf);
+
+	snaxs.isInMesh=true;
+	snaxedges.isInMesh=true;
+	snaxsurfs.isInMesh=true;
+
+	snakeconn.reserve(nSnax, nEdge, nSurf, nVolu);
+
+
+}
+
 void snake::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 
 	snaxs.ChangeIndices(nVert,nEdge,nSurf,nVolu); 
@@ -378,6 +394,13 @@ void snaxarray::Concatenate(const snaxarray &other)
 	isOrderedOnEdge=0;
 }
 
+void snaxarray::ForceArrayReady()
+{
+	ArrayStruct<snax>::ForceArrayReady();
+	isHashEdge=1;
+	isOrderedOnEdge=1;
+}
+
 // Snake Movement
 void snake::UpdateDistance(double dt){
 	int ii;
@@ -430,12 +453,13 @@ int snaxarray::findedge(int key) const
 		cerr << "          in snaxarray::findedge(int key)" << endl; 
 	}
 	auto search=hashEdge.find(key);
-	int key2;
+	
 
 	if (search==hashEdge.end()){
 		return(-1);
 	}
 	#ifdef SAFE_ACCESS
+	int key2;
 	key2=elems[search->second].edgeind;
 	if (key2!=key){
 		throw  invalid_argument ("FIND returned an invalid output ");
@@ -594,6 +618,19 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 
 }
 
+void snake::Flip(){
+	int temp;
+	for (int ii=0;ii<snaxs.size();ii++){
+		temp=snaxs[ii].fromvert;
+		snaxs[ii].fromvert=snaxs(ii)->tovert;
+		snaxs[ii].tovert=temp;
+
+		snaxs[ii].d=1.0-snaxs[ii].d;
+		snaxs[ii].v=-snaxs[ii].v;
+	}
+	snaxs.ForceArrayReady();
+}
+
 
 double SnaxImpactDt(const snax &snax1,const snax &snax2){
 
@@ -624,8 +661,8 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 
 	nSnax=snaxs.size();
 	isSnaxDone.assign(nSnax,false);
-	isImpact.assign(nSnax,0);
-	isImpact.resize(nSnax);
+	isImpact.clear();
+	isImpact.reserve(nSnax*2);
 
 	if(!snaxs.checkready()){
 		snaxs.PrepareForUse();
@@ -635,9 +672,16 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 		if(!isSnaxDone[ii]){
 			nEdge=snaxs.countedge(snaxs(ii)->edgeind);
 			if (nEdge==1){
-				isImpact[ii]= (IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<=0.0)) ? -1 : 0;
-				isImpact[ii]= (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>=0.0)) ? -2 : 0; 
+				if(IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<0.0)) {
+					isImpact.push_back(snaxs(ii)->index);
+					isImpact.push_back(-1);
+
+				} else if (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>0.0)){
+					isImpact.push_back(snaxs(ii)->index);
+					isImpact.push_back(-2);
+				}
 				isSnaxDone[ii]=true;
+
 			} else if (nEdge>1){
 				snaxs.DetectImpactOnEdge(isImpact,isSnaxDone,snaxs(ii)->edgeind);
 			} else {
@@ -666,20 +710,35 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 
 			if (IsAproxEqual(impactTime,0.0) && dOrd==1){
 
-				isImpact[snaxSubs[ii]]=elems[snaxSubs[jj]].index;
-				isImpact[snaxSubs[jj]]=elems[snaxSubs[ii]].index;
+				isImpact.push_back((elems[snaxSubs[ii]].index));
+				isImpact.push_back((elems[snaxSubs[jj]].index));
+				
 
+				isImpact.push_back((elems[snaxSubs[jj]].index));
+				isImpact.push_back((elems[snaxSubs[ii]].index));
+			
 			}
 		}
-		if (isImpact[snaxSubs[ii]]==0){
-			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[snaxSubs[ii]].d,0.0) 
-				&& (elems[snaxSubs[ii]].v<=0.0) && elems[snaxSubs[ii]].orderedge==1) ? -1 : 0;
-			isImpact[snaxSubs[ii]]= (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) 
-				&& (elems[snaxSubs[ii]].v>=0.0) && elems[snaxSubs[ii]].orderedge==nSnax) ? -2 : 0; 
+		
+		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<0.0) 
+			&& elems[snaxSubs[ii]].orderedge==1) {
+			isImpact.push_back(elems[snaxSubs[ii]].index);
+			isImpact.push_back(-1);
+			
+
+		} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>0.0)
+			&& elems[snaxSubs[ii]].orderedge==nSnax){
+			isImpact.push_back(elems[snaxSubs[ii]].index);
+			isImpact.push_back(-2);
+			
 		}
 	}
 
 }
+
+
+
+
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
