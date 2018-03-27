@@ -81,6 +81,7 @@ protected:
 	vector<T> elems;    // vector of elements (structures) 
 	unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
 	void ForceArrayReady();
+	void SetLastIndex() {isSetMI=1;maxIndex=elems.back().index;};
 
 public: 
 	friend class mesh;
@@ -160,8 +161,8 @@ public:
 	inline void GenerateHash();
 	inline int find(T key) const;
 	inline vector<int> find_list(vector<T> &key) const;
-	bool operator()(Q key) const;
-	inline bool IsInVec(Q key) const;
+	bool operator()(const Q &key) const;
+	inline bool IsInVec(const Q &key) const;
 };
 
 // Base class
@@ -169,6 +170,8 @@ public:
 class mesh {
 private:
 	bool borderIsSet=false;
+	void SetLastIndex();
+	friend class snake;
 public:
 	vertarray verts;
 	edgearray edges;
@@ -222,7 +225,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 // Derived Classes
 class volu: public meshpart {
 public:
-	int index;
+	
 	double fill,target,error;
 	vector<int> surfind;
 
@@ -287,7 +290,7 @@ class surf: public meshpart {
 protected:
 	bool isordered;
 public:
-	int index;
+	
 	double fill,target,error;
 	vector<int> edgeind;
 	vector<int> voluind;
@@ -342,7 +345,7 @@ public:
 
 class edge: public meshpart {
 public:
-	int index;
+	
 
 	vector<int> vertind;
 	vector<int> surfind;
@@ -388,7 +391,7 @@ public:
 
 class vert: public meshpart {
 public:
-	int index;
+	
 
 	vector<int> edgeind;
 	vector<double> coord;

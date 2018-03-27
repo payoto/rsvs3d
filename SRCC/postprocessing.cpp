@@ -234,7 +234,7 @@ void tecplotfile::ZoneHeaderPolygon(int nVert,int nEdge,  int nSurf, int nVertDa
 }
 
 int tecplotfile::OpenFile (const char *str){
-
+	fclose(fid);
 	fid=fopen(str,"w");
 	if (fid==NULL){
 		cout << "File '" << str << "' failed to open" << endl; 

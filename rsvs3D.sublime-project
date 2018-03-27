@@ -1,47 +1,55 @@
 {
+	"build_systems":
+	[
+		{
+			"file_regex": "^([^ ]*):(\\d+):(\\d+):\\s*(.*)$",
+			"name": "Custom Make",
+			"shell_cmd": "make ",
+			"variants":
+			[
+				{
+					"name": "testall",
+					"shell_cmd": "make testall"
+				},
+				{
+					"name": "testnew",
+					"shell_cmd": "make testnew"
+				},
+				{
+					"name": "testall clean",
+					"shell_cmd": "make testall -B"
+				},
+				{
+					"name": "testnew clean",
+					"shell_cmd": "make testnew -B"
+				},
+				{
+					"name": "clean",
+					"shell_cmd": "make clean"
+				}
+			]
+		}
+	],
 	"folders":
 	[
 		{
 			"path": "SRCC"
+		},
+		{
+			"path": "D:\\alexa\\Documents\\MATLAB"
 		}
 	],
-
-	"syntax_override": {
-		"\\.cpp$": ["User", "C++RSVS3D"],
-		"\\.hpp$": ["User", "C++RSVS3D"],
-	},
-
-	"build_systems":
-	[
-		
-		{
-			"name": "Custom Make",
-			"file_regex" : "^([^ ]*):(\\d+):(\\d+):\\s*(.*)$" ,
-
-			"variants": [
-				{
-					"name" : "testall" ,
-					"shell_cmd": "make testall"
-				},
-				{
-					"name" : "testnew" ,
-					"shell_cmd": "make testnew"
-				},
-				{
-					"name" : "testall clean" ,
-					"shell_cmd": "make testall -B"
-				},
-				{
-					"name" : "testnew clean" ,
-					"shell_cmd": "make testnew -B"
-				},
-				{
-					"name" : "clean" ,
-					"shell_cmd": "make clean"
-				}
-			],
-
-			"shell_cmd": "make "
-		},
-	]
+	"syntax_override":
+	{
+		"\\.cpp$":
+		[
+			"User",
+			"C++RSVS3D"
+		],
+		"\\.hpp$":
+		[
+			"User",
+			"C++RSVS3D"
+		]
+	}
 }

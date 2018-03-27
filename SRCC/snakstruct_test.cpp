@@ -244,12 +244,11 @@ int Test_snakeinit(){
 		start_s=clock();
 		testSnake.PrepareForUse();
 		for(ii=0;ii<20;++ii){
-			cout << ii << endl;
+			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
 			Test_stepalgo(testSnake, dt, isImpact);
 			
-			cout << endl;
 			totT=totT+1;
 		}
 		stop_s=clock();
@@ -301,12 +300,11 @@ int Test_snakeinitflat(){
 
 		testSnake.PrepareForUse();
 		for(ii=0;ii<10;++ii){
-			cout << ii << endl;
+			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
 			Test_stepalgo(testSnake, dt, isImpact);
 			
-			cout << endl;
 			totT=totT+1;
 		}
 
@@ -329,25 +327,51 @@ int Test_snakeinitflat(){
 
 void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 
+	int start_s,stop_s,start_f;
+
+	start_s=clock();
+	start_f=clock();
+
 	testSnake.CalculateTimeStep(dt,1);
-
 	testSnake.UpdateDistance(dt);
-
 	testSnake.UpdateCoord();
 
+	stop_s=clock();
+	cout << "dt dist coord: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
+
 	testSnake.PrepareForUse();
+
+	stop_s=clock();
+	cout << "PrepareForUse: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
 
 	testSnake.SnaxImpactDetection(isImpact);
-
 	MergeAllContactVertices(testSnake, isImpact);
 
+	stop_s=clock();
+	cout << "Merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
+
 	testSnake.PrepareForUse();
-	
+
 	SpawnArrivedSnaxels(testSnake,isImpact);
+
+
+	stop_s=clock();
+	cout << "Spawn: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
+
 	testSnake.SnaxImpactDetection(isImpact);
 	testSnake.PrepareForUse();
 	MergeAllContactVertices(testSnake, isImpact);
 	testSnake.PrepareForUse();
+
+	stop_s=clock();
+	cout << "Impact merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;
+
+
 }
 
 int Test_snakeOrderEdges(){

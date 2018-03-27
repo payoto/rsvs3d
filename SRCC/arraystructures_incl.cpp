@@ -435,11 +435,23 @@ template<class T> void ArrayStruct <T>::SetMaxIndex()
 	// Sets the correct value of maxIndex
 	int n=elems.size();
 	maxIndex=0;
+	for(int ii=n-1;-1<ii;--ii){
+		if (maxIndex<this->elems[ii].index){
+			maxIndex=elems[ii].index;
+		}
+	}
+	isSetMI=1;
+}
+/*template<class T> void ArrayStruct <T>::SetMaxIndex()
+{
+	// Sets the correct value of maxIndex
+	int n=elems.size();
+	maxIndex=0;
 	for(int ii=0;ii<n;++ii){
 		maxIndex= (maxIndex<this->elems[ii].index) ? elems[ii].index : maxIndex;
 	}
 	isSetMI=1;
-}
+}*/
 template<class T> void ArrayStruct <T>::Concatenate(const ArrayStruct<T> &other)
 {
 	int nCurr,nNew,nTot,ii;
@@ -559,10 +571,10 @@ return(FindSub(key, hashTable) );
 template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(vector<T> &key) const{
 return(FindSubList(key, vec, hashTable) );
 }
-template <class T,class Q> inline bool HashedVector<T,Q>::IsInVec(Q key) const{
+template <class T,class Q> inline bool HashedVector<T,Q>::IsInVec(const Q &key) const{
 return(FindSub(key.Key(), hashTable)!=-1);
 }
-template <class T,class Q>  bool HashedVector<T,Q>::operator()(Q key) const{
+template <class T,class Q>  bool HashedVector<T,Q>::operator()(const Q &key) const{
 return(FindSub(key.Key(), hashTable)!=-1);
 }
 template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &hashTable)  

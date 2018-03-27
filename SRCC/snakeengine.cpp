@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <unordered_map>
+#include <ctime>
 
 #include "snakstruct.hpp"
 #include "snakeengine.hpp"
@@ -22,6 +23,7 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	vector<int> vertSubsTemp,edgeSubsTemp,surfSubsTemp,voluSubsTemp;
 	vector<int>::iterator itVecInt; 
 	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds,hashVertInds;
+
 
 	is3D=snakein.snakemesh->volus.size()>0;
 	// Extract Data corresponding to vertex from Mesh
@@ -67,9 +69,8 @@ void SpawnAtVertex(snake& snakein,int indVert){
 		SpawnAtVertexSurf2D( newsnake, nEdge, voluInds);
 	}
 	
+	snakein.SetMaxIndexNM();
 
-	snakein.PrepareForUse();
-	newsnake.PrepareForUse();
 	snakein.MakeCompatible_inplace(newsnake);
 
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
@@ -242,28 +243,36 @@ void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact){
 void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 	snake fwdSnake, bwdSnake;
+	int start_s,stop_s;
 
 	fwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
 	bwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
 
 	// Generate fwd spawn
+	
+	start_s=clock();
 	SpawnArrivedSnaxelsDir(fullsnake,bwdSnake,isImpact,-1);
 	SpawnArrivedSnaxelsDir(fullsnake,fwdSnake,isImpact,-2);
 
-
+	stop_s=clock();
+	cout << "Spawn: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
 
 	bwdSnake.Flip();
-	bwdSnake.PrepareForUse();
-	fwdSnake.PrepareForUse();
+
+	fwdSnake.SetMaxIndexNM();
 	fwdSnake.MakeCompatible_inplace(bwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	fwdSnake.Concatenate(bwdSnake);
-	fwdSnake.PrepareForUse();
-	fullsnake.PrepareForUse();
+	
+	fullsnake.SetMaxIndexNM();
 	fullsnake.MakeCompatible_inplace(fwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	fullsnake.Concatenate(fwdSnake);
+	stop_s=clock();
+	cout << "Concatenate: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 
+	cout << " nSnax " << fwdSnake.snaxs.size() << "  ";
 	fullsnake.PrepareForUse();
 
 }

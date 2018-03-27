@@ -21,6 +21,9 @@
 
 int main(){
 	customtest gridTest;
+
+
+
 	#ifdef TEST_ALL
 	gridTest.Run(Test_ArrayStructures,"arraystructures");
 	

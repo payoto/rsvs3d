@@ -251,6 +251,27 @@ void snake::SetMaxIndex(){
 	snakemesh->SetMaxIndex();
 
 }
+void snake::SetMaxIndexNM(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
+
+	snaxs.SetMaxIndex();
+	snaxedges.SetMaxIndex();
+	snaxsurfs.SetMaxIndex();
+	snakeconn.SetMaxIndex();
+
+}
+void snake::SetLastIndex(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
+
+	snaxs.SetLastIndex();
+	snaxedges.SetLastIndex();
+	snaxsurfs.SetLastIndex();
+	snakeconn.SetLastIndex();
+	snakemesh->SetLastIndex();
+
+}
 
 void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 // Initialise a 

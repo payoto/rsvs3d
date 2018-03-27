@@ -10,7 +10,7 @@
 #define DEBUGLVL1
 
 #define TEST_SNAKSTRUCT
-#define 
+
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
@@ -116,6 +116,7 @@ public:
 class snake  {
 private:
 	bool is3D=true;
+	void SetLastIndex(); // Baaaad function do not use if you're not sure.
 public:
 	// Handling of data specific to snake
 	snaxarray snaxs; 			// properties associated with snakconn verts
@@ -135,7 +136,8 @@ public:
 	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void HashArray(); // Not really needed as handled by PrepareForUse
-	void SetMaxIndex(); // Not really needed as handled by PrepareForUse	
+	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
+	void SetMaxIndexNM(); // SetMaxIndex no mesh
 	void Concatenate(const snake &other);
 	bool Check3D(){return(is3D);}
 	// Snake merging
@@ -157,7 +159,7 @@ public:
 
 class snax : public meshpart {	
 public:
-	int index=0;
+	
 	double d=0.0;
 	double v=0.0;
 	int fromvert=0; 	// root vertex of *snakemesh
@@ -188,7 +190,7 @@ public:
 
 class snaxedge : public meshpart {
 public:
-	int index=0;
+	
 	int surfind=0;
 	coordvec normvector;
 	void PrepareForUse();
@@ -209,7 +211,7 @@ public:
 
 class snaxsurf : public meshpart {
 public: 
-	int index=0;
+	
 	int voluind=0;
 	coordvec normvector;
 	void PrepareForUse(); 

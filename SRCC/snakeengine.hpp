@@ -9,7 +9,7 @@
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
 
-#define 
+
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.

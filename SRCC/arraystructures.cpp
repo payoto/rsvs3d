@@ -284,6 +284,12 @@ void mesh::SetMaxIndex(){
    surfs.SetMaxIndex();
    volus.SetMaxIndex();
 }
+void mesh::SetLastIndex(){
+   verts.SetLastIndex();
+   edges.SetLastIndex();
+   surfs.SetLastIndex();
+   volus.SetLastIndex();
+}
 void mesh::PrepareForUse(){
 
    verts.isInMesh=true;
@@ -386,7 +392,7 @@ void mesh::displight() const {
 void mesh::Init(int nVe,int nE, int nS, int nVo)
 {
    borderIsSet=false;
-   
+
    verts.Init(nVe);
    edges.Init(nE);
    surfs.Init(nS);
@@ -493,6 +499,7 @@ void surf::OrderEdges(mesh *meshin)
 
       vertCurr=edge2Vert[0];
       edgeCurr=edgeind[0];
+      it=vert2Edge.end();
       for(ii=1;ii<int(edgeind.size());++ii){
          range=vert2Edge.equal_range(vertCurr);
       #ifdef SAFE_ACCESS
@@ -500,6 +507,7 @@ void surf::OrderEdges(mesh *meshin)
             cerr << ii << " vert " << vertCurr << "  ";
             DisplayVector(edge2Vert);
             DisplayVector(edgeind);
+
             cout << it->second << " " << 1/2 << 2/3 <<  endl;
             throw range_error ("unordered_multimap went beyond its range in OrderEdges");
          }
