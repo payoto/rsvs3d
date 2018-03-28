@@ -160,6 +160,9 @@ public:
 
 	inline void GenerateHash();
 	inline int find(T key) const;
+	inline vector<int> findall(T key) const;
+	inline int count(T key) const;
+	vector<int> count(vector<T> &key) const;
 	inline vector<int> find_list(vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
