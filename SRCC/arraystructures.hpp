@@ -448,7 +448,7 @@ int rStart,int rEnd);
 
 template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, 
 R T::*mp, int rStart,int rEnd);
-template<class T, class R> vector<R> ReturnDataEqualRange(T key, unordered_multimap<T,R> &hashTable);
+template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
 
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,

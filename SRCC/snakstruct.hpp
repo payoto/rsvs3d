@@ -37,18 +37,74 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
-
+template <class T> class SnakStruct; 
 class snax;
 class snaxedge;
 class snaxsurf;
 class coordvec;
 class snaxarray;
 
-typedef ArrayStruct<snaxedge> snaxedgearray;
-typedef ArrayStruct<snaxsurf> snaxsurfarray;
+typedef SnakStruct<snaxedge> snaxedgearray;
+typedef SnakStruct<snaxsurf> snaxsurfarray;
 
 
+template <class T> 
+class SnakStruct : public ArrayStruct<T> 
+{
+protected:
+	using ArrayStruct<T>::elems;
+    using ArrayStruct<T>::readyforuse;
 
+	unordered_multimap<int,int> hashParent;
+	int isHashParent=0;
+
+public: 
+	friend class snake;
+
+	inline int KeyParent(int a) const ;
+	int findparent(int key) const; 
+	void findsiblings(int key, vector<int> &siblings) const{
+		siblings=ReturnDataEqualRange(key, hashParent);}
+	int countparent(int key) const {return(hashParent.count(key));};
+	void HashParent();
+
+	// Functions that need modification
+	bool checkready();
+	void ForceArrayReady();
+	void PrepareForUse();
+	void Concatenate(const SnakStruct<T> &other);
+	T& operator[](const int a){ 
+		isHashParent=0;
+		return(ArrayStruct<T>::operator[](a));
+	}
+
+};
+
+class snaxarray : public SnakStruct<snax> 
+{
+protected:
+	int isOrderedOnEdge=0;
+
+public: 
+	friend class snake;
+
+
+	void ReorderOnEdge();
+	void OrderOnEdge();
+	void CalculateTimeStepOnEdge(vector<double> &dt, 	vector<bool> &isSnaxDone, int edgeInd);
+	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd);
+	// Functions that need modification
+	bool checkready();
+	void ForceArrayReady();
+	void PrepareForUse();
+	void Concatenate(const snaxarray &other);
+	snax& operator[](const int a){ 
+		isOrderedOnEdge=0;
+
+		return(SnakStruct<snax>::operator[](a));
+	}
+
+};
 
 class coordvec {
 	// Handles the use and norm of a vector for which the norm and the unit 
@@ -82,36 +138,6 @@ public:
 	}
 };
 
-class snaxarray : public ArrayStruct<snax> 
-{
-protected:
-	unordered_multimap<int,int> hashEdge;
-	int isHashEdge=0;
-	int isOrderedOnEdge=0;
-
-public: 
-	friend class snake;
-
-	inline int KeyEdge(int a) const ;
-	int findedge(int key) const; 
-	int countedge(int key) const {return(hashEdge.count(key));}; 
-	void HashArrayEdge();
-	void ReorderOnEdge();
-	void OrderOnEdge();
-	void CalculateTimeStepOnEdge(vector<double> &dt, 	vector<bool> &isSnaxDone, int edgeInd);
-	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd);
-	// Functions that need modification
-	bool checkready();
-	void ForceArrayReady();
-	void PrepareForUse();
-	void Concatenate(const snaxarray &other);
-	snax& operator[](const int a){ 
-		isOrderedOnEdge=0;
-		isHashEdge=0;
-		return(ArrayStruct<snax>::operator[](a));
-	}
-
-};
 
 class snake  {
 private:
@@ -156,8 +182,12 @@ public:
 
 };
 
+class snakpart { // required functions for parts of snake
+public: 
+	virtual int KeyParent() const =0;
+};
 
-class snax : public meshpart {	
+class snax : public meshpart , public snakpart {	
 public:
 	
 	double d=0.0;
@@ -171,6 +201,7 @@ public:
 	// interface functions
 	void disp() const;
 	int Key() const {return (index);};
+	int KeyParent() const {return (edgeind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
@@ -188,14 +219,15 @@ public:
 };
 
 
-class snaxedge : public meshpart {
+class snaxedge : public meshpart , public snakpart {
 public:
-	
 	int surfind=0;
 	coordvec normvector;
+
 	void PrepareForUse();
 	void disp() const;
-	int Key() const {return (index);}; 
+	int Key() const {return (index);};
+	int KeyParent() const {return (surfind);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	#pragma GCC diagnostic push
@@ -209,7 +241,7 @@ public:
 
 };
 
-class snaxsurf : public meshpart {
+class snaxsurf : public meshpart , public snakpart {
 public: 
 	
 	int voluind=0;
@@ -217,6 +249,7 @@ public:
 	void PrepareForUse(); 
 	void disp() const;
 	int Key() const {return (index);};
+	int KeyParent() const {return (voluind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	#pragma GCC diagnostic push
@@ -247,22 +280,8 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
 // Functions needed at Compile time
 
 // set constructors (used to avoid a variable being unknowingly forgotten)
-inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
-	int edgeindin,int isfreezein,int orderedgein)
-{
-	index=indexin;
-	d=din;
-	v=vin;
-	fromvert=fromvertin; 	// root vertex of *snakemesh
-	tovert=tovertin; 	// destination vertex of *snakemesh
-	edgeind=edgeindin; 	// edge of snakemesh
-	isfreeze=isfreezein; 	// freeze status 
-	orderedge=orderedgein;
-}
 
-inline int snaxarray::KeyEdge(int a) const 
-{
-	return((*this)(a)->edgeind);
-}
+
+#include "snakstruct_incl.cpp"
 
 #endif //SNAKEENGINE_H_INCLUDED

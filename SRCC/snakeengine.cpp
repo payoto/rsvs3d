@@ -264,7 +264,7 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	fwdSnake.MakeCompatible_inplace(bwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	fwdSnake.Concatenate(bwdSnake);
-	
+
 	fullsnake.SetMaxIndexNM();
 	fullsnake.MakeCompatible_inplace(fwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
@@ -332,6 +332,39 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 
 	for (ii=0;ii<int(vertSpawn.size());ii++){
 		SpawnAtVertex(partSnake,vertSpawn[ii]);
+	}
+
+}
+void IdentifyMergeConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
+void CleanupSnakeConnec(snake &snakein){
+	vector<ConnecRemv> connecEdit;
+
+	IdentifyMergeConnec(snakein, connecEdit);
+}
+
+
+void IdentifyMergeConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
+
+	vector<bool> isObjDone;
+	//vector<int> objSub;
+	int nSnax,nSnaxEdge,nSnaxSurf,ii,nParent;
+	ConnecRemv tempConnec;
+
+	nSnax=snakein.snaxs.size();
+	nSnaxEdge=snakein.snaxedges.size();
+	nSnaxSurf=snakein.snaxsurfs.size();
+
+	isObjDone.reserve(nSnaxEdge);
+
+	isObjDone.assign(nSnax,false);
+	for(ii=0; ii<nSnax ; ++ii){
+		if(!isObjDone[ii]){
+			isObjDone[ii]=true;
+			nParent=snakein.snaxs.countparent(snakein.snaxs(ii)->KeyParent());
+			if(nParent>1){
+				snakein.snaxs.findsiblings(snakein.snaxs(ii)->KeyParent(),tempConnec.rmvind);
+			}
+		}
 	}
 
 }

@@ -170,7 +170,47 @@ void snaxsurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 }
 #pragma GCC diagnostic pop
 
+// -------------------------------------------------------------------------------------------
+// Extensions of SnakStruct for snaxarray
+// -------------------------------------------------------------------------------------------
 
+
+bool snaxarray::checkready() 
+{	
+	readyforuse=SnakStruct<snax>::checkready();
+	
+	readyforuse=(readyforuse && isOrderedOnEdge);
+
+	return(readyforuse);
+	
+}
+
+void snaxarray::PrepareForUse()
+{
+
+	SnakStruct<snax>::PrepareForUse();
+
+
+	if (isOrderedOnEdge==0){
+
+		this->ReorderOnEdge();
+	}
+	readyforuse=true;
+}
+
+void snaxarray::Concatenate(const snaxarray &other)
+{
+	SnakStruct<snax>::Concatenate(other);
+
+	isOrderedOnEdge=0;
+}
+
+void snaxarray::ForceArrayReady()
+{
+	SnakStruct<snax>::ForceArrayReady();
+
+	isOrderedOnEdge=1;
+}
 
 // -------------------------------------------------------------------------------------------
 // Implementatation of snake
@@ -364,63 +404,7 @@ snake snake::MakeCompatible(snake other) const{
 	return(other);
 }
 
-// ArrayStruct extension for snax:
 
-bool snaxarray::checkready() 
-{	
-	readyforuse=ArrayStruct<snax>::checkready();
-	
-	readyforuse=(readyforuse && isHashEdge);
-
-	return(readyforuse);
-	
-}
-
-void snaxarray::HashArrayEdge()
-{
-	// Generates a valid unordered_map for the current ArrayStruct
-	// Function should not be called repeatedly 
-	if(!hashEdge.empty()){
-		hashEdge.clear();
-	}
-	hashEdge.reserve(elems.size());
-	for (int i = 0; i < int(elems.size()); ++i)
-	{
-		hashEdge.emplace(KeyEdge(i),i);
-	}
-	isHashEdge=1;
-	
-	
-   //cout << "Array Struct Succesfully Hashed" << endl;
-}
-void snaxarray::PrepareForUse()
-{
-
-	ArrayStruct<snax>::PrepareForUse();
-
-	if (isHashEdge==0){
-		this->HashArrayEdge();
-	}
-	if (isOrderedOnEdge==0){
-
-		this->ReorderOnEdge();
-	}
-	readyforuse=true;
-}
-
-void snaxarray::Concatenate(const snaxarray &other)
-{
-	ArrayStruct<snax>::Concatenate(other);
-	isHashEdge=0;
-	isOrderedOnEdge=0;
-}
-
-void snaxarray::ForceArrayReady()
-{
-	ArrayStruct<snax>::ForceArrayReady();
-	isHashEdge=1;
-	isOrderedOnEdge=1;
-}
 
 // Snake Movement
 void snake::UpdateDistance(double dt){
@@ -467,28 +451,6 @@ void snake::UpdateCoord(){
 
 // snaxarray extension
 
-int snaxarray::findedge(int key) const 
-{
-	if (isHashEdge==0){
-		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
-		cerr << "          in snaxarray::findedge(int key)" << endl; 
-	}
-	auto search=hashEdge.find(key);
-	
-
-	if (search==hashEdge.end()){
-		return(-1);
-	}
-	#ifdef SAFE_ACCESS
-	int key2;
-	key2=elems[search->second].edgeind;
-	if (key2!=key){
-		throw  invalid_argument ("FIND returned an invalid output ");
-	}
-	#endif //SAFE_ACCESS
-	return(search->second);
-}
-
 
 void snaxarray::OrderOnEdge(){
 
@@ -502,10 +464,10 @@ void snaxarray::OrderOnEdge(){
 	sort(edgeInds);
 	unique(edgeInds);
 	for(ii=0;ii<int(edgeInds.size());++ii){
-		nEdge=hashEdge.count(edgeInds[ii]);
+		nEdge=hashParent.count(edgeInds[ii]);
 
 		if (nEdge>1){
-			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashParent);
 			orderSnax.resize(snaxSubs.size());
 			for(jj=0;jj<int(snaxSubs.size());++jj){
 				isBwd=elems[snaxSubs[jj]].fromvert>elems[snaxSubs[jj]].tovert;
@@ -542,10 +504,10 @@ void snaxarray::ReorderOnEdge()
 	unique(edgeInds);
 	for(ii=0;ii<int(edgeInds.size());++ii){
 
-		nEdge=hashEdge.count(edgeInds[ii]);
+		nEdge=hashParent.count(edgeInds[ii]);
 
 		if (nEdge>1){
-			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashParent);
 			orderSnax.resize(snaxSubs.size());
 			needIncrement=false;
 			maxOrd=0;
@@ -576,7 +538,7 @@ void snaxarray::ReorderOnEdge()
 				}
 			}
 		} else {
-			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashEdge);
+			snaxSubs=ReturnDataEqualRange(edgeInds[ii], hashParent);
 			elems[snaxSubs[0]].orderedge=1;
 		}
 
@@ -589,7 +551,7 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnax
 	int nSnax,ii,jj;
 	vector<int> snaxSubs;
 	double impactTime;
-	snaxSubs=ReturnDataEqualRange(edgeInd, hashEdge);
+	snaxSubs=ReturnDataEqualRange(edgeInd, hashParent);
 	nSnax=snaxSubs.size();
 	for(ii=0;ii<nSnax;++ii){
 		isSnaxDone[snaxSubs[ii]]=true;
@@ -622,14 +584,14 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 
 	for(ii=0;ii<nSnax;++ii){
 		if(!isSnaxDone[ii]){
-			nEdge=snaxs.countedge(snaxs(ii)->edgeind);
+			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
 			if (nEdge==1){
 				//dt[ii]=dtDefault;
 				isSnaxDone[ii]=true;
 			} else if (nEdge>1){
 				snaxs.CalculateTimeStepOnEdge(dt,isSnaxDone,snaxs(ii)->edgeind);
 			} else {
-				cerr << "Error: hashEdge was not up to date" << endl;
+				cerr << "Error: hashParent was not up to date" << endl;
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 				throw range_error ("Incorrect hash table provided");
 			}
@@ -691,7 +653,7 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 
 	for(ii=0;ii<nSnax;++ii){
 		if(!isSnaxDone[ii]){
-			nEdge=snaxs.countedge(snaxs(ii)->edgeind);
+			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
 			if (nEdge==1){
 				if(IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<0.0)) {
 					isImpact.push_back(snaxs(ii)->index);
@@ -706,7 +668,7 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 			} else if (nEdge>1){
 				snaxs.DetectImpactOnEdge(isImpact,isSnaxDone,snaxs(ii)->edgeind);
 			} else {
-				cerr << "Error: hashEdge was not up to date" << endl;
+				cerr << "Error: hashParent was not up to date" << endl;
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 				throw range_error ("Incorrect hash table provided");
 			}
@@ -719,7 +681,7 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 	int nSnax,ii,jj, dOrd;
 	vector<int> snaxSubs;
 	double impactTime;
-	snaxSubs=ReturnDataEqualRange(edgeInd, hashEdge);
+	snaxSubs=ReturnDataEqualRange(edgeInd, hashParent);
 	nSnax=snaxSubs.size();
 	for(ii=0;ii<nSnax;++ii){
 

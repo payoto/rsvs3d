@@ -103,7 +103,7 @@ void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subL
 	}
 
 }
-template<class T, class R> vector<R> ReturnDataEqualRange(T key, unordered_multimap<T,R> &hashTable)
+template<class T, class R> vector<R> ReturnDataEqualRange(T key,const unordered_multimap<T,R> &hashTable)
 {
 	vector<R> subList;
 	

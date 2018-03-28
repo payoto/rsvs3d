@@ -23,3 +23,7 @@ SRCC/gch/*
 *.sublime-workspace
 *.sublime-syntax
 
+# Profilers
+*test-cppcheck-build-dir*
+*.cppcheck
+

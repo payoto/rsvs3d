@@ -38,6 +38,16 @@
 using namespace std;
 
 
+class ConnecRemv {
+public:
+	int keepind;
+	int typeobj;
+	vector<int> rmvind;
+
+};
+
+
+
 // Function prototypes
 void SpawnAtVertex(snake &snakein,int indVert);
 void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, 
