@@ -335,47 +335,32 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 	}
 
 }
-void IdentifyMergeConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
-void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> tempIndHash) ;
+
 
 
 void CleanupSnakeConnec(snake &snakein){
 	vector<ConnecRemv> connecEdit;
 
-	IdentifyMergeConnec(snakein, connecEdit);
+	IdentifyMergEdgeConnec(snakein, connecEdit);
 }
 
 
-void IdentifyMergeConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
+void IdentifyMergEdgeConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 
 	vector<bool> isObjDone;
 	vector<int> tempSub,tempSub2, tempCount;
 	HashedVector<int,int> tempIndHash; 
 	//vector<int> objSub;
-	int nSnax,nSnaxEdge,nSnaxSurf,ii,nParent;
+	int nSnaxEdge, ii,nParent; //nSnax, nSnaxSurf,
 	ConnecRemv tempConnec, tempConnec2;
 
-	nSnax=snakein.snaxs.size();
+	//nSnax=snakein.snaxs.size();
 	nSnaxEdge=snakein.snaxedges.size();
-	nSnaxSurf=snakein.snaxsurfs.size();
+	//nSnaxSurf=snakein.snaxsurfs.size();
 
 	isObjDone.reserve(nSnaxEdge);
-	/*
-	isObjDone.assign(nSnax,false);
-	for(ii=0; ii<nSnax ; ++ii){
-		if(!isObjDone[ii]){
-			isObjDone[ii]=true;
-			nParent=snakein.snaxs.countparent(snakein.snaxs(ii)->KeyParent());
-			if(nParent>1){
-				snakein.snaxs.findsiblings(snakein.snaxs(ii)->KeyParent(),tempConnec.rmvind);
-				tempConnec.keepind=tempConnec.rmvind.back();
-				tempConnec.rmvind.pop_back();
-				tempConnec.typeobj=1;
-				connecEdit.push_back(tempConnec);
-			}
-		}
-	}
-	*/
+
+
 	isObjDone.assign(nSnaxEdge,false);
 	for(ii=0; ii<nSnaxEdge ; ++ii){
 		if(!isObjDone[ii]){
@@ -385,21 +370,6 @@ void IdentifyMergeConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 				IdentifyMergeEdgeGeneral(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub,tempSub2, tempCount,tempIndHash);
 			}
 			isObjDone[ii]=true;
-		}
-	}
-
-	isObjDone.assign(nSnaxSurf,false);
-	for(ii=0; ii<nSnaxSurf ; ++ii){
-		if(!isObjDone[ii]){
-			isObjDone[ii]=true;
-			nParent=snakein.snaxsurfs.countparent(snakein.snaxsurfs(ii)->KeyParent());
-			if(nParent>1){
-				snakein.snaxsurfs.findsiblings(snakein.snaxsurfs(ii)->KeyParent(),tempConnec.rmvind);
-				tempConnec.keepind=tempConnec.rmvind.back();
-				tempConnec.rmvind.pop_back();
-				tempConnec.typeobj=3;
-				connecEdit.push_back(tempConnec);
-			}
 		}
 	}
 
@@ -416,68 +386,78 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	tempIndHash.GenerateHash();
 	tempCount=tempIndHash.count(tempIndHash.vec);
 	nTemp=tempCount.size();
+	for (jj=0;jj<int(tempSub.size());++jj){
+		tempConnec2.scopeind.push_back(snakein.snaxedges(tempSub[jj])->index);
 
+	}
 	jjStart=0;
 	while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
 	do{
-		#ifdef SAFE_ACCESS
 		if (jjStart>=nTemp){
-			cerr << "Error: Algorithm not conceived for this case "<< endl;
-			cerr << " Could not find a starting point "<< endl;
-			cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-			throw invalid_argument ("Unexpected algorithmic behaviour");
-		}
-		#endif // SAFE_ACCESS
-		jj=jjStart;
-		tempConnec.rmvind.clear();
-		tempConnec2.rmvind.clear();
-		tempConnec.typeobj=2;
-		tempConnec2.typeobj=1;
-
-		tempCount[jjStart]=0;
-		tempConnec.keepind=snakein.snaxedges(tempSub[jjStart/2])->index;
-		isObjDone[tempSub[jjStart/2]]=true;
-					// if second part of an edge check the other part
-		jjNext=jj+(1-((jj%2)*2)); // equivalend of jj+ (jj%2 ? -1 : 1) 
-		while(tempCount[jjNext]>1){ // Builds one group
-
-			#ifdef SAFE_ACCESS
-			if (tempCount[jjNext]>2){
-				cerr << "Error: Algorithm not conceived for this case "<< endl;
-				cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
-				cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-				throw invalid_argument ("Unexpected algorithmic behaviour");
+			
+			tempConnec.rmvind.clear();
+			tempConnec.keepind=snakein.snaxedges(tempSub[0])->index;
+			tempConnec.typeobj=2;
+			for (jj=0;jj<int(tempSub.size());++jj){
+				tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj])->index);
+				isObjDone[tempSub[jj]]=true;
 			}
-			#endif // SAFE_ACCESS
-
-			tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
-			tempCount[jjNext]=0;
-			tempSub2=tempIndHash.findall(tempIndHash.vec[jjNext]);
-			jj=0;
-			while(tempSub2[jj]==jjNext && jj<4){++jj;}
-
-			#ifdef SAFE_ACCESS
-			if (jj>2){
-				cerr << "Error: Algorithm not conceived for this case "<< endl;
-				cerr << " jj>3 Unsafe read has happened "<< endl;
-				cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-				throw invalid_argument ("Unexpected algorithmic behaviour");
-			}
-			#endif // SAFE_ACCESS
-
-			jj=tempSub2[jj];
-			tempCount[jj]=0;
-			tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj/2])->index);
-			isObjDone[tempSub[jj/2]]=true;
-
-			jjNext=jj+(1-((jj%2)*2));
-
-		}
-		tempConnec2.keepind=tempIndHash.vec[jjNext];
-		if (jj!=jjStart){
 			connecEdit.push_back(tempConnec);
-			connecEdit.push_back(tempConnec2);
+
+		} else {
+
+			jj=jjStart;
+			tempConnec.rmvind.clear();
+			tempConnec2.rmvind.clear();
+			tempConnec.typeobj=2;
+			tempConnec2.typeobj=5;
+
+			tempCount[jjStart]=0;
+			tempConnec.keepind=snakein.snaxedges(tempSub[jjStart/2])->index;
+			isObjDone[tempSub[jjStart/2]]=true;
+						// if second part of an edge check the other part
+			jjNext=jj+(1-((jj%2)*2)); // equivalend of jj+ (jj%2 ? -1 : 1) 
+			while(tempCount[jjNext]>1){ // Builds one group
+
+				#ifdef SAFE_ACCESS
+				if (tempCount[jjNext]>2){
+					cerr << "Error: Algorithm not conceived for this case "<< endl;
+					cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
+					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+					throw invalid_argument ("Unexpected algorithmic behaviour");
+				}
+				#endif // SAFE_ACCESS
+
+				tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
+				tempCount[jjNext]=0;
+				tempSub2=tempIndHash.findall(tempIndHash.vec[jjNext]);
+				jj=0;
+				while(tempSub2[jj]==jjNext && jj<4){++jj;}
+
+				#ifdef SAFE_ACCESS
+				if (jj>2){
+					cerr << "Error: Algorithm not conceived for this case "<< endl;
+					cerr << " jj>3 Unsafe read has happened "<< endl;
+					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+					throw invalid_argument ("Unexpected algorithmic behaviour");
+				}
+				#endif // SAFE_ACCESS
+
+				jj=tempSub2[jj];
+				tempCount[jj]=0;
+				tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj/2])->index);
+				isObjDone[tempSub[jj/2]]=true;
+
+				jjNext=jj+(1-((jj%2)*2));
+
+			}
+			tempConnec2.keepind=tempIndHash.vec[jjNext];
+			if (jj!=jjStart){
+				connecEdit.push_back(tempConnec);
+				connecEdit.push_back(tempConnec2);
+			}
 		}
+		jjStart=0;
 		while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
 	} while (jjStart<nTemp);
 }

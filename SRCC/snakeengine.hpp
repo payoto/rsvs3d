@@ -43,7 +43,13 @@ public:
 	int keepind;
 	int typeobj;
 	vector<int> rmvind;
+	vector<int> scopeind;
 
+	void disp() {
+		cout << "connrmv:  ki " << keepind << " | tobj " << typeobj << " | rmvind ";
+		DisplayVector(rmvind);
+		cout << endl;
+	}
 };
 
 
@@ -65,5 +71,14 @@ void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact);
 
 void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
 void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
+
+//
+void CleanupSnakeConnec(snake &snakein);
+void IdentifyMergEdgeConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
+void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
+	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,
+	vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, 
+	HashedVector<int,int> tempIndHash) ;
+
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

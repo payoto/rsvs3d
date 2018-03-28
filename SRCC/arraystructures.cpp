@@ -240,7 +240,8 @@ void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 }
 
 
-void mesh::SwitchIndex(int typeInd, int oldInd, int newInd){
+void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd)
+{
 
    int ii,jj,newSub;
    vector<int> subList;
@@ -258,14 +259,95 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd){
       verts.isHash=1;
 
    } else if (typeInd==2){
-      cerr << "Not coded mesh::SwitchIndex(2" << endl;
-      throw;
+
+      newSub=edges.find(newInd);
+
+      subList=verts.find_list(edges(edges.find(oldInd))->vertind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
+            if(verts(subList[ii])->edgeind[jj]==oldInd){
+               verts[subList[ii]].edgeind[jj]=newInd;
+            }
+         }  
+      }
+
+      subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+            if(surfs(subList[ii])->edgeind[jj]==oldInd){
+               surfs[subList[ii]].edgeind[jj]=newInd;
+               edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+            }
+         }  
+      }
+
+      edges.isHash=1;
+      verts.isHash=1;
+      surfs.isHash=1;
+      edges.isSetMI=1;
+      verts.isSetMI=1;
+      surfs.isSetMI=1;
+
+
    } else if (typeInd==3){
-      cerr << "Not coded mesh::SwitchIndex(3" << endl;
-      throw;
+      newSub=surfs.find(newInd);
+
+      subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+            if(edges(subList[ii])->surfind[jj]==oldInd){
+               edges[subList[ii]].surfind[jj]=newInd;
+            }
+         }  
+      }
+
+      subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+            if(volus(subList[ii])->surfind[jj]==oldInd){
+               volus[subList[ii]].surfind[jj]=newInd;
+               surfs[newSub].voluind.push_back(volus[subList[ii]].index);
+            }
+         }  
+      }
+      
+      surfs.isHash=1;
+      edges.isHash=1;
+      volus.isHash=1;
+      surfs.isSetMI=1;
+      edges.isSetMI=1;
+      volus.isSetMI=1;
+
    } else if (typeInd==4){
-      cerr << "Not coded mesh::SwitchIndex(4" << endl;
-      throw;
+      newSub=volus.find(newInd);
+      subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
+      for (ii=0;ii<int(subList.size());++ii){ // update vertind
+         jj=surfs(subList[ii])->voluind[1]==oldInd;
+         surfs[subList[ii]].voluind[jj]=newInd;
+         volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
+      }
+      // Hashing has not been invalidated
+      volus.isHash=1;
+      surfs.isHash=1;
+      volus.isSetMI=1;
+      surfs.isSetMI=1;
+   } else if (typeInd==5){ // Modify vertex index in scoped mode
+
+      newSub=verts.find(newInd);
+      subList=edges.find_list(scopeInd);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
+            if(edges(subList[ii])->vertind[jj]==oldInd){
+               edges[subList[ii]].vertind[jj]=newInd;
+               verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
+            }
+         }  
+      }
+      edges.isHash=1;
+      verts.isHash=1;
+      edges.isSetMI=1;
+      verts.isSetMI=1;
+
    }
 
 }
