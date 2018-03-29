@@ -74,16 +74,18 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const  vecto
 
 //
 void CleanupSnakeConnec(snake snakein);
-void IdentifyMergEdgeConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
+void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,
 	vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, 
 	HashedVector<int,int> &tempIndHash) ;
 
-void IdentifyMergSurfConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
+void IdentifyMergSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, 
 	ConnecRemv &tempConnec,vector<int> &tempSub,vector<int> &tempSub2,
 	 vector<int> &tempCount,HashedVector<int,int> &edge2Surf, HashedVector<int,int> &tempIndHash) ;
 void IdentifyMergeSurfRecursive(const snake &snakein,vector<bool> &isObjDone, vector<int> &tempCount,const HashedVector<int,int> &edge2Surf, const HashedVector<int,int> &tempIndHash, ConnecRemv &tempConnec, const vector<int> &tempSub, const vector<int> &tempSub2, int excludeSub);
+void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, 
+	const vector<int> &indRmvVert);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

@@ -356,6 +356,93 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 
 }
 
+void mesh::RemoveIndex(int typeInd, int oldInd)
+{
+
+   int ii,jj;
+   vector<int> subList;
+
+   if(typeInd==1){
+      
+      cerr << "not coded yet" << endl;
+      throw;
+
+   } else if (typeInd==2){
+
+
+      subList=verts.find_list(edges(edges.find(oldInd))->vertind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
+            if(verts(subList[ii])->edgeind[jj]==oldInd){
+               verts[subList[ii]].edgeind.erase(
+                  verts[subList[ii]].edgeind.begin()+jj);
+            }
+         }  
+      }
+
+      subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
+      for (ii=0;ii<int(subList.size());++ii){
+         if(subList[ii]!=-1){
+            for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+               if(surfs(subList[ii])->edgeind[jj]==oldInd){
+                  surfs[subList[ii]].edgeind.erase(
+                     surfs[subList[ii]].edgeind.begin()+jj);
+               }
+            }
+         }  
+      }
+
+      edges.isHash=1;
+      verts.isHash=1;
+      surfs.isHash=1;
+      edges.isSetMI=1;
+      verts.isSetMI=1;
+      surfs.isSetMI=1;
+
+
+   } else if (typeInd==3){
+
+
+      subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+            if(edges(subList[ii])->surfind[jj]==oldInd){
+               edges[subList[ii]].surfind.erase(
+                  edges[subList[ii]].surfind.begin()+jj);
+            }
+         }  
+      }
+
+      subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
+      for (ii=0;ii<int(subList.size());++ii){
+         if(subList[ii]!=-1){
+            for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+               if(volus(subList[ii])->surfind[jj]==oldInd){
+                  volus[subList[ii]].surfind.erase(
+                     volus[subList[ii]].surfind.begin()+jj);
+               }
+            }
+         }  
+      }
+      
+      surfs.isHash=1;
+      edges.isHash=1;
+      volus.isHash=1;
+      surfs.isSetMI=1;
+      edges.isSetMI=1;
+      volus.isSetMI=1;
+
+   } else if (typeInd==4){
+      
+      cerr << "not coded yet" << endl;
+      throw;
+   } else if (typeInd==5){ // Modify vertex index in scoped mode
+
+      cerr << "not coded yet" << endl;
+      throw;
+   }
+
+}
 #pragma GCC diagnostic pop
 // methods for mesh
 void mesh::HashArray(){
