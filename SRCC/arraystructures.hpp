@@ -294,7 +294,9 @@ class surf: public meshpart {
 protected:
 	bool isordered;
 public:
-	
+	friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
+	friend void mesh::RemoveIndex(int typeInd, int oldInd);
+
 	double fill,target,error;
 	vector<int> edgeind;
 	vector<int> voluind;

@@ -11,6 +11,11 @@
 using namespace std;
 
 
+void ConnecRemv::disp() {
+	cout << "connrmv:  ki " << keepind << " | tobj " << typeobj << " | rmvind ";
+	DisplayVector(rmvind);
+	cout << endl;
+}
 
 // Snake Spawning at Vertex.
 void SpawnAtVertex(snake& snakein,int indVert){
@@ -112,7 +117,11 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 		surfSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->voluind,
 			voluInds,hashVoluInds);
 		newsnake.snakeconn.edges[ii].surfind=surfSubsTemp;
+		for(jj=0;jj<int(surfSubsTemp.size());++jj){
 
+			newsnake.snakeconn.edges[ii].surfind[jj]++;
+
+		}
 		// Assign vertind (can be done WAY more efficiently the other way round)
 		// But liek this we can check the logic
 		vertSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->edgeind,
@@ -125,7 +134,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 			}
 		}
 	}
-	newsnake.snakeconn.edges.ChangeIndices(1,0,1,0);
+	newsnake.snakeconn.edges.ChangeIndices(1,0,0,0);
 	if(!newsnake.Check3D()){
 		for (ii=0;ii<nEdge;++ii){
 			newsnake.snakeconn.edges[ii].surfind[0]=1;
@@ -338,9 +347,10 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 
 
 
-void CleanupSnakeConnec(snake snakein){
+void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 
 	vector<ConnecRemv> connecEdit;
+	static int ttt=0;
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
 	vector<int> tempSub;
@@ -443,9 +453,9 @@ void CleanupSnakeConnec(snake snakein){
 			}
 		}
 	}
-	kk=indDelEdge.size();
+	kk=indDelEdge.vec.size();
 	for (ii=0;ii<kk;++ii){
-		snakein.snakeconn.RemoveIndex(2,indDelEdge[ii]);
+		snakein.snakeconn.RemoveIndex(2,indDelEdge.vec[ii]);
 	}
 	kk=indDelSurf.size();
 	for (ii=0;ii<kk;++ii){
@@ -453,7 +463,12 @@ void CleanupSnakeConnec(snake snakein){
 	}
 
 	indRmvSurf.insert(itSurf, indDelSurf.begin(),indDelSurf.end());
-	indRmvEdge.insert(itEdge, indDelEdge.begin(),indDelEdge.end());
+	indRmvEdge.insert(itEdge, indDelEdge.vec.begin(),indDelEdge.vec.end());
+
+	sort(indRmvEdge);
+	sort(indRmvSurf);
+	unique(indRmvEdge);
+	unique(indRmvSurf);
 
 	snakein.snakeconn.surfs.remove(indRmvSurf);
 	snakein.snakeconn.edges.remove(indRmvEdge);
@@ -464,7 +479,9 @@ void CleanupSnakeConnec(snake snakein){
 	snakein.snaxsurfs.remove(indRmvSurf);
 	
 
-
+	snakein.PrepareForUse();
+	tecout.PrintMesh(snakein.snakeconn,2,ttt);
+	ttt++;
 }
 
 
@@ -729,7 +746,7 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const 
 
 	
 	vector<int> tempSub,tempSub2;	//vector<int> objSub;
-	int  ii,jj; //nSnax, nSnaxSurf,
+	int  ii,jj,kk; //nSnax, nSnaxSurf,
 	ConnecRemv tempConnec;
 
 	for(ii=0; ii<int(indRmvVert.size()) ; ++ii){
@@ -746,17 +763,25 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const 
 
 		if (int(tempSub.size())>1){
 			tempConnec.typeobj=4;
-			tempConnec.keepind=tempSub[0];
-			tempConnec.rmvind.clear();
-			for(jj=1; jj<int(tempSub.size());++jj){
-				if(tempSub[jj]>0){
-					tempConnec.rmvind.push_back(tempSub[jj]);
-				}
+			kk=0;
+			if (tempSub[kk]==0){
+				kk++;
 			}
-			if(int(tempConnec.rmvind.size())>0){
-				snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
-					tempConnec.keepind,tempConnec.scopeind);
-				connecEdit.push_back(tempConnec);
+			if (int(tempSub.size())>(kk+1)){
+				tempConnec.keepind=tempSub[kk];
+				tempConnec.rmvind.clear();
+				for(jj=kk+1; jj<int(tempSub.size());++jj){
+					if(tempSub[jj]>0){
+						tempConnec.rmvind.push_back(tempSub[jj]);
+					}
+				}
+				if(int(tempConnec.rmvind.size())>0){
+					for (jj=0; jj<int(tempConnec.rmvind.size());jj++){
+						snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
+							tempConnec.keepind,tempConnec.scopeind);
+					}
+					connecEdit.push_back(tempConnec);
+				}
 			}
 
 		}

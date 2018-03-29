@@ -1,8 +1,8 @@
 
 //===============================================
 // Include Guards
-#ifndef SNAKEENGINE_H_INCLUDED
-#define SNAKEENGINE_H_INCLUDED
+#ifndef SNAKSTRUCT_H_INCLUDED
+#define SNAKSTRUCT_H_INCLUDED
 
 //===============================================
 // Levels of debuging Guards
@@ -30,6 +30,7 @@
 #include <cfloat>
 
 #include "arraystructures.hpp"
+#include "postprocessing.hpp"
 
 //==================================
 // Code
@@ -275,7 +276,7 @@ int Test_snake();
 int Test_snakeinit();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
 
 // Functions needed at Compile time
 
@@ -284,4 +285,4 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
 
 #include "snakstruct_incl.cpp"
 
-#endif //SNAKEENGINE_H_INCLUDED
+#endif //SNAKSTRUCT_H_INCLUDED

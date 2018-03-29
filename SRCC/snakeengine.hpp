@@ -1,15 +1,13 @@
 
 //===============================================
 // Include Guards
-#ifndef SNAKSTRUCT_H_INCLUDED
-#define SNAKSTRUCT_H_INCLUDED
+#ifndef SNAKEENGINE_H_INCLUDED
+#define SNAKEENGINE_H_INCLUDED
 
 //===============================================
 // Levels of debuging Guards
 #ifdef DEBUGLVL2 // All Debugging calls
 #define DEBUGLVL1
-
-
 #endif
 
 #ifdef DEBUGLVL1 // Debugging of new features.
@@ -30,6 +28,7 @@
 
 #include "arraystructures.hpp"
 #include "snakstruct.hpp"
+#include "postprocessing.hpp"
 
 //==================================
 // Code
@@ -44,12 +43,8 @@ public:
 	int typeobj;
 	vector<int> rmvind;
 	vector<int> scopeind;
-
-	void disp() {
-		cout << "connrmv:  ki " << keepind << " | tobj " << typeobj << " | rmvind ";
-		DisplayVector(rmvind);
-		cout << endl;
-	}
+	void disp();
+	
 };
 
 
@@ -64,7 +59,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
 	unordered_multimap<int,int> &hashEdgeInds, unordered_multimap<int,int> &hashVoluInds);
 
 void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds,
- const vector<int> &voluInds,const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds);
+	const vector<int> &voluInds,const vector<int> &voluSubs,unordered_multimap<int,int> &hashSurfInds);
 void SpawnAtVertexSurf2D(snake& newsnake,int nEdge,const vector<int> &voluInds);
 void SpawnAtVertexVolu(snake& newsnake, int nSurf);
 void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact);
@@ -73,7 +68,7 @@ void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
 void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
 
 //
-void CleanupSnakeConnec(snake snakein);
+void CleanupSnakeConnec(snake snakein, tecplotfile &tecout);
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,
@@ -83,7 +78,7 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 void IdentifyMergSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, 
 	ConnecRemv &tempConnec,vector<int> &tempSub,vector<int> &tempSub2,
-	 vector<int> &tempCount,HashedVector<int,int> &edge2Surf, HashedVector<int,int> &tempIndHash) ;
+	vector<int> &tempCount,HashedVector<int,int> &edge2Surf, HashedVector<int,int> &tempIndHash) ;
 void IdentifyMergeSurfRecursive(const snake &snakein,vector<bool> &isObjDone, vector<int> &tempCount,const HashedVector<int,int> &edge2Surf, const HashedVector<int,int> &tempIndHash, ConnecRemv &tempConnec, const vector<int> &tempSub, const vector<int> &tempSub2, int excludeSub);
 void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, 
 	const vector<int> &indRmvVert);

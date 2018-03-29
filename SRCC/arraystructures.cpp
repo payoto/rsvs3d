@@ -278,6 +278,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
                if(surfs(subList[ii])->edgeind[jj]==oldInd){
                   surfs[subList[ii]].edgeind[jj]=newInd;
                   edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+                  surfs[subList[ii]].isordered=false;
                }
             }
          }  
@@ -387,6 +388,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
                if(surfs(subList[ii])->edgeind[jj]==oldInd){
                   surfs[subList[ii]].edgeind.erase(
                      surfs[subList[ii]].edgeind.begin()+jj);
+                  surfs[subList[ii]].isordered=false;
                }
             }
          }  
@@ -664,6 +666,9 @@ void surf::OrderEdges(mesh *meshin)
    unordered_multimap<int,int>::iterator it;
 
    if (edgeind.size()>0){
+      sort(edgeind);
+      unique(edgeind);
+      
       edgeIndOrig=edgeind;
       edgeSub=meshin->edges.find_list(edgeind);
       edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);
