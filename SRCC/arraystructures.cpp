@@ -273,10 +273,12 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 
       subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
       for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
-            if(surfs(subList[ii])->edgeind[jj]==oldInd){
-               surfs[subList[ii]].edgeind[jj]=newInd;
-               edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+         if(subList[ii]!=-1){
+            for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+               if(surfs(subList[ii])->edgeind[jj]==oldInd){
+                  surfs[subList[ii]].edgeind[jj]=newInd;
+                  edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+               }
             }
          }  
       }
@@ -303,10 +305,12 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 
       subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
       for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
-            if(volus(subList[ii])->surfind[jj]==oldInd){
-               volus[subList[ii]].surfind[jj]=newInd;
-               surfs[newSub].voluind.push_back(volus[subList[ii]].index);
+         if(subList[ii]!=-1){
+            for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+               if(volus(subList[ii])->surfind[jj]==oldInd){
+                  volus[subList[ii]].surfind[jj]=newInd;
+                  surfs[newSub].voluind.push_back(volus[subList[ii]].index);
+               }
             }
          }  
       }
