@@ -353,10 +353,9 @@ void dispconnrmv(vector<ConnecRemv> conn){
 	} 
 }
 
-void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
+void CleanupSnakeConnec(snake &snakein,tecplotfile &tecout){
 
 	vector<ConnecRemv> connecEdit;
-	static int ttt=0;
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
 	vector<int> tempSub;
@@ -504,11 +503,12 @@ void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 	
 	snakein.snakeconn.TightenConnectivity();
 	snakein.PrepareForUse();
-	tecout.PrintMesh(snakein.snakeconn,2,ttt);
-	
-
-	tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
-	ttt++;
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivity();
+	}
+	//tecout.PrintMesh(snakein.snakeconn,2,ttt);
+	//tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
+	//ttt++;
 }
 
 
@@ -740,7 +740,7 @@ void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 				unique(tempConnec.rmvind);
 				connecEdit.push_back(tempConnec);
 
-				cout << " " << tempConnec.rmvind.size() << " " << tempSub.size() << " ; ";
+				//cout << " " << tempConnec.rmvind.size() << " " << tempSub.size() << " ; ";
 			}
 
 

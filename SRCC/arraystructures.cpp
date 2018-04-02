@@ -249,17 +249,27 @@ void mesh::TightenConnectivity(){
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd)
 {
 
-   int ii,jj,newSub;
+   int ii,jj,kk,newSub,oldSub;
    vector<int> subList;
-      bool is3DMesh=volus.size()>0;
+   HashedVector<int,int> tempSub;
+   bool is3DMesh=volus.size()>0;
 
    if(typeInd==1){
       newSub=verts.find(newInd);
-      subList=edges.find_list(verts[verts.find(oldInd)].edgeind);
+      oldSub=verts.find(oldInd);
+      subList=edges.find_list(verts[oldSub].edgeind);
       for (ii=0;ii<int(subList.size());++ii){ // update vertind
          jj=edges(subList[ii])->vertind[1]==oldInd;
          edges[subList[ii]].vertind[jj]=newInd;
          verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
+         //cout << " " << edges[subList[ii]].index <<  " ";
+         for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
+            if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
+               verts[oldSub].edgeind.erase(
+                  verts[oldSub].edgeind.begin()+jj);
+               jj--;
+            }
+         }
       }
       // Hashing has not been invalidated
       edges.isHash=1;
@@ -272,7 +282,10 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       for (ii=0;ii<int(subList.size());++ii){
          for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
             if(verts(subList[ii])->edgeind[jj]==oldInd){
+               //cout << " " << verts(subList[ii])->index << " " << endl;DisplayVector(verts[subList[ii]].edgeind);cout << endl;
                verts[subList[ii]].edgeind[jj]=newInd;
+               //DisplayVector(verts[subList[ii]].edgeind);cout << endl;
+
             }
          }  
       }
@@ -339,27 +352,42 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
          //jj=surfs(subList[ii])->voluind[1]==oldInd;
          //surfs[subList[ii]].voluind[jj]=newInd;
          for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
-               if(surfs[subList[ii]].voluind[jj]==oldInd){
-                  surfs[subList[ii]].voluind[jj]=newInd; 
+            if(surfs[subList[ii]].voluind[jj]==oldInd){
+               surfs[subList[ii]].voluind[jj]=newInd; 
                   volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
                }
             }
-        
-      }
+
+         }
       // Hashing has not been invalidated
-      volus.isHash=1;
-      surfs.isHash=1;
-      volus.isSetMI=1;
-      surfs.isSetMI=1;
+         volus.isHash=1;
+         surfs.isHash=1;
+         volus.isSetMI=1;
+         surfs.isSetMI=1;
    } else if (typeInd==5){ // Modify vertex index in scoped mode
 
       newSub=verts.find(newInd);
+      oldSub=verts.find(oldInd);
+
       subList=edges.find_list(scopeInd);
+      tempSub.vec=edges.find_list(verts(oldSub)->edgeind);
+      tempSub.GenerateHash();
       for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
-            if(edges(subList[ii])->vertind[jj]==oldInd){
-               edges[subList[ii]].vertind[jj]=newInd;
-               verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
+         if(tempSub.find(subList[ii])!=-1){
+            for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
+               if(edges(subList[ii])->vertind[jj]==oldInd){
+                  edges[subList[ii]].vertind[jj]=newInd;
+                  verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
+
+                  //cout << " " << edges[subList[ii]].index <<  " ";
+                  for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
+                     if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+                        verts[oldSub].edgeind.erase(
+                           verts[oldSub].edgeind.begin()+kk);
+                        kk--;
+                     }
+                  }
+               }
             }
          }  
       }
@@ -384,7 +412,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
    vector<int> subList;
 
    if(typeInd==1){
-      
+
       cerr << "not coded yet" << endl;
       throw;
 
@@ -459,7 +487,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
       volus.isSetMI=1;
 
    } else if (typeInd==4){
-      
+
       cerr << "not coded yet" << endl;
       throw;
    } else if (typeInd==5){ // Modify vertex index in scoped mode
@@ -474,6 +502,117 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
    }
 
 }
+
+void mesh::TestConnectivity(){
+   int ii,jj,kk,kk2,errCount, errTot;
+   vector<int> testSub;
+
+   errCount=0;
+   errTot=0;
+   kk=int(verts.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=edges.find_list(verts(ii)->edgeind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+            << " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+            DisplayVector(verts(ii)->edgeind);
+            cerr << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+
+
+   errTot+=errCount;
+   errCount=0;
+   kk=int(edges.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=verts.find_list(edges(ii)->vertind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && edges(ii)->vertind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
+            << " makes unknown reference to vertex " << edges(ii)->vertind[jj] << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+
+
+   errTot+=errCount;
+   errCount=0;
+   for (ii=0; ii<kk;++ii){
+      testSub=surfs.find_list(edges(ii)->surfind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && edges(ii)->surfind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
+            << " makes unknown reference to surface " << edges(ii)->surfind[jj] << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+
+
+
+   errTot+=errCount;
+   errCount=0;
+   kk=int(surfs.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=edges.find_list(surfs(ii)->edgeind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && surfs(ii)->edgeind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << surfs(ii)->index
+            << " makes unknown reference to vertex " << surfs(ii)->edgeind[jj] << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+
+   errTot+=errCount;
+   errCount=0;
+   kk=int(surfs.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=volus.find_list(surfs(ii)->voluind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && surfs(ii)->voluind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << surfs(ii)->index
+            << " makes unknown reference to vertex " << surfs(ii)->voluind[jj] << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+
+
+   errTot+=errCount;
+   errCount=0;
+   kk=int(volus.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=surfs.find_list(volus(ii)->surfind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && volus(ii)->surfind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << volus(ii)->index
+            << " makes unknown reference to vertex " << volus(ii)->surfind[jj] << endl;
+         }
+      }
+   }
+   cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+   if (errTot>0){
+      cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+   }
+}
+
 #pragma GCC diagnostic pop
 // methods for mesh
 void mesh::HashArray(){

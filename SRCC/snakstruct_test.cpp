@@ -333,6 +333,7 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	start_f=clock();
 
 	CleanupSnakeConnec(testSnake,outSnake);
+
 	stop_s=clock();
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
