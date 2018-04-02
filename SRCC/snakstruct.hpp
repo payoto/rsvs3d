@@ -215,7 +215,7 @@ public:
 	inline void set(int index, double d,double v,int fromvert,
 		int tovert,int edgeind,int isfreeze,int orderedge);
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
-
+	void TightenConnectivity(){}
 
 };
 
@@ -238,7 +238,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE *fid)const;
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
-
+	void TightenConnectivity(){}
 
 };
 
@@ -260,6 +260,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid)const;
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
+	void TightenConnectivity(){}
 
 
 };

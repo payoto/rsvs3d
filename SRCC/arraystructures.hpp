@@ -67,7 +67,15 @@ typedef ArrayStruct<surf> surfarray;
 typedef ArrayStruct<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
+// Forward declared templated functions
 template <class T> int TestTemplate_ArrayStruct();
+bool CompareFuncOut(function<void()> func1, function<void()> func2);
+template <typename T> inline void sort(vector<T> &vec);
+template <typename T> inline void unique(vector<T> &vec);
+template<class T> vector<int> FindSubList(const vector<T> &keyFind, const vector<T> &keyList,unordered_multimap<T,int> &hashTable) ;
+template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
+template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
+template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat);
 // Templates
 template <class T> 
 class ArrayStruct { 
@@ -105,6 +113,7 @@ public:
 	void write(FILE *fid) const;
 	void read(FILE *fid);
 	void remove(vector<int> delInd);
+	void TightenConnectivity();
 	// methods needed from vector
 	inline int size() const;
 	inline int capacity() const;
@@ -192,6 +201,7 @@ public:
 	void Concatenate(const mesh &other);
 	bool isready() const;
 	void PopulateIndices();
+	void TightenConnectivity();
 //File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
@@ -221,7 +231,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	virtual bool isready(bool isInMesh) const=0 ;
 	virtual void read(FILE * fid)=0 ;
 	virtual void write(FILE * fid) const =0 ;
-
+	virtual void TightenConnectivity() =0;
 	//virtual operator=( meshpart* other)=0 ;
 
 };
@@ -242,7 +252,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-
+	void TightenConnectivity() {sort(surfind);unique(surfind);};
 
 	volu(){ // Constructor
 		index=0;
@@ -309,6 +319,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void OrderEdges(mesh *meshin);
+	void TightenConnectivity() {sort(voluind);unique(voluind);};
 
 	surf(){ // Constructor
 		index=0;
@@ -366,6 +377,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+	void TightenConnectivity() {sort(surfind);unique(surfind);};
 
 
 	edge(){ // Constructor
@@ -412,6 +424,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
+	void TightenConnectivity() {sort(edgeind);unique(edgeind);};
 
 
 	vert(){ // Constructor
@@ -459,13 +472,7 @@ template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
 	R T::*mp , U &out , V oper);
-bool CompareFuncOut(function<void()> func1, function<void()> func2);
-template <typename T> inline void sort(vector<T> &vec);
-template <typename T> inline void unique(vector<T> &vec);
-template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,
-unordered_multimap<T,int> &hashTable) ;
-template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
-template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable) ;
+
 
 //test functions
 int Test_ArrayStructures();

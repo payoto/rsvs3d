@@ -82,5 +82,7 @@ void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 void IdentifyMergeSurfRecursive(const snake &snakein,vector<bool> &isObjDone, vector<int> &tempCount,const HashedVector<int,int> &edge2Surf, const HashedVector<int,int> &tempIndHash, ConnecRemv &tempConnec, const vector<int> &tempSub, const vector<int> &tempSub2, int excludeSub);
 void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, 
 	const vector<int> &indRmvVert);
+
+void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

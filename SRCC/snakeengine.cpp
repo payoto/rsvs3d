@@ -345,7 +345,12 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 
 }
 
-
+void dispconnrmv(vector<ConnecRemv> conn){
+	for (int i = 0; i < int(conn.size()); ++i)
+	{
+		conn[i].disp();
+	} 
+}
 
 void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 
@@ -377,25 +382,26 @@ void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 	}
 
 	// Identify surface connections
-	IdentifyMergSurfConnec(snakein, connecEdit);
-	
-	nSurfConn=int(connecEdit.size());
-	for(ii=nEdgeConn; ii < nSurfConn;++ii){
-		for(jj=0; jj < int(connecEdit[ii].rmvind.size());++jj){
-			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[jj],
-				connecEdit[ii].keepind,connecEdit[ii].scopeind);
+	if (snakein.Check3D()){
+		IdentifyMergSurfConnec(snakein, connecEdit);
+
+		nSurfConn=int(connecEdit.size());
+		for(ii=nEdgeConn; ii < nSurfConn;++ii){
+			for(jj=0; jj < int(connecEdit[ii].rmvind.size());++jj){
+				snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[jj],
+					connecEdit[ii].keepind,connecEdit[ii].scopeind);
+			}
 		}
-	}
+	} 
+
 	// Build removal ind of objects
-	nEdgeSurfConn=int(connecEdit.size());
-	for(ii=0; ii<nEdgeSurfConn;++ii){
+	for(ii=0; ii<nEdgeConn;++ii){
 		if (connecEdit[ii].typeobj==2){
 			indRmvEdge.insert(itEdge, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
 			itEdge=indRmvEdge.end();
 
 		} else if (connecEdit[ii].typeobj==3){
-			indRmvSurf.insert(itSurf, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
-			itSurf=indRmvSurf.end();
+			cerr<< "Should not be here "<< endl;
 		} else if (connecEdit[ii].typeobj==5){
 			indRmvVert.insert(itVert, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
 			itVert=indRmvVert.end();
@@ -403,24 +409,41 @@ void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 	}
 	sort(indRmvVert);
 	sort(indRmvEdge);
-	sort(indRmvSurf);
 	unique(indRmvVert);
 	unique(indRmvEdge);
-	unique(indRmvSurf);
 
 	// Identify Volumes from vertices
-	ModifyMergVoluConnec(snakein, connecEdit, indRmvVert);
-	kk=int(connecEdit.size());
-	for(ii=nEdgeSurfConn; ii<kk;++ii){
-
-		indRmvVolu.insert(itVolu, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
-		itVolu=indRmvVolu.end();
-
+	if (snakein.Check3D()){
+		ModifyMergVoluConnec(snakein, connecEdit, indRmvVert);
+		
+	} else {
+		ModifyMergSurf2DConnec(snakein, connecEdit,indRmvVert);
 	}
 
+
+	nEdgeSurfConn=int(connecEdit.size());
+	for(ii=nEdgeConn; ii<nEdgeSurfConn;++ii){
+
+		if (connecEdit[ii].typeobj==3){
+			indRmvSurf.insert(itSurf, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
+			itSurf=indRmvSurf.end();
+		} else if (connecEdit[ii].typeobj==4){
+			indRmvVolu.insert(itVolu, connecEdit[ii].rmvind.begin(),connecEdit[ii].rmvind.end());
+			itVolu=indRmvVolu.end();
+
+		} else if (connecEdit[ii].typeobj==2){
+			cerr << "Should not be Here " << endl;
+
+		} else  if (connecEdit[ii].typeobj==5){
+			
+			cerr << "Should not be Here " << endl;
+		} 
+	}
+
+	sort(indRmvSurf);
+	unique(indRmvSurf);
 	sort(indRmvVolu);
 	unique(indRmvVolu);
-
 	// Identify collapsed edges from vertind
 	// Remove these like the switch index
 	// Look for edges attached to a deleted vertex and delete them as well
@@ -459,7 +482,7 @@ void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 	}
 	kk=indDelSurf.size();
 	for (ii=0;ii<kk;++ii){
-		snakein.snakeconn.RemoveIndex(2,indDelSurf[ii]);
+		snakein.snakeconn.RemoveIndex(3,indDelSurf[ii]);
 	}
 
 	indRmvSurf.insert(itSurf, indDelSurf.begin(),indDelSurf.end());
@@ -478,9 +501,12 @@ void CleanupSnakeConnec(snake snakein,tecplotfile &tecout){
 	snakein.snaxedges.remove(indRmvEdge);
 	snakein.snaxsurfs.remove(indRmvSurf);
 	
-
+	snakein.snakeconn.TightenConnectivity();
 	snakein.PrepareForUse();
 	tecout.PrintMesh(snakein.snakeconn,2,ttt);
+	
+
+	tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
 	ttt++;
 }
 
@@ -528,6 +554,8 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	tempIndHash.GenerateHash();
 	tempCount=tempIndHash.count(tempIndHash.vec);
 	nTemp=tempCount.size();
+
+	tempConnec2.scopeind.clear();
 	for (jj=0;jj<int(tempSub.size());++jj){
 		tempConnec2.scopeind.push_back(snakein.snaxedges(tempSub[jj])->index);
 
@@ -540,10 +568,15 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 
 		tempConnec.rmvind.clear();
 		tempConnec.keepind=snakein.snaxedges(tempSub[0])->index;
+		tempConnec2.rmvind.clear();
+		tempConnec2.keepind=snakein.snakeconn.edges(tempSub[0])->vertind[0];
 		tempConnec.typeobj=2;
+		tempConnec2.typeobj=5;
 		for (jj=0;jj<int(tempSub.size());++jj){
 			tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj])->index);
 			isObjDone[tempSub[jj]]=true;
+			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[0]);
+			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[1]);
 			#ifdef SAFE_ALGO
 			if (tempCount[jj*2]!=2 && tempCount[jj*2+1]!=2){
 				cerr << "Error: Unexpected  behaviour "<< endl;
@@ -554,6 +587,9 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 			#endif //SAFE_ALGO
 		}
 		connecEdit.push_back(tempConnec);
+		sort(tempConnec2.rmvind);
+		unique(tempConnec2.rmvind);
+		connecEdit.push_back(tempConnec2);
 
 	} else {
 		do{ 
@@ -683,26 +719,34 @@ void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	// is no merging needed in the cell
 
 	if(jjStart<nTemp){ 
-	// if can't find a count above 1 we're done
+		do 
+		{
+			// if can't find a count above 1 we're done
+			tempConnec.rmvind.clear();
 
-		tempSub2=tempIndHash.findall(tempIndHash.vec[jjStart]);
-		// tempSub2 is the position of edges matching that detected by jjStart
-		tempConnec.typeobj=3;
-		isObjDone[tempSub[edge2Surf.vec[jjStart]]]=true;
-		tempConnec.keepind=snakein.snakeconn.surfs(tempSub[edge2Surf.vec[jjStart]])->index;
-		// Kept index is the last surf to be detected as having the edge of jjStart
-		tempCount[jjStart]=0; // To ensure this edge is not set again set tempCount to 0
+			tempSub2=tempIndHash.findall(tempIndHash.vec[jjStart]);
+			// tempSub2 is the position of edges matching that detected by jjStart
+			tempConnec.typeobj=3;
+			isObjDone[tempSub[edge2Surf.vec[jjStart]]]=true;
+			tempConnec.keepind=snakein.snakeconn.surfs(tempSub[edge2Surf.vec[jjStart]])->index;
+			// Kept index is the last surf to be detected as having the edge of jjStart
+			tempCount[jjStart]=0; // To ensure this edge is not set again set tempCount to 0
 
-		IdentifyMergeSurfRecursive( snakein,isObjDone, tempCount,edge2Surf, tempIndHash, 
-			tempConnec, tempSub, tempSub2, jjStart);
-		if (tempConnec.rmvind.size()>0){
-			sort(tempConnec.rmvind);
-			unique(tempConnec.rmvind);
-			connecEdit.push_back(tempConnec);
-		}
+			IdentifyMergeSurfRecursive( snakein,isObjDone, tempCount,edge2Surf, tempIndHash, 
+				tempConnec, tempSub, tempSub2, jjStart);
+			if (tempConnec.rmvind.size()>0){
+				sort(tempConnec.rmvind);
+				unique(tempConnec.rmvind);
+				connecEdit.push_back(tempConnec);
 
+				cout << " " << tempConnec.rmvind.size() << " " << tempSub.size() << " ; ";
+			}
+
+
+			while (tempCount[jjStart]<=1 && jjStart<nTemp)
+				{jjStart++;}
+		} while (jjStart<nTemp);
 	}
-
 	// Note:
 	// Check for surface collapse
 	// if all of the edges are "collapsed edges" the surfaces need to be assembled in a single surface
@@ -718,22 +762,25 @@ void IdentifyMergeSurfRecursive(const snake &snakein, vector<bool> &isObjDone, v
 
 	for(ii = 0 ; ii< int(tempSub2.size()); ++ii){
 		if(tempSub2[ii]!=excludeSub){
-			tempConnec.rmvind.push_back(snakein.snakeconn.surfs(tempSub[edge2Surf.vec[tempSub2[ii]]])->index);
+			if(!isObjDone[tempSub[edge2Surf.vec[tempSub2[ii]]]]){
+				tempConnec.rmvind.push_back(snakein.snakeconn.surfs(
+					tempSub[edge2Surf.vec[tempSub2[ii]]])->index);
 
-			isObjDone[tempSub[edge2Surf.vec[tempSub2[ii]]]]=true;
-			tempCount[tempSub2[ii]]=0; 
-			// this edge is explored set to 0;
-			// add all edges detected on the same edge as merge targets
-			tempSurf=tempIndHash.findall(tempIndHash.vec[tempSub2[ii]]);
+				isObjDone[tempSub[edge2Surf.vec[tempSub2[ii]]]]=true;
+				tempCount[tempSub2[ii]]=0; 
+				// this edge is explored set to 0;
+				// add all edges detected on the same edge as merge targets
+				tempSurf=edge2Surf.findall(edge2Surf.vec[tempSub2[ii]]);
 
-			// find all the occurences of that surf
-			for (jj=0; jj<int(tempSurf.size()); ++jj){
-				if(tempCount[tempSurf[jj]]>1){
+				// find all the occurences of that surf
+				for (jj=0; jj<int(tempSurf.size()); ++jj){
+					if(tempCount[tempSurf[jj]]>1){
 					// for each edge of that cell which is tempCount>1 recurs
-					tempCount[tempSurf[jj]]=0;
-					tempRecur=tempIndHash.findall(tempIndHash.vec[tempSurf[jj]]);
-					IdentifyMergeSurfRecursive( snakein,isObjDone, tempCount,edge2Surf, tempIndHash, 
-						tempConnec, tempSub, tempRecur, tempSurf[jj]);
+						tempCount[tempSurf[jj]]=0;
+						tempRecur=tempIndHash.findall(tempIndHash.vec[tempSurf[jj]]);
+						IdentifyMergeSurfRecursive( snakein,isObjDone, tempCount,edge2Surf, tempIndHash, 
+							tempConnec, tempSub, tempRecur, tempSurf[jj]);
+					}
 				}
 			}
 		}
@@ -773,6 +820,53 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const 
 				for(jj=kk+1; jj<int(tempSub.size());++jj){
 					if(tempSub[jj]>0){
 						tempConnec.rmvind.push_back(tempSub[jj]);
+					}
+				}
+				if(int(tempConnec.rmvind.size())>0){
+					for (jj=0; jj<int(tempConnec.rmvind.size());jj++){
+						snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
+							tempConnec.keepind,tempConnec.scopeind);
+					}
+					connecEdit.push_back(tempConnec);
+				}
+			}
+
+		}
+
+	}
+
+}
+
+
+void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert){
+
+	
+	vector<int> tempSub,tempSub2;	//vector<int> objSub;
+	int  ii,jj,kk; //nSnax, nSnaxSurf,
+	ConnecRemv tempConnec;
+
+	for(ii=0; ii<int(indRmvVert.size()) ; ++ii){
+		// find edges connected to vertex
+		tempSub=snakein.snakeconn.edges.find_list(
+			snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind);
+
+		tempSub2=ConcatenateVectorField(snakein.snakeconn.edges, &edge::surfind, tempSub);
+		
+		sort(tempSub2);
+		unique(tempSub2);
+
+		if (int(tempSub2.size())>1){
+			tempConnec.typeobj=3;
+			kk=0;
+			if (tempSub2[kk]==0){
+				kk++;
+			}
+			if (int(tempSub2.size())>(kk+1)){
+				tempConnec.keepind=tempSub2[kk];
+				tempConnec.rmvind.clear();
+				for(jj=kk+1; jj<int(tempSub2.size());++jj){
+					if(tempSub2[jj]>0){
+						tempConnec.rmvind.push_back(tempSub2[jj]);
 					}
 				}
 				if(int(tempConnec.rmvind.size())>0){

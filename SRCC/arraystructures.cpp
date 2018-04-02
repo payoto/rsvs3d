@@ -238,13 +238,20 @@ void vert::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
       edgeind[i]=edgeind[i]+nEdge;
    }
 }
+void mesh::TightenConnectivity(){
+   verts.TightenConnectivity();
+   surfs.TightenConnectivity();
+   edges.TightenConnectivity();
+   volus.TightenConnectivity();
 
+}
 
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd)
 {
 
    int ii,jj,newSub;
    vector<int> subList;
+      bool is3DMesh=volus.size()>0;
 
    if(typeInd==1){
       newSub=verts.find(newInd);
@@ -259,7 +266,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       verts.isHash=1;
 
    } else if (typeInd==2){
-
       newSub=edges.find(newInd);
 
       subList=verts.find_list(edges(edges.find(oldInd))->vertind);
@@ -273,7 +279,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 
       subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
       for (ii=0;ii<int(subList.size());++ii){
-         if(subList[ii]!=-1){
+         if(subList[ii]!=-1 || is3DMesh){
             for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
                if(surfs(subList[ii])->edgeind[jj]==oldInd){
                   surfs[subList[ii]].edgeind[jj]=newInd;
@@ -300,9 +306,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
          for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
             if(edges(subList[ii])->surfind[jj]==oldInd){
                edges[subList[ii]].surfind[jj]=newInd;
+               surfs[newSub].edgeind.push_back(edges[subList[ii]].index);
             }
          }  
       }
+      surfs.isHash=1;
 
       subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
       for (ii=0;ii<int(subList.size());++ii){
@@ -315,7 +323,8 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
             }
          }  
       }
-      
+
+      surfs[newSub].isordered=false;
       surfs.isHash=1;
       edges.isHash=1;
       volus.isHash=1;
@@ -327,9 +336,15 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       newSub=volus.find(newInd);
       subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
       for (ii=0;ii<int(subList.size());++ii){ // update vertind
-         jj=surfs(subList[ii])->voluind[1]==oldInd;
-         surfs[subList[ii]].voluind[jj]=newInd;
-         volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
+         //jj=surfs(subList[ii])->voluind[1]==oldInd;
+         //surfs[subList[ii]].voluind[jj]=newInd;
+         for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
+               if(surfs[subList[ii]].voluind[jj]==oldInd){
+                  surfs[subList[ii]].voluind[jj]=newInd; 
+                  volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
+               }
+            }
+        
       }
       // Hashing has not been invalidated
       volus.isHash=1;
@@ -353,6 +368,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       edges.isSetMI=1;
       verts.isSetMI=1;
 
+   } else {
+
+      cerr << "Error unknown type of object for index switching" <<endl;
+      cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+      throw invalid_argument (" : Type is out of range");
    }
 
 }
@@ -377,6 +397,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
             if(verts(subList[ii])->edgeind[jj]==oldInd){
                verts[subList[ii]].edgeind.erase(
                   verts[subList[ii]].edgeind.begin()+jj);
+               jj--;
             }
          }  
       }
@@ -389,6 +410,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
                   surfs[subList[ii]].edgeind.erase(
                      surfs[subList[ii]].edgeind.begin()+jj);
                   surfs[subList[ii]].isordered=false;
+                  jj--;
                }
             }
          }  
@@ -411,6 +433,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
             if(edges(subList[ii])->surfind[jj]==oldInd){
                edges[subList[ii]].surfind.erase(
                   edges[subList[ii]].surfind.begin()+jj);
+               jj--;
             }
          }  
       }
@@ -422,6 +445,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
                if(volus(subList[ii])->surfind[jj]==oldInd){
                   volus[subList[ii]].surfind.erase(
                      volus[subList[ii]].surfind.begin()+jj);
+                  jj--;
                }
             }
          }  
@@ -442,6 +466,11 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
       cerr << "not coded yet" << endl;
       throw;
+   } else {
+
+      cerr << "Error unknown type of object for index switching" <<endl;
+      cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+      throw invalid_argument (" : Type is out of range");
    }
 
 }
@@ -668,7 +697,7 @@ void surf::OrderEdges(mesh *meshin)
    if (edgeind.size()>0){
       sort(edgeind);
       unique(edgeind);
-      
+
       edgeIndOrig=edgeind;
       edgeSub=meshin->edges.find_list(edgeind);
       edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);

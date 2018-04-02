@@ -243,7 +243,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<5;++ii){
+		for(ii=0;ii<11;++ii){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
@@ -299,7 +299,7 @@ int Test_snakeinitflat(){
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<4;++ii){
+		for(ii=0;ii<11;++ii){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
@@ -332,6 +332,10 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	start_s=clock();
 	start_f=clock();
 
+	CleanupSnakeConnec(testSnake,outSnake);
+	stop_s=clock();
+	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+	start_s=clock();
 	testSnake.CalculateTimeStep(dt,1);
 	testSnake.UpdateDistance(dt);
 	testSnake.UpdateCoord();
@@ -366,7 +370,6 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	testSnake.PrepareForUse();
 	MergeAllContactVertices(testSnake, isImpact);
 	testSnake.PrepareForUse();
-	CleanupSnakeConnec(testSnake,outSnake);
 	stop_s=clock();
 	cout << "Impact merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;

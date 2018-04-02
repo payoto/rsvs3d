@@ -8,6 +8,11 @@ compiled on its own.
 #ifndef ARRAYSTRUCTS_INCL_H_INCLUDED
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
+template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat)
+{
+	vecRoot.insert(vecRoot.end(),vecConcat.begin(),vecConcat.end());
+}
+
 template <class T> bool CompareDisp(T &mesh1,T &mesh2)
 {
 	bool compFlag;
@@ -425,6 +430,19 @@ template<class T> void ArrayStruct <T>::HashArray()
 		hashTable.emplace(elems[i].Key(),i);
 	}
 	isHash=1;
+	
+	
+   //cout << "Array Struct Succesfully Hashed" << endl;
+}
+
+template<class T> void ArrayStruct <T>::TightenConnectivity()
+{
+
+
+	for (int i = 0; i < int(elems.size()); ++i)
+	{
+		elems[i].TightenConnectivity();
+	}
 	
 	
    //cout << "Array Struct Succesfully Hashed" << endl;
