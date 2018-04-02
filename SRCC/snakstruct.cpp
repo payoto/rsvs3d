@@ -267,6 +267,7 @@ void snake::PrepareForUse() {
 	snaxsurfs.PrepareForUse();
 	snakeconn.PrepareForUse();
 	snakemesh->PrepareForUse();
+	is3D=int(snakemesh->volus.size())>0;
 
 }
 void snake::HashArray(){

@@ -138,6 +138,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 	if(!newsnake.Check3D()){
 		for (ii=0;ii<nEdge;++ii){
 			newsnake.snakeconn.edges[ii].surfind[0]=1;
+			newsnake.snakeconn.edges[ii].surfind[1]=0;
 		}
 	}
 }
