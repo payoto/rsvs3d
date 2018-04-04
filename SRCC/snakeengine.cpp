@@ -382,7 +382,7 @@ void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdi
 
 }
 
-void CleanupSnakeConnec(snake &snakein,tecplotfile &tecout){
+void CleanupSnakeConnec(snake &snakein){
 
 	vector<ConnecRemv> connecEdit;
 

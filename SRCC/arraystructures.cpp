@@ -249,7 +249,7 @@ void mesh::TightenConnectivity(){
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd)
 {
 
-   int ii,jj,kk,newSub,oldSub;
+   int ii,jj,kk,kk1,kk2,kk3,newSub,oldSub;
    vector<int> subList;
    HashedVector<int,int> tempSub;
    bool is3DMesh=volus.size()>0;
@@ -258,16 +258,19 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       newSub=verts.find(newInd);
       oldSub=verts.find(oldInd);
       subList=edges.find_list(verts[oldSub].edgeind);
-      for (ii=0;ii<int(subList.size());++ii){ // update vertind
+      kk2=int(subList.size());
+      for (ii=0;ii<kk2;++ii){ // update vertind
          jj=edges(subList[ii])->vertind[1]==oldInd;
          edges[subList[ii]].vertind[jj]=newInd;
          verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
          //cout << " " << edges[subList[ii]].index <<  " ";
-         for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
+         kk1=int(verts(oldSub)->edgeind.size());
+         for (jj=0;jj<kk1;++jj){
             if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
                verts[oldSub].edgeind.erase(
                   verts[oldSub].edgeind.begin()+jj);
                jj--;
+               kk1--;
             }
          }
       }
@@ -279,8 +282,10 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       newSub=edges.find(newInd);
 
       subList=verts.find_list(edges(edges.find(oldInd))->vertind);
-      for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
+         kk1=int(verts(subList[ii])->edgeind.size());
+         for (jj=0;jj<kk1;++jj){
             if(verts(subList[ii])->edgeind[jj]==oldInd){
                //cout << " " << verts(subList[ii])->index << " " << endl;DisplayVector(verts[subList[ii]].edgeind);cout << endl;
                verts[subList[ii]].edgeind[jj]=newInd;
@@ -291,9 +296,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       }
 
       subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
-      for (ii=0;ii<int(subList.size());++ii){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
          if(subList[ii]!=-1 || is3DMesh){
-            for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+            kk1=int(surfs(subList[ii])->edgeind.size());
+            for (jj=0;jj<kk1;++jj){
                if(surfs(subList[ii])->edgeind[jj]==oldInd){
                   surfs[subList[ii]].edgeind[jj]=newInd;
                   edges[newSub].surfind.push_back(surfs[subList[ii]].index);
@@ -315,8 +322,10 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       newSub=surfs.find(newInd);
 
       subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
-      for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
+         kk1=int(edges(subList[ii])->surfind.size());
+         for (jj=0;jj<kk1;++jj){
             if(edges(subList[ii])->surfind[jj]==oldInd){
                edges[subList[ii]].surfind[jj]=newInd;
                surfs[newSub].edgeind.push_back(edges[subList[ii]].index);
@@ -326,9 +335,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       surfs.isHash=1;
 
       subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
-      for (ii=0;ii<int(subList.size());++ii){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
          if(subList[ii]!=-1){
-            for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+            kk1=int(volus(subList[ii])->surfind.size());
+            for (jj=0;jj<kk1;++jj){
                if(volus(subList[ii])->surfind[jj]==oldInd){
                   volus[subList[ii]].surfind[jj]=newInd;
                   surfs[newSub].voluind.push_back(volus[subList[ii]].index);
@@ -348,10 +359,12 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    } else if (typeInd==4){
       newSub=volus.find(newInd);
       subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
-      for (ii=0;ii<int(subList.size());++ii){ // update vertind
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){ // update vertind
          //jj=surfs(subList[ii])->voluind[1]==oldInd;
          //surfs[subList[ii]].voluind[jj]=newInd;
-         for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
+         kk1=int(surfs(subList[ii])->voluind.size());
+         for (jj=0;jj<kk1;++jj){
             if(surfs[subList[ii]].voluind[jj]==oldInd){
                surfs[subList[ii]].voluind[jj]=newInd; 
                   volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
@@ -372,19 +385,23 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       subList=edges.find_list(scopeInd);
       tempSub.vec=edges.find_list(verts(oldSub)->edgeind);
       tempSub.GenerateHash();
-      for (ii=0;ii<int(subList.size());++ii){
+      kk1=int(subList.size());
+      for (ii=0;ii<kk1;++ii){
          if(tempSub.find(subList[ii])!=-1){
-            for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
+            kk2=int(edges(subList[ii])->vertind.size());
+            for (jj=0;jj<kk2;++jj){
                if(edges(subList[ii])->vertind[jj]==oldInd){
                   edges[subList[ii]].vertind[jj]=newInd;
                   verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
 
                   //cout << " " << edges[subList[ii]].index <<  " ";
-                  for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
+                  kk3=int(verts(oldSub)->edgeind.size());
+                  for (kk=0;kk<kk3;++kk){
                      if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
                         verts[oldSub].edgeind.erase(
                            verts[oldSub].edgeind.begin()+kk);
                         kk--;
+                        kk3--;
                      }
                   }
                }
@@ -408,7 +425,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 void mesh::RemoveIndex(int typeInd, int oldInd)
 {
 
-   int ii,jj;
+   int ii,jj,kk,kk1;
    vector<int> subList;
 
    if(typeInd==1){
@@ -420,25 +437,31 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 
       subList=verts.find_list(edges(edges.find(oldInd))->vertind);
-      for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
+         kk1=int(verts(subList[ii])->edgeind.size());
+         for (jj=0;jj<kk1;++jj){
             if(verts(subList[ii])->edgeind[jj]==oldInd){
                verts[subList[ii]].edgeind.erase(
                   verts[subList[ii]].edgeind.begin()+jj);
                jj--;
+               kk1--;
             }
          }  
       }
 
       subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
-      for (ii=0;ii<int(subList.size());++ii){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
          if(subList[ii]!=-1){
-            for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+            kk1=int(surfs(subList[ii])->edgeind.size());
+            for (jj=0;jj<kk1;++jj){
                if(surfs(subList[ii])->edgeind[jj]==oldInd){
                   surfs[subList[ii]].edgeind.erase(
                      surfs[subList[ii]].edgeind.begin()+jj);
                   surfs[subList[ii]].isordered=false;
                   jj--;
+                  kk1--;
                }
             }
          }  
@@ -456,24 +479,30 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 
       subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
-      for (ii=0;ii<int(subList.size());++ii){
-         for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
+         kk1=int(edges(subList[ii])->surfind.size());
+         for (jj=0;jj<kk1;++jj){
             if(edges(subList[ii])->surfind[jj]==oldInd){
                edges[subList[ii]].surfind.erase(
                   edges[subList[ii]].surfind.begin()+jj);
                jj--;
+               kk1--;
             }
          }  
       }
 
       subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
-      for (ii=0;ii<int(subList.size());++ii){
+      kk=int(subList.size());
+      for (ii=0;ii<kk;++ii){
          if(subList[ii]!=-1){
-            for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+            kk1=int(volus(subList[ii])->surfind.size());
+            for (jj=0;jj<kk1;++jj){
                if(volus(subList[ii])->surfind[jj]==oldInd){
                   volus[subList[ii]].surfind.erase(
                      volus[subList[ii]].surfind.begin()+jj);
                   jj--;
+                  kk1--;
                }
             }
          }  

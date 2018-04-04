@@ -526,6 +526,7 @@ template<class T> void ArrayStruct <T>::PrepareForUse()
 		this->HashArray();
 	}
 	readyforuse=true;
+	
 }
 
 template<class T> void ArrayStruct<T>::remove(vector<int> delInd)

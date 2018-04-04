@@ -247,7 +247,7 @@ int Test_snakeinit(){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
-			Test_stepalgo(testSnake, dt, isImpact,outSnake);
+			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
@@ -303,7 +303,7 @@ int Test_snakeinitflat(){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
-			Test_stepalgo(testSnake, dt, isImpact,outSnake);
+			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
@@ -325,14 +325,14 @@ int Test_snakeinitflat(){
 
 }
 
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 
 	int start_s,stop_s,start_f;
 
 	start_s=clock();
 	start_f=clock();
 
-	CleanupSnakeConnec(testSnake,outSnake);
+	CleanupSnakeConnec(testSnake);
 
 	stop_s=clock();
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;

@@ -279,7 +279,7 @@ int Test_snake();
 int Test_snakeinit();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
 
 // Functions needed at Compile time
 
