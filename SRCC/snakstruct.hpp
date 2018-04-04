@@ -62,7 +62,7 @@ protected:
 public: 
 	friend class snake;
 
-	inline int KeyParent(int a) const ;
+	//inline int KeyParent(int a) const ;
 	int findparent(int key) const; 
 	void findsiblings(int key, vector<int> &siblings) const{
 		siblings=ReturnDataEqualRange(key, hashParent);}
@@ -74,6 +74,7 @@ public:
 	void ForceArrayReady();
 	void PrepareForUse();
 	void Concatenate(const SnakStruct<T> &other);
+	void remove(const vector<int> &sub);
 	T& operator[](const int a){ 
 		isHashParent=0;
 		return(ArrayStruct<T>::operator[](a));
@@ -163,6 +164,7 @@ public:
 	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void HashArray(); // Not really needed as handled by PrepareForUse
+	void HashArrayNM(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndexNM(); // SetMaxIndex no mesh
 	void Concatenate(const snake &other);

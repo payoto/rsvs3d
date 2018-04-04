@@ -281,6 +281,16 @@ void snake::HashArray(){
 	snakemesh->HashArray();
 
 }
+void snake::HashArrayNM(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
+	// Use HashArray when debugging to be sure that fields are correctly hashed
+	snaxs.HashArray();
+	snaxedges.HashArray();
+	snaxsurfs.HashArray();
+	snakeconn.HashArray();
+
+}
 void snake::SetMaxIndex(){
 	// prefer use of PrepareForUse in final code as it includes checks to 
 	// avoid unnecessary repetiion of work
@@ -689,34 +699,35 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 		isSnaxDone[snaxSubs[ii]]=true;
 
 		for(jj=ii+1; jj<nSnax; ++jj){
+			
 			impactTime=SnaxImpactDt(elems[snaxSubs[ii]],elems[snaxSubs[jj]]);
 			dOrd=abs(elems[snaxSubs[ii]].orderedge-elems[snaxSubs[jj]].orderedge);
-
-			if (IsAproxEqual(impactTime,0.0) && dOrd==1){
+			if(dOrd==1 && IsAproxEqual(impactTime,0.0)){
 
 				isImpact.push_back((elems[snaxSubs[ii]].index));
 				isImpact.push_back((elems[snaxSubs[jj]].index));
-				
+
 
 				isImpact.push_back((elems[snaxSubs[jj]].index));
 				isImpact.push_back((elems[snaxSubs[ii]].index));
+
+			} 
 			
-			}
 		}
 		
 		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<0.0) 
 			&& elems[snaxSubs[ii]].orderedge==1) {
 			isImpact.push_back(elems[snaxSubs[ii]].index);
-			isImpact.push_back(-1);
-			
+		isImpact.push_back(-1);
 
-		} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>0.0)
-			&& elems[snaxSubs[ii]].orderedge==nSnax){
-			isImpact.push_back(elems[snaxSubs[ii]].index);
-			isImpact.push_back(-2);
-			
-		}
+
+	} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>0.0)
+		&& elems[snaxSubs[ii]].orderedge==nSnax){
+		isImpact.push_back(elems[snaxSubs[ii]].index);
+		isImpact.push_back(-2);
+
 	}
+}
 
 }
 

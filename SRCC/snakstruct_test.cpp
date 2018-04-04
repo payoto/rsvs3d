@@ -243,7 +243,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<11;++ii){
+		for(ii=0;ii<75;++ii){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 
@@ -299,7 +299,7 @@ int Test_snakeinitflat(){
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<11;++ii){
+		for(ii=0;ii<35;++ii){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 

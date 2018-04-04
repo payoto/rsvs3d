@@ -66,6 +66,12 @@ template<class T> void SnakStruct<T>::Concatenate(const SnakStruct<T> &other)
 	isHashParent=0;
 }
 
+template<class T> void SnakStruct<T>::remove(const vector<int> &sub)
+{
+	ArrayStruct<T>::remove(sub);
+	isHashParent=0;
+}
+
 template<class T>
 void SnakStruct<T>::ForceArrayReady()
 {

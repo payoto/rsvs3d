@@ -84,5 +84,6 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit,
 	const vector<int> &indRmvVert);
 
 void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert);
+void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

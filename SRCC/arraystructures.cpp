@@ -536,7 +536,8 @@ void mesh::TestConnectivity(){
          if (testSub[jj]<0 && edges(ii)->vertind[jj]!=0){
             errCount++;
             cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
-            << " makes unknown reference to vertex " << edges(ii)->vertind[jj] << endl;
+            << " makes unknown reference to vertex " << edges(ii)->vertind[jj] << " list: " ; DisplayVector(edges(ii)->vertind); 
+            cerr << endl;
          }
       }
    }
@@ -567,11 +568,16 @@ void mesh::TestConnectivity(){
       testSub=edges.find_list(surfs(ii)->edgeind);
       kk2=testSub.size();
       for(jj=0;jj< kk2; ++jj){
-         if (testSub[jj]<0 && surfs(ii)->edgeind[jj]!=0){
+         if (testSub[jj]<0){
             errCount++;
-            cerr << " Test Connectivity Error :" << errCount << " edge " << surfs(ii)->index
-            << " makes unknown reference to vertex " << surfs(ii)->edgeind[jj] << endl;
+            cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+            << " makes unknown reference to edge " << surfs(ii)->edgeind[jj] << endl;
          }
+      }
+      if (int(testSub.size())==0){
+         errCount++;
+         cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+         << " has empty edgeind " <<  endl;
       }
    }
    cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
@@ -585,8 +591,8 @@ void mesh::TestConnectivity(){
       for(jj=0;jj< kk2; ++jj){
          if (testSub[jj]<0 && surfs(ii)->voluind[jj]!=0){
             errCount++;
-            cerr << " Test Connectivity Error :" << errCount << " edge " << surfs(ii)->index
-            << " makes unknown reference to vertex " << surfs(ii)->voluind[jj] << endl;
+            cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+            << " makes unknown reference to volu " << surfs(ii)->voluind[jj] << endl;
          }
       }
    }
