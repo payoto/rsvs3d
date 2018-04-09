@@ -307,6 +307,8 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 					for(kk=0;kk<int(subList.size());kk++){
 						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
 					}
+				} else {
+					fullsnake.snaxs[jj].isfreeze=1;
 				}
 
 			}
@@ -328,9 +330,11 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 					for(kk=0;kk<int(subList.size());kk++){
 						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
 					}
+				} else {
+					fullsnake.snaxs[jj].isfreeze=1;
 				}
 
-			}
+			} 
 		}
 	}
 
@@ -339,8 +343,8 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 
 	sort(vertSpawn);
 	unique(vertSpawn);
-
-	for (ii=0;ii<int(vertSpawn.size());ii++){
+	kk=int(vertSpawn.size());
+	for (ii=0;ii<kk;++ii){
 		SpawnAtVertex(partSnake,vertSpawn[ii]);
 	}
 
