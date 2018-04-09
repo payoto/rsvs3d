@@ -10,7 +10,7 @@ LINK=g++
 # Warnings all and Define DEBUGLVL2 to include all check code
 CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -ggdb
 #CUSERFLAGS= 
-CUSERFLAGS= -DDEBUGLVL1 -DSAFE_ACCESS 
+CUSERFLAGS= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO
 #-DSAFE_ALGO
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
@@ -20,7 +20,7 @@ OBJDIR=obj
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
 #make testnew/testall options
-TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp snakeengine.cpp
+TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp snakeengine.cpp snakevel.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 

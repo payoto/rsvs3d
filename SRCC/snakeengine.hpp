@@ -65,10 +65,10 @@ void SpawnAtVertexVolu(snake& newsnake, int nSurf);
 void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact);
 
 void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
-void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
+void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
 
 //
-void CleanupSnakeConnec(snake &snakein, tecplotfile &tecout);
+void CleanupSnakeConnec(snake &snakein);
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,

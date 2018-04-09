@@ -287,7 +287,7 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 }
 
-void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector<int> &isImpact,int dir){
+void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> &isImpact,int dir){
 
 	int nVert, nEdge, nSurf, nVolu,ii,jj,kk;
 	vector<int> vertSpawn,subList;
@@ -295,6 +295,7 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 	if(dir==-1){
 		for(ii=0;ii<int(isImpact.size());ii=ii+2){
 			if(isImpact[ii+1]==dir){
+				jj=fullsnake.snaxs.find(isImpact[ii]);
 				if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->fromvert)->isBorder){
 					jj=fullsnake.snaxs.find(isImpact[ii]);
 					vertSpawn.push_back(fullsnake.snaxs(jj)->fromvert);
@@ -309,6 +310,7 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 					}
 				} else {
 					fullsnake.snaxs[jj].isfreeze=1;
+					fullsnake.snaxs.ForceArrayReady();
 				}
 
 			}
@@ -332,6 +334,7 @@ void SpawnArrivedSnaxelsDir(const snake &fullsnake,snake &partSnake,const vector
 					}
 				} else {
 					fullsnake.snaxs[jj].isfreeze=1;
+					fullsnake.snaxs.ForceArrayReady();
 				}
 
 			} 
@@ -386,7 +389,7 @@ void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdi
 
 }
 
-void CleanupSnakeConnec(snake &snakein,tecplotfile &tecout){
+void CleanupSnakeConnec(snake &snakein){
 
 	vector<ConnecRemv> connecEdit;
 

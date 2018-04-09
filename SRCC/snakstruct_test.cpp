@@ -4,6 +4,7 @@
 
 #include "snakstruct.hpp"
 #include "snakeengine.hpp"
+#include "snakevel.hpp"
 #include "postprocessing.hpp"
 
 using namespace std;
@@ -332,12 +333,13 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	start_s=clock();
 	start_f=clock();
 
-	CleanupSnakeConnec(testSnake,outSnake);
+	CleanupSnakeConnec(testSnake);
 
 	stop_s=clock();
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
-	testSnake.CalculateTimeStep(dt,0.3);
+	CalculateSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,1);
 	testSnake.UpdateDistance(dt);
 	testSnake.UpdateCoord();
 
