@@ -254,6 +254,7 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 	snake fwdSnake, bwdSnake;
 	int start_s,stop_s;
+	HashedVector<int,int> vertNoSpawn;
 
 	fwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
 	bwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
@@ -261,8 +262,10 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	// Generate fwd spawn
 	
 	start_s=clock();
-	SpawnArrivedSnaxelsDir(fullsnake,bwdSnake,isImpact,-1);
-	SpawnArrivedSnaxelsDir(fullsnake,fwdSnake,isImpact,-2);
+	vertNoSpawn.vec.push_back(0);
+	vertNoSpawn.GenerateHash();
+	SpawnArrivedSnaxelsDir(fullsnake,bwdSnake,isImpact,-1,vertNoSpawn);
+	SpawnArrivedSnaxelsDir(fullsnake,fwdSnake,isImpact,-2,vertNoSpawn);
 
 	stop_s=clock();
 	cout << "Spawn: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
@@ -287,71 +290,66 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 }
 
-void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> &isImpact,int dir){
+void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> &isImpact,int dir,
+	HashedVector<int,int> &vertNoSpawn){
 
 	int nVert, nEdge, nSurf, nVolu,ii,jj,kk;
 	vector<int> vertSpawn,subList;
+	int snax::*mp;
+
 	nVert=0; nEdge=0; nSurf=0; nVolu=0;jj=-1;
+
 	if(dir==-1){
-		for(ii=0;ii<int(isImpact.size());ii=ii+2){
-			if(isImpact[ii+1]==dir){
+		mp=&snax::fromvert;
+	} else if (dir==-2){
+		mp=&snax::tovert;
+
+	}
+
+	for(ii=0;ii<int(isImpact.size());ii=ii+2){
+		if(isImpact[ii+1]==dir){
+			jj=fullsnake.snaxs.find(isImpact[ii]);
+			if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->isBorder){
 				jj=fullsnake.snaxs.find(isImpact[ii]);
-				if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->fromvert)->isBorder){
-					jj=fullsnake.snaxs.find(isImpact[ii]);
-					vertSpawn.push_back(fullsnake.snaxs(jj)->fromvert);
-					nVolu++;
-					nVert=nVert+fullsnake.snakemesh->verts(jj)->edgeind.size();
+				vertSpawn.push_back(fullsnake.snaxs(jj)->*mp);
+				nVolu++;
+				nVert=nVert+fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind.size();
 
 
-					subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts(jj)->edgeind);
+				subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind);
 
-					for(kk=0;kk<int(subList.size());kk++){
-						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
-					}
-				} else {
-					fullsnake.snaxs[jj].isfreeze=1;
-					fullsnake.snaxs.ForceArrayReady();
+				for(kk=0;kk<int(subList.size());kk++){
+					nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
 				}
-
+			} else {
+				fullsnake.snaxs[jj].isfreeze=1;
+				fullsnake.snaxs.ForceArrayReady();
 			}
+
 		}
 	}
-
-	if(dir==-2){
-		for(ii=0;ii<int(isImpact.size());ii=ii+2){
-			if(isImpact[ii+1]==dir){
-				jj=fullsnake.snaxs.find(isImpact[ii]);
-				if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->tovert)->isBorder){
-					vertSpawn.push_back(fullsnake.snaxs(jj)->tovert);
-					nVolu++;
-					nVert=nVert+fullsnake.snakemesh->verts(jj)->edgeind.size();
-
-
-					subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts(jj)->edgeind);
-
-					for(kk=0;kk<int(subList.size());kk++){
-						nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
-					}
-				} else {
-					fullsnake.snaxs[jj].isfreeze=1;
-					fullsnake.snaxs.ForceArrayReady();
-				}
-
-			} 
-		}
-	}
+	
 
 	nSurf=nEdge/2;
 	partSnake.reserve(nVert, nEdge, nSurf, nVolu);
 
 	sort(vertSpawn);
 	unique(vertSpawn);
+	cout << endl; 
+	DisplayVector(vertSpawn);
+	cout << endl;
+
 	kk=int(vertSpawn.size());
 
 	for (ii=0;ii<kk;++ii){
-		SpawnAtVertex(partSnake,vertSpawn[ii]);
+		if (vertNoSpawn.find(vertSpawn[ii])==-1){
+			SpawnAtVertex(partSnake,vertSpawn[ii]);
+		} else {
+			cout << endl << "vertex ignored for spawn " <<endl;
+		}
 	}
-
+	vertNoSpawn.vec.insert(vertNoSpawn.vec.end(),vertSpawn.begin(),vertSpawn.end());
+	vertNoSpawn.GenerateHash();
 }
 
 void dispconnrmv(vector<ConnecRemv> conn){
@@ -367,7 +365,7 @@ void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdi
 	int ii,snaxSub1,snaxSub2,nSnaxEdge;
 	ConnecRemv tempConnec,tempConnec2;
 	nSnaxEdge=snakein.snaxedges.size();
-	
+
 	tempConnec.typeobj=1;
 	tempConnec2.typeobj=2;
 
@@ -561,10 +559,11 @@ void CleanupSnakeConnec(snake &snakein){
 				snakein.snakeconn.RemoveIndex(3,indDelSurf[ii]);
 			}
 			kk=indRmvSurf.size()+indDelSurf.size()+2;
-			indRmvSurf.reserve(kk);
-			indRmvSurf.insert(itSurf, indDelSurf.begin(),indDelSurf.end());
+			//indRmvSurf.reserve(kk);
+			indRmvSurf.insert(indRmvSurf.end(), indDelSurf.begin(),indDelSurf.end());
+
 			kk=indRmvEdge.size()+indDelEdge.vec.size()+2;
-			indRmvEdge.reserve(kk);
+			//indRmvEdge.reserve(kk);
 			indRmvEdge.insert(indRmvEdge.end(), indDelEdge.vec.begin(),indDelEdge.vec.end());
 
 			sort(indRmvEdge);
@@ -581,7 +580,7 @@ void CleanupSnakeConnec(snake &snakein){
 			snakein.snaxsurfs.remove(indRmvSurf);
 
 			snakein.snakeconn.TightenConnectivity();
-			
+
 			snakein.PrepareForUse();
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
@@ -639,7 +638,8 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	tempIndHash.vec=ConcatenateVectorField(snakein.snakeconn.edges, &edge::vertind,tempSub);
 	tempIndHash.GenerateHash();
 	tempCount=tempIndHash.count(tempIndHash.vec);
-	nTemp=tempCount.size();
+	tempCount.push_back(0);
+	nTemp=tempCount.size()-1;
 
 	tempConnec2.scopeind.clear();
 	for (jj=0;jj<int(tempSub.size());++jj){
@@ -896,8 +896,9 @@ void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	tempIndHash.GenerateHash();
 	edge2Surf.GenerateHash();
 	tempCount=tempIndHash.count(tempIndHash.vec);
+	tempCount.push_back(0);
 	// tempCount is the vector counting the number of occurences of each edge at each edges location
-	nTemp=tempCount.size();
+	nTemp=tempCount.size()-1;
 
 
 

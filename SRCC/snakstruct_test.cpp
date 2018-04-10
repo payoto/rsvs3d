@@ -245,7 +245,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 

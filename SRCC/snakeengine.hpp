@@ -65,7 +65,7 @@ void SpawnAtVertexVolu(snake& newsnake, int nSurf);
 void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact);
 
 void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
-void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir);
+void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir, HashedVector<int,int> &vertNoSpawn);
 
 //
 void CleanupSnakeConnec(snake &snakein);
