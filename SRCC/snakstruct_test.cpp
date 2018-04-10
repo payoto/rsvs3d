@@ -232,6 +232,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
+		
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
 		SpawnAtVertex(testSnake,675);
@@ -252,6 +253,8 @@ int Test_snakeinit(){
 			
 			totT=totT+1;
 		}
+
+		outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
@@ -308,7 +311,6 @@ int Test_snakeinitflat(){
 			
 			totT=totT+1;
 		}
-
 		//testSnake.disp();
 	// the code you wish to time goes here
 		stop_s=clock();

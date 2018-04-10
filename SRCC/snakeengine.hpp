@@ -74,6 +74,7 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,
 	vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, 
 	HashedVector<int,int> &tempIndHash) ;
+void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> &tempIndHash, int jjStart);
 
 void IdentifyMergSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeSurfGeneral(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, 
