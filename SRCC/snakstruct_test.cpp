@@ -245,10 +245,11 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<100;++ii){
 			cout << ii << " ";
-			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
-
+			if(testSnake.snaxs.size()>0){
+				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			}
 			Test_stepalgo(testSnake, dt, isImpact,outSnake);
 			
 			totT=totT+1;
@@ -305,7 +306,9 @@ int Test_snakeinitflat(){
 		testSnake.PrepareForUse();
 		for(ii=0;ii<35;++ii){
 			cout << ii << " ";
-			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			if(testSnake.snaxs.size()>0){
+				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			}
 
 			Test_stepalgo(testSnake, dt, isImpact,outSnake);
 			

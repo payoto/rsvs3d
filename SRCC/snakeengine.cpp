@@ -335,10 +335,11 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 
 	sort(vertSpawn);
 	unique(vertSpawn);
+	/*
 	cout << endl; 
 	DisplayVector(vertSpawn);
 	cout << endl;
-
+*/
 	kk=int(vertSpawn.size());
 
 	for (ii=0;ii<kk;++ii){
@@ -388,13 +389,35 @@ void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdi
 
 }
 
+
+void SnaxNoConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit){
+
+	int ii,nSnax;
+	ConnecRemv tempConnec;
+	nSnax=snakein.snaxs.size();
+
+	tempConnec.typeobj=1;
+
+	for(ii=0;ii<nSnax;++ii){
+		if(snakein.snakeconn.verts(ii)->edgeind.size()==0)
+		{
+			tempConnec.rmvind.clear();
+			tempConnec.keepind=snakein.snaxs(ii)->index;
+			tempConnec.rmvind.push_back(snakein.snaxs(ii)->index);
+
+			connecEdit.push_back(tempConnec);
+		}
+	}
+
+}
+
 void CleanupSnakeConnec(snake &snakein){
 
 	vector<ConnecRemv> connecEdit;
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
 	vector<int> tempSub,isImpact;
-	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn;
+	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn;
 	bool flag, iterFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -421,9 +444,12 @@ void CleanupSnakeConnec(snake &snakein){
 		itSurf=indRmvSurf.begin();
 		itVolu=indRmvVolu.begin();
 		// Identify invalid vertex connections
+		SnaxNoConnecDetection(snakein, connecEdit);
+
+		nSnaxConn=int(connecEdit.size());
 		SnaxEdgeConnecDetection(snakein, connecEdit);
 		nVertConn=int(connecEdit.size());
-		for(ii=0; ii < nVertConn;ii=ii+2){
+		for(ii=nSnaxConn; ii < nVertConn;ii=ii+2){
 			// Skipping the edges which are marked here for removal.
 			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
 				connecEdit[ii].keepind,connecEdit[ii].scopeind);
@@ -660,6 +686,9 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	while (tempCount[jjStart]!=2 && jjStart<nTemp){jjStart++;}
 	while (jjStart<nTemp){ 
 		IdentifyMergeEdgeGeneralChain(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub,tempSub2, tempCount, tempIndHash,    jjStart);
+		/*cout << endl;
+		tempConnec.disp();
+		tempConnec2.disp();*/
 		jjStart=0;
 		while (tempCount[jjStart]!=2 && jjStart<nTemp){jjStart++;}
 	}

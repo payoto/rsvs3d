@@ -45,8 +45,8 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
 	#endif //TEST_ALL
  
-	gridTest.Run(Test_snakeinit,"Snake spawning");
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
+	gridTest.Run(Test_snakeinit,"Snake spawning");
 
 
 	gridTest.PrintSummary();
