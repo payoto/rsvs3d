@@ -871,14 +871,18 @@ void surf::OrderEdges(mesh *meshin)
             cout << it->second << " " << 1/2 << 2/3 <<  endl;
             throw range_error ("unordered_multimap went beyond its range in OrderEdges");
          }
-         if (range.second._M_cur==NULL){
+         if (vert2Edge.count(vertCurr)==1){
             jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
             DisplayVector(edge2Vert);
-            DisplayVector(edgeind);cerr <<endl;
+            DisplayVector(edgeind);
+            cerr <<endl;
+
             cerr << "Error : Surface does not form closed loop" << endl;
-            cerr << "ii is : " << ii << " jj is : " << jj << endl; 
+            cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
+            jj=vert2Edge.count(vertCurr);
+            cerr << jj  <<  endl; 
              cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-            //throw range_error ("Found a single vertex - surface is not closed");
+            throw range_error ("Found a single vertex - surface is not closed");
          }
          #endif // SAFe_ACCESS
          jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;

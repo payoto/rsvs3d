@@ -245,7 +245,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<300;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
@@ -255,7 +255,9 @@ int Test_snakeinit(){
 			totT=totT+1;
 		}
 
-		outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+		if(testSnake.snaxs.size()>0){
+			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
@@ -344,7 +346,7 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
 	CalculateSnakeVel(testSnake);
-	testSnake.CalculateTimeStep(dt,1);
+	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
 	testSnake.UpdateCoord();
 
