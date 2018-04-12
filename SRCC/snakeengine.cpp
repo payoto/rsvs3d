@@ -294,6 +294,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	HashedVector<int,int> &vertNoSpawn){
 
 	int nVert, nEdge, nSurf, nVolu,ii,jj,kk;
+	bool isReady;
 	vector<int> vertSpawn,subList;
 	int snax::*mp;
 
@@ -305,6 +306,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 		mp=&snax::tovert;
 
 	}
+	isReady=fullsnake.snaxs.checkready();
 
 	for(ii=0;ii<int(isImpact.size());ii=ii+2){
 		if(isImpact[ii+1]==dir){
@@ -323,7 +325,9 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 				}
 			} else {
 				fullsnake.snaxs[jj].isfreeze=1;
-				fullsnake.snaxs.ForceArrayReady();
+				if(isReady){
+					fullsnake.snaxs.ForceArrayReady();
+				}
 			}
 
 		}
