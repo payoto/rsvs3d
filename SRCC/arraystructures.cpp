@@ -427,6 +427,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
    int ii,jj,kk,kk1;
    vector<int> subList;
+   const vector<int> *ptrList;
 
    if(typeInd==1){
 
@@ -496,9 +497,10 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
       kk=int(subList.size());
       for (ii=0;ii<kk;++ii){
          if(subList[ii]!=-1){
-            kk1=int(volus(subList[ii])->surfind.size());
+            ptrList=&(volus(subList[ii])->surfind);
+            kk1=int(ptrList->size());
             for (jj=0;jj<kk1;++jj){
-               if(volus(subList[ii])->surfind[jj]==oldInd){
+               if((*ptrList)[jj]==oldInd){
                   volus[subList[ii]].surfind.erase(
                      volus[subList[ii]].surfind.begin()+jj);
                   jj--;

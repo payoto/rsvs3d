@@ -8,10 +8,10 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DSAFE_ACCESS -DDEBUGLVL1  -ggdb
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic  -ggdb
 #CUSERFLAGS= 
 CUSERFLAGS= 
-#-DSAFE_ALGO 
+#-DSAFE_ALGO -DSAFE_ACCESS -DDEBUGLVL1
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
