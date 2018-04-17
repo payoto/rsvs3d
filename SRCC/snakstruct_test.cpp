@@ -4,6 +4,7 @@
 
 #include "snakstruct.hpp"
 #include "snakeengine.hpp"
+#include "snakevel.hpp"
 #include "postprocessing.hpp"
 
 using namespace std;
@@ -231,6 +232,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
+		
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
 		SpawnAtVertex(testSnake,675);
@@ -243,13 +245,19 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<75;++ii){
+		for(ii=0;ii<300;++ii){
 			cout << ii << " ";
-			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
-
-			Test_stepalgo(testSnake, dt, isImpact);
+			
+			if(testSnake.snaxs.size()>0){
+				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			}
+			Test_stepalgo(testSnake, dt, isImpact,outSnake);
 			
 			totT=totT+1;
+		}
+
+		if(testSnake.snaxs.size()>0){
+			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -301,13 +309,14 @@ int Test_snakeinitflat(){
 		testSnake.PrepareForUse();
 		for(ii=0;ii<35;++ii){
 			cout << ii << " ";
-			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			if(testSnake.snaxs.size()>0){
+				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			}
 
 			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
-
 		//testSnake.disp();
 	// the code you wish to time goes here
 		stop_s=clock();
@@ -337,7 +346,8 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	stop_s=clock();
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
-	testSnake.CalculateTimeStep(dt,1);
+	CalculateSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
 	testSnake.UpdateCoord();
 

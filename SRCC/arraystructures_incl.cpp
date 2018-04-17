@@ -399,6 +399,15 @@ template<class T> void ArrayStruct <T>::disp() const
 	}
 	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << "; isInMesh "  << isInMesh << endl;
 }
+template<class T> void ArrayStruct <T>::disp(int iStart, int iEnd) const 
+{
+	cout << "Array of size " << this->size() << endl;
+	for (int ii=iStart ; iEnd<elems.size();ii++){
+		cout << "Array " << ii << " " ;
+		elems[ii].disp();
+	}
+	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI << "; isInMesh "  << isInMesh << endl;
+}
 template<class T> void ArrayStruct <T>::disp(const vector<int> &subs) const
 {
 	int ii;

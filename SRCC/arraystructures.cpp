@@ -542,15 +542,23 @@ void mesh::TestConnectivity(){
    errTot=0;
    kk=int(verts.size());
    for (ii=0; ii<kk;++ii){
-      testSub=edges.find_list(verts(ii)->edgeind);
-      kk2=testSub.size();
-      for(jj=0;jj< kk2; ++jj){
-         if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
-            errCount++;
-            cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-            << " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
-            DisplayVector(verts(ii)->edgeind);
-            cerr << endl;
+      if(verts(ii)->edgeind.size()==0){
+         errCount++;
+         cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+               << " Has empty connectivity list "; 
+               cerr << endl;
+
+      } else {
+         testSub=edges.find_list(verts(ii)->edgeind);
+         kk2=testSub.size();
+         for(jj=0;jj< kk2; ++jj){
+            if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
+               errCount++;
+               cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+               << " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+               DisplayVector(verts(ii)->edgeind);
+               cerr << endl;
+            }
          }
       }
    }
@@ -885,7 +893,7 @@ void surf::OrderEdges(mesh *meshin)
       it=vert2Edge.end();
       for(ii=1;ii<int(edgeind.size());++ii){
          range=vert2Edge.equal_range(vertCurr);
-      #ifdef SAFE_ACCESS
+         #ifdef SAFE_ACCESS
          if (range.first==vert2Edge.end()){
             cerr << ii << " vert " << vertCurr << "  ";
             DisplayVector(edge2Vert);
@@ -894,14 +902,27 @@ void surf::OrderEdges(mesh *meshin)
             cout << it->second << " " << 1/2 << 2/3 <<  endl;
             throw range_error ("unordered_multimap went beyond its range in OrderEdges");
          }
-      #endif // SAFe_ACCESS
+         if (vert2Edge.count(vertCurr)==1){
+            jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
+            DisplayVector(edge2Vert);
+            DisplayVector(edgeind);
+            cerr <<endl;
+
+            cerr << "Error : Surface does not form closed loop" << endl;
+            cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
+            jj=vert2Edge.count(vertCurr);
+            cerr << jj  <<  endl; 
+             cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+            throw range_error ("Found a single vertex - surface is not closed");
+         }
+         #endif // SAFe_ACCESS
          jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
 
          it=range.first;
          if (jj){++it;}
 
          edgeCurr=edgeIndOrig[(it->second)/2];
-         jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal
+         jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
          vertCurr=edge2Vert[((it->second)/2)*2+jj];
          edgeind[ii]=edgeCurr;
       }

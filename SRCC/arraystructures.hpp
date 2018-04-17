@@ -98,6 +98,7 @@ public:
 
 	void disp() const;
 	void disp(const vector<int> &subs) const;
+	void disp(int iStart, int iEnd) const;
 	int find(int key) const ;
 	vector<int> find_list(const vector<int> &key) const ;
 	inline int GetMaxIndex() const;

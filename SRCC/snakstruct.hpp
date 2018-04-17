@@ -89,7 +89,7 @@ protected:
 
 public: 
 	friend class snake;
-
+	friend void SpawnArrivedSnaxelsDir(snake &fullsnake, snake &partSnake, const vector<int> &isImpact, int dir);
 
 	void ReorderOnEdge();
 	void OrderOnEdge();
