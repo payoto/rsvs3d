@@ -215,6 +215,8 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
 	void RemoveIndex(int typeInd, int oldInd);
+	int ConnectedVertex(vector<int> &vertBlock) const;
+	void ForceCloseContainers();
 // Mesh Quality
 	int OrderEdges();
 	void SetBorders();

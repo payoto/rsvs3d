@@ -289,7 +289,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
             }
          }  
       }
-
+      // Changes the indices of 
       subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
       for (ii=0;ii<int(subList.size());++ii){
          if(subList[ii]!=-1 || is3DMesh){
@@ -531,7 +531,9 @@ void mesh::TestConnectivity(){
          }
       }
    }
-   cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+   if (errCount>0){
+      cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+   }
 
 
    errTot+=errCount;
@@ -549,7 +551,9 @@ void mesh::TestConnectivity(){
          }
       }
    }
-   cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+   if (errCount>0){
+      cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+   }
 
 
    errTot+=errCount;
@@ -565,7 +569,9 @@ void mesh::TestConnectivity(){
          }
       }
    }
-   cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+   if (errCount>0){
+      cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+   }
 
 
 
@@ -588,7 +594,9 @@ void mesh::TestConnectivity(){
          << " has empty edgeind " <<  endl;
       }
    }
-   cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+   if (errCount>0) {
+      cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+   }
 
    errTot+=errCount;
    errCount=0;
@@ -604,7 +612,9 @@ void mesh::TestConnectivity(){
          }
       }
    }
-   cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+   if (errCount>0) {
+      cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+   }
 
 
    errTot+=errCount;
@@ -621,7 +631,9 @@ void mesh::TestConnectivity(){
          }
       }
    }
+   if (errCount>0){
    cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+   }
    if (errTot>0){
       cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
    }
@@ -992,3 +1004,126 @@ void mesh::SetBorders(){
    borderIsSet=true;
 }
 
+void mesh::ForceCloseContainers(){
+   
+   int ii,jj,iEdge,iSurf,kk;
+   int nVert,nEdge,nSurf,nBlocks;
+   bool is3DMesh=volus.size()>0;
+   vector<int> vertBlock;
+
+
+   nBlocks=this->ConnectedVertex(vertBlock);
+
+   nVert=verts.size();
+   if (is3DMesh){
+      // reassign volumes
+      volus.elems.clear();
+      volus.Init(nBlocks);
+      volus.PopulateIndices();
+      volus.HashArray();
+      for(ii=0;ii<nVert;ii++){
+         nEdge=verts(ii)->edgeind.size();
+         for(jj=0;jj<nEdge;++jj){
+            iEdge=edges.find(verts(ii)->edgeind[jj]);
+            nSurf=edges(iEdge)->surfind.size();
+            for (kk=0;kk<nSurf;++kk){
+               iSurf=surfs.find(edges(iEdge)->surfind[kk]);
+               volus.elems[volus.find(vertBlock[ii])].surfind.push_back(edges(iEdge)->surfind[kk]);
+               surfs.elems[iSurf].voluind.clear();
+               surfs.elems[iSurf].voluind.push_back(vertBlock[ii]);
+               surfs.elems[iSurf].voluind.push_back(0);
+            }
+         }
+      }
+   } else {
+      // reassign surfaces
+      surfs.elems.clear();
+      surfs.Init(nBlocks);
+      surfs.PopulateIndices();
+      surfs.HashArray();
+
+      for(ii=0;ii<nVert;ii++){
+         nEdge=verts(ii)->edgeind.size();
+         for(jj=0;jj<nEdge;++jj){
+            iEdge=edges.find(verts(ii)->edgeind[jj]);
+            surfs.elems[surfs.find(vertBlock[ii])].edgeind.push_back(verts(ii)->edgeind[jj]);
+            edges.elems[iEdge].surfind.clear();
+            edges.elems[iEdge].surfind.push_back(vertBlock[ii]);
+            edges.elems[iEdge].surfind.push_back(0);
+         }
+      }
+   }
+
+
+
+
+   this->PrepareForUse();
+}
+
+int mesh::ConnectedVertex(vector<int> &vertBlock) const{
+   // Fills a vector with a number for each vertex corresponding to a
+   // group of connected edges it is part of , can be used close surfaces in 2D or volumes
+   // in 3D.
+   // Uses a flood fill with queue method
+
+
+   int nVertExplored,nVerts,nBlocks,nCurr,nEdgesCurr,ii,jj,kk;
+   vector<bool> vertStatus; // 1 explored 0 not explored
+
+   vector<int> currQueue, nextQueue; // Current and next queues of indices
+
+   // Preparation of the arrays;
+   nVerts=verts.size();
+   nBlocks=0;
+   nVertExplored=0;
+
+   vertStatus.assign(nVerts,false);
+   vertBlock.assign(nVerts,0);
+   currQueue.reserve(nVerts/2);
+   nextQueue.reserve(nVerts/2);
+
+   
+   // While Loop, while not all vertices explored
+   while(nVertExplored<nVerts){
+
+      // if currQueue is empty start new block
+      if(currQueue.size()<1){
+
+         cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+         ii=0;
+         while(vertStatus[ii] && ii<nVerts){
+            ii++;
+         }
+         if (vertStatus[ii]){
+            cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
+            cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+            throw range_error (" : Starting point for block not found");
+         }
+         currQueue.push_back(ii);
+         nBlocks++;
+         
+      }
+      // Explore current queue
+      nCurr=currQueue.size();
+      for (ii = 0; ii < nCurr; ++ii){
+         if (!vertStatus[currQueue[ii]]){
+            vertBlock[currQueue[ii]]=nBlocks;
+            nEdgesCurr=verts(currQueue[ii])->edgeind.size();
+            for(jj=0;jj<nEdgesCurr;++jj){
+               kk=int(edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[0]
+                  ==verts(currQueue[ii])->index);
+               nextQueue.push_back(verts.find(
+                  edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
+            }
+            vertStatus[currQueue[ii]]=true;
+            nVertExplored++;
+         }
+      }
+
+      // Reset current queue and set to next queue
+      currQueue.clear();
+      currQueue.swap(nextQueue);
+
+   }
+   return(nBlocks);
+}

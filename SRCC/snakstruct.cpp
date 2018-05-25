@@ -577,7 +577,19 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnax
 
 }
 
+// Snake operations
 
+void snake::ForceCloseContainers(){
+
+	this->snakeconn.ForceCloseContainers();
+	if(!Check3D()){
+		snaxsurfs.elems.clear();
+      	snaxsurfs.Init(snakeconn.surfs.size());
+     	snaxsurfs.PopulateIndices();
+      	snaxsurfs.HashArray();
+      	this->SetSnaxSurfs();
+	}
+}
 
 void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 

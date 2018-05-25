@@ -174,7 +174,7 @@ public:
 	snake MakeCompatible(snake other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
-
+	void ForceCloseContainers();
 	// Snake Movement
 	void UpdateDistance(double dt);
 	void UpdateDistance(const vector<double> &dt);
@@ -182,6 +182,8 @@ public:
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
+	// Snake connectivity operations
+	void SetSnaxSurfs() {}
 
 };
 

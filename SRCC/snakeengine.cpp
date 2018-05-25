@@ -601,6 +601,12 @@ void CleanupSnakeConnec(snake &snakein){
 			unique(indRmvEdge);
 			unique(indRmvSurf);
 
+			if(indRmvSurf.size()>=40){
+				if (indRmvSurf[39]==1919){
+					cout << "test please " << endl;
+				}
+			}
+
 			snakein.snakeconn.surfs.remove(indRmvSurf);
 			snakein.snakeconn.edges.remove(indRmvEdge);
 			snakein.snakeconn.verts.remove(indRmvVert);
@@ -610,8 +616,11 @@ void CleanupSnakeConnec(snake &snakein){
 			snakein.snaxsurfs.remove(indRmvSurf);
 
 			snakein.snakeconn.TightenConnectivity();
-
 			snakein.PrepareForUse();
+			snakein.ForceCloseContainers();
+			snakein.snakeconn.TightenConnectivity();
+			snakein.PrepareForUse();
+
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
 				snakein.snakeconn.TestConnectivity();
