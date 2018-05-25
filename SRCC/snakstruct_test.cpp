@@ -306,7 +306,7 @@ int Test_snakeinitflat(){
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<35;++ii){
+		for(ii=0;ii<200;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);

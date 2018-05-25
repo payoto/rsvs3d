@@ -460,12 +460,12 @@ void CleanupSnakeConnec(snake &snakein){
 			// Skipping the edges which are marked here for removal.
 			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
 				connecEdit[ii].keepind,connecEdit[ii].scopeind);
-			for(jj=ii;ii<nVertConn;jj=jj+2){
+			for(jj=ii+2;jj<nVertConn;jj=jj+2){
 				if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
 					connecEdit[jj].keepind=connecEdit[ii].keepind;
 				} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0]){
-					connecEdit[jj].rmvind[0]=connecEdit[jj].keepind;
-					connecEdit[jj].keepind=connecEdit[ii].keepind;
+					connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
+					
 				}
 			}
 		}
