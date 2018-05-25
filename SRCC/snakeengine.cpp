@@ -461,12 +461,21 @@ void CleanupSnakeConnec(snake &snakein){
 			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
 				connecEdit[ii].keepind,connecEdit[ii].scopeind);
 			for(jj=ii+2;jj<nVertConn;jj=jj+2){
-				if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
+				if (connecEdit[jj].rmvind[0]==connecEdit[ii].keepind && 
+					connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
 					connecEdit[jj].keepind=connecEdit[ii].keepind;
-				} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0]){
+					connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
+				
+				} else if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0] && 
+					connecEdit[jj].keepind!=connecEdit[ii].keepind){
+
+					connecEdit[jj].keepind=connecEdit[ii].keepind;
+
+				} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0] && 
+					connecEdit[jj].keepind!=connecEdit[ii].keepind){
 					connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
 					
-				}
+				} 
 			}
 		}
 
