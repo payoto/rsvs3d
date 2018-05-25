@@ -365,7 +365,7 @@ void dispconnrmv(vector<ConnecRemv> conn){
 }
 
 
-void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit){
+void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit){
 
 	int ii,snaxSub1,snaxSub2,nSnaxEdge;
 	ConnecRemv tempConnec,tempConnec2;
@@ -388,6 +388,9 @@ void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdi
 
 			connecEdit.push_back(tempConnec);
 			connecEdit.push_back(tempConnec2);
+
+			//snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[0],
+			//	tempConnec.keepind,tempConnec.scopeind);
 		}
 	}
 
@@ -457,6 +460,14 @@ void CleanupSnakeConnec(snake &snakein){
 			// Skipping the edges which are marked here for removal.
 			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
 				connecEdit[ii].keepind,connecEdit[ii].scopeind);
+			for(jj=ii;ii<nVertConn;jj=jj+2){
+				if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
+					connecEdit[jj].keepind=connecEdit[ii].keepind;
+				} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0]){
+					connecEdit[jj].rmvind[0]=connecEdit[jj].keepind;
+					connecEdit[jj].keepind=connecEdit[ii].keepind;
+				}
+			}
 		}
 
 		// Identify Edge Connections
@@ -616,7 +627,7 @@ void CleanupSnakeConnec(snake &snakein){
 			snakein.snaxsurfs.remove(indRmvSurf);
 
 			snakein.snakeconn.TightenConnectivity();
-			snakein.PrepareForUse();
+			snakein.HashArrayNM();
 			snakein.ForceCloseContainers();
 			snakein.snakeconn.TightenConnectivity();
 			snakein.PrepareForUse();

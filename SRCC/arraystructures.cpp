@@ -1089,7 +1089,7 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
       // if currQueue is empty start new block
       if(currQueue.size()<1){
 
-         cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+         //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
          ii=0;
          while(vertStatus[ii] && ii<nVerts){
             ii++;
@@ -1114,6 +1114,18 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
                   ==verts(currQueue[ii])->index);
                nextQueue.push_back(verts.find(
                   edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
+               #ifdef SAFE_ALGO
+               if (verts.find(
+                  edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
+                  cerr << "Edge index: " << verts(currQueue[ii])->edgeind[jj] << " vertex index:" <<  
+                     edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+                  cerr << "Edge connected to non existant vertex" <<endl;
+                  cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+                  throw range_error (" : Vertex not found");
+               }
+               
+               #endif
+
             }
             vertStatus[currQueue[ii]]=true;
             nVertExplored++;

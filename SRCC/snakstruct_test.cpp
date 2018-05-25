@@ -380,9 +380,9 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	testSnake.PrepareForUse();
 	MergeAllContactVertices(testSnake, isImpact);
 	testSnake.PrepareForUse();
-	testSnake.ForceCloseContainers();
-	testSnake.snakeconn.TightenConnectivity();
-	testSnake.PrepareForUse();
+	//testSnake.ForceCloseContainers();
+	//testSnake.snakeconn.TightenConnectivity();
+	//testSnake.PrepareForUse();
 	stop_s=clock();
 	cout << "Impact merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;
