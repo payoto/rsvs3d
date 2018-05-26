@@ -659,7 +659,8 @@ void mesh::SetLastIndex(){
    surfs.SetLastIndex();
    volus.SetLastIndex();
 }
-void mesh::PrepareForUse(){
+
+void mesh::PrepareForUse(bool needOrder){
 
    verts.isInMesh=true;
    edges.isInMesh=true;
@@ -675,9 +676,9 @@ void mesh::PrepareForUse(){
    if (!borderIsSet){
       this->SetBorders();
    }
-
-   this->OrderEdges();
-
+   if(needOrder){
+      this->OrderEdges();
+   }
    verts.ForceArrayReady();
    edges.ForceArrayReady();
    surfs.ForceArrayReady();
@@ -1056,8 +1057,10 @@ void mesh::ForceCloseContainers(){
 
 
 
-
-   this->PrepareForUse();
+   verts.ForceArrayReady();
+   surfs.ForceArrayReady();
+   edges.ForceArrayReady();
+   volus.ForceArrayReady();
 }
 
 int mesh::ConnectedVertex(vector<int> &vertBlock) const{

@@ -28,6 +28,7 @@
 #include <vector>
 #include <cmath>
 #include <cfloat>
+#include <unordered_map>
 
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
@@ -68,7 +69,7 @@ public:
 		siblings=ReturnDataEqualRange(key, hashParent);}
 	int countparent(int key) const {return(hashParent.count(key));};
 	void HashParent();
-
+	void DeHashParent(int pos);
 	// Functions that need modification
 	bool checkready();
 	void ForceArrayReady();
@@ -159,7 +160,7 @@ public:
 	void disp() const;
 	void displight() const;
 	bool isready() const ;
-	void PrepareForUse();
+	void PrepareForUse(bool needOrder=true);
 	void Init(mesh *snakemesh,int nSnax, int nEdge, int nSurf, int nVolu);
 	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;

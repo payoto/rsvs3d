@@ -48,6 +48,26 @@ template<class T> void SnakStruct<T>::HashParent()
 	
    //cout << "Array Struct Succesfully Hashed" << endl;
 }
+
+template<class T> void SnakStruct<T>::DeHashParent(int pos){
+	
+	int key=elems[pos].KeyParent();
+	unordered_multimap<int,int>::iterator it = hashParent.find(key);
+	while(it->second!=pos && it->first==key){++it;}
+
+	if (it->second==pos && it->first==key){
+		hashParent.erase (it);
+	} else {
+
+		cerr << "Error: Key value pair not found and could not be removed "<< endl;
+		cerr << " key " << key << " pos " << pos << endl;
+		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument ("Key value pair not found and could not be removed");
+	}
+}
+
+
+
 template<class T> void SnakStruct<T>::PrepareForUse()
 {
 

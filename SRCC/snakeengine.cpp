@@ -445,7 +445,7 @@ void CleanupSnakeConnec(snake &snakein){
 		indDelSurf.clear();
 		indDelEdge.vec.clear();
 
-		snakein.PrepareForUse();
+		snakein.PrepareForUse(false);
 		itVert=indRmvVert.begin();
 		itEdge=indRmvEdge.begin();
 		itSurf=indRmvSurf.begin();
@@ -454,32 +454,44 @@ void CleanupSnakeConnec(snake &snakein){
 		SnaxNoConnecDetection(snakein, connecEdit);
 
 		nSnaxConn=int(connecEdit.size());
+
 		SnaxEdgeConnecDetection(snakein, connecEdit);
 		nVertConn=int(connecEdit.size());
+		// Identify Edge Connections
 		for(ii=nSnaxConn; ii < nVertConn;ii=ii+2){
 			// Skipping the edges which are marked here for removal.
 			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
 				connecEdit[ii].keepind,connecEdit[ii].scopeind);
-			for(jj=ii+2;jj<nVertConn;jj=jj+2){
-				if (connecEdit[jj].rmvind[0]==connecEdit[ii].keepind && 
-					connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
-					connecEdit[jj].keepind=connecEdit[ii].keepind;
-					connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
+			
+			// for(jj=ii+2;jj<nVertConn;jj=jj+2){
+			// 	if (connecEdit[jj].rmvind[0]==connecEdit[ii].keepind && 
+			// 		connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
+			// 		connecEdit[jj].keepind=connecEdit[ii].keepind;
+			// 		connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
 				
-				} else if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0] && 
-					connecEdit[jj].keepind!=connecEdit[ii].keepind){
+			// 	} else if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0] && 
+			// 		connecEdit[jj].keepind!=connecEdit[ii].keepind){
 
-					connecEdit[jj].keepind=connecEdit[ii].keepind;
+			// 		connecEdit[jj].keepind=connecEdit[ii].keepind;
 
-				} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0] && 
-					connecEdit[jj].keepind!=connecEdit[ii].keepind){
-					connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
+			// 	} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0] && 
+			// 		connecEdit[jj].keepind!=connecEdit[ii].keepind){
+			// 		connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
 					
-				} 
+			// 	} 
+			// }
+		}
+		// removes edges which are degenerate
+
+		for (ii=nSnaxConn+1;ii<nVertConn;ii=ii+2){
+			if (snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[0]==
+				snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[1])
+			{
+				snakein.snakeconn.RemoveIndex(2,connecEdit[ii].rmvind[0]);
+				snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[0]));
+
 			}
 		}
-
-		// Identify Edge Connections
 		IdentifyMergEdgeConnec(snakein, connecEdit);
 
 		nEdgeConn=int(connecEdit.size());
@@ -637,9 +649,6 @@ void CleanupSnakeConnec(snake &snakein){
 
 			snakein.snakeconn.TightenConnectivity();
 			snakein.HashArrayNM();
-			snakein.ForceCloseContainers();
-			snakein.snakeconn.TightenConnectivity();
-			snakein.PrepareForUse();
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
@@ -652,6 +661,10 @@ void CleanupSnakeConnec(snake &snakein){
 
 		}
 	}
+
+	snakein.ForceCloseContainers();
+	snakein.snakeconn.TightenConnectivity();
+	snakein.PrepareForUse(false);
 }
 
 
@@ -730,7 +743,7 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> &tempIndHash, int jjStart) {
 
 	int jj, jjNext;
-	bool flagMoved;
+	bool flagMoved,flag3;
 	jj=jjStart;
 	tempConnec.rmvind.clear();
 	tempConnec2.rmvind.clear();
@@ -748,21 +761,51 @@ void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone
 		flagMoved=true;
 		#ifdef SAFE_ALGO
 		if (tempCount[jjNext]>2){
+			cerr << endl;
+			DisplayVector(tempCount);
+			DisplayVector(tempIndHash.vec);
+			cerr << endl;
+			for (int i = 0; i < int(tempSub.size()); ++i)
+			{
+				snakein.snakeconn.edges(tempSub[i])->disp();
+			}
+			for (int i = 0; i < int(tempSub.size()); ++i)
+			{
+				snakein.snaxedges(tempSub[i])->disp();
+			}
+			for (int i = 0; i < int(tempIndHash.vec.size()); ++i)
+			{
+				snakein.snakeconn.verts.isearch(tempIndHash.vec[i])->disp();
+			}
+			for (int i = 0; i < int(tempIndHash.vec.size()); ++i)
+			{
+				snakein.snaxs.isearch(tempIndHash.vec[i])->disp();
+			}
+			//dispconnrmv(connecEdit);
 			cerr << "Error: Algorithm not conceived for this case "<< endl;
 			cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
 			cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-			throw invalid_argument ("Unexpected algorithmic behaviour");
+			//throw invalid_argument ("Unexpected algorithmic behaviour");
 		}
 		#endif // SAFE_ALGO
-
-		tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
+		flag3=tempCount[jjNext]==3;
+		if (!flag3){
+			tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
+		}
+		
 		tempCount[jjNext]=0;
 		tempSub2=tempIndHash.findall(tempIndHash.vec[jjNext]);
 		jj=0;
-		while(tempSub2[jj]==jjNext && jj<4){++jj;}
+		if(!flag3){
+			while(tempSub2[jj]==jjNext && jj<4){++jj;}
+		} else{
+			while((tempSub2[jj]==jjNext || tempCount[tempSub2[jj]]<3) && jj<4 ){++jj;}
+			tempCount[tempSub2[jj]]=1;
+			while((tempSub2[jj]==jjNext || tempCount[tempSub2[jj]]<3) && jj<4 ){++jj;}
+		}
 
 		#ifdef SAFE_ALGO
-		if (jj>2 || jj<0){
+		if (jj>(2) || jj<0){
 			cerr << "Error: Algorithm not conceived for this case "<< endl;
 			cerr << " jj>3 Unsafe read has happened "<< endl;
 			cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;

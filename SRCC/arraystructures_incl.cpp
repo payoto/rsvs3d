@@ -680,3 +680,22 @@ template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,i
 
 }
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 
+
+
+
+template<template<class Q, class R> class T, class Q, class R> void EraseKeyPair(T<Q,R> hashTable, Q key, R pos){
+
+	typename T<Q,R>::iterator it ;
+	it= hashTable.find(key);
+	while(it->second!=pos && it->first==key){++it;}
+
+	if (it->second==pos && it->first==key){
+		hashTable.erase (it);
+	} else {
+
+		cerr << "Error: Key value pair not found and could not be removed "<< endl;
+		cerr << " key " << key << " pos " << pos << endl;
+		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument ("Key value pair not found and could not be removed");
+	}
+}

@@ -102,7 +102,7 @@ void snax::disp() const{
 }
 
 void snaxedge::disp() const{
-	cout << "snaxedge #" << index << " | isBorder " << isBorder << " ";
+	cout << "snaxedge #" << index << " | surfind " << surfind << " " << " | isBorder " << isBorder << " " ;
 	normvector.disp();
 }
 
@@ -256,7 +256,7 @@ inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) cons
 	snakeconn.GetMaxIndex(nVert,nEdge,nSurf,nVolu);
 }
 
-void snake::PrepareForUse() {
+void snake::PrepareForUse(bool needOrder) {
 
 	snaxs.isInMesh=true;
 	snaxedges.isInMesh=true;
@@ -265,7 +265,7 @@ void snake::PrepareForUse() {
 	snaxs.PrepareForUse();
 	snaxedges.PrepareForUse();
 	snaxsurfs.PrepareForUse();
-	snakeconn.PrepareForUse();
+	snakeconn.PrepareForUse(needOrder);
 	snakemesh->PrepareForUse();
 	is3D=int(snakemesh->volus.size())>0;
 

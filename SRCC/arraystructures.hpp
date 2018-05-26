@@ -196,7 +196,7 @@ public:
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
 	void reserve(int nVe,int nE, int nS, int nVo);
-	void PrepareForUse();
+	void PrepareForUse(bool needOrder=true);
 	void disp() const;
 	void displight() const;
 	void Concatenate(const mesh &other);
@@ -476,7 +476,8 @@ template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
 	R T::*mp , U &out , V oper);
-
+template<template<class Q, class R> class T,class Q, class R>
+	void EraseKeyPair(T<Q,R> hashTable, Q key, R pos);
 
 //test functions
 int Test_ArrayStructures();
