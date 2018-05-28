@@ -593,20 +593,20 @@ template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){
 hashTable.clear();
 HashVector(vec, hashTable);
 }
-template <class T,class Q> inline int HashedVector<T,Q>::find(T key) const
+template <class T,class Q> inline int HashedVector<T,Q>::find(const T key) const
 {
 	return(FindSub(key, hashTable) );
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::findall(T key) const
+template <class T,class Q> inline vector<int> HashedVector<T,Q>::findall(const T key) const
 {
 	return(ReturnDataEqualRange(key,hashTable));
 }
 
-template <class T,class Q> inline int HashedVector<T,Q>::count(T key) const
+template <class T,class Q> inline int HashedVector<T,Q>::count(const T key) const
 {
 	return(hashTable.count(key) );
 }
-template <class T,class Q> vector<int> HashedVector<T,Q>::count(vector<T> &key) const
+template <class T,class Q> vector<int> HashedVector<T,Q>::count(const vector<T> &key) const
 {
 	vector<int> subOut;
 	subOut.reserve(key.size());
@@ -617,7 +617,7 @@ template <class T,class Q> vector<int> HashedVector<T,Q>::count(vector<T> &key) 
 
 	return(subOut);
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(vector<T> &key) const
+template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(const vector<T> &key) const
 {
 	return(FindSubList(key, vec, hashTable) );
 }

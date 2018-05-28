@@ -169,11 +169,11 @@ public:
 	unordered_multimap<T,int> hashTable;
 
 	inline void GenerateHash();
-	inline int find(T key) const;
-	inline vector<int> findall(T key) const;
-	inline int count(T key) const;
-	vector<int> count(vector<T> &key) const;
-	inline vector<int> find_list(vector<T> &key) const;
+	inline int find(const T key) const;
+	inline vector<int> findall(const T key) const;
+	inline int count(const T key) const;
+	vector<int> count(const vector<T> &key) const;
+	inline vector<int> find_list(const vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
 };

@@ -69,6 +69,10 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int>
 
 //
 void CleanupSnakeConnec(snake &snakein);
+void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
+void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vector<int> &tempSub,
+	vector<int> &tempSub2,vector<int> &tempSub3,HashedVector<int,int> &tempIndHash,
+	HashedVector<int,int> &edge2Surf,vector<int> tempCount);
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,

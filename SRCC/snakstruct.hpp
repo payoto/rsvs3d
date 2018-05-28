@@ -169,7 +169,7 @@ public:
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndexNM(); // SetMaxIndex no mesh
 	void Concatenate(const snake &other);
-	bool Check3D(){return(is3D);}
+	bool Check3D() const {return(is3D);}
 	// Snake merging
 	void MakeCompatible_inplace(snake &other) const;
 	snake MakeCompatible(snake other) const;

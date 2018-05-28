@@ -634,6 +634,7 @@ void mesh::TestConnectivity(){
    if (errCount>0){
    cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
    }
+   errTot+=errCount;
    if (errTot>0){
       cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
    }

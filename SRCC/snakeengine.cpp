@@ -424,7 +424,7 @@ void CleanupSnakeConnec(snake &snakein){
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
 	vector<int> tempSub,isImpact;
-	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn;
+	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,nEdgeSameSurfConn;
 	bool flag, iterFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -492,19 +492,38 @@ void CleanupSnakeConnec(snake &snakein){
 
 			}
 		}
-		IdentifyMergEdgeConnec(snakein, connecEdit);
+		// This block of code aims to fix the issue of edges in the same parent surface connected to the same surface
+		// It performs a merge for these surfaces but does not automatically delete the vertex
+		IdentifyMergEdgeSameSurfConnec(snakein, connecEdit);
+		nEdgeSameSurfConn=int(connecEdit.size());
+		for(ii=nVertConn; ii < nEdgeSameSurfConn;++ii){
+			for(jj=0; jj < int(connecEdit[ii].rmvind.size());++jj){
+				snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[jj],
+					connecEdit[ii].keepind,connecEdit[ii].scopeind);
+				if(connecEdit[ii].typeobj==2){
+					snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[jj]));
+				}
+			}
+		}
+		for(ii=nVertConn+1; ii < nEdgeSameSurfConn;ii=ii+2){
+			//connecEdit[ii].rmvind.clear();
+		}
+		cout << " nEdgeSameSurfConn=" << nEdgeSameSurfConn-nVertConn << endl;
+		// End Same surf merge
 
+		IdentifyMergEdgeConnec(snakein, connecEdit);
 		nEdgeConn=int(connecEdit.size());
 		iterFlag=int(nEdgeConn)>0;
 		if(iterFlag){	
 
-			for(ii=nVertConn; ii < nEdgeConn;++ii){
+			for(ii=nEdgeSameSurfConn; ii < nEdgeConn;++ii){
 				for(jj=0; jj < int(connecEdit[ii].rmvind.size());++jj){
 					snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[jj],
 						connecEdit[ii].keepind,connecEdit[ii].scopeind);
 				}
 			}
-
+			SnaxNoConnecDetection(snakein, connecEdit);
+			nEdgeConn=int(connecEdit.size());
 			// Identify surface connections
 			if (snakein.Check3D()){
 				IdentifyMergSurfConnec(snakein, connecEdit);
@@ -668,6 +687,95 @@ void CleanupSnakeConnec(snake &snakein){
 }
 
 
+
+void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit){
+
+	vector<bool> isObjDone;
+	vector<int> tempSub,tempSub2,tempSub3, tempCount, tempCount2;
+	HashedVector<int,int> tempIndHash; 
+	HashedVector<int,int> edge2Surf,tempIndHash2; 
+	//vector<int> objSub;
+	int nSnaxEdge, ii,nParent,stepCheck,nSurf,jj; //nSnax, nSnaxSurf,
+	ConnecRemv tempConnec, tempConnec2;
+	if (snakein.Check3D()){
+		//nSnax=snakein.snaxs.size();
+		nSnaxEdge=snakein.snaxedges.size();
+		//nSnaxSurf=snakein.snaxsurfs.size();
+
+		isObjDone.reserve(nSnaxEdge);
+
+
+		isObjDone.assign(nSnaxEdge,false);
+		for(ii=0; ii<nSnaxEdge ; ++ii){
+			if(!isObjDone[ii]){
+				nParent=snakein.snaxedges.countparent(snakein.snaxedges(ii)->KeyParent());
+				if(nParent>1){
+					
+					nSurf=int(snakein.snakeconn.edges(ii)->surfind.size());
+					stepCheck=0;
+					//for (stepCheck=0;stepCheck<nSurf;stepCheck++){
+
+					IndentifyEdgeSameSurf(snakein,ii,stepCheck,tempSub,tempSub2,tempSub3,tempIndHash2,edge2Surf,tempCount2);
+					if (stepCheck<nSurf){
+						IdentifyMergeEdgeGeneral(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub2,tempSub3, tempCount,tempIndHash);
+					}
+					//}
+				}
+				isObjDone[ii]=true;
+				if ((snakein.snaxedges(ii)->index==15246 || snakein.snaxedges(ii)->index==12607) && stepCheck<nSurf || tempConnec.keepind==12607){
+					cout << endl;
+					cout << ii << endl;
+					snakein.snakeconn.edges(ii)->disp();
+					for(jj=0;jj<int(tempSub2.size());jj++){
+						snakein.snakeconn.edges(tempSub2[jj])->disp();
+						cout << "isobjdone " << (isObjDone[tempSub2[jj]] ? 1 : 0) << endl;
+					}
+					cout << endl;
+				}
+			}
+		}
+	}
+}
+
+void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vector<int> &tempSub,vector<int> &tempSub2,
+	vector<int> &tempSub3,HashedVector<int,int> &tempIndHash,HashedVector<int,int> &edge2Surf,vector<int> tempCount){
+	// Identifies edges which share a surface and 
+	int ii, jj, nTemp;
+
+	if (stepCheck==0){
+		snakein.snaxedges.findsiblings(snakein.snaxedges(currSub)->KeyParent(),tempSub);
+		edge2Surf.vec.clear();
+		tempIndHash.vec=ConcatenateVectorField(snakein.snakeconn.edges, &edge::surfind,tempSub);
+		// tempIndHash is a hashed vector of concatenate (surfs(tempSub).edgeind)
+		for(ii=0; ii<int(tempSub.size());++ii){
+			for(jj=0; jj <int(snakein.snakeconn.edges(tempSub[ii])->surfind.size()); ++jj){
+				edge2Surf.vec.push_back(ii);
+			}
+		}
+		// edge2Surf is a hashed vector of the subscripts into tempSub of the surf matching the 
+		// edges in tempHashInd
+
+		tempIndHash.GenerateHash();
+		edge2Surf.GenerateHash();
+		tempCount=tempIndHash.count(snakein.snakeconn.edges(currSub)->surfind);
+	}
+	tempCount.push_back(0);
+	// tempCount is the vector counting the number of occurences of each edge at each edges location
+	nTemp=tempCount.size()-1;
+
+	while(tempCount[stepCheck]<2 && stepCheck<=nTemp){
+		stepCheck++;
+	}
+
+	if(stepCheck<nTemp){ // Build the temoSub corresponding to that surface
+		tempSub3=tempIndHash.findall(snakein.snakeconn.edges(currSub)->surfind[stepCheck]);
+		tempSub2.clear();
+		for(ii=0;ii<int(tempSub3.size());++ii){
+			tempSub2.push_back(tempSub[edge2Surf.vec[tempSub3[ii]]]);
+		}
+	}
+}
+
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit){
 
 	vector<bool> isObjDone;
@@ -829,122 +937,6 @@ void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone
 
 }
 
-/*
-void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> &tempIndHash) 
-{
-
-	int jj,jjNext,jjStart, nTemp;
-
-
-	// check if the edges are connected
-	tempIndHash.vec.clear();
-	tempCount.clear();
-	tempIndHash.vec=ConcatenateVectorField(snakein.snakeconn.edges, &edge::vertind,tempSub);
-	tempIndHash.GenerateHash();
-	tempCount=tempIndHash.count(tempIndHash.vec);
-	nTemp=tempCount.size();
-
-	tempConnec2.scopeind.clear();
-	for (jj=0;jj<int(tempSub.size());++jj){
-		tempConnec2.scopeind.push_back(snakein.snaxedges(tempSub[jj])->index);
-
-	}
-
-	jjStart=0;
-	while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
-	if (jjStart>=nTemp){ 
-	// if all 2s
-
-		tempConnec.rmvind.clear();
-		tempConnec.keepind=snakein.snaxedges(tempSub[0])->index;
-		tempConnec2.rmvind.clear();
-		tempConnec2.keepind=snakein.snakeconn.edges(tempSub[0])->vertind[0];
-		tempConnec.typeobj=2;
-		tempConnec2.typeobj=5;
-		for (jj=0;jj<int(tempSub.size());++jj){
-			tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj])->index);
-			isObjDone[tempSub[jj]]=true;
-			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[0]);
-			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[1]);
-			#ifdef SAFE_ALGO
-			if (tempCount[jj*2]!=2 && tempCount[jj*2+1]!=2){
-				cerr << "Error: Unexpected  behaviour "<< endl;
-				cerr << " jjStart not found but vertex does not have 2 connections "<< endl;
-				cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-				throw invalid_argument ("Unexpected algorithmic behaviour"); 
-			}
-			#endif //SAFE_ALGO
-		}
-		connecEdit.push_back(tempConnec);
-		sort(tempConnec2.rmvind);
-		unique(tempConnec2.rmvind);
-		connecEdit.push_back(tempConnec2);
-
-	} else {
-		do{ 
-		// group edges by connection groups
-			jj=jjStart;
-			tempConnec.rmvind.clear();
-			tempConnec2.rmvind.clear();
-			tempConnec.typeobj=2;
-			tempConnec2.typeobj=5;
-
-			tempCount[jjStart]=0;
-			tempConnec.keepind=snakein.snaxedges(tempSub[jjStart/2])->index;
-			isObjDone[tempSub[jjStart/2]]=true;
-						// if second part of an edge check the other part
-			jjNext=jj+(1-((jj%2)*2)); // equivalend of jj+ (jj%2 ? -1 : 1) 
-			while(tempCount[jjNext]>1){ 
-			// Builds one group
-
-				#ifdef SAFE_ALGO
-				if (tempCount[jjNext]>2){
-					cerr << "Error: Algorithm not conceived for this case "<< endl;
-					cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
-					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-					throw invalid_argument ("Unexpected algorithmic behaviour");
-				}
-				#endif // SAFE_ALGO
-
-				tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
-				tempCount[jjNext]=0;
-				tempSub2=tempIndHash.findall(tempIndHash.vec[jjNext]);
-				jj=0;
-				while(tempSub2[jj]==jjNext && jj<4){++jj;}
-
-				#ifdef SAFE_ALGO
-				if (jj>2 || jj<0){
-					cerr << "Error: Algorithm not conceived for this case "<< endl;
-					cerr << " jj>3 Unsafe read has happened "<< endl;
-					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-					throw invalid_argument ("Unexpected algorithmic behaviour");
-				}
-				#endif // SAFE_ALGO
-
-				jj=tempSub2[jj];
-				tempCount[jj]=0;
-				tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj/2])->index);
-				isObjDone[tempSub[jj/2]]=true;
-
-				jjNext=jj+(1-((jj%2)*2));
-
-			}
-			tempConnec2.keepind=tempIndHash.vec[jjNext];
-			if (jj!=jjStart){
-				connecEdit.push_back(tempConnec);
-				connecEdit.push_back(tempConnec2);
-			}
-
-			jjStart=0;
-			while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
-			if(jjStart>=nTemp){
-				jjStart=0;
-				while (tempCount[jjStart]!=2 && jjStart<nTemp){jjStart++;}
-			}
-		} while (jjStart<nTemp);
-	}
-}
-*/
 
 void IdentifyMergSurfConnec( const snake &snakein, vector<ConnecRemv> &connecEdit){
 
@@ -1178,3 +1170,121 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, cons
 	}
 
 }
+
+
+/*
+void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> &tempIndHash) 
+{
+
+	int jj,jjNext,jjStart, nTemp;
+
+
+	// check if the edges are connected
+	tempIndHash.vec.clear();
+	tempCount.clear();
+	tempIndHash.vec=ConcatenateVectorField(snakein.snakeconn.edges, &edge::vertind,tempSub);
+	tempIndHash.GenerateHash();
+	tempCount=tempIndHash.count(tempIndHash.vec);
+	nTemp=tempCount.size();
+
+	tempConnec2.scopeind.clear();
+	for (jj=0;jj<int(tempSub.size());++jj){
+		tempConnec2.scopeind.push_back(snakein.snaxedges(tempSub[jj])->index);
+
+	}
+
+	jjStart=0;
+	while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
+	if (jjStart>=nTemp){ 
+	// if all 2s
+
+		tempConnec.rmvind.clear();
+		tempConnec.keepind=snakein.snaxedges(tempSub[0])->index;
+		tempConnec2.rmvind.clear();
+		tempConnec2.keepind=snakein.snakeconn.edges(tempSub[0])->vertind[0];
+		tempConnec.typeobj=2;
+		tempConnec2.typeobj=5;
+		for (jj=0;jj<int(tempSub.size());++jj){
+			tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj])->index);
+			isObjDone[tempSub[jj]]=true;
+			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[0]);
+			tempConnec2.rmvind.push_back(snakein.snakeconn.edges(tempSub[jj])->vertind[1]);
+			#ifdef SAFE_ALGO
+			if (tempCount[jj*2]!=2 && tempCount[jj*2+1]!=2){
+				cerr << "Error: Unexpected  behaviour "<< endl;
+				cerr << " jjStart not found but vertex does not have 2 connections "<< endl;
+				cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+				throw invalid_argument ("Unexpected algorithmic behaviour"); 
+			}
+			#endif //SAFE_ALGO
+		}
+		connecEdit.push_back(tempConnec);
+		sort(tempConnec2.rmvind);
+		unique(tempConnec2.rmvind);
+		connecEdit.push_back(tempConnec2);
+
+	} else {
+		do{ 
+		// group edges by connection groups
+			jj=jjStart;
+			tempConnec.rmvind.clear();
+			tempConnec2.rmvind.clear();
+			tempConnec.typeobj=2;
+			tempConnec2.typeobj=5;
+
+			tempCount[jjStart]=0;
+			tempConnec.keepind=snakein.snaxedges(tempSub[jjStart/2])->index;
+			isObjDone[tempSub[jjStart/2]]=true;
+						// if second part of an edge check the other part
+			jjNext=jj+(1-((jj%2)*2)); // equivalend of jj+ (jj%2 ? -1 : 1) 
+			while(tempCount[jjNext]>1){ 
+			// Builds one group
+
+				#ifdef SAFE_ALGO
+				if (tempCount[jjNext]>2){
+					cerr << "Error: Algorithm not conceived for this case "<< endl;
+					cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
+					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+					throw invalid_argument ("Unexpected algorithmic behaviour");
+				}
+				#endif // SAFE_ALGO
+
+				tempConnec2.rmvind.push_back(tempIndHash.vec[jjNext]);
+				tempCount[jjNext]=0;
+				tempSub2=tempIndHash.findall(tempIndHash.vec[jjNext]);
+				jj=0;
+				while(tempSub2[jj]==jjNext && jj<4){++jj;}
+
+				#ifdef SAFE_ALGO
+				if (jj>2 || jj<0){
+					cerr << "Error: Algorithm not conceived for this case "<< endl;
+					cerr << " jj>3 Unsafe read has happened "<< endl;
+					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+					throw invalid_argument ("Unexpected algorithmic behaviour");
+				}
+				#endif // SAFE_ALGO
+
+				jj=tempSub2[jj];
+				tempCount[jj]=0;
+				tempConnec.rmvind.push_back(snakein.snaxedges(tempSub[jj/2])->index);
+				isObjDone[tempSub[jj/2]]=true;
+
+				jjNext=jj+(1-((jj%2)*2));
+
+			}
+			tempConnec2.keepind=tempIndHash.vec[jjNext];
+			if (jj!=jjStart){
+				connecEdit.push_back(tempConnec);
+				connecEdit.push_back(tempConnec2);
+			}
+
+			jjStart=0;
+			while (tempCount[jjStart]!=1 && jjStart<nTemp){jjStart++;}
+			if(jjStart>=nTemp){
+				jjStart=0;
+				while (tempCount[jjStart]!=2 && jjStart<nTemp){jjStart++;}
+			}
+		} while (jjStart<nTemp);
+	}
+}
+*/
