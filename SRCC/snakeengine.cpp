@@ -695,7 +695,7 @@ void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &co
 	HashedVector<int,int> tempIndHash; 
 	HashedVector<int,int> edge2Surf,tempIndHash2; 
 	//vector<int> objSub;
-	int nSnaxEdge, ii,nParent,stepCheck,nSurf,jj; //nSnax, nSnaxSurf,
+	int nSnaxEdge, ii,nParent,stepCheck,nSurf; //nSnax, nSnaxSurf,
 	ConnecRemv tempConnec, tempConnec2;
 	if (snakein.Check3D()){
 		//nSnax=snakein.snaxs.size();
@@ -708,31 +708,24 @@ void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &co
 		isObjDone.assign(nSnaxEdge,false);
 		for(ii=0; ii<nSnaxEdge ; ++ii){
 			if(!isObjDone[ii]){
-				nParent=snakein.snaxedges.countparent(snakein.snaxedges(ii)->KeyParent());
-				if(nParent>1){
-					
-					nSurf=int(snakein.snakeconn.edges(ii)->surfind.size());
-					stepCheck=0;
-					//for (stepCheck=0;stepCheck<nSurf;stepCheck++){
+				if (snakein.snaxedges.memberIsHashParent(ii)){
+					nParent=snakein.snaxedges.countparent(snakein.snaxedges(ii)->KeyParent());
+					if(nParent>1){
+						
+						nSurf=int(snakein.snakeconn.edges(ii)->surfind.size());
+						stepCheck=0;
+						//for (stepCheck=0;stepCheck<nSurf;stepCheck++){
 
-					IndentifyEdgeSameSurf(snakein,ii,stepCheck,tempSub,tempSub2,tempSub3,tempIndHash2,edge2Surf,tempCount2);
-					if (stepCheck<nSurf){
-						IdentifyMergeEdgeGeneral(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub2,tempSub3, tempCount,tempIndHash);
+						IndentifyEdgeSameSurf(snakein,ii,stepCheck,tempSub,tempSub2,tempSub3,tempIndHash2,edge2Surf,tempCount2);
+						if (stepCheck<nSurf){
+							IdentifyMergeEdgeGeneral(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub2,tempSub3, tempCount,tempIndHash);
+						}
+						//}
 					}
-					//}
+					
 				}
 				isObjDone[ii]=true;
-				if ((snakein.snaxedges(ii)->index==15246 || snakein.snaxedges(ii)->index==12607) && stepCheck<nSurf || tempConnec.keepind==12607){
-					cout << endl;
-					cout << ii << endl;
-					snakein.snakeconn.edges(ii)->disp();
-					for(jj=0;jj<int(tempSub2.size());jj++){
-						snakein.snakeconn.edges(tempSub2[jj])->disp();
-						cout << "isobjdone " << (isObjDone[tempSub2[jj]] ? 1 : 0) << endl;
-					}
-					cout << endl;
-				}
-			}
+			}		
 		}
 	}
 }
@@ -758,8 +751,8 @@ void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vect
 		tempIndHash.GenerateHash();
 		edge2Surf.GenerateHash();
 		tempCount=tempIndHash.count(snakein.snakeconn.edges(currSub)->surfind);
+		tempCount.push_back(0);
 	}
-	tempCount.push_back(0);
 	// tempCount is the vector counting the number of occurences of each edge at each edges location
 	nTemp=tempCount.size()-1;
 
@@ -774,6 +767,7 @@ void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vect
 			tempSub2.push_back(tempSub[edge2Surf.vec[tempSub3[ii]]]);
 		}
 	}
+	
 }
 
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit){

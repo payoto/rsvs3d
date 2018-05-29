@@ -69,7 +69,8 @@ public:
 		siblings=ReturnDataEqualRange(key, hashParent);}
 	int countparent(int key) const {return(hashParent.count(key));};
 	void HashParent();
-	void DeHashParent(int pos);
+	void DeHashParent(const int pos);
+	bool memberIsHashParent(const int pos) const;
 	// Functions that need modification
 	bool checkready();
 	void ForceArrayReady();
