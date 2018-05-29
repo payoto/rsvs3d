@@ -204,6 +204,7 @@ public:
 	void PopulateIndices();
 	void TightenConnectivity();
 	void TestConnectivity();
+	void TestConnectivityBiDir();
 //File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
@@ -229,6 +230,7 @@ class meshpart{ // Abstract class to ensure interface is correct
 	bool isBorder=false;
 
 	virtual void disp() const =0 ;
+	virtual void disptree(const mesh &meshin, int n) const =0 ;
 	virtual int Key() const =0 ; 
 	virtual void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu)=0 ;
 	virtual void PrepareForUse()=0 ;
@@ -249,6 +251,7 @@ public:
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -317,13 +320,15 @@ public:
 	 // reserves 2 as this is the size of the array
 
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
 	bool isready(bool isInMesh) const {return(isInMesh? isordered : true);}
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void OrderEdges(mesh *meshin);
-	void TightenConnectivity() {sort(voluind);unique(voluind);};
+	void TightenConnectivity() {sort(voluind);unique(voluind);
+		sort(edgeind);unique(edgeind);isordered=false;};
 
 	surf(){ // Constructor
 		index=0;
@@ -374,6 +379,7 @@ public:
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -420,6 +426,7 @@ public:
 	 // reserves 2 as this is the size of the array
 
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push

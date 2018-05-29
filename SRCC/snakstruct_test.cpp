@@ -248,6 +248,7 @@ int Test_snakeinit(){
 		for(ii=0;ii<300;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
+				//testSnake.snakeconn.TightenConnectivity();
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 			}
 			Test_stepalgo(testSnake, dt, isImpact,outSnake);
@@ -366,8 +367,12 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	stop_s=clock();
 	cout << "Merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
-
 	testSnake.PrepareForUse();
+	#ifdef SAFE_ALGO
+	if (testSnake.Check3D()){
+		testSnake.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 
 	SpawnArrivedSnaxels(testSnake,isImpact);
 
@@ -380,6 +385,11 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	testSnake.PrepareForUse();
 	MergeAllContactVertices(testSnake, isImpact);
 	testSnake.PrepareForUse();
+	#ifdef SAFE_ALGO
+	if (testSnake.Check3D()){
+		testSnake.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 	//testSnake.ForceCloseContainers();
 	//testSnake.snakeconn.TightenConnectivity();
 	//testSnake.PrepareForUse();

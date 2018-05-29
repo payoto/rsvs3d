@@ -424,7 +424,8 @@ void CleanupSnakeConnec(snake &snakein){
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
 	vector<int> tempSub,isImpact;
-	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,nEdgeSameSurfConn;
+	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
+		nEdgeSameSurfConn,nAbove3,nAboveN;
 	bool flag, iterFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -484,13 +485,13 @@ void CleanupSnakeConnec(snake &snakein){
 		// removes edges which are degenerate
 
 		for (ii=nSnaxConn+1;ii<nVertConn;ii=ii+2){
-			if (snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[0]==
-				snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[1])
-			{
+			// if (snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[0]==
+			// 	snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[1])
+			// {
 				snakein.snakeconn.RemoveIndex(2,connecEdit[ii].rmvind[0]);
 				snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[0]));
 
-			}
+			// }
 		}
 		// This block of code aims to fix the issue of edges in the same parent surface connected to the same surface
 		// It performs a merge for these surfaces but does not automatically delete the vertex
@@ -503,12 +504,17 @@ void CleanupSnakeConnec(snake &snakein){
 				if(connecEdit[ii].typeobj==2){
 					snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[jj]));
 				}
+
+				// for(jj=ii+2;jj<nEdgeSameSurfConn;jj=jj+2){
+				// 	if (connecEdit[jj].rmvind[0]==connecEdit[ii].keepind && 
+				// 		connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
+						
+				// 	} 
+				// }
 			}
 		}
-		for(ii=nVertConn+1; ii < nEdgeSameSurfConn;ii=ii+2){
-			//connecEdit[ii].rmvind.clear();
-		}
-		cout << " nEdgeSameSurfConn=" << nEdgeSameSurfConn-nVertConn << endl;
+
+		//cout << " nEdgeSameSurfConn=" << nEdgeSameSurfConn-nVertConn << endl;
 		// End Same surf merge
 
 		IdentifyMergEdgeConnec(snakein, connecEdit);
@@ -550,11 +556,11 @@ void CleanupSnakeConnec(snake &snakein){
 					itVert=indRmvVert.end();
 				} 
 			}
+			
 			sort(indRmvVert);
 			sort(indRmvEdge);
 			unique(indRmvVert);
 			unique(indRmvEdge);
-
 			// Identify Volumes from vertices
 			if (snakein.Check3D()){
 				ModifyMergVoluConnec(snakein, connecEdit, indRmvVert);
@@ -652,9 +658,27 @@ void CleanupSnakeConnec(snake &snakein){
 			unique(indRmvEdge);
 			unique(indRmvSurf);
 
-			if(indRmvSurf.size()>=40){
-				if (indRmvSurf[39]==1919){
-					cout << "test please " << endl;
+
+			nAbove3=0;
+			nAboveN=0;
+			snakein.snakeconn.TightenConnectivity();
+			for(ii=0;ii<int(indRmvVert.size());ii++){
+				// nAbove3+=int(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2);
+				// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){
+				// 	snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
+				// }
+				if(snakein.snakemesh->edges.isearch(snakein.snaxs.isearch(indRmvVert[ii])->edgeind)->surfind.size()==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
+					snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
+					indRmvVert.erase(indRmvVert.begin()+ii);
+					ii--;
+					nAboveN++;
+				}
+			}
+			// cout << endl << "Above 3 : " << nAbove3 << endl;
+			// cout << endl << "Above N : " << nAboveN << endl;
+			if (nAbove3>0){
+				if (snakein.Check3D()){
+					//snakein.snakeconn.TestConnectivity();
 				}
 			}
 
@@ -671,7 +695,7 @@ void CleanupSnakeConnec(snake &snakein){
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
-				snakein.snakeconn.TestConnectivity();
+				snakein.snakeconn.TestConnectivityBiDir();
 			}
 			#endif
 			//tecout.PrintMesh(snakein.snakeconn,2,ttt);
@@ -683,19 +707,28 @@ void CleanupSnakeConnec(snake &snakein){
 
 	snakein.ForceCloseContainers();
 	snakein.snakeconn.TightenConnectivity();
-	snakein.PrepareForUse(false);
+	snakein.PrepareForUse();
 }
+/*
+void ConnecForwardEdit(vector<ConnecRemv> &connecEdit,int oldInd, int newInd,int startInd,
+	int step, int finalInd){
+	int ii,jj,kk;
 
+	for(ii=startInd;ii<finalInd;++ii){
+
+	}
+}*/
 
 
 void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit){
 
 	vector<bool> isObjDone;
+	bool isAnyDone;
 	vector<int> tempSub,tempSub2,tempSub3, tempCount, tempCount2;
 	HashedVector<int,int> tempIndHash; 
 	HashedVector<int,int> edge2Surf,tempIndHash2; 
 	//vector<int> objSub;
-	int nSnaxEdge, ii,nParent,stepCheck,nSurf; //nSnax, nSnaxSurf,
+	int nSnaxEdge, ii,jj,nParent,stepCheck,nSurf,nTemp; //nSnax, nSnaxSurf,
 	ConnecRemv tempConnec, tempConnec2;
 	if (snakein.Check3D()){
 		//nSnax=snakein.snaxs.size();
@@ -717,7 +750,12 @@ void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &co
 						//for (stepCheck=0;stepCheck<nSurf;stepCheck++){
 
 						IndentifyEdgeSameSurf(snakein,ii,stepCheck,tempSub,tempSub2,tempSub3,tempIndHash2,edge2Surf,tempCount2);
-						if (stepCheck<nSurf){
+						isAnyDone=false;
+						nTemp=tempSub2.size();
+						for (jj=0;jj<nTemp;++jj){
+							isAnyDone=isAnyDone || isObjDone[tempSub2[jj]];
+						}
+						if (stepCheck<nSurf && !isAnyDone){
 							IdentifyMergeEdgeGeneral(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub2,tempSub3, tempCount,tempIndHash);
 						}
 						//}

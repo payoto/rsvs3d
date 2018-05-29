@@ -159,6 +159,7 @@ public:
 
 	// basic operations grouped from each field
 	void disp() const;
+
 	void displight() const;
 	bool isready() const ;
 	void PrepareForUse(bool needOrder=true);
@@ -207,6 +208,7 @@ public:
 
 	// interface functions
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (edgeind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -233,6 +235,7 @@ public:
 
 	void PrepareForUse();
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (surfind);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -255,6 +258,7 @@ public:
 	coordvec normvector;
 	void PrepareForUse(); 
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (voluind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);

@@ -626,8 +626,8 @@ void mesh::TestConnectivity(){
       for(jj=0;jj< kk2; ++jj){
          if (testSub[jj]<0 && volus(ii)->surfind[jj]!=0){
             errCount++;
-            cerr << " Test Connectivity Error :" << errCount << " edge " << volus(ii)->index
-            << " makes unknown reference to vertex " << volus(ii)->surfind[jj] << endl;
+            cerr << " Test Connectivity Error :" << errCount << " volu " << volus(ii)->index
+            << " makes unknown reference to surface " << volus(ii)->surfind[jj] << endl;
          }
       }
    }
@@ -637,6 +637,257 @@ void mesh::TestConnectivity(){
    errTot+=errCount;
    if (errTot>0){
       cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+   }
+}
+
+
+void mesh::TestConnectivityBiDir(){
+   int ii,jj,ll,ll2,kk,kk2,errCount, errTot,errCountBiDir,errTotBiDir;
+   bool flag;
+   vector<int> testSub;
+
+   errCount=0;
+   errCountBiDir=0;
+   errTot=0;
+   errTotBiDir=0;
+   kk=int(verts.size());
+   for (ii=0; ii<kk;++ii){
+      if(verts(ii)->edgeind.size()==0){
+         errCount++;
+         cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+               << " Has empty connectivity list "; 
+               cerr << endl;
+
+      } else {
+         testSub=edges.find_list(verts(ii)->edgeind);
+         kk2=testSub.size();
+         for(jj=0;jj< kk2; ++jj){
+            if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
+               errCount++;
+               cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+               << " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+               DisplayVector(verts(ii)->edgeind);
+               cerr << endl;
+            } else if (verts(ii)->edgeind[jj]!=0){
+               ll2=edges(testSub[jj])->vertind.size();
+               flag=false;
+               for(ll=0;ll<ll2;ll++){
+                  flag=flag || (edges(testSub[jj])->vertind[ll]);
+               }
+               if (!flag){
+                  errCountBiDir++;
+                  cerr << " Test Connectivity Error :" << errCountBiDir << " vertex " << verts(ii)->index
+                  << " makes uni-directional reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+                  DisplayVector(verts(ii)->edgeind); cout << " list (edge.vertind): " ; 
+                  DisplayVector(edges(jj)->vertind);
+               }
+            }
+         }
+      }
+   }
+   if (errCount>0){
+      cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0){
+      cerr << "Test Connectivity vertex (edgeind) uni-directional Errors :" << errCountBiDir << endl;
+   }
+
+
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   errCount=0;
+   errCountBiDir=0;
+   kk=int(edges.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=verts.find_list(edges(ii)->vertind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && edges(ii)->vertind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
+            << " makes unknown reference to vertex " << edges(ii)->vertind[jj] << " list: " ; DisplayVector(edges(ii)->vertind); 
+            cerr << endl;
+         } else if (edges(ii)->vertind[jj]!=0){
+            ll2=verts(testSub[jj])->edgeind.size();
+            flag=false;
+            for(ll=0;ll<ll2;ll++){
+               flag=flag || (verts(testSub[jj])->edgeind[ll]);
+            }
+            if (!flag){
+               errCountBiDir++;
+               cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
+               << " makes uni-directional reference to vertex " << edges(ii)->vertind[jj] << " list: " ; 
+               DisplayVector(edges(ii)->vertind); cout << " list (vert.edgeind): " ; 
+               DisplayVector(verts(jj)->edgeind);
+            }
+         }
+      }
+   }
+   if (errCount>0){
+      cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0){
+      cerr << "Test Connectivity edges (vertind) uni-directional  Errors :" << errCountBiDir << endl;
+   }
+
+
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   errCount=0;
+   errCountBiDir=0;
+   for (ii=0; ii<kk;++ii){
+      testSub=surfs.find_list(edges(ii)->surfind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && edges(ii)->surfind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
+            << " makes unknown reference to surface " << edges(ii)->surfind[jj] << endl;
+         } else if (edges(ii)->surfind[jj]!=0){
+            ll2=surfs(testSub[jj])->edgeind.size();
+            flag=false;
+            for(ll=0;ll<ll2;ll++){
+               flag=flag || (surfs(testSub[jj])->edgeind[ll]);
+            }
+            if (!flag){
+               errCountBiDir++;
+               cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
+               << " makes uni-directional reference to surface " << edges(ii)->surfind[jj] << " list: " ; 
+               DisplayVector(edges(ii)->surfind); cout << " list (surf.edgeind): " ; 
+               DisplayVector(surfs(jj)->edgeind);
+            }
+         }
+      }
+   }
+   if (errCount>0){
+      cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0){
+      cerr << "Test Connectivity edges (surfind) uni-directional  Errors :" << errCountBiDir << endl;
+   }
+
+
+
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   errCount=0;
+   errCountBiDir=0;
+   kk=int(surfs.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=edges.find_list(surfs(ii)->edgeind);
+      kk2=testSub.size();
+      if (int(testSub.size())==0){
+         errCount++;
+         cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+         << " has empty edgeind " <<  endl;
+      }
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+            << " makes unknown reference to edge " << surfs(ii)->edgeind[jj] << endl;
+         } else if (surfs(ii)->edgeind[jj]!=0){
+            ll2=edges(testSub[jj])->surfind.size();
+            flag=false;
+            for(ll=0;ll<ll2;ll++){
+               flag=flag || (edges(testSub[jj])->surfind[ll]);
+            }
+            if (!flag){
+               errCountBiDir++;
+               cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
+               << " makes uni-directional reference to edge " << surfs(ii)->edgeind[jj] << " list: " ; 
+               DisplayVector(surfs(ii)->edgeind); cout << " list (edge.surfind): " ; 
+               DisplayVector(edges(jj)->surfind);
+            }
+         }
+      }
+   }
+   if (errCount>0) {
+      cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0) {
+      cerr << "Test Connectivity surfs (edgeind) uni-directional Errors :" << errCountBiDir << endl;
+   }
+
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   errCount=0;
+   errCountBiDir=0;
+   kk=int(surfs.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=volus.find_list(surfs(ii)->voluind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && surfs(ii)->voluind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
+            << " makes unknown reference to volu " << surfs(ii)->voluind[jj] << endl;
+         } else if (surfs(ii)->voluind[jj]!=0){
+            ll2=volus(testSub[jj])->surfind.size();
+            flag=false;
+            for(ll=0;ll<ll2;ll++){
+               flag=flag || (volus(testSub[jj])->surfind[ll]);
+            }
+            if (!flag){
+               errCountBiDir++;
+               cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
+               << " makes uni-directional reference to volume " << surfs(ii)->voluind[jj] << " list: " ; 
+               DisplayVector(surfs(ii)->voluind); cout << " list (volu.surfind): " ; 
+               DisplayVector(volus(jj)->surfind);
+            }
+         }
+      }
+   }
+   if (errCount>0) {
+      cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0) {
+      cerr << "Test Connectivity surfs (voluind) uni-directional Errors :" << errCountBiDir << endl;
+   }
+
+
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   errCount=0;
+   errCountBiDir=0;
+   kk=int(volus.size());
+   for (ii=0; ii<kk;++ii){
+      testSub=surfs.find_list(volus(ii)->surfind);
+      kk2=testSub.size();
+      for(jj=0;jj< kk2; ++jj){
+         if (testSub[jj]<0 && volus(ii)->surfind[jj]!=0){
+            errCount++;
+            cerr << " Test Connectivity Error :" << errCount << " volu " << volus(ii)->index
+            << " makes unknown reference to surface " << volus(ii)->surfind[jj] << endl;
+         } else if (volus(ii)->surfind[jj]!=0){
+            ll2=surfs(testSub[jj])->voluind.size();
+            flag=false;
+            for(ll=0;ll<ll2;ll++){
+               flag=flag || (surfs(testSub[jj])->voluind[ll]);
+            }
+            if (!flag){
+               errCountBiDir++;
+               cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << volus(ii)->index
+               << " makes uni-directional reference to volume " << volus(ii)->surfind[jj] << " list: " ; 
+               DisplayVector(volus(ii)->surfind); cout << " list (surfs.voluind): " ; 
+               DisplayVector(surfs(jj)->voluind);
+            }
+         }
+      }
+   }
+   if (errCount>0){
+      cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+   }
+   if (errCountBiDir>0){
+      cerr << "Test Connectivity volus (surfind) uni-directional Errors :" << errCountBiDir << endl;
+   }
+   errTot+=errCount;
+   errTotBiDir+=errCountBiDir;
+   if (errTot>0){
+      cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+   }
+   if (errTotBiDir>0){
+      cerr << errTotBiDir << "  Total errors were detected in the bi-directionality of the connectivity list" << endl;
    }
 }
 
