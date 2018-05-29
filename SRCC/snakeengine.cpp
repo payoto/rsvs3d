@@ -436,6 +436,11 @@ void CleanupSnakeConnec(snake &snakein){
 	auto itSurf=indRmvSurf.begin();
 	auto itVolu=indRmvVolu.begin();
 
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 
 	while(iterFlag){
 		indRmvVert.clear();
@@ -705,9 +710,34 @@ void CleanupSnakeConnec(snake &snakein){
 		}
 	}
 
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 	snakein.ForceCloseContainers();
-	snakein.snakeconn.TightenConnectivity();
+	if (snakein.snakeconn.edges(snakein.snakeconn.edges.size()-1)->index==5064 && 
+		snakein.snakeconn.edges(snakein.snakeconn.edges.size()-2)->index==5063){
+		snakein.snakeconn.write("..\\TESTOUT\\snakeat_Problem41.dat");
+	}	
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
+	snakein.snakeconn.OrderEdges();
+	snakein.snakeconn.HashArray();
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 	snakein.PrepareForUse();
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 }
 /*
 void ConnecForwardEdit(vector<ConnecRemv> &connecEdit,int oldInd, int newInd,int startInd,

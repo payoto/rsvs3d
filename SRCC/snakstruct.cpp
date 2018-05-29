@@ -107,9 +107,10 @@ void snaxedge::disp() const{
 }
 
 void snaxsurf::disp() const{
-	cout << "snaxsurf #" << index << " | isBorder " << isBorder << " ";
+	cout << "snaxsurf #" << index << index << " | voluind " << voluind << " " << " | isBorder " << isBorder << " ";
 	normvector.disp();
 }
+
 // file i/o
 void snax::write(FILE *fid) const{
 
@@ -148,6 +149,18 @@ void snaxsurf::PrepareForUse() {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+void snax::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
+void snaxedge::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
+void snaxsurf::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
 void snax::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 	index+=nVert;
 }

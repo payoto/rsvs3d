@@ -29,8 +29,10 @@ void volu::disp() const{
    int i;
    cout << "volu : index " << index << " | fill " << fill << ", "  <<
    target << ", "<< error << " | isBorder " << isBorder << " | surfind " << surfind.size();
-   for (i=0; unsigned_int(i)<surfind.size();i++){
-      cout << "-" << surfind[i];
+   if (surfind.size()<30){
+      for (i=0; unsigned_int(i)<surfind.size();i++){
+         cout << "-" << surfind[i];
+      }
    }
    cout << endl;
 }
@@ -74,6 +76,61 @@ void vert::disp() const{
    }
    cout << endl;
 }
+
+// Class function definitions
+// Methods of meshpart : volu surf edge vert
+void volu::disptree(const mesh &meshin, int n) const{
+   int i;
+   for(i=0;i<n;i++){cout<< "  ";}
+   disp();
+   if(n>0 && surfind.size()<8){
+      for (i=0; unsigned_int(i)<surfind.size();i++){
+         meshin.surfs.isearch(surfind[i])->disptree(meshin,n-1);
+      }
+   }
+}
+
+void surf::disptree(const mesh &meshin, int n) const{
+   int i;
+   for(i=0;i<n;i++){cout<< "  ";}
+   disp();
+   if(n>0){
+      for (i=0; unsigned_int(i)<edgeind.size();i++){
+         meshin.edges.isearch(edgeind[i])->disptree(meshin,n-1);
+      }
+      for (i=0; unsigned_int(i)<voluind.size();i++){
+         if(voluind[i]>0){
+            meshin.volus.isearch(voluind[i])->disptree(meshin,n-1);
+         }
+      }
+   }
+}
+
+void edge::disptree(const mesh &meshin, int n) const{
+   int i;
+   for(i=0;i<n;i++){cout<< "  ";}
+   disp();
+   if(n>0){
+      for (i=0; unsigned_int(i)<vertind.size();i++){
+         meshin.verts.isearch(vertind[i])->disptree(meshin,n-1);
+      }
+      for (i=0; unsigned_int(i)<surfind.size();i++){
+         meshin.surfs.isearch(surfind[i])->disptree(meshin,n-1);
+      }
+   }
+}
+
+void vert::disptree(const mesh &meshin, int n) const{
+   int i;
+   for(i=0;i<n;i++){cout<< "  ";}
+   disp();
+   if(n>0){
+      for (i=0; unsigned_int(i)<edgeind.size();i++){
+         meshin.edges.isearch(edgeind[i])->disptree(meshin,n-1);
+      }
+   }
+}
+
 // Input and output
 void volu::write(FILE *fid) const{
 
@@ -672,14 +729,14 @@ void mesh::TestConnectivityBiDir(){
                ll2=edges(testSub[jj])->vertind.size();
                flag=false;
                for(ll=0;ll<ll2;ll++){
-                  flag=flag || (edges(testSub[jj])->vertind[ll]);
+                  flag=flag || (edges(testSub[jj])->vertind[ll]==verts(ii)->index);
                }
                if (!flag){
                   errCountBiDir++;
                   cerr << " Test Connectivity Error :" << errCountBiDir << " vertex " << verts(ii)->index
                   << " makes uni-directional reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
                   DisplayVector(verts(ii)->edgeind); cout << " list (edge.vertind): " ; 
-                  DisplayVector(edges(jj)->vertind);
+                  DisplayVector(edges(jj)->vertind);cerr << endl;
                }
             }
          }
@@ -711,14 +768,14 @@ void mesh::TestConnectivityBiDir(){
             ll2=verts(testSub[jj])->edgeind.size();
             flag=false;
             for(ll=0;ll<ll2;ll++){
-               flag=flag || (verts(testSub[jj])->edgeind[ll]);
+               flag=flag || (verts(testSub[jj])->edgeind[ll]==edges(ii)->index);
             }
             if (!flag){
                errCountBiDir++;
                cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
                << " makes uni-directional reference to vertex " << edges(ii)->vertind[jj] << " list: " ; 
                DisplayVector(edges(ii)->vertind); cout << " list (vert.edgeind): " ; 
-               DisplayVector(verts(jj)->edgeind);
+               DisplayVector(verts(jj)->edgeind);cerr << endl;
             }
          }
       }
@@ -747,14 +804,14 @@ void mesh::TestConnectivityBiDir(){
             ll2=surfs(testSub[jj])->edgeind.size();
             flag=false;
             for(ll=0;ll<ll2;ll++){
-               flag=flag || (surfs(testSub[jj])->edgeind[ll]);
+               flag=flag || (surfs(testSub[jj])->edgeind[ll]==edges(ii)->index);
             }
             if (!flag){
                errCountBiDir++;
                cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
                << " makes uni-directional reference to surface " << edges(ii)->surfind[jj] << " list: " ; 
                DisplayVector(edges(ii)->surfind); cout << " list (surf.edgeind): " ; 
-               DisplayVector(surfs(jj)->edgeind);
+               DisplayVector(surfs(jj)->edgeind);cerr << endl;
             }
          }
       }
@@ -790,14 +847,14 @@ void mesh::TestConnectivityBiDir(){
             ll2=edges(testSub[jj])->surfind.size();
             flag=false;
             for(ll=0;ll<ll2;ll++){
-               flag=flag || (edges(testSub[jj])->surfind[ll]);
+               flag=flag || (edges(testSub[jj])->surfind[ll]==surfs(ii)->index);
             }
             if (!flag){
                errCountBiDir++;
                cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
                << " makes uni-directional reference to edge " << surfs(ii)->edgeind[jj] << " list: " ; 
                DisplayVector(surfs(ii)->edgeind); cout << " list (edge.surfind): " ; 
-               DisplayVector(edges(jj)->surfind);
+               DisplayVector(edges(jj)->surfind);cerr << endl;
             }
          }
       }
@@ -826,14 +883,14 @@ void mesh::TestConnectivityBiDir(){
             ll2=volus(testSub[jj])->surfind.size();
             flag=false;
             for(ll=0;ll<ll2;ll++){
-               flag=flag || (volus(testSub[jj])->surfind[ll]);
+               flag=flag || (volus(testSub[jj])->surfind[ll]==surfs(ii)->index);
             }
             if (!flag){
                errCountBiDir++;
                cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
                << " makes uni-directional reference to volume " << surfs(ii)->voluind[jj] << " list: " ; 
                DisplayVector(surfs(ii)->voluind); cout << " list (volu.surfind): " ; 
-               DisplayVector(volus(jj)->surfind);
+               DisplayVector(volus(jj)->surfind);cerr << endl;
             }
          }
       }
@@ -863,14 +920,14 @@ void mesh::TestConnectivityBiDir(){
             ll2=surfs(testSub[jj])->voluind.size();
             flag=false;
             for(ll=0;ll<ll2;ll++){
-               flag=flag || (surfs(testSub[jj])->voluind[ll]);
+               flag=flag || (surfs(testSub[jj])->voluind[ll]==volus(ii)->index);
             }
             if (!flag){
                errCountBiDir++;
                cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << volus(ii)->index
                << " makes uni-directional reference to volume " << volus(ii)->surfind[jj] << " list: " ; 
                DisplayVector(volus(ii)->surfind); cout << " list (surfs.voluind): " ; 
-               DisplayVector(surfs(jj)->voluind);
+               DisplayVector(surfs(jj)->voluind);cerr << endl;
             }
          }
       }
@@ -1106,13 +1163,14 @@ void mesh::PopulateIndices(){
 void surf::OrderEdges(mesh *meshin)
 {
    unordered_multimap<int,int> vert2Edge;
-   vector<int> edge2Vert,edgeSub,edgeIndOrig;
+   vector<int> edge2Vert,edgeSub,edgeIndOrig,edgeIndOrig2,edgeFinalShrunk;
    int vertCurr,edgeCurr;
    int ii,jj;
    std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
    unordered_multimap<int,int>::iterator it;
 
    if (edgeind.size()>0){
+      edgeIndOrig2=edgeind;
       sort(edgeind);
       unique(edgeind);
 
@@ -1160,6 +1218,29 @@ void surf::OrderEdges(mesh *meshin)
          vertCurr=edge2Vert[((it->second)/2)*2+jj];
          edgeind[ii]=edgeCurr;
       }
+      #ifdef SAFE_ALGO
+      edgeFinalShrunk=edgeind;
+      sort(edgeFinalShrunk);
+      unique(edgeFinalShrunk);
+      if(edgeFinalShrunk.size()!=edgeIndOrig.size()){
+         cout << endl;
+         cout << "edgeind (pre)- ";
+         DisplayVector(edgeIndOrig2);
+         cout << endl;
+         cout << "edgeind (sort)- ";
+         DisplayVector(edgeIndOrig);
+         cout << endl;
+         cout << "edgeind (final)- ";
+         DisplayVector(edgeind);
+         cout << endl;
+         edgeind=edgeIndOrig;
+         disptree((*meshin),2);
+         cerr << "Error: Order Edges removed some edges from the surface list "<< endl;
+         cerr << " The surface had incorrect connectivity, it was self crossing "<< endl;
+         cerr << "   in function:" <<  __PRETTY_FUNCTION__ << endl;
+         throw invalid_argument ("Incorrect surface connectivity");
+      }
+      #endif //SAGE_ALGO
       isordered=true;
    }
 }

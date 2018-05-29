@@ -183,19 +183,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			else {
 				actVert=1;
 				#ifdef TEST_POSTPROCESSING
-				int kk,kk2;
-				ii=599;
-				meshout.surfs(ii)->disp();
-				for(kk=0;kk<int(meshout.surfs(ii)->edgeind.size());kk++){
-					meshout.edges.isearch(meshout.surfs(ii)->edgeind[kk])->disp();
-				}
-				for(kk=0;kk<int(meshout.surfs(ii)->edgeind.size());kk++){
-					for(kk2=0;kk2<int(meshout.edges.isearch(meshout.surfs(ii)->
-						edgeind[kk])->vertind.size());kk2++){
-						meshout.verts.isearch(meshout.edges.isearch(meshout.surfs(ii)->
-							edgeind[kk])->vertind[kk2])->disp();
-					}
-				}
+				meshout.surfs(ii)->disptree(meshout,4);
 				
 				cerr << "Warning: postprocessing.cpp:tecplotfile::VolFaceMap"<< endl ;
 				cerr << "		Mesh Output failed in output of facemap data" << endl;

@@ -43,6 +43,90 @@ function [grid]=GridStructInit(varargin)
     
 end
 
+function [grid]=LoadGridFromFile(filePath)
+    [grid]=GridStructInit();
+    fid=fopen(filePath,'r');
+    
+    str=fgetl(fid);
+    nums=str2num(str);
+    grid.vert(1).index=1;
+    grid.vert=repmat(grid.vert,[1,nums(1)]);
+    for ii=1:numel(grid.vert)
+        str=fgetl(fid);
+        nums=str2num(str);
+        [grid.vert(ii)]=ParseVert(grid.vert(ii),nums);
+    end
+    
+    
+    str=fgetl(fid);
+    nums=str2num(str);
+    grid.edge(1).index=1;
+    grid.edge=repmat(grid.edge,[1,nums(1)]);
+    for ii=1:numel(grid.edge)
+        str=fgetl(fid);
+        nums=str2num(str);
+        [grid.edge(ii)]=ParseEdge(grid.edge(ii),nums);
+    end
+    
+    
+    str=fgetl(fid);
+    nums=str2num(str);
+    grid.surf(1).index=1;
+    grid.surf=repmat(grid.surf,[1,nums(1)]);
+    for ii=1:numel(grid.surf)
+        str=fgetl(fid);
+        nums=str2num(str);
+        [grid.surf(ii)]=ParseSurf(grid.surf(ii),nums);
+    end
+    
+    
+    str=fgetl(fid);
+    nums=str2num(str);
+    grid.volu(1).index=1;
+    grid.volu=repmat(grid.volu,[1,nums(1)]);
+    for ii=1:numel(grid.volu)
+        str=fgetl(fid);
+        nums=str2num(str);
+        [grid.volu(ii)]=ParseVolu(grid.volu(ii),nums);
+    end
+    fclose(fid);
+end
+
+function [vert]=ParseVert(vert,nums)
+    vert.index=nums(1);
+    s=3;
+    vert.edgeind=nums(s+(1:nums(s)));
+    s=3+nums(s)+1;
+    vert.coord=nums(s+(1:nums(s)));
+end
+
+
+function [vert]=ParseEdge(vert,nums)
+    vert.index=nums(1);
+    s=3;
+    vert.vertind=nums(s+(1:nums(s)));
+    s=3+nums(s)+1;
+    vert.surfind=nums(s+(1:nums(s)));
+end
+
+
+function [vert]=ParseSurf(vert,nums)
+    vert.index=nums(1);
+    vert.fill=nums(2);
+    s=6;
+    vert.voluind=nums(s+(1:nums(s)));
+    s=s+nums(s)+1;
+    vert.edgeind=nums(s+(1:nums(s)));
+end
+
+
+function [vert]=ParseVolu(vert,nums)
+    vert.index=nums(1);
+    
+    vert.fill=nums(2);
+    s=6;
+    vert.surfind=nums(s+(1:nums(s)));
+end
 %% Grid Connectivity methods
 
 function [vertInSurf]=FindVertInSurf(grid)
@@ -78,7 +162,7 @@ function [voluOnRight]=FindRightSurface2D(grid)
     % To be updated if necessary.
     
     voluOnRight=ones(size(grid.edge));
-
+    
     
 end
 
@@ -191,14 +275,18 @@ function []=Plot3DEdge(grid,textLevel)
         for ii=1:numel(grid.edge)
             arr=((ii-1)*2)+1:ii*2;
             plot3(coord(arr,1),coord(arr,2),coord(arr,3),'o-')
-            text(mean(coord(arr,1)),mean(coord(arr,2)),mean(coord(arr,3)),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mean(coord(arr,1)),mean(coord(arr,2)),mean(coord(arr,3)),cellStr{ii})
+            end
         end
     else
         
         for ii=1:numel(grid.edge)
             arr=((ii-1)*2)+1:ii*2;
             plot(coord(arr,1),coord(arr,2),'o-')
-            text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            end
         end
     end
 end
@@ -242,14 +330,18 @@ function []=Plot3DSurf(grid,textLevel)
                 +repmat(mCoord,[size(coord,1),1]);
             plot3(coord([1:end,1],1),coord([1:end,1],2),coord([1:end,1],3),...
                 [vertexSymbols{mod(ii,numel(vertexSymbols))+1},'-']);
-            text(mCoord(:,1),mCoord(:,2),mCoord(:,3),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mCoord(:,1),mCoord(:,2),mCoord(:,3),cellStr{ii})
+            end
         end
     else
         
         for ii=1:numel(grid.edge)
             arr=((ii-1)*2)+1:ii*2;
             plot(coord(arr,1),coord(arr,2),'o-')
-            text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            end
         end
     end
 end
@@ -294,14 +386,18 @@ function []=Plot3DVolume(grid,textLevel)
             plot3([coord([1:end,1],1);mCoord(:,1)],[coord([1:end,1],2);...
                 mCoord(:,2)],[coord([1:end,1],3);mCoord(:,3)],...
                 [vertexSymbols{mod(ii,numel(vertexSymbols))+1}]);
-            text(mCoord(:,1),mCoord(:,2),mCoord(:,3),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mCoord(:,1),mCoord(:,2),mCoord(:,3),cellStr{ii})
+            end
         end
     else
         
         for ii=1:numel(grid.edge)
             arr=((ii-1)*2)+1:ii*2;
             plot(coord(arr,1),coord(arr,2),'o-')
-            text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            if ~isempty(cellStr{ii})
+                text(mean(coord(arr,1)),mean(coord(arr,2)),cellStr{ii})
+            end
         end
     end
 end
