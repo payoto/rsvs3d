@@ -82,7 +82,7 @@ void vert::disp() const{
 void volu::disptree(const mesh &meshin, int n) const{
    int i;
    for(i=0;i<n;i++){cout<< "  ";}
-   disp();
+      disp();
    if(n>0 && surfind.size()<8){
       for (i=0; unsigned_int(i)<surfind.size();i++){
          meshin.surfs.isearch(surfind[i])->disptree(meshin,n-1);
@@ -93,7 +93,7 @@ void volu::disptree(const mesh &meshin, int n) const{
 void surf::disptree(const mesh &meshin, int n) const{
    int i;
    for(i=0;i<n;i++){cout<< "  ";}
-   disp();
+      disp();
    if(n>0){
       for (i=0; unsigned_int(i)<edgeind.size();i++){
          meshin.edges.isearch(edgeind[i])->disptree(meshin,n-1);
@@ -109,7 +109,7 @@ void surf::disptree(const mesh &meshin, int n) const{
 void edge::disptree(const mesh &meshin, int n) const{
    int i;
    for(i=0;i<n;i++){cout<< "  ";}
-   disp();
+      disp();
    if(n>0){
       for (i=0; unsigned_int(i)<vertind.size();i++){
          meshin.verts.isearch(vertind[i])->disptree(meshin,n-1);
@@ -123,7 +123,7 @@ void edge::disptree(const mesh &meshin, int n) const{
 void vert::disptree(const mesh &meshin, int n) const{
    int i;
    for(i=0;i<n;i++){cout<< "  ";}
-   disp();
+      disp();
    if(n>0){
       for (i=0; unsigned_int(i)<edgeind.size();i++){
          meshin.edges.isearch(edgeind[i])->disptree(meshin,n-1);
@@ -452,7 +452,38 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
       verts.isHash=1;
       edges.isSetMI=1;
       verts.isSetMI=1;
+   } else if (typeInd==6){ // Modify surface index in scoped mode
 
+      newSub=surfs.find(newInd);
+      oldSub=surfs.find(oldInd);
+
+      subList=edges.find_list(scopeInd);
+      for (ii=0;ii<int(subList.size());++ii){
+         for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+            if(edges(subList[ii])->surfind[jj]==oldInd){
+               edges[subList[ii]].surfind[jj]=newInd;
+               surfs[newSub].edgeind.push_back(edges[subList[ii]].index); 
+
+               //cout << " " << edges[subList[ii]].index <<  " ";
+               for (kk=0;kk<int(surfs(oldSub)->edgeind.size());++kk){
+                  if(surfs(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+                     surfs[oldSub].edgeind.erase(
+                        surfs[oldSub].edgeind.begin()+kk);
+                     kk--;
+                  }
+               }
+            }
+         } 
+      }
+      for(ii=0;ii<int(surfs(newSub)->voluind.size());ii++){
+         if(surfs(newSub)->voluind[ii]>0){
+            volus.elems[volus.find(surfs(newSub)->voluind[ii])].surfind.push_back(newInd);
+         }
+      }
+      edges.isHash=1;
+      surfs.isHash=1;
+      edges.isSetMI=1;
+      surfs.isSetMI=1;
    } else {
 
       cerr << "Error unknown type of object for index switching" <<endl;
@@ -571,8 +602,8 @@ void mesh::TestConnectivity(){
       if(verts(ii)->edgeind.size()==0){
          errCount++;
          cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-               << " Has empty connectivity list "; 
-               cerr << endl;
+         << " Has empty connectivity list "; 
+         cerr << endl;
 
       } else {
          testSub=edges.find_list(verts(ii)->edgeind);
@@ -689,7 +720,7 @@ void mesh::TestConnectivity(){
       }
    }
    if (errCount>0){
-   cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+      cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
    }
    errTot+=errCount;
    if (errTot>0){
@@ -712,8 +743,8 @@ void mesh::TestConnectivityBiDir(){
       if(verts(ii)->edgeind.size()==0){
          errCount++;
          cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-               << " Has empty connectivity list "; 
-               cerr << endl;
+         << " Has empty connectivity list "; 
+         cerr << endl;
 
       } else {
          testSub=edges.find_list(verts(ii)->edgeind);
@@ -1164,17 +1195,20 @@ void surf::OrderEdges(mesh *meshin)
 {
    unordered_multimap<int,int> vert2Edge;
    vector<int> edge2Vert,edgeSub,edgeIndOrig,edgeIndOrig2,edgeFinalShrunk;
+   vector<bool> isDone;
+   bool isTruncated;
    int vertCurr,edgeCurr;
    int ii,jj;
    std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
    unordered_multimap<int,int>::iterator it;
-
+   isTruncated=false;
    if (edgeind.size()>0){
       edgeIndOrig2=edgeind;
       sort(edgeind);
       unique(edgeind);
 
       edgeIndOrig=edgeind;
+      isDone.assign(edgeIndOrig.size(),false);
       edgeSub=meshin->edges.find_list(edgeind);
       edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);
 
@@ -1182,6 +1216,7 @@ void surf::OrderEdges(mesh *meshin)
 
       vertCurr=edge2Vert[0];
       edgeCurr=edgeind[0];
+      isDone[0]=true;
       it=vert2Edge.end();
       for(ii=1;ii<int(edgeind.size());++ii){
          range=vert2Edge.equal_range(vertCurr);
@@ -1192,7 +1227,7 @@ void surf::OrderEdges(mesh *meshin)
             DisplayVector(edgeind);
 
             cout << it->second << " " << 1/2 << 2/3 <<  endl;
-            throw range_error ("unordered_multimap went beyond its range in OrderEdges");
+            cout<< "throw range_error (" <<"unordered_multimap went beyond its range in OrderEdges" <<")";
          }
          if (vert2Edge.count(vertCurr)==1){
             jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
@@ -1204,19 +1239,42 @@ void surf::OrderEdges(mesh *meshin)
             cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
             jj=vert2Edge.count(vertCurr);
             cerr << jj  <<  endl; 
-             cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-            throw range_error ("Found a single vertex - surface is not closed");
+            cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+            cout << "throw range_error ("<<"Found a single vertex - surface is not closed"<<")";
+            cout << endl;
+            disp();
          }
          #endif // SAFe_ACCESS
          jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
 
          it=range.first;
          if (jj){++it;}
+         if (!isDone[(it->second)/2]){
+            isDone[(it->second)/2]=true;
+            edgeCurr=edgeIndOrig[(it->second)/2];
+            jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
+            vertCurr=edge2Vert[((it->second)/2)*2+jj];
+            edgeind[ii]=edgeCurr;
+         } else {
+            edgeind.erase(edgeind.begin()+ii);
+            isTruncated=true;
+            break;
+         }
+      }
+      if (isTruncated){
 
-         edgeCurr=edgeIndOrig[(it->second)/2];
-         jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
-         vertCurr=edge2Vert[((it->second)/2)*2+jj];
-         edgeind[ii]=edgeCurr;
+         surf newSurf=*this;
+         newSurf.index=meshin->surfs.GetMaxIndex()+1;
+         newSurf.voluind=voluind;
+         newSurf.edgeind.clear();
+         for (ii=0;ii<int(edgeIndOrig.size());++ii){
+            if(!isDone[ii]){
+               newSurf.edgeind.push_back(edgeIndOrig[ii]);
+            }
+         }
+         meshin->surfs.push_back(newSurf);
+         meshin->SwitchIndex(6,index,newSurf.index,newSurf.edgeind);
+         meshin->surfs(meshin->surfs.size()-1)->disptree(*meshin,1);
       }
       #ifdef SAFE_ALGO
       edgeFinalShrunk=edgeind;
@@ -1233,12 +1291,12 @@ void surf::OrderEdges(mesh *meshin)
          cout << "edgeind (final)- ";
          DisplayVector(edgeind);
          cout << endl;
-         edgeind=edgeIndOrig;
-         disptree((*meshin),2);
-         cerr << "Error: Order Edges removed some edges from the surface list "<< endl;
+         
+         //disptree((*meshin),2);
+         cerr << "Warning: OrderEdges removed some edges from the surface list "<< endl;
          cerr << " The surface had incorrect connectivity, it was self crossing "<< endl;
          cerr << "   in function:" <<  __PRETTY_FUNCTION__ << endl;
-         throw invalid_argument ("Incorrect surface connectivity");
+         //throw invalid_argument ("Incorrect surface connectivity");
       }
       #endif //SAGE_ALGO
       isordered=true;
@@ -1252,7 +1310,7 @@ int mesh::OrderEdges(){
    for (ii = 0; ii < surfs.size(); ++ii)
    {
       if (!surfs(ii)->isready(true)){
-         surfs[ii].OrderEdges(this);
+         surfs.elems[ii].OrderEdges(this);
          kk=true;
       }
    }
@@ -1339,7 +1397,7 @@ void mesh::SetBorders(){
 }
 
 void mesh::ForceCloseContainers(){
-   
+
    int ii,jj,iEdge,iSurf,kk;
    int nVert,nEdge,nSurf,nBlocks;
    bool is3DMesh=volus.size()>0;
@@ -1454,24 +1512,24 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
                if (verts.find(
                   edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
                   cerr << "Edge index: " << verts(currQueue[ii])->edgeind[jj] << " vertex index:" <<  
-                     edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
-                  cerr << "Edge connected to non existant vertex" <<endl;
-                  cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-                  throw range_error (" : Vertex not found");
-               }
-               
+               edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+               cerr << "Edge connected to non existant vertex" <<endl;
+               cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+               throw range_error (" : Vertex not found");
+            }
+
                #endif
 
-            }
-            vertStatus[currQueue[ii]]=true;
-            nVertExplored++;
          }
+         vertStatus[currQueue[ii]]=true;
+         nVertExplored++;
       }
+   }
 
       // Reset current queue and set to next queue
-      currQueue.clear();
-      currQueue.swap(nextQueue);
+   currQueue.clear();
+   currQueue.swap(nextQueue);
 
-   }
-   return(nBlocks);
+}
+return(nBlocks);
 }

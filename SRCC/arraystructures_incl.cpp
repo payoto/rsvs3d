@@ -579,9 +579,10 @@ template<class T> inline void ArrayStruct <T>::assign(int n, T& newelem)
 template<class T> inline void ArrayStruct <T>::push_back(T& newelem)  
 {
 	elems.push_back(newelem);
-	isHash=0;
-	isSetMI=0;
-	readyforuse=false;
+
+	maxIndex=newelem.index>maxIndex ? newelem.index : maxIndex;
+	hashTable.emplace(newelem.Key(),elems.size()-1);
+
 }
 template<class T> inline void ArrayStruct <T>::reserve(int n)  
 {

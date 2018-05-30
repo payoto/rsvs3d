@@ -305,6 +305,10 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	} else if (dir==-2){
 		mp=&snax::tovert;
 
+	} else {
+		cerr << "Error: Direction of arrived snaxel is invalid "<< endl;
+		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument("direction was invalid");
 	}
 	isReady=fullsnake.snaxs.checkready();
 
@@ -435,12 +439,6 @@ void CleanupSnakeConnec(snake &snakein){
 	auto itEdge=indRmvEdge.begin();
 	auto itSurf=indRmvSurf.begin();
 	auto itVolu=indRmvVolu.begin();
-
-	#ifdef SAFE_ALGO
-	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
 
 	while(iterFlag){
 		indRmvVert.clear();
@@ -707,37 +705,19 @@ void CleanupSnakeConnec(snake &snakein){
 			//tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
 			//ttt++;
 
+		} else {
+			snakein.HashArrayNM();
+			snakein.ForceCloseContainers();
+			#ifdef SAFE_ALGO
+			if (snakein.Check3D()){
+				snakein.snakeconn.TestConnectivityBiDir();
+			}
+			#endif
+			snakein.snakeconn.OrderEdges();
 		}
 	}
-
-	#ifdef SAFE_ALGO
-	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	snakein.ForceCloseContainers();
-	if (snakein.snakeconn.edges(snakein.snakeconn.edges.size()-1)->index==5064 && 
-		snakein.snakeconn.edges(snakein.snakeconn.edges.size()-2)->index==5063){
-		snakein.snakeconn.write("..\\TESTOUT\\snakeat_Problem41.dat");
-	}	
-	#ifdef SAFE_ALGO
-	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	snakein.snakeconn.OrderEdges();
-	snakein.snakeconn.HashArray();
-	#ifdef SAFE_ALGO
-	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
 	snakein.PrepareForUse();
-	#ifdef SAFE_ALGO
-	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
+
 }
 /*
 void ConnecForwardEdit(vector<ConnecRemv> &connecEdit,int oldInd, int newInd,int startInd,

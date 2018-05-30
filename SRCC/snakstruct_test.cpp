@@ -220,7 +220,7 @@ int Test_snakeinit(){
 	int start_s,stop_s,ii;
 	//bool errFlag;
 	int errTest=0;
-	FILE* fidErr;
+	
 
 	try {
 		fileToOpen="..\\TESTOUT\\TestSnake.plt";
@@ -246,22 +246,13 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<300;++ii){
+		for(ii=0;ii<100;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 			}
-			if (ii==41){
-				fidErr=fopen("..\\TESTOUT\\snakebefore_Problem41.dat","w");
-				if(fidErr!=NULL){
-					testSnake.snakeconn.PrepareForUse();
-					testSnake.snakeconn.OrderEdges();
-					testSnake.snakeconn.SetBorders();
-					testSnake.snakeconn.write(fidErr);
-					fclose(fidErr);
-				}
-			}	
+
 			Test_stepalgo(testSnake, dt, isImpact,outSnake);
 			
 			totT=totT+1;
@@ -377,11 +368,7 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	cout << "PrepareForUse: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
 
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
+	
 	testSnake.SnaxImpactDetection(isImpact);
 	MergeAllContactVertices(testSnake, isImpact);
 
@@ -389,6 +376,7 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 	cout << "Merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 	start_s=clock();
 	testSnake.PrepareForUse();
+	CleanupSnakeConnec(testSnake);
 	#ifdef SAFE_ALGO
 	if (testSnake.Check3D()){
 		testSnake.snakeconn.TestConnectivityBiDir();
