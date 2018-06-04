@@ -14,6 +14,8 @@ contexts: !merge
       scope: variable.language.c++
     - match: \b(snax|snake|snaxarray|snaxedge|snaxsurf|snaxedgearray|snaxsurfarray|coordvec)\b
       scope: variable.language.c++
+    - match: \b(ConnecRemv|triangle|triangulation|triarray|tripointarray|trianglepoint)\b
+      scope: variable.language.c++
 
   types: !prepend
     - include: user-types

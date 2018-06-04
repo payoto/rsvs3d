@@ -33,9 +33,82 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
-
+class triangle;
+class trianglepoint;
+typedef SnakStruct<triangle> triarray;
+typedef SnakStruct<trianglepoint>  tripointarray;
 // Base classes
+class triangulation 
+{
+public:
+	vector<int> acttri;
+	triarray stattri;
+	triarray dynatri;
+	tripointarray trivert;
+}
 
+
+
+class triangle : public meshpart , public snakpart {	
+private:
+	bool isready=false;
+public:
+	
+	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
+	vector<int> pointind;
+	int constrind; // Element in the constraint vector
+	double constrinfluence; //usually 1 or -1
+
+	// interface functions
+	void disp() const;
+	void disptree(const mesh &meshin, int n) const {};
+	int Key() const {return (index);};
+	int KeyParent() const {return (constrind);};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void PrepareForUse(){};
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(isready);}
+	#pragma GCC diagnostic pop
+	void read(FILE * fid);
+	void write(FILE * fid) const;
+	void SwitchIndex(int typeInd, int oldInd, int newInd){}
+	void TightenConnectivity(){}
+	
+	surf(){ // Constructor
+		index=0;
+
+		pointtype.assign(3,0);
+		pointind.assign(3,0);
+		isready=false;
+	}
+};
+
+
+class trianglepoint : public meshpart , public snakpart {	
+public:
+	
+	coordvec coord;
+	int parentsurf;
+
+	// interface functions
+	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
+	int Key() const {return (index);};
+	int KeyParent() const {return (parentsurf);};
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
+	void PrepareForUse(){};
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const {return(true);}
+	#pragma GCC diagnostic pop
+	void read(FILE * fid);
+	void write(FILE * fid) const;
+	void SwitchIndex(int typeInd, int oldInd, int newInd){}
+	void TightenConnectivity(){}
+
+};
 
 void CalculateSnakeVel(snake &snakein);
 
