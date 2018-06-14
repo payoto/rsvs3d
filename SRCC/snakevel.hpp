@@ -23,6 +23,7 @@
 
 //=================================
 // included dependencies
+#include <vector>
 #include "arraystructures.hpp"
 #include "snakstruct.hpp" 
 
@@ -37,6 +38,10 @@ class triangle;
 class trianglepoint;
 typedef SnakStruct<triangle> triarray;
 typedef SnakStruct<trianglepoint>  tripointarray;
+
+// Template Class
+
+
 // Base classes
 class triangulation 
 {
@@ -45,13 +50,14 @@ public:
 	triarray stattri;
 	triarray dynatri;
 	tripointarray trivert;
-}
+};
+
 
 
 
 class triangle : public meshpart , public snakpart {	
 private:
-	bool isready=false;
+	bool isTriangleReady=false;
 public:
 	
 	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
@@ -61,26 +67,28 @@ public:
 
 	// interface functions
 	void disp() const;
-	void disptree(const mesh &meshin, int n) const {};
 	int Key() const {return (index);};
 	int KeyParent() const {return (constrind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {return(isready);}
+	bool isready(bool isInMesh) const {
+		return(isTriangleReady);
+	}
+	void SwitchIndex(int typeInd, int oldInd, int newInd){}
+	void disptree(const mesh &meshin, int n) const {};
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-	void SwitchIndex(int typeInd, int oldInd, int newInd){}
 	void TightenConnectivity(){}
 	
-	surf(){ // Constructor
+	triangle(){ // Constructor
 		index=0;
 
 		pointtype.assign(3,0);
 		pointind.assign(3,0);
-		isready=false;
+		isTriangleReady=false;
 	}
 };
 
@@ -102,10 +110,10 @@ public:
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
 	bool isready(bool isInMesh) const {return(true);}
+	void SwitchIndex(int typeInd, int oldInd, int newInd){}
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-	void SwitchIndex(int typeInd, int oldInd, int newInd){}
 	void TightenConnectivity(){}
 
 };

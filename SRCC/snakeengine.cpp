@@ -11,6 +11,7 @@
 using namespace std;
 
 
+
 void ConnecRemv::disp() {
 	cout << "connrmv:  ki " << keepind << " | tobj " << typeobj << " | rmvind ";
 	DisplayVector(rmvind);
@@ -74,7 +75,7 @@ void SpawnAtVertex(snake& snakein,int indVert){
 		SpawnAtVertexSurf2D( newsnake, nEdge, voluInds);
 	}
 	
-	snakein.SetMaxIndexNM();
+	snakein.SetMaxIndexNM();  
 
 	snakein.MakeCompatible_inplace(newsnake);
 
@@ -89,7 +90,7 @@ void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, cons
 	vector<int> edgeSubsTemp;
 
 	newsnake.snakeconn.verts.PopulateIndices();
-	newsnake.snaxs.PopulateIndices();
+	newsnake.snaxs.PopulateIndices(); 
 	for (ii=0;ii<nVert;++ii){
 		// Finds the to vertex
 		jj=int(newsnake.snakemesh->edges(edgeSubs[ii])->vertind[0]==indVert);

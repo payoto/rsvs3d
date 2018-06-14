@@ -20,7 +20,8 @@ OBJDIR=obj
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
 #make testnew/testall options
-TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp snakeengine.cpp snakevel.cpp
+TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp
+TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 

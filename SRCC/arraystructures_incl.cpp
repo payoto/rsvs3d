@@ -4,10 +4,10 @@ this .cpp file is INCLUDED as part of arraystructures.hpp and  cannot be
 compiled on its own.
 
 */
-
 #ifndef ARRAYSTRUCTS_INCL_H_INCLUDED
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
+#include "arraystructures.hpp"
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat)
 {
 	vecRoot.insert(vecRoot.end(),vecConcat.begin(),vecConcat.end());
@@ -680,11 +680,11 @@ template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,i
 	}
 
 }
-#endif // ARRAYSTRUCTS_INCL_H_INCLUDED 
 
 
 
-template<template<class Q, class R> class T, class Q, class R> void EraseKeyPair(T<Q,R> hashTable, Q key, R pos){
+template<template<class Q, class R> class T,class Q, class R>
+	void EraseKeyPair(T<Q,R> hashTable, Q key, R pos){
 
 	typename T<Q,R>::iterator it ;
 	it= hashTable.find(key);
@@ -700,3 +700,6 @@ template<template<class Q, class R> class T, class Q, class R> void EraseKeyPair
 		throw invalid_argument ("Key value pair not found and could not be removed");
 	}
 }
+
+
+#endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

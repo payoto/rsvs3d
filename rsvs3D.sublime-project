@@ -51,5 +51,45 @@
 			"User",
 			"C++RSVS3D"
 		]
-	}
+	},
+	"linters": {
+        // "cppcheck": {
+	       //  "@disable": false,
+	       //  "args": [],
+	       //  "enable": "style",
+	       //  "excludes": [],
+	       //  "std": ["c++11"],
+	       //  //"selector": "source.cpp, source.hpp"
+        // },
+        "gcc": {
+              "disable": false,
+              "selector": "source.c++",
+              // C-specific settings
+              "c_executable": "gcc",
+              "c_extra_flags": [
+                  "-fsyntax-only",
+                  "-std=c90",
+              ],
+              
+              // C++-specific settings
+              "c++_executable": "g++",
+              "c++_extra_flags": [
+                  "-fsyntax-only",
+                  "-std=c++11",
+              ],
+              
+              // include_dirs for both C and C++
+              // "include_dirs": [
+              //      "${project_folder}/include",
+              //      //"${project_folder}\\SRCC",
+              //  ],
+          },
+    },
+    "settings":
+    {
+         "sublimegdb_workingdir": "${folder:${project_path:main_test.exe}}",
+         // NOTE: You MUST provide --interpreter=mi for the plugin to work
+         "sublimegdb_commandline": "gdb --interpreter=mi ./main_test.exe"
+    
+    }
 }

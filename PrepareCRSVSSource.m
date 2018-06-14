@@ -1,4 +1,4 @@
-function []=PrepareCRSVSSource(fileName)
+function []=PrepareCRSVSSource(targetPath,caseName)
     % THis function generates the C subroutines necessary for the
     % calculation and differentiation of Volume and area in 3-Dimensions
     %
@@ -17,16 +17,41 @@ function []=PrepareCRSVSSource(fileName)
         ccodeGen(ii)=ChangeUnderScoresToBrackets(ccodeGen(ii));
     end
     
-    cellStr=cell(0);
-    for ii=1:numel(ccodeGen)
-        [cellStr]=[cellStr,CodeGenToCpp(ccodeGen(ii))];
-    end
+    [cellSource,cellHeader]=IncludeLib(caseName);
     
-    FID=fopen(fileName,'w');
-    WriteToFile(cellStr,FID)
+    for ii=1:numel(ccodeGen)
+        [cellSourceTemp,cellHeaderTemp]=CodeGenToCpp(ccodeGen(ii));
+        [cellSource]=[cellSource,cellSourceTemp];
+        [cellHeader]=[cellHeader,cellHeaderTemp];
+    end
+    cellSource=regexprep(cellSource,'double &   A0','ArrayVec<double> &   A0');
+    cellHeader=regexprep(cellHeader,'double &   A0','ArrayVec<double> &   A0');
+    
+    
+    sourceName=[targetPath,filesep,caseName,'.cpp'];
+    headerName=[targetPath,filesep,caseName,'.hpp'];
+    
+    FID=fopen(sourceName,'w');
+    WriteToFile(cellSource,FID)
+    fclose(FID);
+    FID=fopen(headerName,'w');
+    WriteToFile(cellHeader,FID)
     fclose(FID);
     
 end
+
+%% Set pre-code
+function [cellSource,cellHeader]=IncludeLib(caseName)
+    
+    cellSource={'#include <vector>','#include "vectorarray.hpp"',...
+        '#include "snakevel.hpp"','using namespace std;',''};
+    
+    cellHeader=[{['#ifndef ',upper(caseName),'_H_INCLUDED'],...
+        ['#define ',upper(caseName),'_H_INCLUDED'],''},cellSource];
+    
+end
+
+
 %% Code Generation functions
 
 function ccodeGen=ChangeUnderScoresToBrackets(ccodeGen)
@@ -64,29 +89,30 @@ function [cinputGen]=CInputGenStruct(type,varargin)
     
 end
 
-function [cellStr]=CodeGenToCpp(ccodeGen)
+function [cellSource,cellHeader]=CodeGenToCpp(ccodeGen)
     
     fieldsFunc={'f','df','ddf'};
     kk=0;
     for ii=1:numel(fieldsFunc)
         if ~isempty(ccodeGen.(fieldsFunc{ii}))
-            kk=kk+1;cellStr{kk}=[ccodeGen.type,' ',ccodeGen.name,'_',fieldsFunc{ii},'('];
+            kk=kk+1;cellSource{kk}=[ccodeGen.type,' ',ccodeGen.name,'_',fieldsFunc{ii},'('];
             outVar=regexp(ccodeGen.(fieldsFunc{ii}),';\s*\w+','match');
             outVar=deblank(outVar{end}(4:end));
             for jj=1:numel(ccodeGen.inputs)
-                cellStr{kk}=[cellStr{kk},ccodeGen.inputs(jj).type,' ',...
+                cellSource{kk}=[cellSource{kk},ccodeGen.inputs(jj).type,' ',...
                     regexprep(ccodeGen.inputs(jj).name,'#MATCHOUT#',outVar)];
                 if jj<numel(ccodeGen.inputs)
-                    cellStr{kk}=[cellStr{kk},' , '];
+                    cellSource{kk}=[cellSource{kk},' , '];
                 end
             end
-            cellStr{kk}=[cellStr{kk},' ) {'];
-            kk=kk+1;cellStr{kk}=ccodeGen.(fieldsFunc{ii});
+            cellHeader{ii}=[cellSource{kk},' );'];
+            cellSource{kk}=[cellSource{kk},' ) {'];
+            kk=kk+1;cellSource{kk}=ccodeGen.(fieldsFunc{ii});
 
 
-            kk=kk+1;cellStr{kk}='}';
-            kk=kk+1;cellStr{kk}='';
-            kk=kk+1;cellStr{kk}='';
+            kk=kk+1;cellSource{kk}='}';
+            kk=kk+1;cellSource{kk}='';
+            kk=kk+1;cellSource{kk}='';
         end
     end
     

@@ -8,6 +8,8 @@ This file adds the support for a second hashed variable called by KeyParent
 #ifndef SNAKSTRUCT_INCL_H_INCLUDED
 #define SNAKSTRUCT_INCL_H_INCLUDED
 
+#include "snakstruct.hpp" // never does anything but useful for linter
+
 inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
 	int edgeindin,int isfreezein,int orderedgein)
 {
