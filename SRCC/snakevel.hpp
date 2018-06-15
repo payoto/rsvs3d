@@ -46,7 +46,7 @@ typedef SnakStruct<trianglepoint>  tripointarray;
 class triangulation 
 {
 public:
-	vector<int> acttri;
+	vector<int> acttri; // 
 	triarray stattri;
 	triarray dynatri;
 	tripointarray trivert;
@@ -63,7 +63,7 @@ public:
 	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
 	vector<int> pointind;
 	int constrind; // Element in the constraint vector
-	double constrinfluence; //usually 1 or -1
+	double constrinfluence; //usually 1 or -1 to do with the ordering
 
 	// interface functions
 	void disp() const;

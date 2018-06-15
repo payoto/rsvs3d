@@ -132,7 +132,7 @@ function [constrVal]=NacaOuterLimit4d(gridrefined,paramoptim,nacaStr)
     constrVal={fillSub,reqFrac};
 end
 
-function [nacaLoops]=NacaMultiTopo(nPtsPloop,nacaStr)
+function [nacaCoord]=NacaMultiTopo(nPtsPloop,nacaStr)
     
     % xTop and xBot need to be normalised
     a4_open=0.1015;
