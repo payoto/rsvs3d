@@ -26,7 +26,7 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     end
     cellSource=regexprep(cellSource,'double &   A0','ArrayVec<double> &   A0');
     cellHeader=regexprep(cellHeader,'double &   A0','ArrayVec<double> &   A0');
-    
+    cellHeader{end+1}='#endif';
     
     sourceName=[targetPath,filesep,caseName,'.cpp'];
     headerName=[targetPath,filesep,caseName,'.hpp'];
@@ -48,6 +48,7 @@ function [cellSource,cellHeader]=IncludeLib(caseName)
     
     cellHeader=[{['#ifndef ',upper(caseName),'_H_INCLUDED'],...
         ['#define ',upper(caseName),'_H_INCLUDED'],''},cellSource];
+    cellSource=[cellSource,{'#include "RSVSmath_automatic.hpp"'}];
     
 end
 
