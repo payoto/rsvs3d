@@ -32,6 +32,7 @@
 
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
+#include "mesh.hpp"
 
 //==================================
 // Code
@@ -39,7 +40,6 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
-template <class T> class SnakStruct; 
 class snax;
 class snaxedge;
 class snaxsurf;
@@ -48,41 +48,6 @@ class snaxarray;
 
 typedef SnakStruct<snaxedge> snaxedgearray;
 typedef SnakStruct<snaxsurf> snaxsurfarray;
-
-
-template <class T> 
-class SnakStruct : public ArrayStruct<T> 
-{
-protected:
-	using ArrayStruct<T>::elems;
-    using ArrayStruct<T>::readyforuse;
-
-	unordered_multimap<int,int> hashParent;
-	int isHashParent=0;
-
-public: 
-	friend class snake;
-
-	//inline int KeyParent(int a) const ;
-	int findparent(int key) const; 
-	void findsiblings(int key, vector<int> &siblings) const{
-		siblings=ReturnDataEqualRange(key, hashParent);}
-	int countparent(int key) const {return(hashParent.count(key));};
-	void HashParent();
-	void DeHashParent(const int pos);
-	bool memberIsHashParent(const int pos) const;
-	// Functions that need modification
-	bool checkready();
-	void ForceArrayReady();
-	void PrepareForUse();
-	void Concatenate(const SnakStruct<T> &other);
-	void remove(const vector<int> &sub);
-	T& operator[](const int a){ 
-		isHashParent=0;
-		return(ArrayStruct<T>::operator[](a));
-	}
-
-};
 
 class snaxarray : public SnakStruct<snax> 
 {
@@ -294,6 +259,5 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, te
 // set constructors (used to avoid a variable being unknowingly forgotten)
 
 
-#include "snakstruct_incl.cpp"
 
 #endif //SNAKSTRUCT_H_INCLUDED

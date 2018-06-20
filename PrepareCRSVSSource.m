@@ -43,7 +43,7 @@ end
 %% Set pre-code
 function [cellSource,cellHeader]=IncludeLib(caseName)
     
-    cellSource={'#include <vector>','#include "vectorarray.hpp"',...
+    cellSource={'#include <vector>','#include <cmath>','#include "vectorarray.hpp"',...
         '#include "snakevel.hpp"','using namespace std;',''};
     
     cellHeader=[{['#ifndef ',upper(caseName),'_H_INCLUDED'],...
@@ -250,7 +250,7 @@ function [ccodeGen]=Code_SurfCentroid()
 end
 function [ccodeGen]=Code_SurfCentroidDiv()
 
-    n=4;
+    n=5;
     x=sym('x_%d__',[1 n]);assume(x,'real');
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
@@ -280,7 +280,7 @@ function [ccodeGen]=Code_SurfCentroidFull()
     
     ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
-    ccodeGen.name='SurfCentroidDiv';
+    ccodeGen.name='SurfCentroid';
     
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...

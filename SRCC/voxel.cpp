@@ -429,6 +429,9 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 	return(0);
 }
 
+
+
+
 // Implementation of Refinement of block grids
 
 // Test code

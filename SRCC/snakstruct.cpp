@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 
+#include "mesh.hpp"
 #include "snakstruct.hpp"
 #include "arraystructures.hpp"
 
