@@ -1,5 +1,6 @@
 #include <iostream>
-#include "arraystructures.hpp"
+
+#include "mesh.hpp"
 #include "postprocessing.hpp"
 
 

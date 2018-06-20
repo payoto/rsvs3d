@@ -2,10 +2,10 @@
 #include <cmath>
 #include <ctime>
 
-#include "snakstruct.hpp"
+#include "snake.hpp"
 #include "snakeengine.hpp"
 #include "snakevel.hpp"
-#include "postprocessing.hpp"
+#include "postprocessing.hpp" 
 
 using namespace std;
 

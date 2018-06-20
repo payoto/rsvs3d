@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "arraystructures.hpp"
-#include "snakstruct.hpp" 
+#include "snake.hpp" 
 
 void CalculateSnakeVel(snake &snakein){
 

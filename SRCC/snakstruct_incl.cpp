@@ -8,20 +8,8 @@ This file adds the support for a second hashed variable called by KeyParent
 #ifndef SNAKSTRUCT_INCL_H_INCLUDED
 #define SNAKSTRUCT_INCL_H_INCLUDED
 
-#include "snakstruct.hpp" // never does anything but useful for linter
+#include "arraystructures.hpp" // never does anything but useful for linter
 
-inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
-	int edgeindin,int isfreezein,int orderedgein)
-{
-	index=indexin;
-	d=din;
-	v=vin;
-	fromvert=fromvertin; 	// root vertex of *snakemesh
-	tovert=tovertin; 	// destination vertex of *snakemesh
-	edgeind=edgeindin; 	// edge of snakemesh
-	isfreeze=isfreezein; 	// freeze status 
-	orderedge=orderedgein;
-}
 
 template<class T> bool SnakStruct<T>::checkready() 
 {	
@@ -113,7 +101,7 @@ template<class T> void SnakStruct<T>::remove(const vector<int> &sub)
 template<class T>
 void SnakStruct<T>::ForceArrayReady()
 {
-	ArrayStruct<snax>::ForceArrayReady();
+	ArrayStruct<T>::ForceArrayReady();
 	isHashParent=1;
 
 }

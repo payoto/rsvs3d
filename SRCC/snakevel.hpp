@@ -25,7 +25,8 @@
 // included dependencies
 #include <vector>
 #include "arraystructures.hpp"
-#include "snakstruct.hpp" 
+#include "snake.hpp" 
+#include "mesh.hpp" 
 
 
 //==================================

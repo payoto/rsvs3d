@@ -27,7 +27,7 @@
 #include <unordered_map>
 
 #include "arraystructures.hpp"
-#include "snakstruct.hpp"
+#include "snake.hpp"
 #include "postprocessing.hpp"
 
 //==================================

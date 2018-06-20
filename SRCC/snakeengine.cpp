@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <ctime>
 
-#include "snakstruct.hpp"
+#include "snake.hpp"
 #include "snakeengine.hpp"
-#include "arraystructures.hpp"
+#include "mesh.hpp"
 
 using namespace std;
 

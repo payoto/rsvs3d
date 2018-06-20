@@ -6,25 +6,66 @@
 
 #include "mesh.hpp"
 
-// Implementation of features
-
-bool CompareFuncOut(function<void()> func1, function<void()> func2){
-   bool compFlag;
-   stringstream ss1,ss2;
-   auto old_buf = cout.rdbuf(ss1.rdbuf()); 
-
-   func1();
-   cout.rdbuf(ss2.rdbuf()); 
-   func2();
-   std::cout.rdbuf(old_buf);
-
-   compFlag=ss1.str().compare(ss2.str())==0;
-   return(compFlag);
-   
-}
-
 
 // Class function definitions
+// Mesh Linking methods
+
+int meshdependence::AddParent(mesh* meshin){
+		HashedVector<int,int> temp;
+
+	parentmesh.push_back(meshin);
+	parentconn.push_back(temp);
+	return(parentmesh.size());
+}
+int meshdependence::AddChild(mesh* meshin){
+		HashedVector<int,int> temp;
+
+	childmesh.push_back(meshin); 
+	return(childmesh.size());
+}
+void meshdependence::RemoveChild(mesh *meshin){
+
+	for (int i = 0; i < int(childmesh.size()); ++i)
+	{
+		if(meshin==childmesh[i]){
+			childmesh.erase(childmesh.begin()+i);
+		} 
+	}
+}
+void meshdependence::RemoveParent(mesh *meshin){
+
+	for (int i = 0; i < int(parentmesh.size()); ++i)
+	{
+		if(meshin==parentmesh[i]){
+			parentmesh.erase(parentmesh.begin()+i);
+			parentconn.erase(parentconn.begin()+i);
+			break;
+		}
+	}
+}
+
+void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
+	HashedVector<int,int> temp;
+
+	temp.vec=parentind;
+	temp.GenerateHash();
+	
+	parentmesh.push_back(meshin);
+	parentconn.push_back(temp);
+}
+
+void mesh::RemoveFromFamily(){
+	int jj;
+
+	for (jj = 0; jj<int(meshtree.parentmesh.size()); jj++){ 
+		meshtree.parentmesh[jj]->meshtree.RemoveChild(this);
+	}
+	for (jj = 0; jj<int(meshtree.childmesh.size()); jj++){ 
+		meshtree.childmesh[jj]->meshtree.RemoveParent(this);
+	}
+
+}
+
 // Methods of meshpart : volu surf edge vert
 void volu::disp() const{
    int i;

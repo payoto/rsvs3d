@@ -16,7 +16,8 @@
 #include "voxel.hpp"
 #include "postprocessing.hpp"
 #endif //TEST_ALL
-#include "snakstruct.hpp"
+#include "mesh.hpp"
+#include "snake.hpp"
 #include "snakeengine.hpp"
 
 int main(){

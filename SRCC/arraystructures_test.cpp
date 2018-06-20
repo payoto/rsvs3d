@@ -3,7 +3,7 @@
 #include <sstream>
 #include <functional>
 
-#include "arraystructures.hpp"
+#include "mesh.hpp"
 
 // Test code
 int Test_ArrayStructures() { 

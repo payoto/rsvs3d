@@ -12,7 +12,7 @@
 #include <Eigen>
 #include <ctime>
 
-#include "arraystructures.hpp"
+#include "mesh.hpp"
 #include "voxel.hpp"
 #include "postprocessing.hpp"
 

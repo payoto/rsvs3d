@@ -61,6 +61,7 @@ class surf;
 class vert;
 class edge;
 
+
 typedef ArrayStruct<volu> voluarray;
 typedef ArrayStruct<surf> surfarray;
 typedef ArrayStruct<edge> edgearray;
@@ -71,10 +72,21 @@ typedef ArrayStruct<vert> vertarray;
 // Base class
 
 class meshdependence {
+	// Class for connecting meshes
+	// Stores a vector of mesh references for parent and children
+protected:
+	vector<int> elemind; // active element index
+	vector<mesh*> parentmesh; // use references as cannot be null
+	vector<mesh*> childmesh;
+	vector<HashedVector<int,int>> parentconn;
+	friend class mesh;
 public:
-	vector<mesh*> parent;
-	vector<mesh*> child;
-	vector<ArrayStruct<int>> v;
+
+	int AddParent(mesh* meshin);
+	int AddChild(mesh* meshin);
+	void AddParent(mesh* meshin, vector<int> &parentind);
+	void RemoveChild(mesh* meshin);
+	void RemoveParent(mesh* meshin);
 };
 
 class mesh {
@@ -120,6 +132,13 @@ public:
 // Mesh Quality
 	int OrderEdges();
 	void SetBorders();
+// Mesh Lineage
+	void RemoveFromFamily();
+
+
+	~mesh(){
+		RemoveFromFamily();
+	}
 };
 
 
