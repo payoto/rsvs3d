@@ -593,6 +593,7 @@ template<class T> inline void ArrayStruct <T>::reserve(int n)
 template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){
 hashTable.clear();
 HashVector(vec, hashTable);
+isHash=true;
 }
 template <class T,class Q> inline int HashedVector<T,Q>::find(const T key) const
 {

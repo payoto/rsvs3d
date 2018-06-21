@@ -198,6 +198,7 @@ class HashedVector { // container for
 public:
 	vector<T> vec;
 	unordered_multimap<T,int> hashTable;
+	bool isHash=false;
 
 	inline void GenerateHash();
 	inline int find(const T key) const;
@@ -207,6 +208,57 @@ public:
 	inline vector<int> find_list(const vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
+
+};
+
+template <class T,class Q>  
+class HashedVectorSafe : protected HashedVector<T,Q> { // container for 
+protected:
+	using HashedVector<T,Q>::vec;
+    using HashedVector<T,Q>::isHash; 
+    using HashedVector<T,Q>::hashTable; 
+public:
+	
+	using HashedVector<T,Q>::GenerateHash;
+	using HashedVector<T,Q>::find;
+	using HashedVector<T,Q>::findall;
+	using HashedVector<T,Q>::count;
+	using HashedVector<T,Q>::find_list;
+	using HashedVector<T,Q>::operator();
+	using HashedVector<T,Q>::IsInVec;
+
+	void operator=(const vector<T> &a){
+		vec=a;
+		isHash=false;
+	}
+	void operator=(const HashedVector<T,Q> &a){
+		vec=a.vec;
+		isHash=a.isHash;
+		hashTable=a.hashTable;
+	}
+	T& operator[](const int a){ 
+	// [] Operator returns a reference to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=vec.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		isHash=0;
+		return(vec[a]);
+	}
+	const T& isearch(const int b) const{ 
+	// () Operator returns a constant pointer to the corresponding elems.
+	// Cannot be used on the left hand side and can't be used to edit data in elems
+		int a=this->find(b);
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=vec.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		return(&(vec[a]));
+	}
 };
 
 // Base class

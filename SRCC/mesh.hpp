@@ -75,23 +75,27 @@ class meshdependence {
 	// Class for connecting meshes
 	// Stores a vector of mesh references for parent and children
 protected:
+	friend class mesh;
+
 	vector<int> elemind; // active element index
 	vector<mesh*> parentmesh; // use references as cannot be null
 	vector<mesh*> childmesh;
-	vector<HashedVector<int,int>> parentconn;
-	friend class mesh;
-public:
-
+	vector<HashedVectorSafe<int,int>> parentconn;
+	// These methods are protected to avoid broken/uni-directional connectivities being generated
 	int AddParent(mesh* meshin);
 	int AddChild(mesh* meshin);
 	void AddParent(mesh* meshin, vector<int> &parentind);
 	void RemoveChild(mesh* meshin);
 	void RemoveParent(mesh* meshin);
+public:
+
 };
 
 class mesh {
 private:
 	bool borderIsSet=false;
+	bool meshDepIsSet=false;
+	int meshDim=0;
 	void SetLastIndex();
 	friend class snake;
 public:
@@ -101,6 +105,14 @@ public:
 	voluarray volus;
 
 	meshdependence meshtree;
+// Mesh Lineage
+	void RemoveFromFamily();
+	void AddChild(mesh* meshin);
+	void AddParent(mesh* meshin);
+	void AddParent(mesh* meshin, vector<int> &parentind);
+	void AddChild(mesh* meshin, vector<int> &parentind);
+	void SetMeshDepElm();
+	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
 // basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();
@@ -132,8 +144,6 @@ public:
 // Mesh Quality
 	int OrderEdges();
 	void SetBorders();
-// Mesh Lineage
-	void RemoveFromFamily();
 
 
 	~mesh(){
