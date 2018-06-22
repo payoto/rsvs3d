@@ -74,6 +74,7 @@ typedef ArrayStruct<vert> vertarray;
 class meshdependence {
 	// Class for connecting meshes
 	// Stores a vector of mesh references for parent and children
+	// Needs to support partial meshes for constraint handling
 protected:
 	friend class mesh;
 
@@ -113,6 +114,7 @@ public:
 	void AddChild(mesh* meshin, vector<int> &parentind);
 	void SetMeshDepElm();
 	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
+	int WhatDim(){return(meshDim);}
 // basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();

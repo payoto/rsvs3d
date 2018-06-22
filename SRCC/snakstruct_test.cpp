@@ -5,7 +5,8 @@
 #include "snake.hpp"
 #include "snakeengine.hpp"
 #include "snakevel.hpp"
-#include "postprocessing.hpp" 
+#include "postprocessing.hpp"
+#include "meshrefinement.hpp" 
 
 using namespace std;
 

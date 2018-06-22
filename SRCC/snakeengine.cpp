@@ -402,20 +402,20 @@ void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit){
 }
 
 
-void SnaxNoConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit){
+void SnaxNoConnecDetection(const mesh &snakeconn, vector<ConnecRemv> &connecEdit){
 
 	int ii,nSnax;
 	ConnecRemv tempConnec;
-	nSnax=snakein.snaxs.size();
+	nSnax=snakeconn.verts.size();
 
 	tempConnec.typeobj=1;
 
 	for(ii=0;ii<nSnax;++ii){
-		if(snakein.snakeconn.verts(ii)->edgeind.size()==0)
+		if(snakeconn.verts(ii)->edgeind.size()==0)
 		{
 			tempConnec.rmvind.clear();
-			tempConnec.keepind=snakein.snaxs(ii)->index;
-			tempConnec.rmvind.push_back(snakein.snaxs(ii)->index);
+			tempConnec.keepind=snakeconn.verts(ii)->index;
+			tempConnec.rmvind.push_back(snakeconn.verts(ii)->index);
 
 			connecEdit.push_back(tempConnec);
 		}
@@ -456,7 +456,7 @@ void CleanupSnakeConnec(snake &snakein){
 		itSurf=indRmvSurf.begin();
 		itVolu=indRmvVolu.begin();
 		// Identify invalid vertex connections
-		SnaxNoConnecDetection(snakein, connecEdit);
+		SnaxNoConnecDetection(snakein.snakeconn, connecEdit);
 
 		nSnaxConn=int(connecEdit.size());
 
@@ -532,7 +532,7 @@ void CleanupSnakeConnec(snake &snakein){
 						connecEdit[ii].keepind,connecEdit[ii].scopeind);
 				}
 			}
-			SnaxNoConnecDetection(snakein, connecEdit);
+			SnaxNoConnecDetection(snakein.snakeconn, connecEdit);
 			nEdgeConn=int(connecEdit.size());
 			// Identify surface connections
 			if (snakein.Check3D()){
