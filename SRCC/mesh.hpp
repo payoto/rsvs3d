@@ -60,6 +60,7 @@ class volu;
 class surf;
 class vert;
 class edge;
+class coordvec;
 
 
 typedef ArrayStruct<volu> voluarray;
@@ -380,6 +381,56 @@ public:
 	}
 
 	int Key() const {return(index);}
+};
+
+
+
+class coordvec {
+	// Handles the use and norm of a vector for which the norm and the unit 
+	// value might be needed
+protected:
+	vector<double> elems;
+	double norm;
+	int isuptodate;
+	
+
+public:
+	double CalcNorm();
+	double GetNorm();
+	void PrepareForUse();
+	coordvec Unit() const ;
+	double Unit(const int a) const;
+	void assign(double a, double b, double c);
+	double& operator[](int a);
+	double operator()(int a) const;
+	void disp() const;
+	bool isready() const {return(bool(isuptodate));};
+	const vector<double>& usedata() {return(elems);}
+	// Math and logical operations (element wise)
+	void max(const vector<double> &vecin);
+	void min(const vector<double> &vecin);
+	void add(const vector<double> &vecin);
+	void substract(const vector<double> &vecin);
+	void div(const vector<double> &vecin);
+	void div(double scalin);
+	void mult(const vector<double> &vecin);
+
+	coordvec(){
+		elems.reserve(3); // reserves 3 as this is the size of the array
+		elems.assign(3,0);
+		norm=0;
+		isuptodate=0;
+		#ifdef TEST_SNAKSTRUCT
+		cout << "constructor called for coordvec" << endl;
+		#endif
+	}
+	void operator=(vector<double> a){
+		if(int(a.size())!=3){
+			cout << "Warning : Coordinate vector is being a vecetor other than 3 long" << endl;
+		}
+		elems=a;
+		isuptodate=0;
+	}
 };
 
 //test functions

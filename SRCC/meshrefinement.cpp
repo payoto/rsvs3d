@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "meshrefinement.hpp"
 #include "mesh.hpp"
+#include "meshrefinement.hpp"
 
 using namespace std; 
 
@@ -123,4 +123,69 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 	newparent.volus.remove(indRmvVolu);
 
 	newparent.PrepareForUse();
+}
+
+
+void CartesianMapping(const mesh& meshin, vector<int> elmMapping, vector<int> &dims){
+
+	int ii, jj, kk, n,nBox,sub;
+	coordvec minCoord,maxCoord,cellCoord,deltaCoord;
+	vector<int> boxMap,vertList,edgeList;
+
+
+	n=meshin.verts.size();
+	// Define bounds;
+	minCoord=meshin.verts(0)->coord;
+	maxCoord=meshin.verts(0)->coord;
+	for(ii=1;ii<n;ii++){
+		minCoord.min(meshin.verts(ii)->coord);
+		maxCoord.max(meshin.verts(ii)->coord);
+	}
+	deltaCoord=maxCoord;
+	deltaCoord.substract(minCoord.usedata());
+	// integer vector for each possible locations based on dim split
+	nBox=1;
+	for(ii=0;ii<3;++ii){
+		dims[ii]=dims[ii]?dims[ii]:1;
+		nBox=nBox*dims[ii];
+	}
+	boxMap.assign(nBox,0);
+	elmMapping.clear();
+	elmMapping.assign(meshin.volus.size(),0);
+	// Go through volumes calculating their location find which box it fits in
+	n=meshin.volus.size();
+	for(ii=0;ii<n;ii++){
+
+		edgeList=ConcatenateVectorField(meshin.surfs,&surf::edgeind,
+			meshin.surfs.find_list(meshin.volus(ii)->surfind));
+		vertList=ConcatenateVectorField(meshin.edges,&edge::vertind,
+			meshin.edges.find_list(edgeList));
+		vertList=meshin.verts.find_list(vertList);
+		sort(vertList);
+		unique(vertList);	
+		kk=int(vertList.size());
+		cellCoord.assign(0.0, 0.0 , 0.0);
+		for (jj=0;jj<kk;++jj){
+			cellCoord.add(meshin.verts(vertList[jj])->coord);
+		}
+		cellCoord.div(double(kk));
+
+		cellCoord.substract(minCoord.usedata());
+		cellCoord.div(deltaCoord.usedata());
+		for (jj=0;jj<3;++jj){
+			cellCoord[jj]=cellCoord[jj]*double(dims[jj]-1);
+		}
+		sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
+			+(dims[0])*(dims[1])*int(cellCoord[2]);
+		if(boxMap[sub]==0){
+		// if the box as never been explored put the index in it
+			boxMap[sub]=meshin.volus(ii)->index;
+			elmMapping[ii]=boxMap[sub];
+		} else {
+		// put the number of the box in the elmMapping
+			elmMapping[ii]=boxMap[sub];
+		}
+	}
+
+
 }

@@ -43,7 +43,6 @@ using namespace std;
 class snax;
 class snaxedge;
 class snaxsurf;
-class coordvec;
 class snaxarray;
 
 typedef SnakStruct<snaxedge> snaxedgearray;
@@ -75,37 +74,6 @@ public:
 
 };
 
-class coordvec {
-	// Handles the use and norm of a vector for which the norm and the unit 
-	// value might be needed
-protected:
-	vector<double> elems;
-	double norm;
-	int isuptodate;
-	
-
-public:
-	double CalcNorm();
-	double GetNorm();
-	void PrepareForUse();
-	coordvec Unit() const ;
-	double Unit(const int a) const;
-	void assign(double a, double b, double c);
-	double& operator[](int a);
-	double operator()(int a) const;
-	void disp() const;
-	bool isready() const {return(bool(isuptodate));};
-
-	coordvec(){
-		elems.reserve(3); // reserves 3 as this is the size of the array
-		elems.assign(3,0);
-		norm=0;
-		isuptodate=0;
-		#ifdef TEST_SNAKSTRUCT
-		cout << "constructor called for coordvec" << endl;
-		#endif
-	}
-};
 
 
 class snake  {

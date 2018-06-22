@@ -27,7 +27,7 @@
 
 //=================================
 // included dependencies
-
+ 
 #include "mesh.hpp"
 
 //==================================
@@ -43,7 +43,10 @@ using namespace std;
 
 // Base class
 
-
+void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmMapping);
+void CartesianMapping(const mesh& meshin, vector<int> elmMapping, vector<int> &dims);
 //test functions
+
+int Test_MeshRefinement();
 
 #endif // MESH_H_INCLUDED

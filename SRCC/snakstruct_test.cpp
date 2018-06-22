@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <cstdlib>
 
 #include "snake.hpp"
 #include "snakeengine.hpp"
@@ -247,7 +248,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();
@@ -446,3 +447,40 @@ int Test_snakeOrderEdges(){
 
 }
 
+int Test_MeshRefinement(){
+
+	mesh snakeMesh, voluMesh;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	vector<int> elmMapping;
+	int ii;
+	
+	//bool errFlag;
+	int errTest=0;
+
+	try {
+		fileToOpen="..\\TESTOUT\\Test_Multimesh.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		snakeMesh.PrepareForUse();
+		outSnake.PrintMesh(snakeMesh);
+
+		snakeMesh.OrderEdges();
+		outSnake.PrintMesh(snakeMesh);
+		//testSnake.disp();
+		for (ii=0;ii<snakeMesh.volus.size();++ii){
+			elmMapping.push_back(1);
+		}
+		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+		for (ii=0;ii<voluMesh.volus.size();++ii){
+			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0+0.5);
+		}
+		outSnake.PrintMesh(voluMesh);
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+
+}
