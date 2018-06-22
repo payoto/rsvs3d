@@ -126,7 +126,7 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 }
 
 
-void CartesianMapping(const mesh& meshin, vector<int> elmMapping, vector<int> &dims){
+void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &dims){
 
 	int ii, jj, kk, n,nBox,sub;
 	coordvec minCoord,maxCoord,cellCoord,deltaCoord;

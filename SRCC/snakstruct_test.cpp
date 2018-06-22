@@ -452,7 +452,7 @@ int Test_MeshRefinement(){
 	mesh snakeMesh, voluMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
-	vector<int> elmMapping;
+	vector<int> elmMapping,dims;
 	int ii;
 	
 	//bool errFlag;
@@ -472,10 +472,15 @@ int Test_MeshRefinement(){
 		for (ii=0;ii<snakeMesh.volus.size();++ii){
 			elmMapping.push_back(1);
 		}
+		dims.assign(3,0);
+		dims[0]=2;dims[1]=3;dims[2]=1;
+		CartesianMapping(snakeMesh,  elmMapping, dims);
+		DisplayVector(elmMapping);
 		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
 		for (ii=0;ii<voluMesh.volus.size();++ii){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0+0.5);
 		}
+		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(voluMesh);
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
