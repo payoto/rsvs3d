@@ -480,9 +480,12 @@ int Test_MeshRefinement(){
 		unique(elmMapping);
 		DisplayVector(elmMapping);
 		for (ii=0;ii<voluMesh.volus.size();++ii){
-			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0+0.5);
+			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
+
+		snakeMesh.AddParent(&voluMesh,elmMapping);
+
 		outSnake.PrintMesh(voluMesh);
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
