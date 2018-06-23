@@ -475,8 +475,10 @@ int Test_MeshRefinement(){
 		dims.assign(3,0);
 		dims[0]=2;dims[1]=3;dims[2]=1;
 		CartesianMapping(snakeMesh,  elmMapping, dims);
-		DisplayVector(elmMapping);
 		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+		sort(elmMapping);
+		unique(elmMapping);
+		DisplayVector(elmMapping);
 		for (ii=0;ii<voluMesh.volus.size();++ii){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0+0.5);
 		}

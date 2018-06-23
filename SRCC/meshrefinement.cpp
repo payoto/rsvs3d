@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "mesh.hpp"
 #include "meshrefinement.hpp"
@@ -146,7 +147,7 @@ void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &
 	// integer vector for each possible locations based on dim split
 	nBox=1;
 	for(ii=0;ii<3;++ii){
-		dims[ii]=dims[ii]?dims[ii]:1;
+		dims[ii]=dims[ii]>0?dims[ii]:1;
 		nBox=nBox*dims[ii];
 	}
 	boxMap.assign(nBox,0);
@@ -173,10 +174,15 @@ void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &
 		cellCoord.substract(minCoord.usedata());
 		cellCoord.div(deltaCoord.usedata());
 		for (jj=0;jj<3;++jj){
-			cellCoord[jj]=cellCoord[jj]*double(dims[jj]-1);
+			cellCoord[jj]=cellCoord[jj]*double(dims[jj]);
+			cellCoord[jj]=floor(cellCoord[jj]);
+			cellCoord[jj]=(cellCoord[jj]>=double(dims[jj]))?double(dims[jj]-1):cellCoord[jj];
 		}
 		sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
 			+(dims[0])*(dims[1])*int(cellCoord[2]);
+		if (sub>=nBox){
+			throw invalid_argument("sub was larger than available size");
+		}
 		if(boxMap[sub]==0){
 		// if the box as never been explored put the index in it
 			boxMap[sub]=meshin.volus(ii)->index;
