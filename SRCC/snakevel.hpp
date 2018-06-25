@@ -44,7 +44,7 @@ typedef SnakStruct<trianglepoint>  tripointarray;
 
 
 // Base classes
-class triangulation 
+class triangulation  
 {
 public:
 	vector<int> acttri; // 
@@ -54,6 +54,9 @@ public:
 
 	snake* snakeDep=NULL; // Pointer to the Snake referred to in triangles
 	mesh* meshDep=NULL; // Pointer to the Mesh referred to in triangles
+
+	void disp() const;
+	void PrepareForUse();
 };
 
 
@@ -71,6 +74,7 @@ public:
 
 	// interface functions
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (parentsurf);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -81,7 +85,6 @@ public:
 		return(isTriangleReady);
 	}
 	void SwitchIndex(int typeInd, int oldInd, int newInd){}
-	void disptree(const mesh &meshin, int n) const {};
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
@@ -126,8 +129,8 @@ void CalculateSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh);
-void TriangulateSnake(const snake& snakein, triangulation &triangleRSVS);
-void TriangulateMesh(const mesh& meshin, triangulation &triangleRSVS);
+void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
+void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 
 #endif // SNAKEVEL_H_INCLUDED
 

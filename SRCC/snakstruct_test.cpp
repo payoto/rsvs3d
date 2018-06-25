@@ -9,6 +9,7 @@
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp" 
 
+
 using namespace std;
 
 // Implementation in snakstruct.cpp
@@ -453,6 +454,7 @@ int Test_MeshRefinement(){
 	const char *fileToOpen;
 	tecplotfile outSnake;
 	vector<int> elmMapping,dims;
+	triangulation testTriangle;
 	int ii;
 	
 	//bool errFlag;
@@ -485,7 +487,8 @@ int Test_MeshRefinement(){
 		voluMesh.PrepareForUse();
 
 		snakeMesh.AddParent(&voluMesh,elmMapping);
-
+		testTriangle.PrepareForUse();
+		TriangulateMesh(voluMesh,testTriangle);
 		outSnake.PrintMesh(voluMesh);
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 

@@ -23,19 +23,21 @@ void CalculateSnakeVel(snake &snakein){
 
 
 
-void TriangulateMesh(const mesh& meshin, triangulation &triangleRSVS){
+void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
 	TriangulateContainer(meshin,triangleRSVS , 1);
+	triangleRSVS.meshDep=&meshin;
 
 }
-void TriangulateSnake(const snake& snakein, triangulation &triangleRSVS){
+void TriangulateSnake(snake& snakein, triangulation &triangleRSVS){
 
-		TriangulateContainer(snakein.snakeconn, triangleRSVS , 2);
+	TriangulateContainer(snakein.snakeconn, triangleRSVS , 2);
+	triangleRSVS.snakeDep=&snakein;
 }
 
 
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh){
-	int ii,n,maxInd;
+	int ii,n,nTriS,nTriE,maxIndVert, maxIndTriangle;
 	triarray triangulation::*mp;
 
 	if (typeMesh==1){
@@ -44,12 +46,18 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 		mp=&triangulation::dynatri;
 	}
 
-	maxInd=triangleRSVS.trivert.GetMaxIndex();
+	maxIndVert=triangleRSVS.trivert.GetMaxIndex();
+	maxIndTriangle=int((triangleRSVS.*mp).GetMaxIndex());
 	n=meshin.surfs.size();
-
+	nTriS=int((triangleRSVS.*mp).size());
 	for (ii=0; ii<n; ++ii){
-		TriangulateSurface((*meshin.surfs(ii)),meshin,triangleRSVS.*mp, 
-			triangleRSVS.trivert, typeMesh, maxInd+ii+1);
+		TriangulateSurface(*(meshin.surfs(ii)),meshin,triangleRSVS.*mp, 
+			triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
+	}
+	
+	nTriE=int((triangleRSVS.*mp).size());
+	for (ii=0; ii<(nTriE-nTriS); ++ii){
+		(triangleRSVS.*mp)[nTriS+ii].index=ii+maxIndTriangle+1;
 	}
 }
 
@@ -72,20 +80,88 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	triangleEdge.SetPointType(typeMesh,typeMesh,3);
 	triangleEdge.pointind[2]=trivertMaxInd+1;
 	triangleEdge.parentsurf=surfin.index;
+	if (n>3){
+		for(ii=0; ii<n; ++ii){
+			meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+			edgeCentre.mult(edgeLength);
+			surfCentre.coord.add(edgeCentre.usedata());
+			surfLength+=edgeLength;
 
-	for(ii=0; ii<n; ++ii){
-		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
-		edgeCentre.mult(edgeLength);
-		surfCentre.coord.add(edgeCentre.usedata());
-		surfLength+=edgeLength;
+			triangleEdge.pointind[0]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[0];
+			triangleEdge.pointind[1]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[1];
+			triangul.push_back(triangleEdge);
+		}
 
-		triangleEdge.pointind[0]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[0];
-		triangleEdge.pointind[1]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[1];
+		surfCentre.coord.div(surfLength);
+		surfCentre.index=trivertMaxInd+1;
+		surfCentre.parentsurf=surfin.index;
+		surfCentre.parentType=typeMesh;
+		trivert.push_back(surfCentre);
+	} else {
+
+		triangleEdge.SetPointType(typeMesh,typeMesh,typeMesh);
+
+		triangleEdge.pointind=ConcatenateVectorField(meshin.edges,&edge::vertind,meshin.edges.find_list(surfin.edgeind));
+		sort(triangleEdge.pointind);
+		unique(triangleEdge.pointind);
+		triangleEdge.parentsurf=surfin.index;
 		triangul.push_back(triangleEdge);
 	}
-
-	surfCentre.coord.div(surfLength);
-	surfCentre.index=trivertMaxInd+1;
-	surfCentre.parentsurf=surfin.index;
-	surfCentre.parentType=typeMesh;
 }
+
+void MeshTriangulation(mesh &meshout,const mesh& meshin, 
+	triarray &triangul, tripointarray& trivert, const int typeMesh){
+
+	int ii,jj,kk,n, nSub;
+	vector<bool> isTriDone;
+	vector<int> tempSub,tempType;
+	
+	meshout=meshin;
+	meshout.PrepareForUse();
+	n=int(triangul.size());
+	isTriDone.assign(n,false);
+	
+	
+
+	for (ii=0 ; ii < n ; ++ii){
+		if(!isTriDone[ii]){
+			tempType=triangul(ii)->pointtype;
+			sort(tempType);
+			unique(tempType);
+			if (int(tempType.size())>1){
+				triangul.findsiblings(triangul(ii)->KeyParent(),tempSub);
+				nSub=tempSub.size();
+
+			}
+		}
+	}
+}
+
+// Triangulation class Methods
+
+void triangulation::disp() const{
+
+	cout << "This is a triangulation object" << endl;
+} 
+void triangulation::PrepareForUse() {
+	stattri.PrepareForUse();
+	dynatri.PrepareForUse();
+	trivert.PrepareForUse();
+	
+} 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+void triangle::disp() const{} 
+void triangle::disptree(mesh const&, int) const {}
+void triangle::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
+void triangle::read(FILE * fid){}
+void triangle::write(FILE * fid) const {}
+
+void trianglepoint::disp() const{} 
+void trianglepoint::disptree(mesh const&, int) const {}
+void trianglepoint::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
+void trianglepoint::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}
+void trianglepoint::read(FILE * fid){}
+void trianglepoint::write(FILE * fid) const {}
+#pragma GCC diagnostic pop
