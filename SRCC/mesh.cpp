@@ -138,13 +138,20 @@ int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	{
 		elems[ii]=elems[ii]*vecin[ii];
 	}
-}
+} 
 
 void coordvec::div(double scalin){
 int n=int(elems.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]/scalin;
+	}
+}
+void coordvec::mult(double scalin){
+int n=int(elems.size());
+	for (int ii = 0; ii < n; ++ii)
+	{
+		elems[ii]=elems[ii]*scalin;
 	}
 }
 //// ----------------------------------------
@@ -264,6 +271,22 @@ void mesh::MaintainLineage(){
 	//    - recognise the modifications needed depending on child and parent dimensionality 
 	//    - Modify the parentconn vec 
 
+}
+
+
+/// MAth operations in mesh
+void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const {
+
+	int sub;
+	centre.assign(0,0,0);
+	length=0;
+	sub=meshin->verts.find(vertind[0]);
+	centre.substract(meshin->verts(sub)->coord);
+	centre.add(meshin->verts.isearch(vertind[1])->coord);
+	length=centre.CalcNorm(); 
+	centre.add(meshin->verts(sub)->coord);
+	centre.add(meshin->verts(sub)->coord);
+	centre.div(2);
 }
 
 // Methods of meshpart : volu surf edge vert

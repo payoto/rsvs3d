@@ -51,6 +51,9 @@ public:
 	triarray stattri;
 	triarray dynatri;
 	tripointarray trivert;
+
+	snake* snakeDep=NULL; // Pointer to the Snake referred to in triangles
+	mesh* meshDep=NULL; // Pointer to the Mesh referred to in triangles
 };
 
 
@@ -63,13 +66,13 @@ public:
 	
 	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
 	vector<int> pointind;
-	int constrind; // Element in the constraint vector
-	double constrinfluence; //usually 1 or -1 to do with the ordering
+	int parentsurf=0; // Element in the constraint vector
+	double constrinfluence=0; //usually 1 or -1 to do with the ordering
 
 	// interface functions
 	void disp() const;
 	int Key() const {return (index);};
-	int KeyParent() const {return (constrind);};
+	int KeyParent() const {return (parentsurf);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
@@ -83,7 +86,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void TightenConnectivity(){}
-	
+	void SetPointType(int a, int b, int c){	pointtype[0]=a;pointtype[1]=b;pointtype[2]=c;}
 	triangle(){ // Constructor
 		index=0;
 
@@ -98,8 +101,8 @@ class trianglepoint : public meshpart , public snakpart {
 public:
 	
 	coordvec coord;
-	int parentsurf;
-
+	int parentsurf=0;
+	int parentType=0;
 	// interface functions
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
@@ -120,7 +123,11 @@ public:
 };
 
 void CalculateSnakeVel(snake &snakein);
-
+void TriangulateSurface(const surf &surfin,const mesh& meshin, 
+	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
+void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh);
+void TriangulateSnake(const snake& snakein, triangulation &triangleRSVS);
+void TriangulateMesh(const mesh& meshin, triangulation &triangleRSVS);
 
 #endif // SNAKEVEL_H_INCLUDED
 
