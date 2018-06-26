@@ -289,6 +289,35 @@ void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &len
 	centre.div(2);
 }
 
+// Surfarray methods
+
+void surfarray::SetNoModif(){
+	int ii,n;
+	n=ArrayStruct<surf>::size();
+	for(ii=0;ii<n;++ii){
+		elems[ii].isModif=false;
+	}
+}
+void surfarray::ReturnModifInd(vector<int> &vecind){
+	int ii,n;
+	n=ArrayStruct<surf>::size();
+	vecind.clear();
+	for(ii=0;ii<n;++ii){
+		if(elems[ii].isModif){
+			vecind.push_back(elems[ii].index);
+		}
+	}
+}
+void surfarray::ReturnModifLog(vector<bool> &modiflog){
+	int ii,n;
+	n=ArrayStruct<surf>::size();
+	modiflog.assign(n,false);
+	for(ii=0;ii<n;++ii){
+
+		modiflog[ii]=(elems[ii].index);
+	}
+}
+
 // Methods of meshpart : volu surf edge vert
 void volu::disp() const{
 	int i;

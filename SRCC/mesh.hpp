@@ -371,13 +371,13 @@ public:
 
 class surfarray : public ArrayStruct<surf>{
 	using ArrayStruct<surf>::elems;
-	
 	friend class mesh;
 	friend class snake;
+
 public:
 	void SetNoModif();
 	void ReturnModifInd(vector<int> &vecind);
-	void ReturnModifLog(vector<bool> &veclog);
+	void ReturnModifLog(vector<bool> &modiflog);
 	surf& operator[](const int a){ 
 		#ifdef SAFE_ACCESS 
 		ArrayStruct<surf>::issafeaccess(a);
