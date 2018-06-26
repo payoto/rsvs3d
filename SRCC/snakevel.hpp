@@ -57,6 +57,7 @@ public:
 
 	void disp() const;
 	void PrepareForUse();
+	void CleanDynaTri();
 };
 
 
@@ -128,13 +129,14 @@ public:
 void CalculateSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
-void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh);
+void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList={});
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
+void MaintainTriangulateSnake(triangulation &triangleRSVS);
+void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin);
 
-
-void Test_stepalgoRSVS(snake &testSnake,triangulation RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
 int Test_snakeRSVS();
 #endif // SNAKEVEL_H_INCLUDED
 

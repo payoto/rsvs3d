@@ -25,7 +25,7 @@ void CalculateSnakeVel(snake &snakein){
 
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
-	TriangulateContainer(meshin,triangleRSVS , 1);
+	TriangulateContainer(meshin,triangleRSVS , 1); 
 	triangleRSVS.meshDep=&meshin;
 
 }
@@ -34,9 +34,35 @@ void TriangulateSnake(snake& snakein, triangulation &triangleRSVS){
 	TriangulateContainer(snakein.snakeconn, triangleRSVS , 2);
 	triangleRSVS.snakeDep=&snakein;
 }
+void MaintainTriangulateSnake(triangulation &triangleRSVS){
+
+	vector<int> surfReTriangulate;
+	int ii,n;
+
+	if(triangleRSVS.snakeDep!=NULL){
+		triangleRSVS.snakeDep->snakeconn.surfs.ReturnModifInd(surfReTriangulate);
+		surfReTriangulate=triangleRSVS.snakeDep->snakeconn.surfs.find_list(surfReTriangulate);
+		triangleRSVS.CleanDynaTri();
+		n=triangleRSVS.trivert.size();
+		// Still need to recompute coordinates
+		for (ii=0;ii<n;++ii){
+			if(triangleRSVS.trivert(ii)->parentType==2){
+				SurfCentroid(triangleRSVS.trivert[ii].coord,
+					*(triangleRSVS.snakeDep->snakeconn.surfs.isearch(triangleRSVS.trivert(ii)->parentsurf)),
+					 triangleRSVS.snakeDep->snakeconn); 
+			}
+		}
+		triangleRSVS.trivert.SetMaxIndex();
+		TriangulateContainer(triangleRSVS.snakeDep->snakeconn, triangleRSVS , 2,surfReTriangulate);
+		
+
+		triangleRSVS.snakeDep->snakeconn.surfs.SetNoModif();
+	}
+	triangleRSVS.PrepareForUse();
+}
 
 
-void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh){
+void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList){
 	int ii,n,nTriS,nTriE,maxIndVert, maxIndTriangle;
 	triarray triangulation::*mp;
 
@@ -48,13 +74,21 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 
 	maxIndVert=triangleRSVS.trivert.GetMaxIndex();
 	maxIndTriangle=int((triangleRSVS.*mp).GetMaxIndex());
-	n=meshin.surfs.size();
-	nTriS=int((triangleRSVS.*mp).size());
-	for (ii=0; ii<n; ++ii){
-		TriangulateSurface(*(meshin.surfs(ii)),meshin,triangleRSVS.*mp, 
-			triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
-	}
 	
+	nTriS=int((triangleRSVS.*mp).size());
+	if (int(subList.size())==0){
+		n=meshin.surfs.size();
+		for (ii=0; ii<n; ++ii){
+			TriangulateSurface(*(meshin.surfs(ii)),meshin,triangleRSVS.*mp, 
+				triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
+		}
+	} else {
+		n=subList.size();
+		for (ii=0; ii<n; ++ii){
+			TriangulateSurface(*(meshin.surfs(subList[ii])),meshin,triangleRSVS.*mp, 
+				triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
+		}
+	}
 	nTriE=int((triangleRSVS.*mp).size());
 	for (ii=0; ii<(nTriE-nTriS); ++ii){
 		(triangleRSVS.*mp)[nTriS+ii].index=ii+maxIndTriangle+1;
@@ -108,6 +142,23 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 		triangul.push_back(triangleEdge);
 	}
 }
+
+void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin){
+	int ii,n;
+	coordvec edgeCentre;
+	double edgeLength,surfLength;
+	coord.assign(0,0,0);
+	n=int(surfin.edgeind.size());
+	for(ii=0; ii<n; ++ii){
+		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+		edgeCentre.mult(edgeLength);
+		coord.add(edgeCentre.usedata());
+		surfLength+=edgeLength;
+	}
+
+	coord.div(surfLength);
+}
+
 
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert){
 
@@ -270,6 +321,35 @@ void triangulation::PrepareForUse() {
 	trivert.PrepareForUse();
 	
 } 
+
+void triangulation::CleanDynaTri(){
+	vector<int> triDel,pDEl;
+	int ii,jj,n,n2;
+
+
+	n=dynatri.size();
+	for (ii=0;ii<n;++ii){
+		if(snakeDep->snakeconn.surfs.find(dynatri(ii)->KeyParent())==-1){
+			triDel.push_back(dynatri(ii)->index);
+		} else if (snakeDep->snakeconn.surfs.isearch(dynatri(ii)->KeyParent())->returnIsModif()) { 
+			triDel.push_back(dynatri(ii)->index);
+		}
+	}
+	n=triDel.size();
+	for (ii=0;ii<n;++ii){
+		n2=3;//dynatri.isearch(triDel[ii])->pointtype.size();
+		for(jj=0;jj<n2;++jj){
+			if(dynatri.isearch(triDel[ii])->pointtype[jj]==3){
+				pDEl.push_back(dynatri.isearch(triDel[ii])->pointind[jj]);
+			}
+		}
+	}
+
+	dynatri.remove(triDel);
+	trivert.remove(pDEl);
+
+	PrepareForUse();
+}
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"

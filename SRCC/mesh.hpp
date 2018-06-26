@@ -221,6 +221,7 @@ public:
 	void OrderEdges(mesh *meshin);
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
+	bool returnIsModif() const {return(isModif);}
 
 	surf(){ // Constructor
 		index=0;

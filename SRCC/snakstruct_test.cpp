@@ -601,6 +601,8 @@ int Test_snakeRSVS(){
 				TriangulateMesh(testSnake.snakeconn,testTriangle);
 				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 				outSnake.PrintMesh(triMesh,2,totT);
+				MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+				outSnake.PrintMesh(triMesh,3,totT);
 			}
 
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact,outSnake);
@@ -616,6 +618,8 @@ int Test_snakeRSVS(){
 			TriangulateMesh(testSnake.snakeconn,testTriangle);
 			MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 			outSnake.PrintMesh(triMesh,2,totT);
+			MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+			outSnake.PrintMesh(triMesh,3,totT);
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -632,9 +636,9 @@ int Test_snakeRSVS(){
 	return(errTest);
 
 }
-void Test_stepalgoRSVS(snake &testSnake,triangulation RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
 
 	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
-
+	MaintainTriangulateSnake(RSVStri);
 
 }
