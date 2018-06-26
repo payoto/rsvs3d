@@ -132,5 +132,9 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
+
+
+void Test_stepalgoRSVS(snake &testSnake,triangulation RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
+int Test_snakeRSVS();
 #endif // SNAKEVEL_H_INCLUDED
 

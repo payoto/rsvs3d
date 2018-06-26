@@ -118,6 +118,15 @@ public:
 	inline void reserve(int n);
 	inline void clear();
 	// Operators
+	void issafeaccess(const int a){
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+	}
+	
 	const T* operator()(const int a) const{ 
 	// () Operator returns a constant pointer to the corresponding elems.
 	// Cannot be used on the left hand side and can't be used to edit data in elems

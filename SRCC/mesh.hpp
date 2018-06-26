@@ -54,7 +54,7 @@ using namespace std;
 
 class meshpart;
 class mesh;
-class meshdependence;
+class meshdependence; 
 class ConnecRemv;
 
 class volu;
@@ -62,37 +62,16 @@ class surf;
 class vert;
 class edge;
 class coordvec;
-
+class surfarray;
+//typedef ArrayStruct<surf> surfarray;
 
 typedef ArrayStruct<volu> voluarray;
-typedef ArrayStruct<surf> surfarray;
 typedef ArrayStruct<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
 // Forward declared templated functions
 
 // Base class
-
-class meshdependence {
-	// Class for connecting meshes
-	// Stores a vector of mesh references for parent and children
-	// Needs to support partial meshes for constraint handling
-protected:
-	friend class mesh;
-
-	vector<int> elemind; // active element index
-	vector<mesh*> parentmesh; // use references as cannot be null
-	vector<mesh*> childmesh;
-	vector<HashedVectorSafe<int,int>> parentconn;
-	// These methods are protected to avoid broken/uni-directional connectivities being generated
-	int AddParent(mesh* meshin);
-	int AddChild(mesh* meshin);
-	void AddParent(mesh* meshin, vector<int> &parentind);
-	void RemoveChild(mesh* meshin);
-	void RemoveParent(mesh* meshin);
-public:
-
-};
 
 
 
@@ -142,67 +121,6 @@ public:
 		}
 		elems=a;
 		isuptodate=0;
-	}
-};
-
-class mesh {
-private:
-	bool borderIsSet=false;
-	bool meshDepIsSet=false;
-	int meshDim=0;
-	void SetLastIndex();
-	friend class snake;
-public:
-	vertarray verts;
-	edgearray edges;
-	surfarray surfs;
-	voluarray volus;
-
-	meshdependence meshtree;
-// Mesh Lineage
-	void RemoveFromFamily();
-	void AddChild(mesh* meshin);
-	void AddParent(mesh* meshin);
-	void AddParent(mesh* meshin, vector<int> &parentind);
-	void AddChild(mesh* meshin, vector<int> &parentind);
-	void SetMeshDepElm();
-	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
-	int WhatDim(){return(meshDim);}
-// basic operations grouped from each field
-	void HashArray();
-	void SetMaxIndex();
-	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
-	void Init(int nVe,int nE, int nS, int nVo);
-	void reserve(int nVe,int nE, int nS, int nVo);
-	void PrepareForUse(bool needOrder=true);
-	void disp() const;
-	void displight() const;
-	void Concatenate(const mesh &other);
-	bool isready() const;
-	void PopulateIndices();
-	void TightenConnectivity();
-	void TestConnectivity();
-	void TestConnectivityBiDir();
-//File I/o
-	void write(FILE *fid) const;
-	void read(FILE *fid);
-	int write(const char *str) const;
-	int read(const char *str);
-// Mesh merging
-	void MakeCompatible_inplace(mesh &other) const;
-	mesh MakeCompatible(mesh other) const;
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
-	void RemoveIndex(int typeInd, int oldInd);
-	int ConnectedVertex(vector<int> &vertBlock) const;
-	void ForceCloseContainers();
-// Mesh Quality
-	int OrderEdges();
-	void SetBorders();
-
-
-	~mesh(){
-		RemoveFromFamily();
 	}
 };
 
@@ -281,9 +199,12 @@ public:
 class surf: public meshpart {
 protected:
 	bool isordered;
+	bool isModif=true;
 public:
-	friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
-	friend void mesh::RemoveIndex(int typeInd, int oldInd);
+	friend class mesh;
+	friend class surfarray;
+	//friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
+	//friend void mesh::RemoveIndex(int typeInd, int oldInd);
 
 	double fill,target,error;
 	vector<int> edgeind;
@@ -446,6 +367,109 @@ public:
 	void disp();
 	
 };
+
+
+class surfarray : public ArrayStruct<surf>{
+	using ArrayStruct<surf>::elems;
+	
+	friend class mesh;
+	friend class snake;
+public:
+	void SetNoModif();
+	void ReturnModifInd(vector<int> &vecind);
+	void ReturnModifLog(vector<bool> &veclog);
+	surf& operator[](const int a){ 
+		#ifdef SAFE_ACCESS 
+		ArrayStruct<surf>::issafeaccess(a);
+		#endif
+		elems[a].isModif=true;
+		return(ArrayStruct<surf>::operator[](a));
+	}
+};
+
+class meshdependence {
+	// Class for connecting meshes
+	// Stores a vector of mesh references for parent and children
+	// Needs to support partial meshes for constraint handling
+protected:
+	friend class mesh;
+
+	vector<int> elemind; // active element index
+	vector<mesh*> parentmesh; // use references as cannot be null
+	vector<mesh*> childmesh;
+	vector<HashedVectorSafe<int,int>> parentconn;
+	// These methods are protected to avoid broken/uni-directional connectivities being generated
+	int AddParent(mesh* meshin);
+	int AddChild(mesh* meshin);
+	void AddParent(mesh* meshin, vector<int> &parentind);
+	void RemoveChild(mesh* meshin);
+	void RemoveParent(mesh* meshin);
+public:
+
+};
+
+
+class mesh {
+private:
+	bool borderIsSet=false;
+	bool meshDepIsSet=false;
+	int meshDim=0;
+	void SetLastIndex();
+	friend class snake;
+public:
+	vertarray verts;
+	edgearray edges;
+	surfarray surfs;
+	voluarray volus;
+
+	meshdependence meshtree;
+// Mesh Lineage
+	void RemoveFromFamily();
+	void AddChild(mesh* meshin);
+	void AddParent(mesh* meshin);
+	void AddParent(mesh* meshin, vector<int> &parentind);
+	void AddChild(mesh* meshin, vector<int> &parentind);
+	void SetMeshDepElm();
+	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
+	int WhatDim(){return(meshDim);}
+// basic operations grouped from each field
+	void HashArray();
+	void SetMaxIndex();
+	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
+	void Init(int nVe,int nE, int nS, int nVo);
+	void reserve(int nVe,int nE, int nS, int nVo);
+	void PrepareForUse(bool needOrder=true);
+	void disp() const;
+	void displight() const;
+	void Concatenate(const mesh &other);
+	bool isready() const;
+	void PopulateIndices();
+	void TightenConnectivity();
+	void TestConnectivity();
+	void TestConnectivityBiDir();
+//File I/o
+	void write(FILE *fid) const;
+	void read(FILE *fid);
+	int write(const char *str) const;
+	int read(const char *str);
+// Mesh merging
+	void MakeCompatible_inplace(mesh &other) const;
+	mesh MakeCompatible(mesh other) const;
+	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
+	void RemoveIndex(int typeInd, int oldInd);
+	int ConnectedVertex(vector<int> &vertBlock) const;
+	void ForceCloseContainers();
+// Mesh Quality
+	int OrderEdges();
+	void SetBorders();
+
+
+	~mesh(){
+		RemoveFromFamily();
+	}
+};
+
 
 //test functions
 int Test_ArrayStructures();
