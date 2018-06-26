@@ -588,6 +588,10 @@ template<class T> inline void ArrayStruct <T>::reserve(int n)
 {
 	elems.reserve(n);
 }
+template<class T> inline void ArrayStruct <T>::clear()  
+{
+	elems.clear();
+}
 // Hashed Vector Template class implementations
 
 template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){

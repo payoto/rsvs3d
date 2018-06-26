@@ -790,9 +790,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    	surfs.isSetMI=1;
    } else {
 
-   	cerr << "Error unknown type of object for index switching" <<endl;
+   	cerr << "Error unknown type " << typeInd << " of object for index switching" <<endl;
    	cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   	throw invalid_argument (" : Type is out of range");
+   	throw invalid_argument (" Type is out of range");
    }
 
 }

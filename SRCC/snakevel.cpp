@@ -109,19 +109,36 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	}
 }
 
-void MeshTriangulation(mesh &meshout,const mesh& meshin, 
-	triarray &triangul, tripointarray& trivert, const int typeMesh){
+void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert){
 
-	int ii,jj,kk,n, nSub;
+	int ii,jj,kk,ll,n, nSub,subSurf,nSurfInd,mm;
+	int nNewVert, nNewEdge, nNewSurf,maxIndVert, maxIndEdge, maxIndSurf,vertSub;
 	vector<bool> isTriDone;
-	vector<int> tempSub,tempType;
-	
+	vector<int> tempSub,tempType,tempVert,tempEdge;
+	mesh tempMesh;
+	vert buildVert;edge buildEdge;surf buildSurf;
+	bool flag;
+	ConnecRemv tempConnec,tempConnec2;
+	vector<ConnecRemv> conn;
+
 	meshout=meshin;
+
 	meshout.PrepareForUse();
+	triangul.PrepareForUse();
+	trivert.PrepareForUse();
+	meshout.SetMaxIndex();
+
 	n=int(triangul.size());
 	isTriDone.assign(n,false);
-	
-	
+
+	nNewVert=0; nNewEdge=0; nNewSurf=0;
+	maxIndVert=meshout.verts.GetMaxIndex(); 
+	maxIndEdge=meshout.edges.GetMaxIndex();
+	maxIndSurf=meshout.surfs.GetMaxIndex();
+	//cout << " " << maxIndVert << " " << maxIndEdge << " " << maxIndSurf << endl;
+
+	buildEdge.vertind.assign(2,0);
+	buildEdge.surfind.assign(2,0);
 
 	for (ii=0 ; ii < n ; ++ii){
 		if(!isTriDone[ii]){
@@ -131,10 +148,114 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,
 			if (int(tempType.size())>1){
 				triangul.findsiblings(triangul(ii)->KeyParent(),tempSub);
 				nSub=tempSub.size();
+				//cout << " " << nSub ;
+				for(jj=0 ; jj< nSub;++jj){
+					isTriDone[tempSub[jj]]=true;
+				}
+
+				subSurf=meshin.surfs.find(triangul(ii)->KeyParent());
+				tempVert=ConcatenateVectorField(meshin.edges,&edge::vertind,meshin.edges.find_list(meshin.surfs(subSurf)->edgeind));
+				sort(tempVert);
+				unique(tempVert);
+
+				tempEdge=meshin.edges.find_list(meshin.surfs(subSurf)->edgeind);
+				// Build nSub edges
+				// 1 vertex
+				// nSub-1 surfaces
+
+
+				// Add the vertex
+				for(jj=0;jj<3;++jj){
+					if(triangul(ii)->pointtype[jj]==3){
+						buildVert.index=maxIndVert+nNewVert+1;
+						nNewVert++;
+						buildVert.coord=trivert.isearch(triangul(ii)->pointind[jj])->coord.usedata(); 
+						buildVert.edgeind.clear();
+						for(kk=0; kk<int(tempVert.size());++kk){
+							buildVert.edgeind.push_back(maxIndEdge+nNewEdge+1+kk);
+						}
+						tempMesh.verts.push_back(buildVert);
+						break;
+					}
+				}
+				// Add the edges 
+				ll=0;
+				kk=0;
+				flag=(meshin.edges(tempEdge[kk])->vertind[ll]
+					==meshin.edges(tempEdge[kk+1])->vertind[0]) | 
+					(meshin.edges(tempEdge[kk])->vertind[ll]
+					==meshin.edges(tempEdge[kk+1])->vertind[1]);
+				if(!flag){ll=((ll+1)%2);}
+				
+
+				nSub=int(tempEdge.size());
+				for(kk=0; kk<nSub;++kk){
+					buildEdge.index=(maxIndEdge+nNewEdge+1+kk);
+					buildEdge.vertind[0]=buildVert.index;
+					buildEdge.vertind[1]=meshin.edges(tempEdge[kk])->vertind[ll];
+					vertSub=meshin.verts.find(meshin.edges(tempEdge[kk])->vertind[ll]);
+					meshout.verts[vertSub].edgeind.push_back(maxIndEdge+nNewEdge+1+kk);
+
+					buildEdge.surfind[0]=(kk==0)*(meshin.surfs(subSurf)->index)
+						+(kk!=0)*(maxIndSurf+nNewSurf+kk);
+					buildEdge.surfind[1]=(kk==(nSub-1))*(meshin.surfs(subSurf)->index)
+						+(kk!=(nSub-1))*(maxIndSurf+nNewSurf+kk+1);
+
+					tempMesh.edges.push_back(buildEdge);
+
+					if(kk==0){
+
+						meshout.surfs[subSurf].edgeind.clear();
+						meshout.surfs[subSurf].edgeind.push_back(maxIndEdge+nNewEdge+1);
+						meshout.surfs[subSurf].edgeind.push_back(maxIndEdge+nNewEdge+nSub);
+						meshout.surfs[subSurf].edgeind.push_back(meshin.edges(tempEdge[kk])->index);
+						
+					} else {
+
+						buildSurf=*(meshin.surfs(subSurf));
+						buildSurf.index=maxIndSurf+nNewSurf+kk;
+						buildSurf.edgeind.clear();
+						buildSurf.edgeind.push_back(maxIndEdge+nNewEdge+kk);
+						buildSurf.edgeind.push_back(maxIndEdge+nNewEdge+kk+1);
+						buildSurf.edgeind.push_back(meshin.edges(tempEdge[kk])->index);
+
+						tempMesh.surfs.push_back(buildSurf);
+
+						nSurfInd=meshout.edges[tempEdge[kk]].surfind.size();
+						for (mm=0;mm<nSurfInd; ++mm){
+							if(meshout.edges[tempEdge[kk]].surfind[mm]==meshin.surfs(subSurf)->index){
+								meshout.edges[tempEdge[kk]].surfind[mm]=maxIndSurf+nNewSurf+kk;
+							}
+						}
+						nSurfInd=buildSurf.voluind.size();
+						for (mm=0;mm<nSurfInd; ++mm){
+							if(buildSurf.voluind[mm]!=0){
+								meshout.volus[meshin.volus.find(buildSurf.voluind[mm])].surfind.push_back(buildSurf.index);
+							}
+						}
+					}
+
+
+					if(kk<int(tempEdge.size()-1)){
+						
+						flag=(meshin.edges(tempEdge[kk])->vertind[0]
+							==meshin.edges(tempEdge[kk+1])->vertind[ll]) | 
+							(meshin.edges(tempEdge[kk])->vertind[1]
+							==meshin.edges(tempEdge[kk+1])->vertind[ll]);
+						ll=((ll+1)%2)*(flag)+ll*(!flag);
+					}
+				}
+				nNewEdge=nNewEdge+nSub;
+				nNewSurf=nNewSurf+nSub-1;
 
 			}
+			isTriDone[ii]=true;
 		}
 	}
+
+	meshout.Concatenate(tempMesh);
+	meshout.PrepareForUse();
+	//meshout.TestConnectivityBiDir();
 }
 
 // Triangulation class Methods

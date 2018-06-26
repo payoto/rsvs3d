@@ -55,6 +55,7 @@ using namespace std;
 class meshpart;
 class mesh;
 class meshdependence;
+class ConnecRemv;
 
 class volu;
 class surf;
@@ -115,7 +116,7 @@ public:
 	double operator()(int a) const;
 	void disp() const;
 	bool isready() const {return(bool(isuptodate));};
-	const vector<double>& usedata() {return(elems);}
+	const vector<double>& usedata() const {return(elems);}
 	// Math and logical operations (element wise)
 	void max(const vector<double> &vecin);
 	void min(const vector<double> &vecin);
@@ -436,6 +437,15 @@ public:
 
 
 
+class ConnecRemv {
+public:
+	int keepind;
+	int typeobj;
+	vector<int> rmvind;
+	vector<int> scopeind;
+	void disp();
+	
+};
 
 //test functions
 int Test_ArrayStructures();

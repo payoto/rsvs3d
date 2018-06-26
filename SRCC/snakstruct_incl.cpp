@@ -129,6 +129,15 @@ int SnakStruct<T>::findparent(int key) const
 	return(search->second);
 }
 
-
+template<class T>
+void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const 
+{
+	if (isHashParent==0){
+		cerr << "Warning: reading from potentially obsolete unordered_multimap " << endl;
+		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
+		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
+	}
+	siblings=ReturnDataEqualRange(key, hashParent);
+}
 
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

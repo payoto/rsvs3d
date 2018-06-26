@@ -34,18 +34,8 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
+using namespace std; 
 
-
-class ConnecRemv {
-public:
-	int keepind;
-	int typeobj;
-	vector<int> rmvind;
-	vector<int> scopeind;
-	void disp();
-	
-};
 
 
 

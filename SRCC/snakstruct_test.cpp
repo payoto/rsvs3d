@@ -214,7 +214,8 @@ int Test_snake(){
 
 int Test_snakeinit(){
 	snake testSnake;
-	mesh snakeMesh;
+	mesh snakeMesh, triMesh;
+	triangulation testTriangle;
 	const char *fileToOpen;
 	tecplotfile outSnake;
 	double totT=0.0;
@@ -249,11 +250,19 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<20;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+
+				testSnake.snakeconn.PrepareForUse();
+				testTriangle.stattri.clear();
+				testTriangle.trivert.clear();
+				testTriangle.PrepareForUse();
+				TriangulateMesh(testSnake.snakeconn,testTriangle);
+				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
+				outSnake.PrintMesh(triMesh,2,totT);
 			}
 
 			Test_stepalgo(testSnake, dt, isImpact,outSnake);
@@ -263,6 +272,12 @@ int Test_snakeinit(){
 
 		if(testSnake.snaxs.size()>0){
 			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			testTriangle.stattri.clear();
+			testTriangle.trivert.clear();
+			testTriangle.PrepareForUse();
+			TriangulateMesh(testSnake.snakeconn,testTriangle);
+			MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
+			outSnake.PrintMesh(triMesh,2,totT);
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -450,7 +465,7 @@ int Test_snakeOrderEdges(){
 
 int Test_MeshRefinement(){
 
-	mesh snakeMesh, voluMesh;
+	mesh snakeMesh, voluMesh, triMesh;
 	const char *fileToOpen;
 	tecplotfile outSnake;
 	vector<int> elmMapping,dims;
@@ -485,11 +500,18 @@ int Test_MeshRefinement(){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
-
 		snakeMesh.AddParent(&voluMesh,elmMapping);
+
 		testTriangle.PrepareForUse();
 		TriangulateMesh(voluMesh,testTriangle);
+		voluMesh.TightenConnectivity();
+		voluMesh.OrderEdges();
+		testTriangle.PrepareForUse();
+		MeshTriangulation(triMesh,voluMesh,testTriangle.stattri, testTriangle.trivert);
 		outSnake.PrintMesh(voluMesh);
+		outSnake.PrintMesh(triMesh);
+
+
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;

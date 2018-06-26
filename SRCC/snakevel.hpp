@@ -131,6 +131,6 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh);
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
-
+void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
 #endif // SNAKEVEL_H_INCLUDED
 

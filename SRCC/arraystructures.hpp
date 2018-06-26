@@ -116,6 +116,7 @@ public:
 	inline void assign(int n, T& newelem);
 	inline void push_back(T& newelem);
 	inline void reserve(int n);
+	inline void clear();
 	// Operators
 	const T* operator()(const int a) const{ 
 	// () Operator returns a constant pointer to the corresponding elems.
@@ -174,8 +175,7 @@ public:
 
 	//inline int KeyParent(int a) const ;
 	int findparent(int key) const; 
-	void findsiblings(int key, vector<int> &siblings) const{
-		siblings=ReturnDataEqualRange(key, hashParent);}
+	void findsiblings(int key, vector<int> &siblings) const; 
 	int countparent(int key) const {return(hashParent.count(key));};
 	void HashParent();
 	void DeHashParent(const int pos);
