@@ -13,7 +13,6 @@
 #include <vector> 
 #include <cmath> 
 #include "vectorarray.hpp" 
-#include "snakevel.hpp" 
 #include "RSVSmath_automatic.hpp"
 using namespace std; 
 
@@ -68,6 +67,59 @@ public:
 
 };
 
+
+class CoordFunc {
+protected:
+	vector<vector<double>*> coords;
+
+	double fun;
+	ArrayVec<double> funA;
+	ArrayVec<double> jac;
+	ArrayVec<double> hes;
+
+	bool isReady;
+	bool isCalc;
+	int nDim; // target length of vectors
+	int nCoord; // target length of vectors
+	int nFun;
+
+	bool MakeValidField(vector<double>* mp);
+	void InitialiseArrays();
+public:
+	// Check validity
+	bool CheckValid();
+	bool MakeValid();
+	void PreCalc();
+	// Build a valid object
+	void assign(vector<vector<double>*> &coords);
+	void assign(int pRepI,vector<double> &pRep);
+	void ResetDim(int nDim){InitialiseArrays();}
+	void ResetNCoord(int nCoord){InitialiseArrays();}
+	void ResetNFun(int nFun){InitialiseArrays();}
+
+	virtual void Calc() = 0; // Virtual function that calculates the function
+
+	CoordFunc(){
+		nDim=3;
+		nCoord=3;
+		nFun=1;
+		InitialiseArrays();
+	}
+	CoordFunc(int nDim){
+		nCoord=3;
+		nFun=1;
+		InitialiseArrays();
+	}
+	CoordFunc(int nDim,int nCoord){
+		nFun=1;
+		InitialiseArrays();
+	}
+	CoordFunc(int nDim,int nCoord,int nFun){
+		InitialiseArrays();
+	}
+
+};
+
 class Volume : public TriFunc {
 	using TriFunc::TriFunc;
 	using TriFunc::PreCalc;
@@ -97,22 +149,31 @@ public:
 
 };
 
-class LengthEdge : public TriFunc {
-	using TriFunc::TriFunc;
-	using TriFunc::PreCalc;
-	using TriFunc::p0;
-	using TriFunc::p1;
-	using TriFunc::p2;
-	using TriFunc::fun;
-	using TriFunc::jac;
-	using TriFunc::hes;
+class LengthEdge : public CoordFunc {
+
+	using CoordFunc::PreCalc;
+	using CoordFunc::coords;
+	using CoordFunc::fun;
+	using CoordFunc::jac;
+	using CoordFunc::hes;
 
 public:
 	void Calc();
+	LengthEdge() : CoordFunc(3,2){}
 };
 
-class SurfCentroid {
+class SurfCentroid : public CoordFunc {
+	using CoordFunc::PreCalc;
+	using CoordFunc::coords;
+	using CoordFunc::fun;
+	using CoordFunc::jac;
+	using CoordFunc::hes;
+	using CoordFunc::nCoord;
 
+public:
+	void Calc();
+	SurfCentroid() : CoordFunc(3,4,3){};
+	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){};
 
 };
 
