@@ -6,9 +6,13 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     % polygon
     % Areas are similarly calculated for triangular portions of a polygon
     
-    [ccodeGen(5)]=Code_SurfCentroid();
+    [ccodeGen(5)]=Code_SurfCentroid4();
     [ccodeGen(6)]=Code_SurfCentroidDiv();
     [ccodeGen(7)]=Code_SurfCentroidFull();
+    [ccodeGen(8)]=Code_SurfCentroid5();
+    [ccodeGen(9)]=Code_SurfCentroid6();
+    [ccodeGen(10)]=Code_SurfCentroidConnec();
+    [ccodeGen(11)]=Code_SurfCentroidNoConnec();
     [ccodeGen(4)]=Code_SurfIntersect();
     [ccodeGen(1)]=Code_Volume();
     [ccodeGen(2)]=Code_Area();
@@ -227,7 +231,7 @@ end
 % Surf Object centroid (vec<x>,vec<y>,vec<z>)
 
 
-function [ccodeGen]=Code_SurfCentroid()
+function [ccodeGen]=Code_SurfCentroid4()
 
     n=4;
     x=sym('x_%d__',[1 n]);assume(x,'real');
@@ -236,7 +240,7 @@ function [ccodeGen]=Code_SurfCentroid()
     
     ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
-    ccodeGen.name='SurfCentroid';
+    ccodeGen.name='SurfCentroid4';
     
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z])),[x,y,z]);
@@ -248,6 +252,49 @@ function [ccodeGen]=Code_SurfCentroid()
     ccodeGen.ddf='';
     
 end
+function [ccodeGen]=Code_SurfCentroid5()
+
+    n=5;
+    x=sym('x_%d__',[1 n]);assume(x,'real');
+    y=sym('y_%d__',[1 n]);assume(y,'real');
+    z=sym('z_%d__',[1 n]);assume(z,'real');
+    
+    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
+    ccodeGen.name='SurfCentroid5';
+    
+    lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
+        ,1))*transpose([x;y;z])),[x,y,z]);
+    lengthedgeJac=jacobian(lengthedge);
+    %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
+    
+    ccodeGen.f=custcccode(lengthedge);
+    ccodeGen.df=custcccode(lengthedgeJac);
+    ccodeGen.ddf='';
+    
+end
+function [ccodeGen]=Code_SurfCentroid6()
+
+    n=5;
+    x=sym('x_%d__',[1 n]);assume(x,'real');
+    y=sym('y_%d__',[1 n]);assume(y,'real');
+    z=sym('z_%d__',[1 n]);assume(z,'real');
+    
+    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
+    ccodeGen.name='SurfCentroid5';
+    
+    lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
+        ,1))*transpose([x;y;z])),[x,y,z]);
+    lengthedgeJac=jacobian(lengthedge);
+    %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
+    
+    ccodeGen.f=custcccode(lengthedge);
+    ccodeGen.df=custcccode(lengthedgeJac);
+    ccodeGen.ddf='';
+    
+end
+
 function [ccodeGen]=Code_SurfCentroidDiv()
 
     n=5;
@@ -285,6 +332,51 @@ function [ccodeGen]=Code_SurfCentroidFull()
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...
         y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([1:2,4]),y([1:2,4]),z([1:2,4])]);
+    lengthedgeJac=jacobian(lengthedge);
+    %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
+    
+    ccodeGen.f=custcccode(lengthedge);
+    ccodeGen.df=custcccode(lengthedgeJac);
+    ccodeGen.ddf='';
+    
+end
+
+function [ccodeGen]=Code_SurfCentroidConnec()
+
+    n=5;
+    x=sym('x_%d__',[1 n]);assume(x,'real');
+    y=sym('y_%d__',[1 n]);assume(y,'real');
+    z=sym('z_%d__',[1 n]);assume(z,'real');
+    
+    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
+    ccodeGen.name='SurfCentroidConnec';
+    
+    lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
+        ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...
+        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([1:2]),y([1:2]),z([1:2])]);
+    lengthedgeJac=jacobian(lengthedge);
+    %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
+    
+    ccodeGen.f=custcccode(lengthedge);
+    ccodeGen.df=custcccode(lengthedgeJac);
+    ccodeGen.ddf='';
+    
+end
+function [ccodeGen]=Code_SurfCentroidNoConnec()
+
+    n=6;
+    x=sym('x_%d__',[1 n]);assume(x,'real');
+    y=sym('y_%d__',[1 n]);assume(y,'real');
+    z=sym('z_%d__',[1 n]);assume(z,'real');
+    
+    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
+    ccodeGen.name='SurfCentroidNoConnec';
+    
+    lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
+        ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...
+        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([2,4]),y([2,4]),z([2,4])]);
     lengthedgeJac=jacobian(lengthedge);
     %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
     

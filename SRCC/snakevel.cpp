@@ -21,19 +21,19 @@ void CalculateSnakeVel(snake &snakein){
 	}
 }
 
-
-
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
 	TriangulateContainer(meshin,triangleRSVS , 1); 
 	triangleRSVS.meshDep=&meshin;
 
 }
+
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS){
 
 	TriangulateContainer(snakein.snakeconn, triangleRSVS , 2);
 	triangleRSVS.snakeDep=&snakein;
 }
+
 void MaintainTriangulateSnake(triangulation &triangleRSVS){
 
 	vector<int> surfReTriangulate;
