@@ -1,12 +1,10 @@
 #include <vector> 
 #include <cmath> 
 #include "vectorarray.hpp" 
-#include "snakevel.hpp" 
-#include "RSVSmath_automatic.hpp" 
-
 using namespace std; 
 
-void Volume_f(vector<double> p0 , vector<double> p1 , vector<double> p2 , double &   t0 ) { 
+#include "RSVSmath_automatic.hpp" 
+void Volume_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7;
   t2 = p0[1]-p1[1];
   t3 = p0[1]-p2[1];
@@ -19,7 +17,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7;
 } 
 
 
-void Volume_df(vector<double> p0 , vector<double> p1 , vector<double> p2 , ArrayVec<double> &   A0 ) { 
+void Volume_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
   t2 = p1[3]-p2[3];
   t3 = p0[3]-p2[3];
@@ -43,7 +41,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
 } 
 
 
-void Volume_ddf(vector<double> p0 , vector<double> p1 , vector<double> p2 , ArrayVec<double> &   A0 ) { 
+void Volume_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
   t2 = p1[3]*(1.0/6.0);
   t3 = p2[2]*(1.0/6.0);
@@ -94,7 +92,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
 } 
 
 
-void Area_f(vector<double> p0 , vector<double> p1 , vector<double> p2 , double &   t0 ) { 
+void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ) { 
 double   t3,   t4,   t6,   t9,   t2,   t7,   t8,   t5,   t10;
   t3 = p0[1]-p1[1];
   t4 = p0[1]-p2[1];
@@ -110,7 +108,7 @@ double   t3,   t4,   t6,   t9,   t2,   t7,   t8,   t5,   t10;
 } 
 
 
-void Area_df(vector<double> p0 , vector<double> p1 , vector<double> p2 , ArrayVec<double> &   A0 ) { 
+void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t13,   t7,   t8,   t9,   t10,   t18,   t11,   t14,   t15,   t12,   t16,   t17,   t19,   t20,   t21,   t22,   t23,   t24,   t25;
   t2 = p0[1]-p1[1];
   t3 = p0[1]-p2[1];
@@ -149,7 +147,7 @@ double   t2,   t3,   t4,   t5,   t6,   t13,   t7,   t8,   t9,   t10,   t18,   t1
 } 
 
 
-void Area_ddf(vector<double> p0 , vector<double> p1 , vector<double> p2 , ArrayVec<double> &   A0 ) { 
+void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t5,   t6,   t8,   t11,   t13,   t14,   t4,   t9,   t10,   t15,   t16,   t7,   t20,   t21,   t12,   t19,   t23,   t24,   t17,   t18,   t22,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t37,   t33,   t34,   t35,   t36,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t70,   t47,   t48,   t49,   t50,   t51,   t52,   t53,   t54,   t55,   t56,   t75,   t57,   t58,   t59,   t60,   t61,   t62,   t63,   t64,   t65,   t66,   t67,   t68,   t69,   t71,   t72,   t73,   t74,   t76,   t77,   t78,   t79,   t80,   t81,   t82,   t83,   t84,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118,   t119,   t120,   t121,   t122,   t123,   t124,   t125,   t126,   t127,   t128,   t129,   t130,   t131,   t132,   t133,   t134,   t135,   t136,   t137,   t138,   t139,   t140,   t141,   t142,   t143,   t144,   t145,   t146,   t147,   t148,   t149,   t150,   t151,   t152,   t153,   t154,   t155,   t156,   t157,   t158,   t159,   t160,   t161,   t162,   t163,   t164,   t165,   t166,   t167,   t168,   t169,   t170,   t171,   t172,   t173,   t174,   t175,   t176;
   t2 = p1[2]-p2[2];
   t3 = p1[3]-p2[3];
@@ -411,7 +409,7 @@ double   t2,   t3,   t5,   t6,   t8,   t11,   t13,   t14,   t4,   t9,   t10,   t
 } 
 
 
-void LengthEdge_f(vector<double> p0 , vector<double> p1 , double &   t0 ) { 
+void LengthEdge_f(const vector<double>& p0 , const vector<double>& p1 , double &   t0 ) { 
 double   t2,   t3,   t4;
   t2 = p0[1]-p1[1];
   t3 = p0[2]-p1[2];
@@ -421,7 +419,7 @@ double   t2,   t3,   t4;
 } 
 
 
-void LengthEdge_df(vector<double> p0 , vector<double> p1 , ArrayVec<double> &   A0 ) { 
+void LengthEdge_df(const vector<double>& p0 , const vector<double>& p1 , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21;
   t2 = p0[1]-p1[1];
   t3 = p0[2]-p1[2];
@@ -453,7 +451,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void LengthEdge_ddf(vector<double> p0 , vector<double> p1 , ArrayVec<double> &   A0 ) { 
+void LengthEdge_ddf(const vector<double>& p0 , const vector<double>& p1 , ArrayVec<double> &   A0 ) { 
 double   t10,   t11,   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31;
   t10 = p0[1]*2.0;
   t11 = p1[1]*2.0;
@@ -525,7 +523,7 @@ double   t10,   t11,   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t12,   t1
 } 
 
 
-void SurfIntersect_f(vector<double> p1 , vector<double> p2 , vector<double> v0 , vector<double> v01 , vector<double> v02 , vector<double> v11 , vector<double> v12 , vector<double> c , double &   t0 ) { 
+void SurfIntersect_f(const vector<double>& p1 , const vector<double>& p2 , const vector<double>& v0 , const vector<double>& v01 , const vector<double>& v02 , const vector<double>& v11 , const vector<double>& v12 , const vector<double>& c , double &   t0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t14,   t8,   t9,   t10,   t16,   t11,   t12,   t20,   t13,   t15,   t17,   t18,   t19,   t21,   t22,   t23,   t24;
   t2 = p1[2]-p2[2];
   t3 = v01[1]+v02[1]-v11[1]-v12[1];
@@ -555,7 +553,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t14,   t8,   t9,   t10,   t16,   t1
 } 
 
 
-void SurfIntersect_df(vector<double> p1 , vector<double> p2 , vector<double> v0 , vector<double> v01 , vector<double> v02 , vector<double> v11 , vector<double> v12 , vector<double> c , ArrayVec<double> &   A0 ) { 
+void SurfIntersect_df(const vector<double>& p1 , const vector<double>& p2 , const vector<double>& v0 , const vector<double>& v01 , const vector<double>& v02 , const vector<double>& v11 , const vector<double>& v12 , const vector<double>& c , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t19,   t8,   t9,   t10,   t21,   t11,   t12,   t28,   t13,   t33,   t14,   t34,   t15,   t16,   t17,   t18,   t20,   t22,   t23,   t24,   t25,   t26,   t27,   t29,   t30,   t37,   t31,   t32,   t35,   t36,   t42,   t38,   t39,   t40,   t43,   t41,   t44,   t45,   t46,   t55,   t56,   t57,   t47,   t48,   t49,   t54,   t50,   t53,   t51,   t52,   t58,   t59,   t60,   t61,   t62,   t63,   t64,   t66,   t65,   t67,   t68,   t69,   t70,   t71,   t72,   t73,   t74,   t75,   t76,   t77,   t78,   t79,   t80;
   t2 = p1[2]-p2[2];
   t3 = v01[1]+v02[1]-v11[1]-v12[1];
@@ -646,7 +644,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t19,   t8,   t9,   t10,   t21,   t1
 } 
 
 
-void SurfIntersect_ddf(vector<double> p1 , vector<double> p2 , vector<double> v0 , vector<double> v01 , vector<double> v02 , vector<double> v11 , vector<double> v12 , vector<double> c , ArrayVec<double> &   A0 ) { 
+void SurfIntersect_ddf(const vector<double>& p1 , const vector<double>& p2 , const vector<double>& v0 , const vector<double>& v01 , const vector<double>& v02 , const vector<double>& v11 , const vector<double>& v12 , const vector<double>& c , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t27,   t8,   t9,   t10,   t29,   t11,   t12,   t34,   t13,   t14,   t15,   t21,   t22,   t16,   t17,   t18,   t24,   t25,   t19,   t20,   t23,   t26,   t28,   t30,   t31,   t32,   t33,   t35,   t40,   t36,   t37,   t38,   t39,   t49,   t50,   t41,   t47,   t42,   t48,   t43,   t44,   t45,   t46,   t51,   t52,   t53,   t54,   t55,   t56,   t57,   t58,   t59,   t77,   t78,   t79,   t60,   t65,   t61,   t62,   t63,   t66,   t64,   t67,   t68,   t73,   t74,   t75,   t69,   t70,   t71,   t72,   t76,   t80,   t83,   t81,   t84,   t82,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118,   t127,   t128,   t129,   t119,   t120,   t121,   t122,   t125,   t126,   t123,   t124,   t130,   t131,   t147,   t148,   t149,   t132,   t133,   t134,   t135,   t136,   t137,   t138,   t139,   t140,   t141,   t142,   t143,   t144,   t145,   t146,   t150,   t151,   t152,   t153,   t154,   t155,   t156,   t157,   t158,   t159,   t160,   t161,   t162,   t163,   t176,   t177,   t164,   t165,   t166,   t167,   t168,   t169,   t170,   t171,   t172,   t183,   t184,   t173,   t174,   t175,   t178,   t179,   t180,   t181,   t182,   t185,   t186,   t187,   t188,   t189,   t190,   t191,   t192,   t193,   t194,   t195,   t196,   t197,   t198,   t199;
   t2 = p1[2]-p2[2];
   t3 = v01[1]+v02[1]-v11[1]-v12[1];
@@ -886,7 +884,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t27,   t8,   t9,   t10,   t29,   t1
 } 
 
 
-void SurfCentroid4_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroid4_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
@@ -927,7 +925,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroid4_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroid4_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t20,   t17,   t18,   t19,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t31,   t28,   t29,   t30,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t42,   t39,   t40,   t41,   t43,   t44,   t47,   t45,   t46,   t50,   t48,   t49,   t53,   t51,   t52,   t54,   t57,   t55,   t56,   t60,   t58,   t59,   t63,   t61,   t62,   t64,   t65,   t66,   t67,   t68,   t69,   t70,   t71,   t72,   t73,   t74,   t75,   t76,   t77,   t78,   t79,   t80,   t81,   t82,   t83,   t84,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94;
   t2 = x[1]-x[4];
   t3 = y[1]-y[4];
@@ -1062,7 +1060,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroidDiv_f(vector<double> x , vector<double> y , vector<double> z , double &   t0 ) { 
+void SurfCentroidDiv_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , double &   t0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
@@ -1084,7 +1082,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroidDiv_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroidDiv_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t29,   t26,   t27,   t28,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t48,   t51,   t49,   t50,   t54,   t52,   t53,   t58,   t55,   t56,   t57,   t59,   t60,   t63,   t61,   t62,   t65,   t64,   t67,   t66,   t70,   t68,   t69,   t71,   t74,   t72,   t73,   t76,   t75,   t78,   t77,   t81,   t79,   t80;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
@@ -1185,220 +1183,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroid_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43;
-  t2 = x[1]-x[2];
-  t3 = y[1]-y[2];
-  t4 = z[1]-z[2];
-  t5 = x[2]-x[3];
-  t6 = y[2]-y[3];
-  t7 = z[2]-z[3];
-  t8 = x[1]-x[5];
-  t9 = y[1]-y[5];
-  t10 = z[1]-z[5];
-  t11 = x[3]-x[4];
-  t12 = y[3]-y[4];
-  t13 = z[3]-z[4];
-  t14 = x[4]-x[5];
-  t15 = y[4]-y[5];
-  t16 = z[4]-z[5];
-  t17 = t2*t2;
-  t18 = t3*t3;
-  t19 = t4*t4;
-  t20 = t17+t18+t19;
-  t21 = sqrt(t20);
-  t22 = t5*t5;
-  t23 = t6*t6;
-  t24 = t7*t7;
-  t25 = t22+t23+t24;
-  t26 = sqrt(t25);
-  t27 = t8*t8;
-  t28 = t9*t9;
-  t29 = t10*t10;
-  t30 = t27+t28+t29;
-  t31 = sqrt(t30);
-  t32 = t11*t11;
-  t33 = t12*t12;
-  t34 = t13*t13;
-  t35 = t32+t33+t34;
-  t36 = sqrt(t35);
-  t37 = t14*t14;
-  t38 = t15*t15;
-  t39 = t16*t16;
-  t40 = t37+t38+t39;
-  t41 = sqrt(t40);
-  t42 = t21+t26+t31+t36+t41;
-  t43 = 1.0/t42;
-  A0[0][0] = t43*(t21*x[2]+t26*x[3]+t31*x[1]+t36*x[4]+t41*x[5]);
-  A0[0][1] = t43*(t21*y[2]+t26*y[3]+t31*y[1]+t36*y[4]+t41*y[5]);
-  A0[0][2] = t43*(t21*z[2]+t26*z[3]+t31*z[1]+t36*z[4]+t41*z[5]);
- 
-} 
-
-
-void SurfCentroid_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t48,   t27,   t28,   t62,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t49,   t50,   t51,   t61,   t52,   t53,   t54,   t55,   t56,   t57,   t58,   t59,   t60,   t65,   t63,   t64,   t66,   t67,   t70,   t68,   t75,   t69,   t71,   t72,   t74,   t73,   t77,   t76,   t78,   t81,   t79,   t86,   t80,   t82,   t83,   t85,   t84,   t88,   t87,   t89,   t90,   t91,   t114,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t124,   t104,   t105,   t106,   t107,   t108,   t109,   t128,   t110,   t111,   t112,   t113,   t115,   t116,   t117,   t118,   t119,   t120,   t121,   t122,   t123,   t125,   t126,   t127,   t129,   t130;
-  t2 = x[1]-x[5];
-  t3 = y[1]-y[5];
-  t4 = z[1]-z[5];
-  t5 = x[1]-x[2];
-  t6 = y[1]-y[2];
-  t7 = z[1]-z[2];
-  t8 = x[1]*2.0;
-  t9 = t2*t2;
-  t10 = t3*t3;
-  t11 = t4*t4;
-  t12 = t9+t10+t11;
-  t13 = t5*t5;
-  t14 = t6*t6;
-  t15 = t7*t7;
-  t16 = t13+t14+t15;
-  t17 = x[2]-x[3];
-  t18 = y[2]-y[3];
-  t19 = z[2]-z[3];
-  t20 = sqrt(t12);
-  t21 = x[3]-x[4];
-  t22 = y[3]-y[4];
-  t23 = z[3]-z[4];
-  t24 = x[4]-x[5];
-  t25 = y[4]-y[5];
-  t26 = z[4]-z[5];
-  t48 = x[2]*2.0;
-  t27 = t8-t48;
-  t28 = 1.0/sqrt(t16);
-  t62 = x[5]*2.0;
-  t29 = t8-t62;
-  t30 = 1.0/sqrt(t12);
-  t31 = sqrt(t16);
-  t32 = t17*t17;
-  t33 = t18*t18;
-  t34 = t19*t19;
-  t35 = t32+t33+t34;
-  t36 = sqrt(t35);
-  t37 = t21*t21;
-  t38 = t22*t22;
-  t39 = t23*t23;
-  t40 = t37+t38+t39;
-  t41 = sqrt(t40);
-  t42 = t24*t24;
-  t43 = t25*t25;
-  t44 = t26*t26;
-  t45 = t42+t43+t44;
-  t46 = sqrt(t45);
-  t47 = t20+t31+t36+t41+t46;
-  t49 = t27*t28*x[2]*(1.0/2.0);
-  t50 = 1.0/t47;
-  t51 = t27*t28*(1.0/2.0);
-  t61 = x[3]*2.0;
-  t52 = t48-t61;
-  t53 = 1.0/sqrt(t35);
-  t54 = 1.0/(t47*t47);
-  t55 = t31*x[2];
-  t56 = t36*x[3];
-  t57 = t20*x[1];
-  t58 = t41*x[4];
-  t59 = t46*x[5];
-  t60 = t55+t56+t57+t58+t59;
-  t65 = x[4]*2.0;
-  t63 = t61-t65;
-  t64 = 1.0/sqrt(t40);
-  t66 = 1.0/sqrt(t45);
-  t67 = y[1]*2.0;
-  t70 = y[2]*2.0;
-  t68 = t67-t70;
-  t75 = y[5]*2.0;
-  t69 = t67-t75;
-  t71 = t28*t68*x[2]*(1.0/2.0);
-  t72 = t28*t68*(1.0/2.0);
-  t74 = y[3]*2.0;
-  t73 = t70-t74;
-  t77 = y[4]*2.0;
-  t76 = t74-t77;
-  t78 = z[1]*2.0;
-  t81 = z[2]*2.0;
-  t79 = t78-t81;
-  t86 = z[5]*2.0;
-  t80 = t78-t86;
-  t82 = t28*t79*x[2]*(1.0/2.0);
-  t83 = t28*t79*(1.0/2.0);
-  t85 = z[3]*2.0;
-  t84 = t81-t85;
-  t88 = z[4]*2.0;
-  t87 = t85-t88;
-  t89 = t29*t30*(1.0/2.0);
-  t90 = t51+t89;
-  t91 = t27*t28*y[2]*(1.0/2.0);
-  t114 = t52*t53*(1.0/2.0);
-  t92 = t51-t114;
-  t93 = t31*y[2];
-  t94 = t36*y[3];
-  t95 = t20*y[1];
-  t96 = t41*y[4];
-  t97 = t46*y[5];
-  t98 = t93+t94+t95+t96+t97;
-  t99 = t62-t65;
-  t100 = t63*t64*(1.0/2.0);
-  t101 = t30*t69*(1.0/2.0);
-  t102 = t72+t101;
-  t103 = t28*t68*y[2]*(1.0/2.0);
-  t124 = t53*t73*(1.0/2.0);
-  t104 = t72-t124;
-  t105 = t75-t77;
-  t106 = t64*t76*(1.0/2.0);
-  t107 = t30*t80*(1.0/2.0);
-  t108 = t83+t107;
-  t109 = t28*t79*y[2]*(1.0/2.0);
-  t128 = t53*t84*(1.0/2.0);
-  t110 = t83-t128;
-  t111 = t86-t88;
-  t112 = t64*t87*(1.0/2.0);
-  t113 = t27*t28*z[2]*(1.0/2.0);
-  t115 = t31*z[2];
-  t116 = t36*z[3];
-  t117 = t20*z[1];
-  t118 = t41*z[4];
-  t119 = t46*z[5];
-  t120 = t115+t116+t117+t118+t119;
-  t121 = t66*(t62-t65)*(1.0/2.0);
-  t122 = t100+t121;
-  t123 = t28*t68*z[2]*(1.0/2.0);
-  t125 = t66*(t75-t77)*(1.0/2.0);
-  t126 = t106+t125;
-  t127 = t28*t79*z[2]*(1.0/2.0);
-  t129 = t66*(t86-t88)*(1.0/2.0);
-  t130 = t112+t129;
-  A0[0][0] = t50*(t20+t49+t29*t30*x[1]*(1.0/2.0))-t54*t60*t90;
-  A0[0][1] = t50*(t31-t49+t52*t53*x[3]*(1.0/2.0))+t54*t60*t92;
-  A0[0][2] = -t50*(-t41+t63*t64*x[4]*(1.0/2.0)+t66*x[5]*(t62-x[4]*2.0)*(1.0/2.0))+t54*t60*(t100+t66*t99*(1.0/2.0));
-  A0[0][3] = t50*(t71+t30*t69*x[1]*(1.0/2.0))-t54*t60*t102;
-  A0[0][4] = -t50*(t71-t53*t73*x[3]*(1.0/2.0))+t54*t60*t104;
-  A0[0][5] = -t50*(t64*t76*x[4]*(1.0/2.0)+t66*x[5]*(t75-y[4]*2.0)*(1.0/2.0))+t54*t60*(t106+t66*t105*(1.0/2.0));
-  A0[0][6] = t50*(t82+t30*t80*x[1]*(1.0/2.0))-t54*t60*t108;
-  A0[0][7] = -t50*(t82-t53*t84*x[3]*(1.0/2.0))+t54*t60*t110;
-  A0[0][8] = -t50*(t64*t87*x[4]*(1.0/2.0)+t66*x[5]*(t86-z[4]*2.0)*(1.0/2.0))+t54*t60*(t112+t66*t111*(1.0/2.0));
-  A0[1][0] = t50*(t91+t29*t30*y[1]*(1.0/2.0))-t54*t90*t98;
-  A0[1][1] = -t50*(t91-t52*t53*y[3]*(1.0/2.0))+t54*t92*t98;
-  A0[1][2] = -t50*(t63*t64*y[4]*(1.0/2.0)+t66*t99*y[5]*(1.0/2.0))+t54*t98*t122;
-  A0[1][3] = t50*(t20+t103+t30*t69*y[1]*(1.0/2.0))-t54*t98*t102;
-  A0[1][4] = t50*(t31-t103+t53*t73*y[3]*(1.0/2.0))+t54*t98*t104;
-  A0[1][5] = -t50*(-t41+t64*t76*y[4]*(1.0/2.0)+t66*t105*y[5]*(1.0/2.0))+t54*t98*t126;
-  A0[1][6] = t50*(t109+t30*t80*y[1]*(1.0/2.0))-t54*t98*t108;
-  A0[1][7] = -t50*(t109-t53*t84*y[3]*(1.0/2.0))+t54*t98*t110;
-  A0[1][8] = -t50*(t64*t87*y[4]*(1.0/2.0)+t66*t111*y[5]*(1.0/2.0))+t54*t98*t130;
-  A0[2][0] = t50*(t113+t29*t30*z[1]*(1.0/2.0))-t54*t90*t120;
-  A0[2][1] = -t50*(t113-t52*t53*z[3]*(1.0/2.0))+t54*t92*t120;
-  A0[2][2] = -t50*(t63*t64*z[4]*(1.0/2.0)+t66*t99*z[5]*(1.0/2.0))+t54*t120*t122;
-  A0[2][3] = t50*(t123+t30*t69*z[1]*(1.0/2.0))-t54*t102*t120;
-  A0[2][4] = -t50*(t123-t53*t73*z[3]*(1.0/2.0))+t54*t104*t120;
-  A0[2][5] = -t50*(t64*t76*z[4]*(1.0/2.0)+t66*t105*z[5]*(1.0/2.0))+t54*t120*t126;
-  A0[2][6] = t50*(t20+t127+t30*t80*z[1]*(1.0/2.0))-t54*t108*t120;
-  A0[2][7] = t50*(t31-t127+t53*t84*z[3]*(1.0/2.0))+t54*t110*t120;
-  A0[2][8] = -t50*(-t41+t64*t87*z[4]*(1.0/2.0)+t66*t111*z[5]*(1.0/2.0))+t54*t120*t130;
- 
-} 
-
-
-void SurfCentroid5_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroid5_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
@@ -1447,7 +1232,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroid5_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroid5_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t20,   t17,   t18,   t19,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t31,   t28,   t29,   t30,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t42,   t39,   t40,   t41,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t53,   t50,   t51,   t52,   t54,   t55,   t58,   t56,   t57,   t61,   t59,   t60,   t64,   t62,   t63,   t67,   t65,   t66,   t68,   t71,   t69,   t70,   t74,   t72,   t73,   t77,   t75,   t76,   t80,   t78,   t79,   t81,   t82,   t83,   t84,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118;
   t2 = x[1]-x[5];
   t3 = y[1]-y[5];
@@ -1615,60 +1400,68 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroid5_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41;
+void SurfCentroid6_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
+double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t48,   t49;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
   t4 = z[1]-z[2];
   t5 = x[2]-x[3];
   t6 = y[2]-y[3];
   t7 = z[2]-z[3];
-  t8 = x[1]-x[5];
-  t9 = y[1]-y[5];
-  t10 = z[1]-z[5];
+  t8 = x[1]-x[6];
+  t9 = y[1]-y[6];
+  t10 = z[1]-z[6];
   t11 = x[3]-x[4];
   t12 = y[3]-y[4];
   t13 = z[3]-z[4];
   t14 = x[4]-x[5];
   t15 = y[4]-y[5];
   t16 = z[4]-z[5];
-  t17 = t2*t2;
-  t18 = t3*t3;
-  t19 = t4*t4;
-  t20 = t17+t18+t19;
-  t21 = sqrt(t20);
-  t22 = t5*t5;
-  t23 = t6*t6;
-  t24 = t7*t7;
-  t25 = t22+t23+t24;
-  t26 = sqrt(t25);
-  t27 = t8*t8;
-  t28 = t9*t9;
-  t29 = t10*t10;
-  t30 = t27+t28+t29;
-  t31 = sqrt(t30);
-  t32 = t11*t11;
-  t33 = t12*t12;
-  t34 = t13*t13;
-  t35 = t32+t33+t34;
-  t36 = sqrt(t35);
-  t37 = t14*t14;
-  t38 = t15*t15;
-  t39 = t16*t16;
-  t40 = t37+t38+t39;
-  t41 = sqrt(t40);
-  A0[0][0] = t21*x[2]+t26*x[3]+t31*x[1]+t36*x[4]+t41*x[5];
-  A0[0][1] = t21*y[2]+t26*y[3]+t31*y[1]+t36*y[4]+t41*y[5];
-  A0[0][2] = t21*z[2]+t26*z[3]+t31*z[1]+t36*z[4]+t41*z[5];
+  t17 = x[5]-x[6];
+  t18 = y[5]-y[6];
+  t19 = z[5]-z[6];
+  t20 = t2*t2;
+  t21 = t3*t3;
+  t22 = t4*t4;
+  t23 = t20+t21+t22;
+  t24 = sqrt(t23);
+  t25 = t5*t5;
+  t26 = t6*t6;
+  t27 = t7*t7;
+  t28 = t25+t26+t27;
+  t29 = sqrt(t28);
+  t30 = t8*t8;
+  t31 = t9*t9;
+  t32 = t10*t10;
+  t33 = t30+t31+t32;
+  t34 = sqrt(t33);
+  t35 = t11*t11;
+  t36 = t12*t12;
+  t37 = t13*t13;
+  t38 = t35+t36+t37;
+  t39 = sqrt(t38);
+  t40 = t14*t14;
+  t41 = t15*t15;
+  t42 = t16*t16;
+  t43 = t40+t41+t42;
+  t44 = sqrt(t43);
+  t45 = t17*t17;
+  t46 = t18*t18;
+  t47 = t19*t19;
+  t48 = t45+t46+t47;
+  t49 = sqrt(t48);
+  A0[0][0] = t24*x[2]+t29*x[3]+t34*x[1]+t39*x[4]+t44*x[5]+t49*x[6];
+  A0[0][1] = t24*y[2]+t29*y[3]+t34*y[1]+t39*y[4]+t44*y[5]+t49*y[6];
+  A0[0][2] = t24*z[2]+t29*z[3]+t34*z[1]+t39*z[4]+t44*z[5]+t49*z[6];
  
 } 
 
 
-void SurfCentroid5_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t20,   t17,   t18,   t19,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t31,   t28,   t29,   t30,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t42,   t39,   t40,   t41,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t53,   t50,   t51,   t52,   t54,   t55,   t58,   t56,   t57,   t61,   t59,   t60,   t64,   t62,   t63,   t67,   t65,   t66,   t68,   t71,   t69,   t70,   t74,   t72,   t73,   t77,   t75,   t76,   t80,   t78,   t79,   t81,   t82,   t83,   t84,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118;
-  t2 = x[1]-x[5];
-  t3 = y[1]-y[5];
-  t4 = z[1]-z[5];
+void SurfCentroid6_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
+double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t20,   t17,   t18,   t19,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t31,   t28,   t29,   t30,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t42,   t39,   t40,   t41,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t53,   t50,   t51,   t52,   t54,   t55,   t56,   t57,   t58,   t59,   t60,   t64,   t61,   t62,   t63,   t65,   t66,   t69,   t67,   t68,   t72,   t70,   t71,   t75,   t73,   t74,   t78,   t76,   t77,   t81,   t79,   t80,   t82,   t85,   t83,   t84,   t88,   t86,   t87,   t91,   t89,   t90,   t94,   t92,   t93,   t97,   t95,   t96,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118,   t119,   t120,   t121,   t122,   t123,   t124,   t125,   t126,   t127,   t128,   t129,   t130,   t131,   t132,   t133,   t134,   t135,   t136,   t137,   t138,   t139,   t140,   t141,   t142;
+  t2 = x[1]-x[6];
+  t3 = y[1]-y[6];
+  t4 = z[1]-z[6];
   t5 = x[1]-x[2];
   t6 = y[1]-y[2];
   t7 = z[1]-z[2];
@@ -1715,308 +1508,322 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
   t48 = t45*t45;
   t49 = t46+t47+t48;
   t53 = x[5]*2.0;
-  t50 = t8-t53;
-  t51 = 1.0/sqrt(t12);
-  t52 = t50*t51*x[1]*(1.0/2.0);
-  t54 = 1.0/sqrt(t49);
-  t55 = y[1]*2.0;
-  t58 = y[2]*2.0;
-  t56 = t55-t58;
-  t57 = t18*t56*x[2]*(1.0/2.0);
-  t61 = y[3]*2.0;
-  t59 = t58-t61;
-  t60 = t29*t59*x[3]*(1.0/2.0);
-  t64 = y[4]*2.0;
-  t62 = t61-t64;
-  t63 = t40*t62*x[4]*(1.0/2.0);
-  t67 = y[5]*2.0;
-  t65 = t55-t67;
-  t66 = t51*t65*x[1]*(1.0/2.0);
-  t68 = z[1]*2.0;
-  t71 = z[2]*2.0;
-  t69 = t68-t71;
-  t70 = t18*t69*x[2]*(1.0/2.0);
-  t74 = z[3]*2.0;
-  t72 = t71-t74;
-  t73 = t29*t72*x[3]*(1.0/2.0);
-  t77 = z[4]*2.0;
-  t75 = t74-t77;
-  t76 = t40*t75*x[4]*(1.0/2.0);
-  t80 = z[5]*2.0;
-  t78 = t68-t80;
-  t79 = t51*t78*x[1]*(1.0/2.0);
-  t81 = t17*t18*y[2]*(1.0/2.0);
-  t82 = t28*t29*y[3]*(1.0/2.0);
-  t83 = t39*t40*y[4]*(1.0/2.0);
-  t84 = t42-t53;
-  t85 = t50*t51*y[1]*(1.0/2.0);
-  t86 = t54*t84*y[5]*(1.0/2.0);
-  t87 = sqrt(t12);
-  t88 = sqrt(t16);
-  t89 = t18*t56*y[2]*(1.0/2.0);
-  t90 = sqrt(t27);
-  t91 = t29*t59*y[3]*(1.0/2.0);
-  t92 = sqrt(t38);
-  t93 = t40*t62*y[4]*(1.0/2.0);
-  t94 = t64-t67;
-  t95 = sqrt(t49);
-  t96 = t51*t65*y[1]*(1.0/2.0);
-  t97 = t54*t94*y[5]*(1.0/2.0);
-  t98 = t18*t69*y[2]*(1.0/2.0);
-  t99 = t29*t72*y[3]*(1.0/2.0);
-  t100 = t40*t75*y[4]*(1.0/2.0);
-  t101 = t77-t80;
-  t102 = t51*t78*y[1]*(1.0/2.0);
-  t103 = t54*t101*y[5]*(1.0/2.0);
-  t104 = t17*t18*z[2]*(1.0/2.0);
-  t105 = t28*t29*z[3]*(1.0/2.0);
-  t106 = t39*t40*z[4]*(1.0/2.0);
-  t107 = t50*t51*z[1]*(1.0/2.0);
-  t108 = t54*t84*z[5]*(1.0/2.0);
-  t109 = t18*t56*z[2]*(1.0/2.0);
-  t110 = t29*t59*z[3]*(1.0/2.0);
-  t111 = t40*t62*z[4]*(1.0/2.0);
-  t112 = t51*t65*z[1]*(1.0/2.0);
-  t113 = t54*t94*z[5]*(1.0/2.0);
-  t114 = t18*t69*z[2]*(1.0/2.0);
-  t115 = t29*t72*z[3]*(1.0/2.0);
-  t116 = t40*t75*z[4]*(1.0/2.0);
-  t117 = t51*t78*z[1]*(1.0/2.0);
-  t118 = t54*t101*z[5]*(1.0/2.0);
-  A0[0][0] = t19+t52+t87;
-  A0[0][1] = -t19+t30+t88;
-  A0[0][2] = -t30+t41+t90;
-  A0[0][3] = -t41+t92+t54*x[5]*(t42-x[5]*2.0)*(1.0/2.0);
-  A0[0][4] = -t52+t95-t54*t84*x[5]*(1.0/2.0);
-  A0[0][5] = t57+t66;
-  A0[0][6] = -t57+t60;
-  A0[0][7] = -t60+t63;
-  A0[0][8] = -t63+t54*x[5]*(t64-y[5]*2.0)*(1.0/2.0);
-  A0[0][9] = -t66-t54*t94*x[5]*(1.0/2.0);
-  A0[0][10] = t70+t79;
-  A0[0][11] = -t70+t73;
-  A0[0][12] = -t73+t76;
-  A0[0][13] = -t76+t54*x[5]*(t77-z[5]*2.0)*(1.0/2.0);
-  A0[0][14] = -t79-t54*t101*x[5]*(1.0/2.0);
-  A0[1][0] = t81+t85;
-  A0[1][1] = -t81+t82;
-  A0[1][2] = -t82+t83;
-  A0[1][3] = -t83+t86;
-  A0[1][4] = -t85-t86;
-  A0[1][5] = t87+t89+t96;
-  A0[1][6] = t88-t89+t91;
-  A0[1][7] = t90-t91+t93;
-  A0[1][8] = t92-t93+t97;
-  A0[1][9] = t95-t96-t97;
-  A0[1][10] = t98+t102;
-  A0[1][11] = -t98+t99;
-  A0[1][12] = -t99+t100;
-  A0[1][13] = -t100+t103;
-  A0[1][14] = -t102-t103;
-  A0[2][0] = t104+t107;
-  A0[2][1] = -t104+t105;
-  A0[2][2] = -t105+t106;
-  A0[2][3] = -t106+t108;
-  A0[2][4] = -t107-t108;
-  A0[2][5] = t109+t112;
-  A0[2][6] = -t109+t110;
-  A0[2][7] = -t110+t111;
-  A0[2][8] = -t111+t113;
-  A0[2][9] = -t112-t113;
-  A0[2][10] = t87+t114+t117;
-  A0[2][11] = t88-t114+t115;
-  A0[2][12] = t90-t115+t116;
-  A0[2][13] = t92-t116+t118;
-  A0[2][14] = t95-t117-t118;
+  t50 = t42-t53;
+  t51 = 1.0/sqrt(t49);
+  t52 = t50*t51*x[5]*(1.0/2.0);
+  t54 = x[5]-x[6];
+  t55 = y[5]-y[6];
+  t56 = z[5]-z[6];
+  t57 = t54*t54;
+  t58 = t55*t55;
+  t59 = t56*t56;
+  t60 = t57+t58+t59;
+  t64 = x[6]*2.0;
+  t61 = t8-t64;
+  t62 = 1.0/sqrt(t12);
+  t63 = t61*t62*x[1]*(1.0/2.0);
+  t65 = 1.0/sqrt(t60);
+  t66 = y[1]*2.0;
+  t69 = y[2]*2.0;
+  t67 = t66-t69;
+  t68 = t18*t67*x[2]*(1.0/2.0);
+  t72 = y[3]*2.0;
+  t70 = t69-t72;
+  t71 = t29*t70*x[3]*(1.0/2.0);
+  t75 = y[4]*2.0;
+  t73 = t72-t75;
+  t74 = t40*t73*x[4]*(1.0/2.0);
+  t78 = y[5]*2.0;
+  t76 = t75-t78;
+  t77 = t51*t76*x[5]*(1.0/2.0);
+  t81 = y[6]*2.0;
+  t79 = t66-t81;
+  t80 = t62*t79*x[1]*(1.0/2.0);
+  t82 = z[1]*2.0;
+  t85 = z[2]*2.0;
+  t83 = t82-t85;
+  t84 = t18*t83*x[2]*(1.0/2.0);
+  t88 = z[3]*2.0;
+  t86 = t85-t88;
+  t87 = t29*t86*x[3]*(1.0/2.0);
+  t91 = z[4]*2.0;
+  t89 = t88-t91;
+  t90 = t40*t89*x[4]*(1.0/2.0);
+  t94 = z[5]*2.0;
+  t92 = t91-t94;
+  t93 = t51*t92*x[5]*(1.0/2.0);
+  t97 = z[6]*2.0;
+  t95 = t82-t97;
+  t96 = t62*t95*x[1]*(1.0/2.0);
+  t98 = t17*t18*y[2]*(1.0/2.0);
+  t99 = t28*t29*y[3]*(1.0/2.0);
+  t100 = t39*t40*y[4]*(1.0/2.0);
+  t101 = t50*t51*y[5]*(1.0/2.0);
+  t102 = t53-t64;
+  t103 = t61*t62*y[1]*(1.0/2.0);
+  t104 = t65*t102*y[6]*(1.0/2.0);
+  t105 = sqrt(t12);
+  t106 = sqrt(t16);
+  t107 = t18*t67*y[2]*(1.0/2.0);
+  t108 = sqrt(t27);
+  t109 = t29*t70*y[3]*(1.0/2.0);
+  t110 = sqrt(t38);
+  t111 = t40*t73*y[4]*(1.0/2.0);
+  t112 = sqrt(t49);
+  t113 = t51*t76*y[5]*(1.0/2.0);
+  t114 = t78-t81;
+  t115 = sqrt(t60);
+  t116 = t62*t79*y[1]*(1.0/2.0);
+  t117 = t65*t114*y[6]*(1.0/2.0);
+  t118 = t18*t83*y[2]*(1.0/2.0);
+  t119 = t29*t86*y[3]*(1.0/2.0);
+  t120 = t40*t89*y[4]*(1.0/2.0);
+  t121 = t51*t92*y[5]*(1.0/2.0);
+  t122 = t94-t97;
+  t123 = t62*t95*y[1]*(1.0/2.0);
+  t124 = t65*t122*y[6]*(1.0/2.0);
+  t125 = t17*t18*z[2]*(1.0/2.0);
+  t126 = t28*t29*z[3]*(1.0/2.0);
+  t127 = t39*t40*z[4]*(1.0/2.0);
+  t128 = t50*t51*z[5]*(1.0/2.0);
+  t129 = t61*t62*z[1]*(1.0/2.0);
+  t130 = t65*t102*z[6]*(1.0/2.0);
+  t131 = t18*t67*z[2]*(1.0/2.0);
+  t132 = t29*t70*z[3]*(1.0/2.0);
+  t133 = t40*t73*z[4]*(1.0/2.0);
+  t134 = t51*t76*z[5]*(1.0/2.0);
+  t135 = t62*t79*z[1]*(1.0/2.0);
+  t136 = t65*t114*z[6]*(1.0/2.0);
+  t137 = t18*t83*z[2]*(1.0/2.0);
+  t138 = t29*t86*z[3]*(1.0/2.0);
+  t139 = t40*t89*z[4]*(1.0/2.0);
+  t140 = t51*t92*z[5]*(1.0/2.0);
+  t141 = t62*t95*z[1]*(1.0/2.0);
+  t142 = t65*t122*z[6]*(1.0/2.0);
+  A0[0][0] = t19+t63+t105;
+  A0[0][1] = -t19+t30+t106;
+  A0[0][2] = -t30+t41+t108;
+  A0[0][3] = -t41+t52+t110;
+  A0[0][4] = -t52+t112+t65*x[6]*(t53-x[6]*2.0)*(1.0/2.0);
+  A0[0][5] = -t63+t115-t65*t102*x[6]*(1.0/2.0);
+  A0[0][6] = t68+t80;
+  A0[0][7] = -t68+t71;
+  A0[0][8] = -t71+t74;
+  A0[0][9] = -t74+t77;
+  A0[0][10] = -t77+t65*x[6]*(t78-y[6]*2.0)*(1.0/2.0);
+  A0[0][11] = -t80-t65*t114*x[6]*(1.0/2.0);
+  A0[0][12] = t84+t96;
+  A0[0][13] = -t84+t87;
+  A0[0][14] = -t87+t90;
+  A0[0][15] = -t90+t93;
+  A0[0][16] = -t93+t65*x[6]*(t94-z[6]*2.0)*(1.0/2.0);
+  A0[0][17] = -t96-t65*t122*x[6]*(1.0/2.0);
+  A0[1][0] = t98+t103;
+  A0[1][1] = -t98+t99;
+  A0[1][2] = -t99+t100;
+  A0[1][3] = -t100+t101;
+  A0[1][4] = -t101+t104;
+  A0[1][5] = -t103-t104;
+  A0[1][6] = t105+t107+t116;
+  A0[1][7] = t106-t107+t109;
+  A0[1][8] = t108-t109+t111;
+  A0[1][9] = t110-t111+t113;
+  A0[1][10] = t112-t113+t117;
+  A0[1][11] = t115-t116-t117;
+  A0[1][12] = t118+t123;
+  A0[1][13] = -t118+t119;
+  A0[1][14] = -t119+t120;
+  A0[1][15] = -t120+t121;
+  A0[1][16] = -t121+t124;
+  A0[1][17] = -t123-t124;
+  A0[2][0] = t125+t129;
+  A0[2][1] = -t125+t126;
+  A0[2][2] = -t126+t127;
+  A0[2][3] = -t127+t128;
+  A0[2][4] = -t128+t130;
+  A0[2][5] = -t129-t130;
+  A0[2][6] = t131+t135;
+  A0[2][7] = -t131+t132;
+  A0[2][8] = -t132+t133;
+  A0[2][9] = -t133+t134;
+  A0[2][10] = -t134+t136;
+  A0[2][11] = -t135-t136;
+  A0[2][12] = t105+t137+t141;
+  A0[2][13] = t106-t137+t138;
+  A0[2][14] = t108-t138+t139;
+  A0[2][15] = t110-t139+t140;
+  A0[2][16] = t112-t140+t142;
+  A0[2][17] = t115-t141-t142;
  
 } 
 
 
-void SurfCentroidConnec_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43;
+void SurfCentroidConnec_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
+double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
   t4 = z[1]-z[2];
-  t5 = x[2]-x[3];
-  t6 = y[2]-y[3];
-  t7 = z[2]-z[3];
-  t8 = x[1]-x[5];
-  t9 = y[1]-y[5];
-  t10 = z[1]-z[5];
+  t5 = x[1]-x[4];
+  t6 = y[1]-y[4];
+  t7 = z[1]-z[4];
+  t8 = x[2]-x[3];
+  t9 = y[2]-y[3];
+  t10 = z[2]-z[3];
   t11 = x[3]-x[4];
   t12 = y[3]-y[4];
   t13 = z[3]-z[4];
-  t14 = x[4]-x[5];
-  t15 = y[4]-y[5];
-  t16 = z[4]-z[5];
-  t17 = t2*t2;
-  t18 = t3*t3;
-  t19 = t4*t4;
-  t20 = t17+t18+t19;
-  t21 = sqrt(t20);
-  t22 = t5*t5;
-  t23 = t6*t6;
-  t24 = t7*t7;
-  t25 = t22+t23+t24;
-  t26 = sqrt(t25);
-  t27 = t8*t8;
-  t28 = t9*t9;
-  t29 = t10*t10;
-  t30 = t27+t28+t29;
-  t31 = sqrt(t30);
-  t32 = t11*t11;
-  t33 = t12*t12;
-  t34 = t13*t13;
-  t35 = t32+t33+t34;
-  t36 = sqrt(t35);
-  t37 = t14*t14;
-  t38 = t15*t15;
-  t39 = t16*t16;
-  t40 = t37+t38+t39;
-  t41 = sqrt(t40);
-  t42 = t21+t26+t31+t36+t41;
-  t43 = 1.0/t42;
-  A0[0][0] = t43*(t21*x[2]+t26*x[3]+t31*x[1]+t36*x[4]+t41*x[5]);
-  A0[0][1] = t43*(t21*y[2]+t26*y[3]+t31*y[1]+t36*y[4]+t41*y[5]);
-  A0[0][2] = t43*(t21*z[2]+t26*z[3]+t31*z[1]+t36*z[4]+t41*z[5]);
+  t14 = t2*t2;
+  t15 = t3*t3;
+  t16 = t4*t4;
+  t17 = t14+t15+t16;
+  t18 = sqrt(t17);
+  t19 = t5*t5;
+  t20 = t6*t6;
+  t21 = t7*t7;
+  t22 = t19+t20+t21;
+  t23 = sqrt(t22);
+  t24 = t8*t8;
+  t25 = t9*t9;
+  t26 = t10*t10;
+  t27 = t24+t25+t26;
+  t28 = sqrt(t27);
+  t29 = t11*t11;
+  t30 = t12*t12;
+  t31 = t13*t13;
+  t32 = t29+t30+t31;
+  t33 = sqrt(t32);
+  t34 = t18+t23+t28+t33;
+  t35 = 1.0/t34;
+  A0[0][0] = t35*(t18*x[2]+t23*x[1]+t28*x[3]+t33*x[4]);
+  A0[0][1] = t35*(t18*y[2]+t23*y[1]+t28*y[3]+t33*y[4]);
+  A0[0][2] = t35*(t18*z[2]+t23*z[1]+t28*z[3]+t33*z[4]);
  
 } 
 
 
-void SurfCentroidConnec_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t48,   t27,   t28,   t75,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t49,   t50,   t51,   t79,   t52,   t53,   t54,   t55,   t56,   t57,   t58,   t59,   t60,   t61,   t64,   t62,   t87,   t63,   t65,   t66,   t91,   t67,   t68,   t71,   t69,   t93,   t70,   t72,   t73,   t97,   t74,   t76,   t77,   t78,   t100,   t80,   t81,   t82,   t83,   t84,   t85,   t86,   t88,   t89,   t90,   t108,   t92,   t94,   t95,   t96,   t110,   t98,   t99,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t109;
-  t2 = x[1]-x[5];
-  t3 = y[1]-y[5];
-  t4 = z[1]-z[5];
-  t5 = x[1]-x[2];
-  t6 = y[1]-y[2];
-  t7 = z[1]-z[2];
-  t8 = x[1]*2.0;
-  t9 = t2*t2;
-  t10 = t3*t3;
-  t11 = t4*t4;
-  t12 = t9+t10+t11;
-  t13 = t5*t5;
-  t14 = t6*t6;
-  t15 = t7*t7;
-  t16 = t13+t14+t15;
-  t17 = x[2]-x[3];
-  t18 = y[2]-y[3];
-  t19 = z[2]-z[3];
-  t20 = sqrt(t12);
-  t21 = x[3]-x[4];
-  t22 = y[3]-y[4];
-  t23 = z[3]-z[4];
-  t24 = x[4]-x[5];
-  t25 = y[4]-y[5];
-  t26 = z[4]-z[5];
-  t48 = x[2]*2.0;
-  t27 = t8-t48;
-  t28 = 1.0/sqrt(t16);
-  t75 = x[5]*2.0;
-  t29 = t8-t75;
-  t30 = 1.0/sqrt(t12);
-  t31 = sqrt(t16);
-  t32 = t17*t17;
-  t33 = t18*t18;
-  t34 = t19*t19;
-  t35 = t32+t33+t34;
-  t36 = sqrt(t35);
-  t37 = t21*t21;
-  t38 = t22*t22;
-  t39 = t23*t23;
-  t40 = t37+t38+t39;
-  t41 = sqrt(t40);
-  t42 = t24*t24;
-  t43 = t25*t25;
-  t44 = t26*t26;
-  t45 = t42+t43+t44;
-  t46 = sqrt(t45);
-  t47 = t20+t31+t36+t41+t46;
-  t49 = t27*t28*x[2]*(1.0/2.0);
-  t50 = 1.0/t47;
-  t51 = t27*t28*(1.0/2.0);
-  t79 = x[3]*2.0;
-  t52 = t48-t79;
-  t53 = 1.0/sqrt(t35);
-  t54 = 1.0/(t47*t47);
-  t55 = t31*x[2];
-  t56 = t36*x[3];
-  t57 = t20*x[1];
-  t58 = t41*x[4];
-  t59 = t46*x[5];
-  t60 = t55+t56+t57+t58+t59;
-  t61 = y[1]*2.0;
-  t64 = y[2]*2.0;
-  t62 = t61-t64;
-  t87 = y[5]*2.0;
-  t63 = t61-t87;
-  t65 = t28*t62*x[2]*(1.0/2.0);
-  t66 = t28*t62*(1.0/2.0);
-  t91 = y[3]*2.0;
-  t67 = t64-t91;
-  t68 = z[1]*2.0;
-  t71 = z[2]*2.0;
-  t69 = t68-t71;
-  t93 = z[5]*2.0;
-  t70 = t68-t93;
-  t72 = t28*t69*x[2]*(1.0/2.0);
-  t73 = t28*t69*(1.0/2.0);
-  t97 = z[3]*2.0;
-  t74 = t71-t97;
-  t76 = t29*t30*(1.0/2.0);
-  t77 = t51+t76;
-  t78 = t27*t28*y[2]*(1.0/2.0);
-  t100 = t52*t53*(1.0/2.0);
-  t80 = t51-t100;
-  t81 = t31*y[2];
-  t82 = t36*y[3];
-  t83 = t20*y[1];
-  t84 = t41*y[4];
-  t85 = t46*y[5];
-  t86 = t81+t82+t83+t84+t85;
-  t88 = t30*t63*(1.0/2.0);
-  t89 = t66+t88;
-  t90 = t28*t62*y[2]*(1.0/2.0);
-  t108 = t53*t67*(1.0/2.0);
-  t92 = t66-t108;
-  t94 = t30*t70*(1.0/2.0);
-  t95 = t73+t94;
-  t96 = t28*t69*y[2]*(1.0/2.0);
-  t110 = t53*t74*(1.0/2.0);
-  t98 = t73-t110;
-  t99 = t27*t28*z[2]*(1.0/2.0);
-  t101 = t31*z[2];
-  t102 = t36*z[3];
-  t103 = t20*z[1];
-  t104 = t41*z[4];
-  t105 = t46*z[5];
-  t106 = t101+t102+t103+t104+t105;
-  t107 = t28*t62*z[2]*(1.0/2.0);
-  t109 = t28*t69*z[2]*(1.0/2.0);
-  A0[0][0] = t50*(t20+t49+t29*t30*x[1]*(1.0/2.0))-t54*t60*t77;
-  A0[0][1] = t50*(t31-t49+t52*t53*x[3]*(1.0/2.0))+t54*t60*t80;
-  A0[0][2] = t50*(t65+t30*t63*x[1]*(1.0/2.0))-t54*t60*t89;
-  A0[0][3] = -t50*(t65-t53*t67*x[3]*(1.0/2.0))+t54*t60*t92;
-  A0[0][4] = t50*(t72+t30*t70*x[1]*(1.0/2.0))-t54*t60*t95;
-  A0[0][5] = -t50*(t72-t53*t74*x[3]*(1.0/2.0))+t54*t60*t98;
-  A0[1][0] = t50*(t78+t29*t30*y[1]*(1.0/2.0))-t54*t77*t86;
-  A0[1][1] = -t50*(t78-t52*t53*y[3]*(1.0/2.0))+t54*t80*t86;
-  A0[1][2] = t50*(t20+t90+t30*t63*y[1]*(1.0/2.0))-t54*t86*t89;
-  A0[1][3] = t50*(t31-t90+t53*t67*y[3]*(1.0/2.0))+t54*t86*t92;
-  A0[1][4] = t50*(t96+t30*t70*y[1]*(1.0/2.0))-t54*t86*t95;
-  A0[1][5] = -t50*(t96-t53*t74*y[3]*(1.0/2.0))+t54*t86*t98;
-  A0[2][0] = t50*(t99+t29*t30*z[1]*(1.0/2.0))-t54*t77*t106;
-  A0[2][1] = -t50*(t99-t52*t53*z[3]*(1.0/2.0))+t54*t80*t106;
-  A0[2][2] = t50*(t107+t30*t63*z[1]*(1.0/2.0))-t54*t89*t106;
-  A0[2][3] = -t50*(t107-t53*t67*z[3]*(1.0/2.0))+t54*t92*t106;
-  A0[2][4] = t50*(t20+t109+t30*t70*z[1]*(1.0/2.0))-t54*t95*t106;
-  A0[2][5] = t50*(t31-t109+t53*t74*z[3]*(1.0/2.0))+t54*t98*t106;
+void SurfCentroidConnec_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
+double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t40,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t41,   t42,   t43,   t69,   t44,   t45,   t46,   t47,   t48,   t49,   t50,   t51,   t52,   t53,   t55,   t54,   t56,   t57,   t79,   t58,   t59,   t60,   t62,   t61,   t63,   t64,   t84,   t65,   t66,   t86,   t67,   t68,   t88,   t70,   t71,   t72,   t73,   t74,   t75,   t76,   t94,   t77,   t78,   t96,   t80,   t81,   t97,   t82,   t83,   t99,   t85,   t87,   t89,   t90,   t91,   t92,   t93,   t95,   t98;
+  t2 = x[1]-x[2];
+  t3 = y[1]-y[2];
+  t4 = z[1]-z[2];
+  t5 = t2*t2;
+  t6 = t3*t3;
+  t7 = t4*t4;
+  t8 = t5+t6+t7;
+  t9 = x[2]-x[3];
+  t10 = y[2]-y[3];
+  t11 = z[2]-z[3];
+  t12 = sqrt(t8);
+  t13 = x[1]-x[4];
+  t14 = y[1]-y[4];
+  t15 = z[1]-z[4];
+  t16 = t9*t9;
+  t17 = t10*t10;
+  t18 = t11*t11;
+  t19 = t16+t17+t18;
+  t20 = x[3]-x[4];
+  t21 = y[3]-y[4];
+  t22 = z[3]-z[4];
+  t23 = x[1]*2.0;
+  t24 = x[2]*2.0;
+  t25 = 1.0/sqrt(t8);
+  t40 = x[3]*2.0;
+  t26 = t24-t40;
+  t27 = 1.0/sqrt(t19);
+  t28 = t13*t13;
+  t29 = t14*t14;
+  t30 = t15*t15;
+  t31 = t28+t29+t30;
+  t32 = sqrt(t31);
+  t33 = sqrt(t19);
+  t34 = t20*t20;
+  t35 = t21*t21;
+  t36 = t22*t22;
+  t37 = t34+t35+t36;
+  t38 = sqrt(t37);
+  t39 = t12+t32+t33+t38;
+  t41 = t26*t27*x[3]*(1.0/2.0);
+  t42 = 1.0/t39;
+  t43 = t26*t27*(1.0/2.0);
+  t69 = x[4]*2.0;
+  t44 = t40-t69;
+  t45 = 1.0/sqrt(t37);
+  t46 = 1.0/(t39*t39);
+  t47 = t12*x[2];
+  t48 = t32*x[1];
+  t49 = t33*x[3];
+  t50 = t38*x[4];
+  t51 = t47+t48+t49+t50;
+  t52 = y[1]*2.0;
+  t53 = y[2]*2.0;
+  t55 = y[3]*2.0;
+  t54 = t53-t55;
+  t56 = t27*t54*x[3]*(1.0/2.0);
+  t57 = t27*t54*(1.0/2.0);
+  t79 = y[4]*2.0;
+  t58 = t55-t79;
+  t59 = z[1]*2.0;
+  t60 = z[2]*2.0;
+  t62 = z[3]*2.0;
+  t61 = t60-t62;
+  t63 = t27*t61*x[3]*(1.0/2.0);
+  t64 = t27*t61*(1.0/2.0);
+  t84 = z[4]*2.0;
+  t65 = t62-t84;
+  t66 = t23-t24;
+  t86 = t25*t66*(1.0/2.0);
+  t67 = t43-t86;
+  t68 = t26*t27*y[3]*(1.0/2.0);
+  t88 = t44*t45*(1.0/2.0);
+  t70 = t43-t88;
+  t71 = t12*y[2];
+  t72 = t32*y[1];
+  t73 = t33*y[3];
+  t74 = t38*y[4];
+  t75 = t71+t72+t73+t74;
+  t76 = t52-t53;
+  t94 = t25*t76*(1.0/2.0);
+  t77 = t57-t94;
+  t78 = t27*t54*y[3]*(1.0/2.0);
+  t96 = t45*t58*(1.0/2.0);
+  t80 = t57-t96;
+  t81 = t59-t60;
+  t97 = t25*t81*(1.0/2.0);
+  t82 = t64-t97;
+  t83 = t27*t61*y[3]*(1.0/2.0);
+  t99 = t45*t65*(1.0/2.0);
+  t85 = t64-t99;
+  t87 = t26*t27*z[3]*(1.0/2.0);
+  t89 = t12*z[2];
+  t90 = t32*z[1];
+  t91 = t33*z[3];
+  t92 = t38*z[4];
+  t93 = t89+t90+t91+t92;
+  t95 = t27*t54*z[3]*(1.0/2.0);
+  t98 = t27*t61*z[3]*(1.0/2.0);
+  A0[0][0] = t42*(t12+t41-t25*x[2]*(t23-x[2]*2.0)*(1.0/2.0))-t46*t51*t67;
+  A0[0][1] = t42*(t33-t41+t44*t45*x[4]*(1.0/2.0))+t46*t51*t70;
+  A0[0][2] = t42*(t56-t25*x[2]*(t52-y[2]*2.0)*(1.0/2.0))-t46*t51*t77;
+  A0[0][3] = -t42*(t56-t45*t58*x[4]*(1.0/2.0))+t46*t51*t80;
+  A0[0][4] = t42*(t63-t25*x[2]*(t59-z[2]*2.0)*(1.0/2.0))-t46*t51*t82;
+  A0[0][5] = -t42*(t63-t45*t65*x[4]*(1.0/2.0))+t46*t51*t85;
+  A0[1][0] = t42*(t68-t25*t66*y[2]*(1.0/2.0))-t46*t67*t75;
+  A0[1][1] = -t42*(t68-t44*t45*y[4]*(1.0/2.0))+t46*t70*t75;
+  A0[1][2] = t42*(t12+t78-t25*t76*y[2]*(1.0/2.0))-t46*t75*t77;
+  A0[1][3] = t42*(t33-t78+t45*t58*y[4]*(1.0/2.0))+t46*t75*t80;
+  A0[1][4] = t42*(t83-t25*t81*y[2]*(1.0/2.0))-t46*t75*t82;
+  A0[1][5] = -t42*(t83-t45*t65*y[4]*(1.0/2.0))+t46*t75*t85;
+  A0[2][0] = t42*(t87-t25*t66*z[2]*(1.0/2.0))-t46*t67*t93;
+  A0[2][1] = -t42*(t87-t44*t45*z[4]*(1.0/2.0))+t46*t70*t93;
+  A0[2][2] = t42*(t95-t25*t76*z[2]*(1.0/2.0))-t46*t77*t93;
+  A0[2][3] = -t42*(t95-t45*t58*z[4]*(1.0/2.0))+t46*t80*t93;
+  A0[2][4] = t42*(t12+t98-t25*t81*z[2]*(1.0/2.0))-t46*t82*t93;
+  A0[2][5] = t42*(t33-t98+t45*t65*z[4]*(1.0/2.0))+t46*t85*t93;
  
 } 
 
 
-void SurfCentroidNoConnec_f(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
+void SurfCentroidNoConnec_f(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
 double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t50,   t51;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
@@ -2075,8 +1882,8 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
 } 
 
 
-void SurfCentroidNoConnec_df(vector<double> x , vector<double> y , vector<double> z , ArrayVec<double> &   A0 ) { 
-double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t56,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t50,   t51,   t52,   t53,   t54,   t55,   t57,   t58,   t59,   t86,   t60,   t61,   t62,   t63,   t64,   t65,   t66,   t67,   t68,   t69,   t70,   t71,   t73,   t72,   t74,   t100,   t75,   t76,   t77,   t79,   t78,   t80,   t107,   t81,   t82,   t83,   t110,   t84,   t85,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t111,   t95,   t96,   t97,   t119,   t98,   t99,   t101,   t120,   t102,   t103,   t104,   t121,   t105,   t106,   t108,   t122,   t109,   t112,   t113,   t114,   t115,   t116,   t117,   t118;
+void SurfCentroidNoConnec_df(const vector<double>& x , const vector<double>& y , const vector<double>& z , ArrayVec<double> &   A0 ) { 
+double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t13,   t14,   t15,   t16,   t17,   t18,   t19,   t20,   t21,   t22,   t23,   t24,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t83,   t32,   t33,   t34,   t35,   t36,   t37,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t47,   t48,   t49,   t50,   t51,   t52,   t53,   t54,   t55,   t56,   t57,   t58,   t59,   t87,   t60,   t61,   t62,   t63,   t64,   t65,   t66,   t67,   t68,   t69,   t70,   t71,   t98,   t72,   t73,   t74,   t102,   t75,   t76,   t77,   t106,   t78,   t79,   t80,   t110,   t81,   t82,   t84,   t113,   t85,   t86,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t114,   t96,   t97,   t99,   t122,   t100,   t101,   t103,   t123,   t104,   t105,   t107,   t124,   t108,   t109,   t111,   t125,   t112,   t115,   t116,   t117,   t118,   t119,   t120,   t121;
   t2 = x[1]-x[2];
   t3 = y[1]-y[2];
   t4 = z[1]-z[2];
@@ -2107,8 +1914,8 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
   t29 = x[1]*2.0;
   t30 = x[2]*2.0;
   t31 = 1.0/sqrt(t8);
-  t56 = x[3]*2.0;
-  t32 = t30-t56;
+  t83 = x[3]*2.0;
+  t32 = t30-t83;
   t33 = 1.0/sqrt(t16);
   t34 = sqrt(t16);
   t35 = t17*t17;
@@ -2132,12 +1939,13 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
   t53 = t50+t51+t52;
   t54 = sqrt(t53);
   t55 = t12+t34+t39+t44+t49+t54;
-  t57 = 1.0/t55;
-  t58 = x[4]*2.0;
-  t59 = 1.0/sqrt(t43);
-  t86 = x[5]*2.0;
-  t60 = t58-t86;
-  t61 = 1.0/sqrt(t48);
+  t56 = 1.0/t55;
+  t57 = x[4]*2.0;
+  t58 = x[5]*2.0;
+  t59 = 1.0/sqrt(t48);
+  t87 = x[6]*2.0;
+  t60 = t58-t87;
+  t61 = 1.0/sqrt(t53);
   t62 = 1.0/(t55*t55);
   t63 = t12*x[2];
   t64 = t34*x[3];
@@ -2148,74 +1956,76 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10,   t11,   t12,   t1
   t69 = t63+t64+t65+t66+t67+t68;
   t70 = y[1]*2.0;
   t71 = y[2]*2.0;
-  t73 = y[3]*2.0;
-  t72 = t71-t73;
-  t74 = y[4]*2.0;
-  t100 = y[5]*2.0;
-  t75 = t74-t100;
+  t98 = y[3]*2.0;
+  t72 = t71-t98;
+  t73 = y[4]*2.0;
+  t74 = y[5]*2.0;
+  t102 = y[6]*2.0;
+  t75 = t74-t102;
   t76 = z[1]*2.0;
   t77 = z[2]*2.0;
-  t79 = z[3]*2.0;
-  t78 = t77-t79;
-  t80 = z[4]*2.0;
-  t107 = z[5]*2.0;
-  t81 = t80-t107;
+  t106 = z[3]*2.0;
+  t78 = t77-t106;
+  t79 = z[4]*2.0;
+  t80 = z[5]*2.0;
+  t110 = z[6]*2.0;
+  t81 = t80-t110;
   t82 = t29-t30;
-  t83 = t32*t33*(1.0/2.0);
-  t110 = t31*t82*(1.0/2.0);
-  t84 = t83-t110;
-  t85 = t56-t58;
-  t87 = t60*t61*(1.0/2.0);
-  t88 = t12*y[2];
-  t89 = t34*y[3];
-  t90 = t39*y[1];
-  t91 = t44*y[4];
-  t92 = t49*y[5];
-  t93 = t54*y[6];
-  t94 = t88+t89+t90+t91+t92+t93;
-  t111 = t59*t85*(1.0/2.0);
-  t95 = t87-t111;
-  t96 = t70-t71;
-  t97 = t33*t72*(1.0/2.0);
-  t119 = t31*t96*(1.0/2.0);
-  t98 = t97-t119;
-  t99 = t73-t74;
-  t101 = t61*t75*(1.0/2.0);
-  t120 = t59*t99*(1.0/2.0);
-  t102 = t101-t120;
-  t103 = t76-t77;
-  t104 = t33*t78*(1.0/2.0);
-  t121 = t31*t103*(1.0/2.0);
-  t105 = t104-t121;
-  t106 = t79-t80;
-  t108 = t61*t81*(1.0/2.0);
-  t122 = t59*t106*(1.0/2.0);
-  t109 = t108-t122;
-  t112 = t12*z[2];
-  t113 = t34*z[3];
-  t114 = t39*z[1];
-  t115 = t44*z[4];
-  t116 = t49*z[5];
-  t117 = t54*z[6];
-  t118 = t112+t113+t114+t115+t116+t117;
-  A0[0][0] = t57*(t12+t32*t33*x[3]*(1.0/2.0)-t31*x[2]*(t29-x[2]*2.0)*(1.0/2.0))-t62*t69*t84;
-  A0[0][1] = t57*(t44+t60*t61*x[5]*(1.0/2.0)-t59*x[4]*(t56-x[4]*2.0)*(1.0/2.0))-t62*t69*t95;
-  A0[0][2] = t57*(t33*t72*x[3]*(1.0/2.0)-t31*x[2]*(t70-y[2]*2.0)*(1.0/2.0))-t62*t69*t98;
-  A0[0][3] = t57*(t61*t75*x[5]*(1.0/2.0)-t59*x[4]*(t73-y[4]*2.0)*(1.0/2.0))-t62*t69*t102;
-  A0[0][4] = t57*(t33*t78*x[3]*(1.0/2.0)-t31*x[2]*(t76-z[2]*2.0)*(1.0/2.0))-t62*t69*t105;
-  A0[0][5] = t57*(t61*t81*x[5]*(1.0/2.0)-t59*x[4]*(t79-z[4]*2.0)*(1.0/2.0))-t62*t69*t109;
-  A0[1][0] = t57*(t32*t33*y[3]*(1.0/2.0)-t31*t82*y[2]*(1.0/2.0))-t62*t84*t94;
-  A0[1][1] = t57*(t60*t61*y[5]*(1.0/2.0)-t59*t85*y[4]*(1.0/2.0))-t62*t94*t95;
-  A0[1][2] = t57*(t12+t33*t72*y[3]*(1.0/2.0)-t31*t96*y[2]*(1.0/2.0))-t62*t94*t98;
-  A0[1][3] = t57*(t44+t61*t75*y[5]*(1.0/2.0)-t59*t99*y[4]*(1.0/2.0))-t62*t94*t102;
-  A0[1][4] = t57*(t33*t78*y[3]*(1.0/2.0)-t31*t103*y[2]*(1.0/2.0))-t62*t94*t105;
-  A0[1][5] = t57*(t61*t81*y[5]*(1.0/2.0)-t59*t106*y[4]*(1.0/2.0))-t62*t94*t109;
-  A0[2][0] = t57*(t32*t33*z[3]*(1.0/2.0)-t31*t82*z[2]*(1.0/2.0))-t62*t84*t118;
-  A0[2][1] = t57*(t60*t61*z[5]*(1.0/2.0)-t59*t85*z[4]*(1.0/2.0))-t62*t95*t118;
-  A0[2][2] = t57*(t33*t72*z[3]*(1.0/2.0)-t31*t96*z[2]*(1.0/2.0))-t62*t98*t118;
-  A0[2][3] = t57*(t61*t75*z[5]*(1.0/2.0)-t59*t99*z[4]*(1.0/2.0))-t62*t102*t118;
-  A0[2][4] = t57*(t12+t33*t78*z[3]*(1.0/2.0)-t31*t103*z[2]*(1.0/2.0))-t62*t105*t118;
-  A0[2][5] = t57*(t44+t61*t81*z[5]*(1.0/2.0)-t59*t106*z[4]*(1.0/2.0))-t62*t109*t118;
+  t84 = t32*t33*(1.0/2.0);
+  t113 = t31*t82*(1.0/2.0);
+  t85 = t84-t113;
+  t86 = t57-t58;
+  t88 = t60*t61*(1.0/2.0);
+  t89 = t12*y[2];
+  t90 = t34*y[3];
+  t91 = t39*y[1];
+  t92 = t44*y[4];
+  t93 = t49*y[5];
+  t94 = t54*y[6];
+  t95 = t89+t90+t91+t92+t93+t94;
+  t114 = t59*t86*(1.0/2.0);
+  t96 = t88-t114;
+  t97 = t70-t71;
+  t99 = t33*t72*(1.0/2.0);
+  t122 = t31*t97*(1.0/2.0);
+  t100 = t99-t122;
+  t101 = t73-t74;
+  t103 = t61*t75*(1.0/2.0);
+  t123 = t59*t101*(1.0/2.0);
+  t104 = t103-t123;
+  t105 = t76-t77;
+  t107 = t33*t78*(1.0/2.0);
+  t124 = t31*t105*(1.0/2.0);
+  t108 = t107-t124;
+  t109 = t79-t80;
+  t111 = t61*t81*(1.0/2.0);
+  t125 = t59*t109*(1.0/2.0);
+  t112 = t111-t125;
+  t115 = t12*z[2];
+  t116 = t34*z[3];
+  t117 = t39*z[1];
+  t118 = t44*z[4];
+  t119 = t49*z[5];
+  t120 = t54*z[6];
+  t121 = t115+t116+t117+t118+t119+t120;
+  A0[0][0] = t56*(t12+t32*t33*x[3]*(1.0/2.0)-t31*x[2]*(t29-x[2]*2.0)*(1.0/2.0))-t62*t69*t85;
+  A0[0][1] = t56*(t49+t60*t61*x[6]*(1.0/2.0)-t59*x[5]*(t57-x[5]*2.0)*(1.0/2.0))-t62*t69*t96;
+  A0[0][2] = t56*(t33*t72*x[3]*(1.0/2.0)-t31*x[2]*(t70-y[2]*2.0)*(1.0/2.0))-t62*t69*t100;
+  A0[0][3] = t56*(t61*t75*x[6]*(1.0/2.0)-t59*x[5]*(t73-y[5]*2.0)*(1.0/2.0))-t62*t69*t104;
+  A0[0][4] = t56*(t33*t78*x[3]*(1.0/2.0)-t31*x[2]*(t76-z[2]*2.0)*(1.0/2.0))-t62*t69*t108;
+  A0[0][5] = t56*(t61*t81*x[6]*(1.0/2.0)-t59*x[5]*(t79-z[5]*2.0)*(1.0/2.0))-t62*t69*t112;
+  A0[1][0] = t56*(t32*t33*y[3]*(1.0/2.0)-t31*t82*y[2]*(1.0/2.0))-t62*t85*t95;
+  A0[1][1] = t56*(t60*t61*y[6]*(1.0/2.0)-t59*t86*y[5]*(1.0/2.0))-t62*t95*t96;
+  A0[1][2] = t56*(t12+t33*t72*y[3]*(1.0/2.0)-t31*t97*y[2]*(1.0/2.0))-t62*t95*t100;
+  A0[1][3] = t56*(t49+t61*t75*y[6]*(1.0/2.0)-t59*t101*y[5]*(1.0/2.0))-t62*t95*t104;
+  A0[1][4] = t56*(t33*t78*y[3]*(1.0/2.0)-t31*t105*y[2]*(1.0/2.0))-t62*t95*t108;
+  A0[1][5] = t56*(t61*t81*y[6]*(1.0/2.0)-t59*t109*y[5]*(1.0/2.0))-t62*t95*t112;
+  A0[2][0] = t56*(t32*t33*z[3]*(1.0/2.0)-t31*t82*z[2]*(1.0/2.0))-t62*t85*t121;
+  A0[2][1] = t56*(t60*t61*z[6]*(1.0/2.0)-t59*t86*z[5]*(1.0/2.0))-t62*t96*t121;
+  A0[2][2] = t56*(t33*t72*z[3]*(1.0/2.0)-t31*t97*z[2]*(1.0/2.0))-t62*t100*t121;
+  A0[2][3] = t56*(t61*t75*z[6]*(1.0/2.0)-t59*t101*z[5]*(1.0/2.0))-t62*t104*t121;
+  A0[2][4] = t56*(t12+t33*t78*z[3]*(1.0/2.0)-t31*t105*z[2]*(1.0/2.0))-t62*t108*t121;
+  A0[2][5] = t56*(t49+t61*t81*z[6]*(1.0/2.0)-t59*t109*z[5]*(1.0/2.0))-t62*t112*t121;
  
 } 
 

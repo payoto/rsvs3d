@@ -16,10 +16,9 @@ template<class T> void ArrayVec<T>::assign(int nR,int nC, T& newelem)
 	tempElems.assign(nC,newelem);
 	elems.assign(nR,tempElems);
 
-	dim.clear();
+	dim.clear(); 
 	dim.push_back(nR);
 	dim.push_back(nC);
 }
-
 
 #endif // VECTORARRAY_INCL_H_INCLUDED

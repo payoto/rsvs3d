@@ -8,11 +8,11 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     
     [ccodeGen(5)]=Code_SurfCentroid4();
     [ccodeGen(6)]=Code_SurfCentroidDiv();
-    [ccodeGen(7)]=Code_SurfCentroidFull();
-    [ccodeGen(8)]=Code_SurfCentroid5();
-    [ccodeGen(9)]=Code_SurfCentroid6();
-    [ccodeGen(10)]=Code_SurfCentroidConnec();
-    [ccodeGen(11)]=Code_SurfCentroidNoConnec();
+    %[ccodeGen(7)]=Code_SurfCentroidFull();
+    [ccodeGen(7)]=Code_SurfCentroid5();
+    [ccodeGen(8)]=Code_SurfCentroid6();
+    [ccodeGen(9)]=Code_SurfCentroidConnec();
+    [ccodeGen(10)]=Code_SurfCentroidNoConnec();
     [ccodeGen(4)]=Code_SurfIntersect();
     [ccodeGen(1)]=Code_Volume();
     [ccodeGen(2)]=Code_Area();
@@ -48,7 +48,7 @@ end
 function [cellSource,cellHeader]=IncludeLib(caseName)
     
     cellSource={'#include <vector>','#include <cmath>','#include "vectorarray.hpp"',...
-        '#include "snakevel.hpp"','using namespace std;',''};
+        'using namespace std;',''};
     
     cellHeader=[{['#ifndef ',upper(caseName),'_H_INCLUDED'],...
         ['#define ',upper(caseName),'_H_INCLUDED'],''},cellSource];
@@ -165,7 +165,7 @@ function [ccodeGen]=Code_Volume()
     p1=sym('p1_%d__',[3,1]);assume(p1,'real');
     p2=sym('p2_%d__',[3,1]);assume(p2,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','p0','p1','p2');
+    ccodeGen=CCodeGenStruct('const vector<double>&','p0','p1','p2');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='Volume';
     
@@ -189,7 +189,7 @@ function [ccodeGen]=Code_Area()
     p1=sym('p1_%d__',[3,1]);assume(p1,'real');
     p2=sym('p2_%d__',[3,1]);assume(p2,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','p0','p1','p2');
+    ccodeGen=CCodeGenStruct('const vector<double>&','p0','p1','p2');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='Area';
     
@@ -212,7 +212,7 @@ function [ccodeGen]=Code_LengthEdge()
     p0=sym('p0_%d__',[3,1]);assume(p0,'real');
     p1=sym('p1_%d__',[3,1]);assume(p1,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','p0','p1');
+    ccodeGen=CCodeGenStruct('const vector<double>&','p0','p1');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='LengthEdge';
     
@@ -238,7 +238,7 @@ function [ccodeGen]=Code_SurfCentroid4()
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroid4';
     
@@ -259,7 +259,7 @@ function [ccodeGen]=Code_SurfCentroid5()
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroid5';
     
@@ -275,14 +275,14 @@ function [ccodeGen]=Code_SurfCentroid5()
 end
 function [ccodeGen]=Code_SurfCentroid6()
 
-    n=5;
+    n=6;
     x=sym('x_%d__',[1 n]);assume(x,'real');
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
-    ccodeGen.name='SurfCentroid5';
+    ccodeGen.name='SurfCentroid6';
     
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z])),[x,y,z]);
@@ -302,7 +302,7 @@ function [ccodeGen]=Code_SurfCentroidDiv()
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroidDiv';
     
@@ -325,7 +325,7 @@ function [ccodeGen]=Code_SurfCentroidFull()
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroid';
     
@@ -343,18 +343,18 @@ end
 
 function [ccodeGen]=Code_SurfCentroidConnec()
 
-    n=5;
+    n=4;
     x=sym('x_%d__',[1 n]);assume(x,'real');
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroidConnec';
     
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...
-        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([1:2]),y([1:2]),z([1:2])]);
+        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([2:3]),y([2:3]),z([2:3])]);
     lengthedgeJac=jacobian(lengthedge);
     %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
     
@@ -370,13 +370,13 @@ function [ccodeGen]=Code_SurfCentroidNoConnec()
     y=sym('y_%d__',[1 n]);assume(y,'real');
     z=sym('z_%d__',[1 n]);assume(z,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','x','y','z');
+    ccodeGen=CCodeGenStruct('const vector<double>&','x','y','z');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfCentroidNoConnec';
     
     lengthedge=symfun((sqrt(sum(([x;y;z]-[x([end,1:end-1]);y([end,1:end-1]);z([end,1:end-1])]).^2 ...
         ,1))*transpose([x;y;z]))/sum(sqrt(sum(([x;y;z]-[x([end,1:end-1]);...
-        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([2,4]),y([2,4]),z([2,4])]);
+        y([end,1:end-1]);z([end,1:end-1])]).^2 ,1))),[x([2,5]),y([2,5]),z([2,5])]);
     lengthedgeJac=jacobian(lengthedge);
     %lengthedgeHes=[hessian(lengthedge(1)),hessian(lengthedge(2)),hessian(lengthedge(3))];
     
@@ -405,7 +405,7 @@ function [ccodeGen]=Code_SurfIntersect()
     
     c=sym('c_%d__',[3,1]);assume(c,'real');
     
-    ccodeGen=CCodeGenStruct('vector<double>','p1','p2','v0','v01','v02','v11','v12','c');
+    ccodeGen=CCodeGenStruct('const vector<double>&','p1','p2','v0','v01','v02','v11','v12','c');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='SurfIntersect';
     
