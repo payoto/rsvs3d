@@ -165,6 +165,18 @@ void CoordFunc::assign(int pRepI,vector<double> &pRep){
 	isReady=false;
 }
 
+
+void CoordFunc::ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c){
+	a=fun;
+	b=jac;
+	c=hes; 
+}
+void CoordFunc::ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c){
+	a=funA;
+	b=jac;
+	c=hes;
+}
+
 void CoordFunc::PreCalc(){
 	
 	if (!isReady){
@@ -174,7 +186,7 @@ void CoordFunc::PreCalc(){
 		MakeValid();
 	}
 	if (!isReady){
-		cerr << "TriFunc cannot be made to match the required paremeters " << endl;
+		cerr << "CoordFunc cannot be made to match the required paremeters " << endl;
 	}
 	
 }

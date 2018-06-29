@@ -134,7 +134,7 @@ void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
 void MaintainTriangulateSnake(triangulation &triangleRSVS);
-void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin);
+void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
 int Test_snakeRSVS();

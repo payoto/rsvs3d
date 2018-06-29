@@ -94,33 +94,42 @@ public:
 	// Build a valid object
 	void assign(vector<vector<double> const*> &coords);
 	void assign(int pRepI,vector<double> &pRep);
-
+	void ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c);
+	void ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	virtual void Calc() = 0; // Virtual function that calculates the function
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-	void ResetDim(int nDim){InitialiseArrays();}
-	void ResetNCoord(int nCoord){InitialiseArrays();}
-	void ResetNFun(int nFun){InitialiseArrays();}
+	void ResetDim(int n){nDim=n;InitialiseArrays();}
+	void ResetNCoord(int n){nCoord=n;InitialiseArrays();}
+	void ResetNFun(int n){nFun=n;InitialiseArrays();}
 	CoordFunc(){
 		nDim=3;
 		nCoord=3;
 		nFun=1;
 		InitialiseArrays();
 	}
-	CoordFunc(int nDim){
+	CoordFunc(int n1){
+		nDim=n1;
 		nCoord=3;
 		nFun=1;
 		InitialiseArrays();
 	}
-	CoordFunc(int nDim,int nCoord){
+	CoordFunc(int n1,int n2){
+		nDim=n1;
+		nCoord=n2;
 		nFun=1;
 		InitialiseArrays();
 	}
-	CoordFunc(int nDim,int nCoord,int nFun){
+
+	CoordFunc(int n1,int n2,int n3){
+		nDim=n1;
+		nCoord=n2;
+		nFun=n3;
 		InitialiseArrays();
 	}
-#pragma GCC diagnostic pop
+	~CoordFunc(){
+		coords.clear();
+	}
+
 };
 
 class Volume : public TriFunc {
@@ -174,6 +183,8 @@ protected:
 	using CoordFunc::hes;
 	using CoordFunc::nCoord;
 
+
+
 	vector<double> centroid;
 	double edgeLength=0.0;
 public:
@@ -183,6 +194,9 @@ public:
 	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
 	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){centroid.assign(nDim,0);};
 
+	~SurfCentroid(){
+		coords.clear();
+	}
 
 };
 

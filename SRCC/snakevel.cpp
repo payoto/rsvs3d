@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "arraystructures.hpp"
+#include "mesh.hpp"
 #include "snake.hpp" 
 #include "snakevel.hpp"
 #include "RSVSmath.hpp"
@@ -48,7 +49,7 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		// Still need to recompute coordinates
 		for (ii=0;ii<n;++ii){
 			if(triangleRSVS.trivert(ii)->parentType==2){
-				SurfCentroid(triangleRSVS.trivert[ii].coord,
+				SurfaceCentroid_fun(triangleRSVS.trivert[ii].coord,
 					*(triangleRSVS.snakeDep->snakeconn.surfs.isearch(triangleRSVS.trivert(ii)->parentsurf)),
 					 triangleRSVS.snakeDep->snakeconn); 
 			}
@@ -143,7 +144,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	}
 }
 
-void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin){
+void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin){
 	int ii,n;
 	coordvec edgeCentre;
 	double edgeLength,surfLength;
@@ -160,20 +161,28 @@ void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin){
 }
 
 
-void SurfCentroid2(coordvec &coord,const surf &surfin, const mesh& meshin){
+void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
 	int ii,n;
-	coordvec edgeCentre;
-	double edgeLength,surfLength;
+	vector<int> vertind;
+	vector<vector<double> const *> veccoord;
+	SurfCentroid tempCalc;
+	ArrayVec<double> tempCoord,jac,hes;
+
 	coord.assign(0,0,0);
 	n=int(surfin.edgeind.size());
+
+	veccoord.reserve(n);
+	ConnVertFromConnEdge(meshin, surfin.edgeind,vertind);
+
 	for(ii=0; ii<n; ++ii){
-		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
-		edgeCentre.mult(edgeLength);
-		coord.add(edgeCentre.usedata());
-		surfLength+=edgeLength;
+		veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
 	}
 
-	coord.div(surfLength);
+	tempCalc.assign(veccoord);
+	tempCalc.Calc();
+
+	tempCalc.ReturnDat(tempCoord,jac,hes);
+	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
 
 

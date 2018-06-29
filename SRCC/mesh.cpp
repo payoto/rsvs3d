@@ -1882,3 +1882,33 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	}
 	return(nBlocks);
 }
+
+
+void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind){
+	// Returns a list of connected vertices matching a list of connected edges
+	bool flag;
+	int kk,ll,nEdge; 
+
+	nEdge=int(edgeind.size());
+	vertind.reserve(nEdge);
+	ll=0;
+	kk=0;
+	flag=(meshin.edges.isearch(edgeind[kk])->vertind[ll]
+		==meshin.edges.isearch(edgeind[kk+1])->vertind[0]) | 
+	(meshin.edges.isearch(edgeind[kk])->vertind[ll]
+		==meshin.edges.isearch(edgeind[kk+1])->vertind[1]);
+	if(!flag){
+		ll=((ll+1)%2);
+	}
+	for(kk=0; kk<nEdge;++kk){
+		vertind.push_back(meshin.edges.isearch(edgeind[kk])->vertind[ll]);
+		
+		if(kk<(nEdge-1)){
+			flag=(meshin.edges.isearch(edgeind[kk])->vertind[0]
+				==meshin.edges.isearch(edgeind[kk+1])->vertind[ll]) | 
+			(meshin.edges.isearch(edgeind[kk])->vertind[1]
+				==meshin.edges.isearch(edgeind[kk+1])->vertind[ll]);
+			ll=((ll+1)%2)*(flag)+ll*(!flag);
+		}
+	}
+}

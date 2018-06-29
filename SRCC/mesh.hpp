@@ -471,6 +471,9 @@ public:
 	}
 };
 
+// Function declarations
+
+void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind);
 
 //test functions
 int Test_ArrayStructures();
