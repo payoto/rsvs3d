@@ -32,7 +32,7 @@
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 using namespace std;
-
+ 
 // Template Class
 
 template<class T> class ArrayVec{
@@ -40,7 +40,8 @@ protected:
 	vector< vector<T> > elems;
 	vector<int> dim;
 public:
-	void assign(int nR,int nC, T& newelem);
+	void assign(int nR,int nC, T newelem);
+	void size(int &nR, int &nC){nR=elems.size();if(nR>0){nC=elems[0].size();}};
 
 	vector<T>& operator[](const int a){ 
 	// [] Operator returns a reference to the corresponding elems.

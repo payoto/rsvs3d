@@ -6,19 +6,20 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     % polygon
     % Areas are similarly calculated for triangular portions of a polygon
     if true
+        [ccodeGen(1)]=Code_Volume();
+        [ccodeGen(2)]=Code_Area();
+        [ccodeGen(3)]=Code_LengthEdge();
+        [ccodeGen(4)]=Code_SurfIntersect();
         [ccodeGen(5)]=Code_SurfCentroid4();
-        %[ccodeGen(6)]=Code_SurfCentroidDiv();
-        %[ccodeGen(7)]=Code_SurfCentroidFull();
         [ccodeGen(6)]=Code_SurfCentroid5();
         [ccodeGen(7)]=Code_SurfCentroid6();
         [ccodeGen(8)]=Code_SurfCentroidConnec();
         [ccodeGen(9)]=Code_SurfCentroidNoConnec();
-        [ccodeGen(4)]=Code_SurfIntersect();
-        [ccodeGen(1)]=Code_Volume();
-        [ccodeGen(2)]=Code_Area();
-        [ccodeGen(3)]=Code_LengthEdge();
+        [ccodeGen(10)]=Code_SurfCentroidSelf();
     else
-        ccodeGen=Code_SurfCentroid4();
+        [ccodeGen(8)]=Code_SurfCentroidConnec();
+        [ccodeGen(9)]=Code_SurfCentroidNoConnec();
+        [ccodeGen(10)]=Code_SurfCentroidSelf();
     end
     
     for ii=1:numel(ccodeGen)
@@ -213,9 +214,9 @@ function [ccodeGen]=Code_Area()
     ccodeGen.f=custcccode(area);
     ccodeGen.df=custcccode(areaJac);
     ccodeGen.ddf=custcccode(areaHes);
-    ccodeGen.symfun(1).fun=vol;
-    ccodeGen.symfun.jac=volJac;
-    ccodeGen.symfun.hes=volHes;
+    ccodeGen.symfun(1).fun=area;
+    ccodeGen.symfun.jac=areaJac;
+    ccodeGen.symfun.hes=areaHes;
     
 end
 
@@ -239,9 +240,9 @@ function [ccodeGen]=Code_LengthEdge()
     ccodeGen.f=custcccode(lengthedge);
     ccodeGen.df=custcccode(lengthedgeJac);
     ccodeGen.ddf=custcccode(lengthedgeHes);
-    ccodeGen.symfun(1).fun=vol;
-    ccodeGen.symfun.jac=volJac;
-    ccodeGen.symfun.hes=volHes;
+    ccodeGen.symfun(1).fun=lengthedge;
+    ccodeGen.symfun.jac=lengthedgeJac;
+    ccodeGen.symfun.hes=lengthedgeHes;
     
 end
 
@@ -249,7 +250,13 @@ end
 
 % Surf Object centroid (vec<x>,vec<y>,vec<z>)
 
+function [ccodeGen]=Code_SurfCentroidSelf()
 
+    n=3;
+    [ccodeGen]=Code_SurfCentroid(n,[2]);
+    ccodeGen.name='SurfCentroidSelf';
+    
+end
 function [ccodeGen]=Code_SurfCentroid4()
 
     n=4;
@@ -309,15 +316,24 @@ end
 
 function [ccodeGen]=Code_SurfCentroidConnec()
 
-    n=4;
+    n=6;
     [ccodeGen]=Code_SurfCentroid(n,[2 3]);
     ccodeGen.name='SurfCentroidConnec';
     
 end
 function [ccodeGen]=Code_SurfCentroidNoConnec()
 
-    n=6;
-    [ccodeGen]=Code_SurfCentroid(n,[2 5]);
+    n=8;
+    [ccodeGen]=Code_SurfCentroid(n,[2 6]);
+    ccodeGen.name='SurfCentroidNoConnec';
+    
+    
+end
+
+function [ccodeGen]=Code_SurfCentroidNoConnec2()
+
+    n=20;
+    [ccodeGen]=Code_SurfCentroid(n,[10 11]);
     ccodeGen.name='SurfCentroidNoConnec';
     
     
@@ -358,11 +374,22 @@ function [ccodeGen]=Code_SurfCentroid(n,ind)
     
     ccodeGen.f=custcccode(crep(centroid));
     ccodeGen.df=custcccode(crep(lengthedgeJac));
-    ccodeGen.ddf='';%custcccode(lengthedgeHes);
+    if numel(ind)>2
+        ccodeGen.ddf='';%custcccode(crep(lengthedgeHes));
+    elseif numel(ind)==2
+        mask=zeros(6);
+        mask(1:3,4:6)=1;
+        mask(4:6,1:3)=1;
+        mask=repmat(mask,[1,3]);
+        lengthedgeHes=lengthedgeHes.*mask;
+        ccodeGen.ddf=custcccode(crep(lengthedgeHes));
+    else
+        ccodeGen.ddf=custcccode(crep(lengthedgeHes));
+    end
     
     ccodeGen.symfun(1).fun=centroid;
     ccodeGen.symfun.jac=transpose(lengthedgeJac);
-    ccodeGen.symfun.hes=lengthedgeHes;
+    ccodeGen.symfun.hes=crep(lengthedgeHes);
     
 end
 

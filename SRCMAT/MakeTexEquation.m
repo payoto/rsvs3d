@@ -10,12 +10,19 @@ function []=MakeTexEquation(symeq,fileName,filePath)
         cellfun(@numel,regexp(sqrtCont,'\}'));
     sqrtCont=sqrtCont(keepLog);
     n=max(cellfun(@str2num,regexprep(unique(regexp(str,'_[0-9]*','match')),'_','')));
-    sqrtCont=sqrtCont(1:n);
-    sqrtCont=sqrtCont([1,3:end,2]);
+    if numel(sqrtCont)>=n
+        sqrtCont=sqrtCont(1:n);
+        sqrtCont=sqrtCont([1,3:end,2]);
+    end
     translaTable=cell(0,3);
     
     ord=[1,n,2:n-1];
     fmatFun=@(dim,ind1,ind2) [dim,'_{',ind1,',',ind2,'}'];
+    translaTable(end+1,1:2)={'X_dot_d',['\\sum x_{i,i+1}','d_i']};
+    translaTable(end+1,1:2)={'Y_dot_d',['\\sum y_{i,i+1}','d_i']};
+    translaTable(end+1,1:2)={'Z_dot_d',['\\sum z_{i,i+1}','d_i']};
+    translaTable(end+1,1:2)={'totD',['\\sum d']};
+    
     translaTable(end+1,1:2)={'\\left\(\\frac\{\\mathrm\{([xyz])_([0-9]*)\}\}\{2\} \+ \\frac\{\\mathrm\{[xyz]_([0-9]*)\}\}\{2\}\\right\)',fmatFun('$1','$2','$3')};
     translaTable(end,3)={false};
     for ii=1:numel(sqrtCont)

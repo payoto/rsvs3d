@@ -10,14 +10,14 @@ compiled on its own.
 #define VECTORARRAY_INCL_H_INCLUDED
 #include "vectorarray.hpp" // include guarded does nothing (needed for the linter)
 
-template<class T> void ArrayVec<T>::assign(int nR,int nC, T& newelem)  
+template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)  
 {
 	vector<T> tempElems;
 	tempElems.assign(nC,newelem);
 	elems.assign(nR,tempElems);
 
 	dim.clear(); 
-	dim.push_back(nR);
+	dim.push_back(nR); 
 	dim.push_back(nC);
 }
 

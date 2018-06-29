@@ -4,6 +4,7 @@
 #include "arraystructures.hpp"
 #include "snake.hpp" 
 #include "snakevel.hpp"
+#include "RSVSmath.hpp"
 
 using namespace std;	
 
@@ -60,7 +61,6 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 	}
 	triangleRSVS.PrepareForUse();
 }
-
 
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList){
 	int ii,n,nTriS,nTriE,maxIndVert, maxIndTriangle;
@@ -144,6 +144,23 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 }
 
 void SurfCentroid(coordvec &coord,const surf &surfin, const mesh& meshin){
+	int ii,n;
+	coordvec edgeCentre;
+	double edgeLength,surfLength;
+	coord.assign(0,0,0);
+	n=int(surfin.edgeind.size());
+	for(ii=0; ii<n; ++ii){
+		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+		edgeCentre.mult(edgeLength);
+		coord.add(edgeCentre.usedata());
+		surfLength+=edgeLength;
+	}
+
+	coord.div(surfLength);
+}
+
+
+void SurfCentroid2(coordvec &coord,const surf &surfin, const mesh& meshin){
 	int ii,n;
 	coordvec edgeCentre;
 	double edgeLength,surfLength;

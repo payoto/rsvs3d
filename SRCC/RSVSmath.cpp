@@ -43,11 +43,11 @@ bool TriFunc::MakeValid(){
 	// Warning : This operates directly on the data of the pointer
 
 	isReady=true;
-	bool fieldReady;
-
-	fieldReady=MakeValidField(&TriFunc::p0);isReady=isReady & fieldReady;
-	fieldReady=MakeValidField(&TriFunc::p1);isReady=isReady & fieldReady;
-	fieldReady=MakeValidField(&TriFunc::p2);isReady=isReady & fieldReady;
+	//bool fieldReady;
+	CheckValid();
+	// fieldReady=MakeValidField(&TriFunc::p0);isReady=isReady & fieldReady;
+	// fieldReady=MakeValidField(&TriFunc::p1);isReady=isReady & fieldReady;
+	// fieldReady=MakeValidField(&TriFunc::p2);isReady=isReady & fieldReady;
 
 	return(isReady);
 }
@@ -72,10 +72,10 @@ void TriFunc::assign(int pRepI,vector<double> &pRep){
 		p2=&pRep;
 	}
 	
-	isCalc=false;
+	isCalc=false; 
 	isReady=false;
 }
-
+ 
 void TriFunc::PreCalc(){
 	
 	if (!isReady){
@@ -92,25 +92,26 @@ void TriFunc::PreCalc(){
 
 /// CoordFunc supports the same stuff as tri func but can have any number of points
 
-bool CoordFunc::MakeValidField(vector<double>* mp){
+bool CoordFunc::MakeValidField(vector<double> const * mp){
 	// Tries to make a valid array
 	// Warning : This operates directly on the data stored in the field of the pointer
 	
-	int ii,n;
+	// int ii,n;
 	bool fieldReady; 
 	if ((mp)==NULL){
 		fieldReady=false;
 	} else {
-		n=int((mp)->size());
-		if (n<nDim){
-			for(ii=0;ii<(nDim-n);++ii){
-				(mp)->push_back(0);
-			}
-		} else if (n>nDim){
-			for(ii=0;ii<(n-nDim);++ii){
-				(mp)->pop_back();
-			}
-		} 
+		fieldReady=false;
+		// n=int((mp)->size());
+		// if (n<nDim){
+		// 	for(ii=0;ii<(nDim-n);++ii){
+		// 		(mp)->push_back(0);
+		// 	}
+		// } else if (n>nDim){
+		// 	for(ii=0;ii<(n-nDim);++ii){
+		// 		(mp)->pop_back();
+		// 	}
+		// } 
 	}
 	return(fieldReady);
 }
@@ -141,14 +142,14 @@ bool CoordFunc::MakeValid(){
 	return(isReady);
 }
 
-void CoordFunc::assign(vector<vector<double>*> &pRep){
+void CoordFunc::assign(vector<vector<double> const*> &pRep){
 	if (int(pRep.size())==nCoord){
 		coords=pRep;
 	} else {
 		ResetNCoord(int(pRep.size()));
 		coords=pRep;
 	}
-	isCalc=false;
+	isCalc=false; 
 	isReady=false;
 }
 
@@ -184,7 +185,7 @@ void CoordFunc::InitialiseArrays(){
 		funA.assign(nFun,1,fun); 
 	}
 	jac.assign(nFun,nCoord*nDim,fun); 
-	hes.assign(nCoord*nDim,nCoord*nDim,fun);
+	hes.assign(nCoord*nDim,nCoord*nDim*nFun,fun);
 	coords.assign(nCoord,NULL);
 	isReady=false;
 	isCalc=false;
@@ -235,12 +236,57 @@ void LengthEdge::Calc(){
 	}
 }
 
+
+
 void SurfCentroid::Calc(){
+/* This function calculates centroid Jacobian and Hessian using
+matlab automatically generated code
 
-	vector<double> x,y,z;
-	int ii,n;
+the jacobian is arranged :
+	  x0 x1  xn y0 y1  yn  z0 z1  zn
+ xc [                               ] 
+ yc [                               ]
+ zc [                               ]
 
+ The Hessian is arranged:
+ 					xc 				 					yc 				 				zc 				
+	  x0 x1  xn y0 y1  yn  z0 z1  zn	x0 x1  xn y0 y1  yn  z0 z1  zn	    x0 x1  xn y0 y1  yn  z0 z1  zn
+ x0 [                               ]  [                               ]  [                               ] 
+ x1 [                               ]  [                               ]  [                               ] 
+ xn [                               ]  [                               ]  [                               ] 
+ y0 [                               ]  [                               ]  [                               ] 
+ y1 [                               ]  [                               ]  [                               ] 
+ yn [                               ]  [                               ]  [                               ] 
+ z0 [                               ]  [                               ]  [                               ] 
+ z1 [                               ]  [                               ]  [                               ] 
+ zn [                               ]  [                               ]  [                               ] 
+
+*/
+
+	vector<double> x,y,z,centroidTLength;
+	ArrayVec<double> temp;
+	double currEdge;
+	int ii,ii1,ii2,jj,jj2,nR,nC,ind,ind2;
+
+	PreCalc();
+
+	
 	if (!isCalc){
+		// Calculate centroid and 
+		centroid.assign(nDim,0);
+		edgeLength=0;
+		for(jj=0;jj<nCoord;++jj){
+			currEdge=0;
+			LengthEdge_f(*coords[jj],*coords[(jj+1)%nCoord],currEdge);
+			edgeLength+=currEdge;
+			for(ii=0; ii<nDim; ++ii){
+				centroid[ii]+=currEdge*((*coords[jj])[ii]+(*coords[(jj+1)%nCoord])[ii])/2;
+			}
+			
+		}
+		for(ii=0; ii<nDim; ++ii){
+			funA[ii][0]=centroid[ii]/edgeLength;
+		}
 		if  (nCoord<4){
 			throw invalid_argument("nCoord <= 3 surfCentroid Not implemented");
 		} else if (nCoord<7){
@@ -256,20 +302,142 @@ void SurfCentroid::Calc(){
 
 			switch(nCoord){
 				case 4:
-					SurfCentroid4_f(x,y,z,funA);
-					SurfCentroid4_df(x,y,z,jac);
+					//SurfCentroid4_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
+					SurfCentroid4_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
 				case 5:
-					SurfCentroid5_f(x,y,z,funA);
-					SurfCentroid5_df(x,y,z,jac);
+					//SurfCentroid5_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
+					SurfCentroid5_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
 				case 6:
-					SurfCentroid6_f(x,y,z,funA);
-					SurfCentroid6_df(x,y,z,jac);
+					//SurfCentroid6_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
+					SurfCentroid6_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
 			}
 		} else {
-			x.reserve(6);
-			y.reserve(6);
-			z.reserve(6);
-
+			/*the jacobian is arranged :
+			  x0 x1  xn y0 y1  yn  z0 z1  zn
+			 xc [                               ] 
+			 yc [                               ]
+			 zc [                               ]*/
+			 
+			x.assign(3,0);
+			y.assign(3,0);
+			z.assign(3,0);
+			temp.assign(nDim,nDim,0); 
+			for (jj=0;jj<nCoord;jj++){
+				for (ii=0; ii<3 ; ++ii){ 
+					x[ii]=((*coords[(jj+ii)%nCoord])[0]);
+					y[ii]=((*coords[(jj+ii)%nCoord])[1]);
+					z[ii]=((*coords[(jj+ii)%nCoord])[2]);
+				}
+				SurfCentroidSelf_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],temp);
+				ind=(jj+1)%nCoord;
+				// WARNING : This needs to be checked to make sure it matches the automaticly generated ones
+				for(ii1=0; ii1<nDim ; ii1++){
+					for(ii2=0; ii2<nDim ; ii2++){
+						jac[ii1][ind+(ii2*nCoord)]=temp[ii1][ii2];
+					}
+				}
+			}
 		}
+
+		// Calculate Hessian
+
+		/* The Hessian is arranged:
+ 					xc 				 					yc 				 				zc 				
+	  x0 x1  xn y0 y1  yn  z0 z1  zn	x0 x1  xn y0 y1  yn  z0 z1  zn	    x0 x1  xn y0 y1  yn  z0 z1  zn
+ x0 [                               ]  [                               ]  [                               ] 
+ x1 [                               ]  [                               ]  [                               ] 
+ xn [                               ]  [                               ]  [                               ] 
+ y0 [                               ]  [                               ]  [                               ] 
+ y1 [                               ]  [                               ]  [                               ] 
+ yn [                               ]  [                               ]  [                               ] 
+ z0 [                               ]  [                               ]  [                               ] 
+ z1 [                               ]  [                               ]  [                               ] 
+ zn [                               ]  [                               ]  [                               ] */
+
+		// Squared terms of the Hessian
+		hes.size(nR,nC);
+		x.assign(3,0);
+		y.assign(3,0);
+		z.assign(3,0);
+		temp.assign(nDim,nDim*nFun,0); 
+		for (jj=0;jj<nCoord;jj++){
+			for (ii=0; ii<3 ; ++ii){ 
+				x[ii]=((*coords[(jj+ii)%nCoord])[0]);
+				y[ii]=((*coords[(jj+ii)%nCoord])[1]);
+				z[ii]=((*coords[(jj+ii)%nCoord])[2]);
+			}
+			SurfCentroidSelf_ddf(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],temp);
+			ind=(jj+1)%nCoord;
+			// WARNING : This needs to be checked to make sure it matches the automaticly generated ones
+			for(ii1=0; ii1<nDim ; ii1++){
+				for(ii2=0; ii2<nDim ; ii2++){
+					for(ii=0;ii<nFun;ii++){
+						hes[ind+(ii1*nCoord)][ind+(ii2*nCoord)+(ii*nDim*nCoord)]=temp[ii1][ii2+(nDim*ii)];
+					}
+				}
+			}
+		}
+
+		// Connected terms of the Hessian
+		x.assign(6,0);
+		y.assign(6,0);
+		z.assign(6,0);
+		temp.assign(nDim*2,2*nDim*nFun,0); 
+		for (jj=0;jj<nCoord;jj++){
+			jj2=(jj+1)%nCoord;
+			for (ii=0; ii<4 ; ++ii){ 
+				x[ii]=((*coords[(jj+ii)%nCoord])[0]);
+				y[ii]=((*coords[(jj+ii)%nCoord])[1]);
+				z[ii]=((*coords[(jj+ii)%nCoord])[2]);
+			}
+			SurfCentroidConnec_ddf(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],temp);
+			ind=(jj+1)%nCoord;
+			ind2=(jj2+1)%nCoord;
+				// WARNING : This needs to be checked to make sure it matches the automaticly generated ones
+			for(ii1=0; ii1<nDim ; ii1++){
+				for(ii2=0; ii2<nDim ; ii2++){
+					for(ii=0;ii<nFun;ii++){
+						hes[ind+(ii1*nCoord)][ind2+(ii2*nCoord)+(ii*nDim*nCoord)]=temp[ii1][nDim+ii2+(nDim*ii)];
+						hes[ind2+(ii1*nCoord)][ind+(ii2*nCoord)+(ii*nDim*nCoord)]=temp[ii1+nDim][ii2+(nDim*ii)];
+					}
+				}
+			}
+			
+		}
+
+
+		// Not Connected terms of the Hessian
+		x.assign(8,0);
+		y.assign(8,0);
+		z.assign(8,0);
+		temp.assign(nDim*2,2*nDim*nFun,0); 
+		for (jj=0;jj<nCoord;jj++){
+			for(jj2=jj+2;jj2<nCoord; ++jj2){
+				for (ii=0; ii<3 ; ++ii){ 
+					x[ii]=((*coords[(jj+ii)%nCoord])[0]);
+					y[ii]=((*coords[(jj+ii)%nCoord])[1]);
+					z[ii]=((*coords[(jj+ii)%nCoord])[2]);
+				}
+
+				for (ii=0; ii<3 ; ++ii){ 
+					x[ii+4]=((*coords[(jj2+ii)%nCoord])[0]);
+					y[ii+4]=((*coords[(jj2+ii)%nCoord])[1]);
+					z[ii+4]=((*coords[(jj2+ii)%nCoord])[2]);
+				}
+				SurfCentroidNoConnec_ddf(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],temp);
+				ind=(jj+1)%nCoord;
+				ind2=(jj2+1)%nCoord;
+				// WARNING : This needs to be checked to make sure it matches the automaticly generated ones
+				for(ii1=0; ii1<nDim ; ii1++){
+					for(ii2=0; ii2<nDim ; ii2++){
+						for(ii=0;ii<nFun;ii++){
+							hes[ind+(ii1*nCoord)][ind2+(ii2*nCoord)+(ii*nDim*nCoord)]=temp[ii1][nDim+ii2+(nDim*ii)];
+							hes[ind2+(ii1*nCoord)][ind+(ii2*nCoord)+(ii*nDim*nCoord)]=temp[ii1+nDim][ii2+(nDim*ii)];
+						}
+					}
+				}
+			}
+		}
+
 	}
 }

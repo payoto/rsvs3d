@@ -25,9 +25,9 @@ using namespace std;
 
 class TriFunc {
 protected:
-	vector<double>* p0=NULL;
-	vector<double>* p1=NULL;
-	vector<double>* p2=NULL;
+	vector<double> const * p0=NULL;
+	vector<double> const * p1=NULL;
+	vector<double> const * p2=NULL;
 
 	double fun;
 	ArrayVec<double> jac;
@@ -70,7 +70,7 @@ public:
 
 class CoordFunc {
 protected:
-	vector<vector<double>*> coords;
+	vector<vector<double> const *> coords;
 
 	double fun;
 	ArrayVec<double> funA;
@@ -79,11 +79,12 @@ protected:
 
 	bool isReady;
 	bool isCalc;
+
 	int nDim; // target length of vectors
 	int nCoord; // target length of vectors
 	int nFun;
 
-	bool MakeValidField(vector<double>* mp);
+	bool MakeValidField(vector<double> const* mp);
 	void InitialiseArrays();
 public:
 	// Check validity
@@ -91,14 +92,16 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(vector<vector<double>*> &coords);
+	void assign(vector<vector<double> const*> &coords);
 	void assign(int pRepI,vector<double> &pRep);
-	void ResetDim(int nDim){InitialiseArrays();}
-	void ResetNCoord(int nCoord){InitialiseArrays();}
-	void ResetNFun(int nFun){InitialiseArrays();}
 
 	virtual void Calc() = 0; // Virtual function that calculates the function
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+	void ResetDim(int nDim){InitialiseArrays();}
+	void ResetNCoord(int nCoord){InitialiseArrays();}
+	void ResetNFun(int nFun){InitialiseArrays();}
 	CoordFunc(){
 		nDim=3;
 		nCoord=3;
@@ -117,7 +120,7 @@ public:
 	CoordFunc(int nDim,int nCoord,int nFun){
 		InitialiseArrays();
 	}
-
+#pragma GCC diagnostic pop
 };
 
 class Volume : public TriFunc {
@@ -163,17 +166,23 @@ public:
 };
 
 class SurfCentroid : public CoordFunc {
-	using CoordFunc::PreCalc;
+protected:
+	//using CoordFunc::PreCalc;
 	using CoordFunc::coords;
 	using CoordFunc::fun;
 	using CoordFunc::jac;
 	using CoordFunc::hes;
 	using CoordFunc::nCoord;
 
+	vector<double> centroid;
+	double edgeLength=0.0;
 public:
+	
 	void Calc();
-	SurfCentroid() : CoordFunc(3,4,3){};
-	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){};
+	void assigncentroid(const vector<double> &vecin);
+	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
+	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){centroid.assign(nDim,0);};
+
 
 };
 
