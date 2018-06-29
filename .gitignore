@@ -1,8 +1,11 @@
 # Ignore git ignore
 
+
 *NOGIT*
 *TESTOUT*
 .gitattributes
+
+!*.lay
 
 # ignore matlab executables
 *.mexw64
