@@ -42,7 +42,12 @@ protected:
 public:
 	void assign(int nR,int nC, T newelem);
 	void size(int &nR, int &nC){nR=elems.size();if(nR>0){nC=elems[0].size();}};
-
+	void clear(){
+		for (int ii=0; ii<int(elems.size());ii++){
+			elems[ii].clear();
+		}
+		elems.clear();
+	}
 	vector<T>& operator[](const int a){ 
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
@@ -52,6 +57,10 @@ public:
 		}
 		#endif //SAFE_ACCESS
 		return(elems[a]);
+	}
+
+	~ArrayVec<T>(){
+		clear();
 	}
 
 };
