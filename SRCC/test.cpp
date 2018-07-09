@@ -16,8 +16,11 @@
 #include "voxel.hpp"
 #include "postprocessing.hpp"
 #endif //TEST_ALL
-#include "snakstruct.hpp"
+#include "mesh.hpp"
+#include "snake.hpp"
 #include "snakeengine.hpp"
+#include "meshrefinement.hpp"
+#include "snakevel.hpp"
 
 int main(){
 	customtest gridTest;
@@ -43,10 +46,12 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
-	#endif //TEST_ALL
- 
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_snakeinit,"Snake spawning");
+	#endif //TEST_ALL
+ 
+	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
+	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
 
 
 	gridTest.PrintSummary();

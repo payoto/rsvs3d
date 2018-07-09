@@ -3,8 +3,7 @@
 #include <vector>
 #include <cmath>
 
-#include "snakstruct.hpp"
-#include "arraystructures.hpp"
+#include "snake.hpp"
 
 using namespace std;
 
@@ -13,86 +12,7 @@ using namespace std;
 
 // Class Method implementaton 
 
-// -------------------------------------------------------------------------------------------
-// Implementatation of coordvec 
-// -------------------------------------------------------------------------------------------
-double& coordvec::operator[](int a)
-{
-	// returns a reference to the value and can be used to set a value
-	#ifdef SAFE_ACCESS // adds a check in debug mode
-	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
-	}
-	#endif //SAFE_ACCESS
-	isuptodate=0;
-	return(elems[a]);
-}
-double coordvec::operator()(int a) const
-{
-	// returns the value (cannot be used to set data)
-	#ifdef SAFE_ACCESS // adds a check in debug mode
-	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
-	}
-	#endif // SAFE_ACCESS
-	return(elems[a]);
-}
 
-coordvec coordvec::Unit() const 
-{
-	coordvec unitCoordVec;
-	for (int ii=0;ii<3;++ii){
-		unitCoordVec.elems[ii]=elems[ii]/norm;
-	}
-	unitCoordVec.norm=1;
-	unitCoordVec.isuptodate=1;
-	return (unitCoordVec);
-}
-
-double coordvec::Unit(const int a) const
-{
-	#ifdef SAFE_ACCESS // adds a check in debug mode
-	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
-	}
-	#endif // SAFE_ACCESS
-	if (isuptodate==0){
-		cerr << "Warning: NORM of coordvec potentially obsolete " << endl;
-		cerr << "          in coordvec::Unit(const int a) const" << endl; 
-		cerr << "          To avoid this message perform read operations on coordvec using the () operator" << endl; 
-	}
-	return(elems[a]/norm);
-}
-
-double coordvec::GetNorm(){
-	// TEST_RANGE
-	if (~isuptodate){
-		this->CalcNorm();
-	}
-	return(norm);
-}
-
-double coordvec::CalcNorm(){
-	norm=sqrt(pow(elems[0],2)+pow(elems[1],2)+pow(elems[2],2));
-	isuptodate=1;
-	return(norm);
-}
-
-void coordvec::PrepareForUse(){
-	this->CalcNorm();
-}
-
-void coordvec::assign(double a,double b,double c){
-	elems[0]=a;
-	elems[1]=b;
-	elems[2]=c;
-	this->CalcNorm();
-}	
-
-void coordvec::disp() const{
-	cout << "coordvec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] << "] norm "
-	<< norm << " utd " << isuptodate <<endl;
-}
 // -------------------------------------------------------------------------------------------
 // Implementatation of snax - snaxedge - snaxsurf 
 // -------------------------------------------------------------------------------------------
@@ -102,14 +22,15 @@ void snax::disp() const{
 }
 
 void snaxedge::disp() const{
-	cout << "snaxedge #" << index << " | isBorder " << isBorder << " ";
+	cout << "snaxedge #" << index << " | surfind " << surfind << " " << " | isBorder " << isBorder << " " ;
 	normvector.disp();
 }
 
 void snaxsurf::disp() const{
-	cout << "snaxsurf #" << index << " | isBorder " << isBorder << " ";
+	cout << "snaxsurf #" << index << index << " | voluind " << voluind << " " << " | isBorder " << isBorder << " ";
 	normvector.disp();
 }
+
 // file i/o
 void snax::write(FILE *fid) const{
 
@@ -148,6 +69,18 @@ void snaxsurf::PrepareForUse() {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+void snax::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
+void snaxedge::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
+void snaxsurf::disptree(const mesh &meshin, int n) const{
+   
+   disp();
+}
 void snax::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 	index+=nVert;
 }
@@ -256,7 +189,7 @@ inline void snake::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) cons
 	snakeconn.GetMaxIndex(nVert,nEdge,nSurf,nVolu);
 }
 
-void snake::PrepareForUse() {
+void snake::PrepareForUse(bool needOrder) {
 
 	snaxs.isInMesh=true;
 	snaxedges.isInMesh=true;
@@ -265,7 +198,7 @@ void snake::PrepareForUse() {
 	snaxs.PrepareForUse();
 	snaxedges.PrepareForUse();
 	snaxsurfs.PrepareForUse();
-	snakeconn.PrepareForUse();
+	snakeconn.PrepareForUse(needOrder);
 	snakemesh->PrepareForUse();
 	is3D=int(snakemesh->volus.size())>0;
 
@@ -577,7 +510,19 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnax
 
 }
 
+// Snake operations
 
+void snake::ForceCloseContainers(){
+
+	this->snakeconn.ForceCloseContainers();
+	if(!Check3D()){
+		snaxsurfs.elems.clear();
+      	snaxsurfs.Init(snakeconn.surfs.size());
+     	snaxsurfs.PopulateIndices();
+      	snaxsurfs.HashArray();
+      	this->SetSnaxSurfs();
+	}
+}
 
 void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 

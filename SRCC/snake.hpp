@@ -28,9 +28,11 @@
 #include <vector>
 #include <cmath>
 #include <cfloat>
+#include <unordered_map>
 
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
+#include "mesh.hpp"
 
 //==================================
 // Code
@@ -38,49 +40,13 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
-template <class T> class SnakStruct; 
 class snax;
 class snaxedge;
 class snaxsurf;
-class coordvec;
 class snaxarray;
 
 typedef SnakStruct<snaxedge> snaxedgearray;
 typedef SnakStruct<snaxsurf> snaxsurfarray;
-
-
-template <class T> 
-class SnakStruct : public ArrayStruct<T> 
-{
-protected:
-	using ArrayStruct<T>::elems;
-    using ArrayStruct<T>::readyforuse;
-
-	unordered_multimap<int,int> hashParent;
-	int isHashParent=0;
-
-public: 
-	friend class snake;
-
-	//inline int KeyParent(int a) const ;
-	int findparent(int key) const; 
-	void findsiblings(int key, vector<int> &siblings) const{
-		siblings=ReturnDataEqualRange(key, hashParent);}
-	int countparent(int key) const {return(hashParent.count(key));};
-	void HashParent();
-
-	// Functions that need modification
-	bool checkready();
-	void ForceArrayReady();
-	void PrepareForUse();
-	void Concatenate(const SnakStruct<T> &other);
-	void remove(const vector<int> &sub);
-	T& operator[](const int a){ 
-		isHashParent=0;
-		return(ArrayStruct<T>::operator[](a));
-	}
-
-};
 
 class snaxarray : public SnakStruct<snax> 
 {
@@ -108,37 +74,6 @@ public:
 
 };
 
-class coordvec {
-	// Handles the use and norm of a vector for which the norm and the unit 
-	// value might be needed
-protected:
-	vector<double> elems;
-	double norm;
-	int isuptodate;
-	
-
-public:
-	double CalcNorm();
-	double GetNorm();
-	void PrepareForUse();
-	coordvec Unit() const ;
-	double Unit(const int a) const;
-	void assign(double a, double b, double c);
-	double& operator[](int a);
-	double operator()(int a) const;
-	void disp() const;
-	bool isready() const {return(bool(isuptodate));};
-
-	coordvec(){
-		elems.reserve(3); // reserves 3 as this is the size of the array
-		elems.assign(3,0);
-		norm=0;
-		isuptodate=0;
-		#ifdef TEST_SNAKSTRUCT
-		cout << "constructor called for coordvec" << endl;
-		#endif
-	}
-};
 
 
 class snake  {
@@ -157,9 +92,10 @@ public:
 
 	// basic operations grouped from each field
 	void disp() const;
+
 	void displight() const;
 	bool isready() const ;
-	void PrepareForUse();
+	void PrepareForUse(bool needOrder=true);
 	void Init(mesh *snakemesh,int nSnax, int nEdge, int nSurf, int nVolu);
 	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
@@ -168,13 +104,13 @@ public:
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndexNM(); // SetMaxIndex no mesh
 	void Concatenate(const snake &other);
-	bool Check3D(){return(is3D);}
+	bool Check3D() const {return(is3D);}
 	// Snake merging
 	void MakeCompatible_inplace(snake &other) const;
 	snake MakeCompatible(snake other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
-
+	void ForceCloseContainers();
 	// Snake Movement
 	void UpdateDistance(double dt);
 	void UpdateDistance(const vector<double> &dt);
@@ -182,6 +118,8 @@ public:
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
+	// Snake connectivity operations
+	void SetSnaxSurfs() {}
 
 };
 
@@ -203,6 +141,7 @@ public:
 
 	// interface functions
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (edgeind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -229,6 +168,7 @@ public:
 
 	void PrepareForUse();
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (surfind);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -251,6 +191,7 @@ public:
 	coordvec normvector;
 	void PrepareForUse(); 
 	void disp() const;
+	void disptree(const mesh &meshin, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (voluind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -285,7 +226,18 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
 
 // set constructors (used to avoid a variable being unknowingly forgotten)
 
+inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
+	int edgeindin,int isfreezein,int orderedgein)
+{
+	index=indexin;
+	d=din;
+	v=vin;
+	fromvert=fromvertin; 	// root vertex of *snakemesh
+	tovert=tovertin; 	// destination vertex of *snakemesh
+	edgeind=edgeindin; 	// edge of snakemesh
+	isfreeze=isfreezein; 	// freeze status 
+	orderedge=orderedgein;
+}
 
-#include "snakstruct_incl.cpp"
 
 #endif //SNAKSTRUCT_H_INCLUDED

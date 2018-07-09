@@ -12,7 +12,7 @@
 #include <Eigen>
 #include <ctime>
 
-#include "arraystructures.hpp"
+#include "mesh.hpp"
 #include "voxel.hpp"
 #include "postprocessing.hpp"
 
@@ -428,6 +428,9 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 #endif
 	return(0);
 }
+
+
+
 
 // Implementation of Refinement of block grids
 

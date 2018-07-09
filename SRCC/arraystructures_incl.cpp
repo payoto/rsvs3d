@@ -4,10 +4,10 @@ this .cpp file is INCLUDED as part of arraystructures.hpp and  cannot be
 compiled on its own.
 
 */
-
 #ifndef ARRAYSTRUCTS_INCL_H_INCLUDED
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
+#include "arraystructures.hpp"
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat)
 {
 	vecRoot.insert(vecRoot.end(),vecConcat.begin(),vecConcat.end());
@@ -580,34 +580,40 @@ template<class T> inline void ArrayStruct <T>::assign(int n, T& newelem)
 template<class T> inline void ArrayStruct <T>::push_back(T& newelem)  
 {
 	elems.push_back(newelem);
-	isHash=0;
-	isSetMI=0;
-	readyforuse=false;
+
+	maxIndex=newelem.index>maxIndex ? newelem.index : maxIndex;
+	hashTable.emplace(newelem.Key(),elems.size()-1);
+
 }
 template<class T> inline void ArrayStruct <T>::reserve(int n)  
 {
 	elems.reserve(n);
+}
+template<class T> inline void ArrayStruct <T>::clear()  
+{
+	elems.clear();
 }
 // Hashed Vector Template class implementations
 
 template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){
 hashTable.clear();
 HashVector(vec, hashTable);
+isHash=true;
 }
-template <class T,class Q> inline int HashedVector<T,Q>::find(T key) const
+template <class T,class Q> inline int HashedVector<T,Q>::find(const T key) const
 {
 	return(FindSub(key, hashTable) );
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::findall(T key) const
+template <class T,class Q> inline vector<int> HashedVector<T,Q>::findall(const T key) const
 {
 	return(ReturnDataEqualRange(key,hashTable));
 }
 
-template <class T,class Q> inline int HashedVector<T,Q>::count(T key) const
+template <class T,class Q> inline int HashedVector<T,Q>::count(const T key) const
 {
 	return(hashTable.count(key) );
 }
-template <class T,class Q> vector<int> HashedVector<T,Q>::count(vector<T> &key) const
+template <class T,class Q> vector<int> HashedVector<T,Q>::count(const vector<T> &key) const
 {
 	vector<int> subOut;
 	subOut.reserve(key.size());
@@ -618,7 +624,7 @@ template <class T,class Q> vector<int> HashedVector<T,Q>::count(vector<T> &key) 
 
 	return(subOut);
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(vector<T> &key) const
+template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(const vector<T> &key) const
 {
 	return(FindSubList(key, vec, hashTable) );
 }
@@ -680,4 +686,26 @@ template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,i
 	}
 
 }
+
+
+
+template<template<class Q, class R> class T,class Q, class R>
+	void EraseKeyPair(T<Q,R> hashTable, Q key, R pos){
+
+	typename T<Q,R>::iterator it ;
+	it= hashTable.find(key);
+	while(it->second!=pos && it->first==key){++it;}
+
+	if (it->second==pos && it->first==key){
+		hashTable.erase (it);
+	} else {
+
+		cerr << "Error: Key value pair not found and could not be removed "<< endl;
+		cerr << " key " << key << " pos " << pos << endl;
+		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument ("Key value pair not found and could not be removed");
+	}
+}
+
+
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

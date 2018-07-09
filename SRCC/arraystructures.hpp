@@ -50,22 +50,13 @@
 using namespace std;
 
 
-class meshpart;
-class mesh;
-
-class volu;
-class surf;
-class vert;
-class edge;
 
 template <class T> class ArrayStruct;
 template <class T,class Q> class HashedVector;
+template <class T> class SnakStruct; 
+
 typedef unsigned int unsigned_int;
 
-typedef ArrayStruct<volu> voluarray;
-typedef ArrayStruct<surf> surfarray;
-typedef ArrayStruct<edge> edgearray;
-typedef ArrayStruct<vert> vertarray;
 
 // Forward declared templated functions
 template <class T> int TestTemplate_ArrayStruct();
@@ -76,6 +67,10 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind, const vector
 template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
 template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat);
+template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
+
+
+
 // Templates
 template <class T> 
 class ArrayStruct { 
@@ -121,7 +116,17 @@ public:
 	inline void assign(int n, T& newelem);
 	inline void push_back(T& newelem);
 	inline void reserve(int n);
+	inline void clear();
 	// Operators
+	void issafeaccess(const int a){
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+	}
+	
 	const T* operator()(const int a) const{ 
 	// () Operator returns a constant pointer to the corresponding elems.
 	// Cannot be used on the left hand side and can't be used to edit data in elems
@@ -162,66 +167,113 @@ public:
 
 }; 
 
+
+
+template <class T> 
+class SnakStruct : public ArrayStruct<T> 
+{
+protected:
+	using ArrayStruct<T>::elems;
+    using ArrayStruct<T>::readyforuse;
+
+	unordered_multimap<int,int> hashParent;
+	int isHashParent=0;
+
+public: 
+	friend class snake;
+
+	//inline int KeyParent(int a) const ;
+	int findparent(int key) const; 
+	void findsiblings(int key, vector<int> &siblings) const; 
+	int countparent(int key) const {return(hashParent.count(key));};
+	void HashParent();
+	void DeHashParent(const int pos);
+	bool memberIsHashParent(const int pos) const;
+	// Functions that need modification
+	bool checkready();
+	void ForceArrayReady();
+	void PrepareForUse();
+	void Concatenate(const SnakStruct<T> &other);
+	void remove(const vector<int> &sub);
+	T& operator[](const int a){ 
+		isHashParent=0;
+		return(ArrayStruct<T>::operator[](a));
+	}
+
+};
+
 template <class T,class Q>  
 class HashedVector { // container for 
 public:
 	vector<T> vec;
 	unordered_multimap<T,int> hashTable;
+	bool isHash=false;
 
 	inline void GenerateHash();
-	inline int find(T key) const;
-	inline vector<int> findall(T key) const;
-	inline int count(T key) const;
-	vector<int> count(vector<T> &key) const;
-	inline vector<int> find_list(vector<T> &key) const;
+	inline int find(const T key) const;
+	inline vector<int> findall(const T key) const;
+	inline int count(const T key) const;
+	vector<int> count(const vector<T> &key) const;
+	inline vector<int> find_list(const vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
+
+};
+
+template <class T,class Q>  
+class HashedVectorSafe : protected HashedVector<T,Q> { // container for 
+protected:
+	using HashedVector<T,Q>::vec;
+    using HashedVector<T,Q>::isHash; 
+    using HashedVector<T,Q>::hashTable; 
+public:
+	
+	using HashedVector<T,Q>::GenerateHash;
+	using HashedVector<T,Q>::find;
+	using HashedVector<T,Q>::findall;
+	using HashedVector<T,Q>::count;
+	using HashedVector<T,Q>::find_list;
+	using HashedVector<T,Q>::operator();
+	using HashedVector<T,Q>::IsInVec;
+
+	void operator=(const vector<T> &a){
+		vec=a;
+		isHash=false;
+	}
+	void operator=(const HashedVector<T,Q> &a){
+		vec=a.vec;
+		isHash=a.isHash;
+		hashTable=a.hashTable;
+	}
+	T& operator[](const int a){ 
+	// [] Operator returns a reference to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=vec.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		isHash=0;
+		return(vec[a]);
+	}
+	const T& isearch(const int b) const{ 
+	// () Operator returns a constant pointer to the corresponding elems.
+	// Cannot be used on the left hand side and can't be used to edit data in elems
+		int a=this->find(b);
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=vec.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		return(&(vec[a]));
+	}
 };
 
 // Base class
 
-class mesh {
-private:
-	bool borderIsSet=false;
-	void SetLastIndex();
-	friend class snake;
-public:
-	vertarray verts;
-	edgearray edges;
-	surfarray surfs;
-	voluarray volus;
-// basic operations grouped from each field
-	void HashArray();
-	void SetMaxIndex();
-	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
-	void Init(int nVe,int nE, int nS, int nVo);
-	void reserve(int nVe,int nE, int nS, int nVo);
-	void PrepareForUse();
-	void disp() const;
-	void displight() const;
-	void Concatenate(const mesh &other);
-	bool isready() const;
-	void PopulateIndices();
-	void TightenConnectivity();
-	void TestConnectivity();
-//File I/o
-	void write(FILE *fid) const;
-	void read(FILE *fid);
-	int write(const char *str) const;
-	int read(const char *str);
-// Mesh merging
-	void MakeCompatible_inplace(mesh &other) const;
-	mesh MakeCompatible(mesh other) const;
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
-	void RemoveIndex(int typeInd, int oldInd);
-// Mesh Quality
-	int OrderEdges();
-	void SetBorders();
-};
 
-
-class meshpart{ // Abstract class to ensure interface is correct
+class ArrayStructpart{ // Abstract class to ensure interface is correct
 	public : 
 	int index=0;
 	bool isBorder=false;
@@ -238,222 +290,6 @@ class meshpart{ // Abstract class to ensure interface is correct
 
 };
 
-// Derived Classes
-class volu: public meshpart {
-public:
-	
-	double fill,target,error;
-	vector<int> surfind;
-
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void disp() const;
-	void PrepareForUse(){};
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {return(true);}
-	#pragma GCC diagnostic pop
-	void read(FILE * fid);
-	void write(FILE * fid) const;
-	void TightenConnectivity() {sort(surfind);unique(surfind);};
-
-	volu(){ // Constructor
-		index=0;
-		fill=0;
-		target=1;
-		error=1;
-
-		#ifdef TEST_ARRAYSTRUCT
-		cout << "volu #" << index << " Was created " << surfind.size() << endl;
-		#endif
-	}
-	volu(const volu& oldVolu){ // Copy-Constructor
-		index=oldVolu.index;
-		fill=oldVolu.fill;
-		target=oldVolu.target;
-		error=oldVolu.error;
-		surfind=oldVolu.surfind;
-
-		#ifdef TEST_ARRAYSTRUCT
-		cout << "copyvolu #" << index << " Was created " << surfind.size() << endl;
-		#endif
-	}
-	~volu(){ // Destructor
-		surfind.clear();
-
-		#ifdef TEST_ARRAYSTRUCT
-		cout << "volu #" << index << " Was deleted " << surfind.size() << endl;
-		#endif
-
-	}
-	void operator=(const volu* other){
-		index=other->index;
-		fill=other->fill;
-		target=other->target;
-		error=other->error;
-		surfind=other->surfind;
-
-		#ifdef TEST_ARRAYSTRUCT
-		cout << "OTHER: " ; other->disp();
-		#endif
-	}
-
-	int Key() const {return(index);}
-};
-
-
-
-class surf: public meshpart {
-protected:
-	bool isordered;
-public:
-	friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
-	friend void mesh::RemoveIndex(int typeInd, int oldInd);
-
-	double fill,target,error;
-	vector<int> edgeind;
-	vector<int> voluind;
-	 // reserves 2 as this is the size of the array
-
-	void disp() const;
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void PrepareForUse(){};	
-	bool isready(bool isInMesh) const {return(isInMesh? isordered : true);}
-	void read(FILE * fid);
-	void write(FILE * fid) const;
-	void OrderEdges(mesh *meshin);
-	void TightenConnectivity() {sort(voluind);unique(voluind);};
-
-	surf(){ // Constructor
-		index=0;
-		fill=1;
-		target=1;
-		error=1;
-		voluind.reserve(2); // reserves 2 as this is the size of the array
-		voluind.assign(2,0);
-		isordered=false;
-	}
-	~surf(){ // Destructor
-
-		edgeind.clear();
-		voluind.clear();
-
-	}
-	surf(const surf& oldSurf){ // Copy-Constructor
-		index=oldSurf.index;
-		fill=oldSurf.fill;
-		target=oldSurf.target;
-		error=oldSurf.error;
-		edgeind=oldSurf.edgeind;
-		voluind=oldSurf.voluind;
-		isordered=oldSurf.isordered;
-	}
-	void operator=(const surf* other){
-		index=other->index;
-		fill=other->fill;
-		error=other->error;
-		target=other->target;
-		edgeind=other->edgeind;
-		voluind=other->voluind;
-		isordered=other->isordered;
-	}
-
-	int Key() const {return(index);}
-
-};
-
-
-class edge: public meshpart {
-public:
-	
-
-	vector<int> vertind;
-	vector<int> surfind;
-	 // reserves 2 as this is the size of the array
-
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void disp() const;
-	void PrepareForUse(){};
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {return(true);}
-	#pragma GCC diagnostic pop
-	void read(FILE * fid);
-	void write(FILE * fid) const;
-	void TightenConnectivity() {sort(surfind);unique(surfind);};
-
-
-	edge(){ // Constructor
-		index=0;
-		vertind.reserve(2);
-		vertind.assign(2,0); // reserves 2 as this is the size of the array
-
-	}
-	edge(const edge& oldEdge){ // Copy-Constructor
-		index=oldEdge.index;
-		vertind=oldEdge.vertind;
-		surfind=oldEdge.surfind;
-	}
-	~edge(){ // Destructor
-
-		vertind.clear();
-		surfind.clear();
-
-	}
-	void operator=(const edge* other){
-		index=other->index;
-
-		vertind=other->vertind;
-		surfind=other->surfind;
-	}
-
-	int Key() const {return(index);}
-};
-
-class vert: public meshpart {
-public:
-	
-
-	vector<int> edgeind;
-	vector<double> coord;
-	 // reserves 2 as this is the size of the array
-
-	void disp() const;
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void PrepareForUse(){};
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {return(true);}
-	#pragma GCC diagnostic pop
-	void read(FILE * fid);
-	void write(FILE * fid) const;
-	void TightenConnectivity() {sort(edgeind);unique(edgeind);};
-
-
-	vert(){ // Constructor
-		index=0;
-		coord.reserve(3); // reserves 2 as this is the size of the array
-		coord.assign(3,0);
-	}
-	vert(const vert& oldEdge){ // Copy-Constructor
-		index=oldEdge.index;
-		edgeind=oldEdge.edgeind;
-		coord=oldEdge.coord;
-	}
-	~vert(){ // Destructor
-
-		edgeind.clear();
-		coord.clear();
-
-	}
-	void operator=(const vert* other){
-		index=other->index;
-
-		edgeind=other->edgeind;
-		coord=other->coord;
-	}
-
-	int Key() const {return(index);}
-};
 
 // functions
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
@@ -469,24 +305,19 @@ int rStart,int rEnd);
 
 template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, 
 R T::*mp, int rStart,int rEnd);
-template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
 
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
 	R T::*mp , U &out , V oper);
-
+template<template<class Q, class R> class T,class Q, class R>
+	void EraseKeyPair(T<Q,R> hashTable, Q key, R pos);
 
 //test functions
-int Test_ArrayStructures();
-int Test_Volu();
-int Test_Surf();
-int Test_Vert();
-int Test_Edge();
-int Test_Mesh();
-void PopulateIndices(mesh *meshin);
+
 //template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 //bool CompareFuncOut(function<void()> mesh1, function<void()> mesh2);
 
 #include "arraystructures_incl.cpp"
+#include "snakstruct_incl.cpp"
 
 #endif // ARRAYSTRUCTS_H_INCLUDED

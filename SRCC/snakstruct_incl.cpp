@@ -8,18 +8,8 @@ This file adds the support for a second hashed variable called by KeyParent
 #ifndef SNAKSTRUCT_INCL_H_INCLUDED
 #define SNAKSTRUCT_INCL_H_INCLUDED
 
-inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
-	int edgeindin,int isfreezein,int orderedgein)
-{
-	index=indexin;
-	d=din;
-	v=vin;
-	fromvert=fromvertin; 	// root vertex of *snakemesh
-	tovert=tovertin; 	// destination vertex of *snakemesh
-	edgeind=edgeindin; 	// edge of snakemesh
-	isfreeze=isfreezein; 	// freeze status 
-	orderedge=orderedgein;
-}
+#include "arraystructures.hpp" // never does anything but useful for linter
+
 
 template<class T> bool SnakStruct<T>::checkready() 
 {	
@@ -48,6 +38,42 @@ template<class T> void SnakStruct<T>::HashParent()
 	
    //cout << "Array Struct Succesfully Hashed" << endl;
 }
+
+template<class T> void SnakStruct<T>::DeHashParent(const int pos){
+	
+	int key=elems[pos].KeyParent();
+	unordered_multimap<int,int>::iterator it = hashParent.find(key);
+	while(it->second!=pos && it->first==key){++it;}
+
+	if (it->second==pos && it->first==key){
+		hashParent.erase (it);
+	} else {
+
+		cerr << "Error: Key value pair not found and could not be removed "<< endl;
+		cerr << " key " << key << " pos " << pos << endl;
+		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument ("Key value pair not found and could not be removed");
+	}
+}
+template<class T> bool SnakStruct<T>::memberIsHashParent(const int pos) const{
+	
+	int key=elems[pos].KeyParent();
+	unordered_multimap<int,int>::const_iterator it = hashParent.find(key);
+	if(it != hashParent.end()){
+		while(it->second!=pos && it->first==key){++it;}
+
+		if (it->second==pos && it->first==key){
+			return(true);
+		} else {
+
+			return(false);
+		}
+	}else {
+		return(false);
+	}
+}
+
+
 template<class T> void SnakStruct<T>::PrepareForUse()
 {
 
@@ -75,7 +101,7 @@ template<class T> void SnakStruct<T>::remove(const vector<int> &sub)
 template<class T>
 void SnakStruct<T>::ForceArrayReady()
 {
-	ArrayStruct<snax>::ForceArrayReady();
+	ArrayStruct<T>::ForceArrayReady();
 	isHashParent=1;
 
 }
@@ -103,6 +129,15 @@ int SnakStruct<T>::findparent(int key) const
 	return(search->second);
 }
 
-
+template<class T>
+void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const 
+{
+	if (isHashParent==0){
+		cerr << "Warning: reading from potentially obsolete unordered_multimap " << endl;
+		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
+		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
+	}
+	siblings=ReturnDataEqualRange(key, hashParent);
+}
 
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

@@ -27,25 +27,15 @@
 #include <unordered_map>
 
 #include "arraystructures.hpp"
-#include "snakstruct.hpp"
+#include "snake.hpp"
 #include "postprocessing.hpp"
 
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
+using namespace std; 
 
-
-class ConnecRemv {
-public:
-	int keepind;
-	int typeobj;
-	vector<int> rmvind;
-	vector<int> scopeind;
-	void disp();
-	
-};
 
 
 
@@ -69,6 +59,10 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int>
 
 //
 void CleanupSnakeConnec(snake &snakein);
+void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
+void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vector<int> &tempSub,
+	vector<int> &tempSub2,vector<int> &tempSub3,HashedVector<int,int> &tempIndHash,
+	HashedVector<int,int> &edge2Surf,vector<int> tempCount);
 void IdentifyMergEdgeConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,
 	vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,
@@ -85,8 +79,8 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit,
 	const vector<int> &indRmvVert);
 
 void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert);
-void SnaxEdgeConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit);
-void SnaxNoConnecDetection(const snake &snakein, vector<ConnecRemv> &connecEdit);
-
+void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit);
+void SnaxNoConnecDetection(const mesh &snakeconn, vector<ConnecRemv> &connecEdit);
+void dispconnrmv(vector<ConnecRemv> conn);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

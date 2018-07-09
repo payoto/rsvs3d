@@ -1,5 +1,6 @@
 #include <iostream>
-#include "arraystructures.hpp"
+
+#include "mesh.hpp"
 #include "postprocessing.hpp"
 
 
@@ -183,6 +184,8 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			else {
 				actVert=1;
 				#ifdef TEST_POSTPROCESSING
+				//meshout.surfs(ii)->disptree(meshout,4);
+				
 				cerr << "Warning: postprocessing.cpp:tecplotfile::VolFaceMap"<< endl ;
 				cerr << "		Mesh Output failed in output of facemap data" << endl;
 				cerr << "		Surface is not ordered " << endl;

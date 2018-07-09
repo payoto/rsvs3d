@@ -8,10 +8,11 @@ CC=g++
 LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic  -ggdb
+
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -ggdb -g
 #CUSERFLAGS= 
-CUSERFLAGS= 
-#-DSAFE_ALGO -DSAFE_ACCESS -DDEBUGLVL1
+CUSERFLAGS= -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
+#-DSAFE_ALGO
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
@@ -20,7 +21,8 @@ OBJDIR=obj
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
 #make testnew/testall options
-TESTSOURCES=test.cpp arraystructures.cpp  snakstruct.cpp snakstruct_test.cpp postprocessing.cpp snakeengine.cpp snakevel.cpp
+TESTSOURCES=test.cpp mesh.cpp snake.cpp arraystructures.cpp snakstruct_test.cpp postprocessing.cpp
+TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp RSVSmath.cpp meshrefinement.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 
