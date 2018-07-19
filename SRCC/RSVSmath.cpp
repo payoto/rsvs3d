@@ -459,8 +459,11 @@ the jacobian is arranged :
 
 void SurfCentroid::Disp(){
 	 for (int ii=0; ii< nCoord ; ii++){
-	 	cout << "c " << ii ;
+	 	cout << "c " << ii << " ";
 	 	DisplayVector(*coords[ii]); 
 	 	cout << endl;
 	 }
+ 	cout << "edgeLength" << edgeLength << endl << "centroid ";
+ 	DisplayVector(centroid); 
+ 	cout << endl;
 }

@@ -14,7 +14,7 @@
 #include <cmath> 
 #include "vectorarray.hpp" 
 #include "RSVSmath_automatic.hpp"
-#include "arraystructures.hpp" // for use of DisplayVector
+
 using namespace std; 
 
 
