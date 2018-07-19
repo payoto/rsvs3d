@@ -9,9 +9,9 @@ using namespace std;
 bool TriFunc::MakeValidField(vector<double>* TriFunc::*mp){
 	// Tries to make a valid array
 	// Warning : This operates directly on the data stored in the field of the pointer
-	
+	 
 	int ii,n;
-	bool fieldReady; 
+	bool fieldReady=true; 
 	if ((this->*mp)==NULL){
 		fieldReady=false;
 	} else {
@@ -36,7 +36,7 @@ bool TriFunc::CheckValid(){
 	if (p2==NULL){isReady=false;} else if (int(p2->size())!=nTarg){isReady=false;}
 
 	return(isReady);
-}
+} 
 
 bool TriFunc::MakeValid(){
 	// Tries to make a valid array
@@ -318,12 +318,15 @@ the jacobian is arranged :
 				case 4:
 					//SurfCentroid4_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid4_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 				case 5:
 					//SurfCentroid5_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid5_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 				case 6:
 					//SurfCentroid6_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid6_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 			}
 		} else {
 			/*the jacobian is arranged :

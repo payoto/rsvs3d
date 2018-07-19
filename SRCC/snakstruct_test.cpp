@@ -8,7 +8,7 @@
 #include "snakevel.hpp"
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp" 
-
+#include "RSVSmath.hpp"
 
 using namespace std;
 
@@ -521,6 +521,38 @@ int Test_MeshRefinement(){
 
 }
 
+int Test_surfcentre(){ 
+	// int ii,n;
+	// vector<int> vertind;
+    vector<vector<double> const *> veccoord;
+	SurfCentroid tempCalc;
+	vector<double> v1 = {0.0 , 0.0, 0.0 };
+	vector<double> v2 = {1.0 , 1.0, 0.0 };
+	vector<double> v3 = {0.0 , 1.0, 1.0 };
+	vector<double> v4 = {1.0 , 0.0, 0.0 };
+	// ArrayVec<double> tempCoord,jac,hes;
+
+	// coord.assign(0,0,0);
+	// n=int(surfin.edgeind.size());
+
+	// veccoord.reserve(n);
+	// ConnVertFromConnEdge(meshin, surfin.edgeind,vertind);
+
+	// for(ii=0; ii<n; ++ii){
+	// 	veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
+	// }
+	veccoord.push_back(&v1);
+	veccoord.push_back(&v2);
+	veccoord.push_back(&v3);
+	veccoord.push_back(&v4);
+	tempCalc.assign(veccoord);
+	tempCalc.Calc();
+
+	// tempCalc.ReturnDat(tempCoord,jac,hes);
+	// coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
+
+	return(0);
+}
 
 int Test_snakeRSVS(){
 	snake testSnake;

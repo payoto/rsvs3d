@@ -122,7 +122,7 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-	void TightenConnectivity(){}
+	void TightenConnectivity() override {}
 
 };
 
@@ -138,5 +138,6 @@ void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin)
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
 int Test_snakeRSVS();
+int Test_surfcentre();
 #endif // SNAKEVEL_H_INCLUDED
 

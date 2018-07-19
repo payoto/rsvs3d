@@ -147,7 +147,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin){
 	int ii,n;
 	coordvec edgeCentre;
-	double edgeLength,surfLength;
+	double edgeLength,surfLength=0;
 	coord.assign(0,0,0);
 	n=int(surfin.edgeind.size());
 	for(ii=0; ii<n; ++ii){
