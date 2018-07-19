@@ -1,7 +1,7 @@
 
 #include "RSVSmath.hpp"
 #include "RSVSmath_automatic.hpp"
-
+#include "arraystructures.hpp" // for use of DisplayVector
 
 using namespace std;
 
@@ -292,7 +292,9 @@ the jacobian is arranged :
 			LengthEdge_f(*coords[jj],*coords[(jj+1)%nCoord],currEdge);
 			edgeLength+=currEdge;
 			for(ii=0; ii<nDim; ++ii){
-				centroid[ii]+=currEdge*((*coords[jj])[ii]+(*coords[(jj+1)%nCoord])[ii])/2;
+				centroid[ii]+=currEdge*(
+					(*(coords[jj]))[ii]
+					+(*(coords[(jj+1)%nCoord]))[ii])/2;
 			}
 			
 		}
@@ -452,4 +454,13 @@ the jacobian is arranged :
 		}
 
 	}
+}
+
+
+void SurfCentroid::Disp(){
+	 for (int ii=0; ii< nCoord ; ii++){
+	 	cout << "c " << ii ;
+	 	DisplayVector(*coords[ii]); 
+	 	cout << endl;
+	 }
 }

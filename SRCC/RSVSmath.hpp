@@ -14,6 +14,7 @@
 #include <cmath> 
 #include "vectorarray.hpp" 
 #include "RSVSmath_automatic.hpp"
+#include "arraystructures.hpp" // for use of DisplayVector
 using namespace std; 
 
 
@@ -57,7 +58,8 @@ public:
 		isReady=false;
 		isCalc=false;
 	}
-	TriFunc(int nTarg){
+	TriFunc(int a){
+		nTarg=a;
 		fun=0;
 		jac.assign(1,3*nTarg,fun);
 		hes.assign(3*nTarg,3*nTarg,fun);
@@ -143,7 +145,7 @@ class Volume : public TriFunc {
 	using TriFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 };
 
 class Area : public TriFunc {
@@ -157,7 +159,7 @@ class Area : public TriFunc {
 	using TriFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 
 };
 
@@ -170,7 +172,7 @@ class LengthEdge : public CoordFunc {
 	using CoordFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 	LengthEdge() : CoordFunc(3,2){}
 };
 
@@ -188,15 +190,16 @@ protected:
 	vector<double> centroid;
 	double edgeLength=0.0;
 public:
-	
-	void Calc();
+	void Disp();
+	void Calc() override;
 	void assigncentroid(const vector<double> &vecin);
 	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
-	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){centroid.assign(nDim,0);};
+	SurfCentroid(int a) : CoordFunc(3,a,3){
+		nCoord=a;
+		centroid.assign(nDim,0);
+	};
 
-	~SurfCentroid(){
-		coords.clear();
-	}
+	
 
 };
 
