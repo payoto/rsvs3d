@@ -52,30 +52,31 @@
 			"C++RSVS3D"
 		]
 	},
-	"settings": {
-        "SublimeLinter.linters.cppcheck.disable": false, 
-        "SublimeLinter.linters.cppcheck.args": [], 
-        "SublimeLinter.linters.cppcheck.enable": "style", 
-        "SublimeLinter.linters.cppcheck.excludes": ["variableScope"], 
-        "SublimeLinter.linters.cppcheck.std": [
-            "c++11"
-        ], 
-        "SublimeLinter.linters.gcc.c++_executable": "g++", 
-        "SublimeLinter.linters.gcc.c++_extra_flags": [
-            "-fsyntax-only", 
-            "-std=c++11"
-        ], 
-        "SublimeLinter.linters.gcc.c_executable": "gcc", 
-        "SublimeLinter.linters.gcc.c_extra_flags": [
-            "-fsyntax-only", 
-            "-std=c90"
-        ], 
-        "SublimeLinter.linters.gcc.disable": false, 
-        "SublimeLinter.linters.gcc.include_dirs": [
-            "C:\\ap1949include\\Eigen_all\\Eigen\\"
-        ], 
-        "SublimeLinter.linters.gcc.selector": "source.c++"
-    },
+	// "settings": {
+ //        "SublimeLinter.linters.cppcheck.disable": false, 
+ //        "SublimeLinter.linters.cppcheck.args": [], 
+ //        "SublimeLinter.linters.cppcheck.enable": "style", 
+ //        "SublimeLinter.linters.cppcheck.excludes": ["variableScope"], 
+ //        "SublimeLinter.linters.cppcheck.std": [
+ //            "c++11"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.c++_executable": "g++", 
+ //        "SublimeLinter.linters.gcc.c++_extra_flags": [
+ //            "-fsyntax-only", 
+ //            "-std=c++11"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.c_executable": "gcc", 
+ //        "SublimeLinter.linters.gcc.c_extra_flags": [
+ //            "-fsyntax-only", 
+ //            "-std=c90"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.disable": false, 
+ //        "SublimeLinter.linters.gcc.include_dirs": [
+ //            "C:\\ap1949include\\Eigen_all\\Eigen\\"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.selector": "source.c++"
+ //    },
+    
     "settings":
     {
          "sublimegdb_workingdir": "${folder:${project_path:main_test.exe}}",

@@ -52,6 +52,8 @@ public:
 	triarray dynatri;
 	tripointarray trivert;
 
+	mesh dynamesh; // mesh which contains custom intersection surfaces
+
 	snake* snakeDep=NULL; // Pointer to the Snake referred to in triangles
 	mesh* meshDep=NULL; // Pointer to the Mesh referred to in triangles
 
@@ -74,22 +76,22 @@ public:
 	double constrinfluence=0; //usually 1 or -1 to do with the ordering
 
 	// interface functions
-	void disp() const;
-	void disptree(const mesh &meshin, int n) const;
-	int Key() const {return (index);};
-	int KeyParent() const {return (parentsurf);};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void PrepareForUse(){};
+	void disp() const override;
+	void disptree(const mesh &meshin, int n) const override;
+	int Key() const override {return (index);};
+	int KeyParent() const override {return (parentsurf);};
+	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
+	void PrepareForUse()override{};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {
+	bool isready(bool isInMesh) const override{
 		return(isTriangleReady);
 	}
 	void SwitchIndex(int typeInd, int oldInd, int newInd){}
 	#pragma GCC diagnostic pop
-	void read(FILE * fid);
-	void write(FILE * fid) const;
-	void TightenConnectivity(){}
+	void read(FILE * fid) override;
+	void write(FILE * fid) const override;
+	void TightenConnectivity() override{}
 	void SetPointType(int a, int b, int c){	pointtype[0]=a;pointtype[1]=b;pointtype[2]=c;}
 	triangle(){ // Constructor
 		index=0;
@@ -108,20 +110,20 @@ public:
 	int parentsurf=0;
 	int parentType=0;
 	// interface functions
-	void disp() const;
-	void disptree(const mesh &meshin, int n) const;
-	int Key() const {return (index);};
-	int KeyParent() const {return (parentsurf);};
-	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
+	void disp() const override;
+	void disptree(const mesh &meshin, int n) const override;
+	int Key() const override {return (index);};
+	int KeyParent() const override {return (parentsurf);};
+	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
-	void PrepareForUse(){};
+	void PrepareForUse() override {};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
-	bool isready(bool isInMesh) const {return(true);}
+	bool isready(bool isInMesh) const override {return(true);}
 	void SwitchIndex(int typeInd, int oldInd, int newInd){}
 	#pragma GCC diagnostic pop
-	void read(FILE * fid);
-	void write(FILE * fid) const;
+	void read(FILE * fid) override;
+	void write(FILE * fid) const override;
 	void TightenConnectivity() override {}
 
 };
@@ -136,7 +138,7 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 void MaintainTriangulateSnake(triangulation &triangleRSVS);
 void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
 
-void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake);
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake);
 int Test_snakeRSVS();
 int Test_surfcentre();
 #endif // SNAKEVEL_H_INCLUDED

@@ -22,7 +22,7 @@ int Test_SnakeStructures() {
    // Test the functionality provided by arraystructures
 
 	int errFlag,errTest;
-
+ 
 
 	errFlag=0;
 
@@ -211,17 +211,17 @@ int Test_snake(){
 	return(errTest);
 
 }
-
-int Test_snakeinit(){
+ 
+int Test_snakeinit(){ 
 	snake testSnake;
 	mesh snakeMesh, triMesh;
 	triangulation testTriangle;
-	const char *fileToOpen;
-	tecplotfile outSnake;
-	double totT=0.0;
-	vector<double> dt;
+	const char *fileToOpen;    
+	tecplotfile outSnake;   
+	double totT=0.0;  
+	vector<double> dt;  
 	vector<int> isImpact;
-	int start_s,stop_s,ii;
+	int start_s,stop_s,ii;   
 	//bool errFlag;
 	int errTest=0;
 	
@@ -530,6 +530,7 @@ int Test_surfcentre(){
 	vector<double> v2 = {1.0 , 1.0, 0.0 };
 	vector<double> v3 = {0.0 , 1.0, 1.0 };
 	vector<double> v4 = {1.0 , 0.0, 0.0 };
+	vector<double> v5 = {1.0 , 0.0, 0.0 };
 	// ArrayVec<double> tempCoord,jac,hes;
 
 	// coord.assign(0,0,0);
@@ -545,6 +546,10 @@ int Test_surfcentre(){
 	veccoord.push_back(&v2);
 	veccoord.push_back(&v3);
 	veccoord.push_back(&v4);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
 	tempCalc.assign(veccoord);
 	tempCalc.Calc();
 
@@ -668,7 +673,7 @@ int Test_snakeRSVS(){
 	return(errTest);
 
 }
-void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake){
 
 	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
 	MaintainTriangulateSnake(RSVStri);

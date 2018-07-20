@@ -58,7 +58,7 @@ public:
 		isReady=false;
 		isCalc=false;
 	}
-	TriFunc(int a){
+	explicit TriFunc(int a){
 		nTarg=a;
 		fun=0;
 		jac.assign(1,3*nTarg,fun);
@@ -109,7 +109,7 @@ public:
 		nFun=1;
 		InitialiseArrays();
 	}
-	CoordFunc(int n1){
+	explicit CoordFunc(int n1){
 		nDim=n1;
 		nCoord=3;
 		nFun=1;
@@ -194,7 +194,7 @@ public:
 	void Calc() override;
 	void assigncentroid(const vector<double> &vecin);
 	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
-	SurfCentroid(int a) : CoordFunc(3,a,3){
+	explicit SurfCentroid(int a) : CoordFunc(3,a,3){
 		nCoord=a;
 		centroid.assign(nDim,0);
 	};

@@ -335,6 +335,10 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 	//meshout.TestConnectivityBiDir();
 }
 
+void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
+
+}
+
 // Triangulation class Methods
 
 void triangulation::disp() const{

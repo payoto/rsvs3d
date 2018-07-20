@@ -24,11 +24,11 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	snake newsnake;
 	int subVert,nVert, nEdge,nSurf,nVolu;
 	bool is3D;
-	vector<int> vertInds,edgeInds,surfInds,voluInds,edgeInds2;
-	vector<int> vertSubs,edgeSubs,surfSubs,voluSubs;
-	vector<int> vertSubsTemp,edgeSubsTemp,surfSubsTemp,voluSubsTemp;
-	vector<int>::iterator itVecInt; 
-	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds,hashVertInds;
+	vector<int> edgeInds,surfInds,voluInds;
+	vector<int> edgeSubs,surfSubs,voluSubs;
+	//vector<int> vertSubsTemp,edgeSubsTemp,surfSubsTemp,voluSubsTemp;
+	//vector<int>::iterator itVecInt; 
+	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds;
 
 
 	is3D=snakein.snakemesh->volus.size()>0;
@@ -172,7 +172,7 @@ void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds, 
 void SpawnAtVertexSurf2D(snake& newsnake,int nEdge, const vector<int> &voluInds){
 
 	int ii,jj;
-	vector<int> surfSubsTemp;
+	//vector<int> surfSubsTemp;
 
 	newsnake.snakeconn.surfs.PopulateIndices();
 	newsnake.snaxsurfs.PopulateIndices();
@@ -880,6 +880,7 @@ void IdentifyMergeEdgeGeneral(const snake &snakein, vector<bool> &isObjDone,vect
 	}
 	// perform all loops starting at a 2
 	jjStart=0;
+	
 	while (tempCount[jjStart]!=2 && jjStart<nTemp){jjStart++;}
 	while (jjStart<nTemp){ 
 		IdentifyMergeEdgeGeneralChain(snakein, isObjDone,connecEdit, tempConnec,  tempConnec2,tempSub,tempSub2, tempCount, tempIndHash,    jjStart);
