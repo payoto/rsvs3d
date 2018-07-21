@@ -337,6 +337,9 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 
 void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
 
+	// Snaxel Operation:
+	// - 
+
 }
 
 // Triangulation class Methods
