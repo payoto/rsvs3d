@@ -79,7 +79,7 @@ public:
 	int Key() const override {return (index);};
 	int KeyParent() const override {return (parentsurf);};
 	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
-	void PrepareForUse()override{};
+	void PrepareForUse() override {};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
 	bool isready(bool isInMesh) const override{
