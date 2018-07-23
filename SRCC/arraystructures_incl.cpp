@@ -130,6 +130,33 @@ template <typename T> inline void unique(vector<T> &vec)
 	auto itVecInt = std::unique (vec.begin(), vec.end());       
 	vec.resize( std::distance(vec.begin(),itVecInt));
 }
+// template <typename T> inline void set_intersection(vector<T> &targVec,vector<T> &vec1,vector<T> &vec2,bool isSort)
+// {
+// 	T tempType;
+// 	typename std::vector<T>::iterator it;
+// 	targVec.assign(vec1.size(),tempType);
+// 	if(!isSort){
+// 		sort(vec1);
+// 		sort(vec2);
+// 	}
+// 	it =set_intersection(vec1.begin(),vec1.end(),vec2.begin(),vec2.end(),targVec.begin());
+
+// 	targVec.resize(it-targVec.begin());
+// }
+
+template <typename T> inline void set_intersection(vector<T> &targVec,const vector<T> &vec1,const vector<T> &vec2,bool isSort)
+{
+	T tempType;
+	typename std::vector<T>::iterator it;
+	targVec.assign(vec1.size(),tempType);
+	if(!isSort){
+		throw invalid_argument("Constant vectors are unsorted cannot intersect");
+	}
+	it =set_intersection(vec1.begin(),vec1.end(),vec2.begin(),vec2.end(),targVec.begin());
+
+	targVec.resize(it-targVec.begin());
+}
+
 // Find option for vectors
 
 

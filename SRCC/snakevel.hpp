@@ -52,8 +52,6 @@ public:
 	triarray dynatri;
 	tripointarray trivert;
 
-	mesh dynamesh; // mesh which contains custom intersection surfaces
-
 	snake* snakeDep=NULL; // Pointer to the Snake referred to in triangles
 	mesh* meshDep=NULL; // Pointer to the Mesh referred to in triangles
 
@@ -109,6 +107,7 @@ public:
 	coordvec coord;
 	int parentsurf=0;
 	int parentType=0;
+	
 	// interface functions
 	void disp() const override;
 	void disptree(const mesh &meshin, int n) const override;

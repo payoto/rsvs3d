@@ -335,12 +335,164 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 	//meshout.TestConnectivityBiDir();
 }
 
-void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
-
+int FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone){
 	// Snaxel Operation:
-	// - 
+	// *- follow appropriate connection* < HERE
+	// - reverse onto edge
+	// -if its the final snaxel on the edge -> Go to Vertex
+	// - else find the correct snaxel -> Has it been explored?
+	//    - No: got to snaxel
+	//    - Yes: finish 
+	int snaxSub, snaxedgeSub,ii,kk,nE;
+	bool flagIter;
+	//Build edge index sets to intersect
+
+	snaxSub=snakeRSVS.snakeconn.verts.find(actSnax);
+	nE=snakeRSVS.snakeconn.verts(snaxSub)->edgeind.size();
+	// Define snaxel edge to follow
+	ii=0;
+	if (followSnaxEdge==0){
+		followSnaxEdge=0;
+		flagIter=false;
+	} else {
+		flagIter=true;
+	}
+
+	while (ii<nE && !flagIter) {
+		followSnaxEdge=snakeRSVS.snakeconn.verts(snaxSub)->edgeind[ii];
+		flagIter=snakeRSVS.snaxedges.isearch(followSnaxEdge)->surfind==actSurf;
+		ii++;
+	}
+
+	if(!flagIter){
+		cerr << "Error : Cannot build grid/snake intersection a suitable edge in the surface" << endl;
+		cerr << "        was not found." << endl; 
+		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument ("edge not found in surface");
+	}
+	
+	snaxedgeSub=snakeRSVS.snaxedges.find(followSnaxEdge);
+	isSnaxEdgeDone[snaxedgeSub]=true;
+	// Find the snaxel to look from
+	kk=0;	
+	kk=snakeRSVS.snakeconn.edges(snaxedgeSub)->vertind[kk]!=actSnax;
+
+	actSnax=snakeRSVS.snakeconn.edges(snaxedgeSub)->vertind[kk];
+
+	return(actSnax);
+}
+
+int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType){
+	// - reverse onto edge
+	// -if its the final snaxel on the edge -> Go to Vertex
+	// - else find the correct snaxel -> Has it been explored?
+	//    - No: got to snaxel
+	//    - Yes: finish 
+	// returnType 0 (unassigned) 1 (vertex) 2 ()
+
+
+	bool dirSnax; // 0 reverse, 1 forward;
+	int snaxSub,edgeInd,nSib,nextSnax;
+	int ii;
+	vector<int> snaxSiblings;
+
+	snaxSub=snakeRSVS.snaxs.find(actSnax);
+	dirSnax=snakeRSVS.snaxs(snaxSub)->fromvert < snakeRSVS.snaxs(snaxSub)->tovert;
+
+	snakeRSVS.snaxs.findsiblings(snakeRSVS.snaxs(snaxSub)->edgeind,snaxSiblings);
+	nSib=snaxSiblings.size();
+	if(nSib==1){ // if there is a single snaxel return only that one
+		returnType=1;
+		returnIndex=snakeRSVS.snaxs(snaxSub)->fromvert;
+	} else {
+		int currSnaxOrd=snakeRSVS.snaxs(snaxSub)->orderedge;
+		int nextSnaxOrd=0;
+		int nextSnaxPos=-1;
+		int testOrder;
+		if (dirSnax){
+			for(ii=0 ; ii<nSib; ++ii){
+				testOrder=snakeRSVS.snaxs(snaxSiblings[ii])->orderedge;
+
+				if(testOrder<currSnaxOrd && (testOrder>nextSnaxOrd || nextSnaxPos==-1)){
+					nextSnaxPos=ii;
+					nextSnaxOrd=testOrder;
+				}
+			}
+		}else{
+			for(ii=0 ; ii<nSib; ++ii){
+				testOrder=snakeRSVS.snaxs(snaxSiblings[ii])->orderedge;
+
+				if(testOrder>currSnaxOrd && (testOrder<nextSnaxOrd || nextSnaxPos==-1)){
+					nextSnaxPos=ii;
+					nextSnaxOrd=testOrder;
+				}
+			}
+		}
+		if (nextSnaxPos==-1){
+			returnType=1;
+			returnIndex=snakeRSVS.snaxs(snaxSub)->fromvert;
+		} else {
+			returnType=2;
+			returnIndex=snakeRSVS.snaxs(snaxSiblings[nextSnaxPos])->index;
+		}
+
+	}
+	return(0);
 
 }
+
+int FollowVertexConnection(){
+
+	// Vertex Operation
+	// - Find next edge
+	// - if there is a snaxel on that edge 
+	//    -> Goto the first snaxel.
+	//    -> else go to the other vertex.
+	return(0);
+}
+
+void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
+
+	vector<bool> isSnaxEdgeDone;
+	int ii,jj,kk,n1,n2;
+	int actVert, actSnax, actSurf,actSnaxEdge;
+	bool flagDone;
+
+	n2=triangleRSVS.snakeDep->snaxedges.size();
+	isSnaxEdgeDone.assign(n2,false);
+
+	for(ii=0;ii<n2;ii++){
+		if(!isSnaxEdgeDone[ii]){
+			actVert=0;
+			actSnax=0;
+			actSnaxEdge=triangleRSVS.snakeDep->snaxedges(ii)->index;
+			actSurf=triangleRSVS.snakeDep->snaxedges(ii)->surfind;
+			if(triangleRSVS.meshDep->surfs.find(actSurf)>0){
+				actSnax=triangleRSVS.snakeDep->snakeconn.edges(ii)->vertind[0];
+				actSnax=FollowSnaxEdgeConnection(actSnax, actSurf,actSnaxEdge, 
+					*(triangleRSVS.snakeDep), isSnaxEdgeDone);
+
+			}
+		}
+	}
+
+
+	// Snaxel Operation:
+	// - follow appropriate connection
+	// - reverse onto edge
+	// -if its the final snaxel on the edge -> Go to Vertex
+	// - else find the correct snaxel -> Has it been explored?
+	//    - No: got to snaxel
+	//    - Yes: finish 
+
+	// Vertex Operation
+	// - Find next edge
+	// - if there is a snaxel on that edge 
+	//    -> Goto the first snaxel.
+	//    -> else go to the other vertex.
+
+}
+
 
 // Triangulation class Methods
 

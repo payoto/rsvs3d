@@ -436,9 +436,8 @@ void snaxarray::OrderOnEdge(){
 void snaxarray::ReorderOnEdge()
 {
 
-	vector<int> edgeInds,snaxSubs,orderSubs;
-	vector<double> orderSnax,unorderSnax;
-	unordered_multimap<double,int> hashOrder;
+	vector<int> edgeInds,snaxSubs;
+	vector<double> orderSnax;
 	int isBwd;
 	int ii, jj, nEdge, maxOrd=0;
 	bool needIncrement;

@@ -63,6 +63,8 @@ template <class T> int TestTemplate_ArrayStruct();
 bool CompareFuncOut(function<void()> func1, function<void()> func2);
 template <typename T> inline void sort(vector<T> &vec);
 template <typename T> inline void unique(vector<T> &vec);
+// template <typename T> inline void set_intersection(vector<T> &targVec,vector<T> &vec1,vector<T> &vec2,bool isSort=true);
+template <typename T> inline void set_intersection(vector<T> &targVec,const vector<T> &vec1,const vector<T> &vec2,bool isSort);
 template<class T> vector<int> FindSubList(const vector<T> &keyFind, const vector<T> &keyList,unordered_multimap<T,int> &hashTable) ;
 template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
 template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
