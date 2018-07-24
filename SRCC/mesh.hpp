@@ -62,11 +62,11 @@ class surf;
 class vert;
 class edge;
 class coordvec;
-class surfarray;
-//typedef ArrayStruct<surf> surfarray;
 
+//typedef ArrayStruct<surf> surfarray;
+typedef ModiftrackArray<surf> surfarray;
 typedef ArrayStruct<volu> voluarray;
-typedef ArrayStruct<edge> edgearray;
+typedef ModiftrackArray<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
 // Forward declared templated functions
@@ -196,13 +196,13 @@ public:
 
 
 
-class surf: public meshpart {
+class surf: public meshpart , public modiftrackpart {
 protected:
 	bool isordered;
-	bool isModif=true;
+	//bool isModif=true;
 public:
 	friend class mesh;
-	friend class surfarray;
+	friend surfarray;
 	//friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
 	//friend void mesh::RemoveIndex(int typeInd, int oldInd);
 
@@ -221,7 +221,7 @@ public:
 	void OrderEdges(mesh *meshin);
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
-	bool returnIsModif() const {return(isModif);}
+	//bool returnIsModif() const {return(isModif);}
 
 	surf(){ // Constructor
 		index=0;
@@ -262,7 +262,7 @@ public:
 };
 
 
-class edge: public meshpart {
+class edge: public meshpart , public modiftrackpart {
 public:
 	
 
@@ -369,7 +369,7 @@ public:
 	
 };
 
-
+/*
 class surfarray : public ArrayStruct<surf>{
 	using ArrayStruct<surf>::elems;
 	friend class mesh;
@@ -386,7 +386,7 @@ public:
 		elems[a].isModif=true;
 		return(ArrayStruct<surf>::operator[](a));
 	}
-};
+};*/
 
 class meshdependence {
 	// Class for connecting meshes

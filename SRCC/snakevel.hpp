@@ -37,8 +37,11 @@ using namespace std;
 
 class triangle;
 class trianglepoint;
+class trianglesurf;
+
 typedef SnakStruct<triangle> triarray;
 typedef SnakStruct<trianglepoint>  tripointarray;
+typedef SnakStruct<trianglesurf>  trisurfarray;
 
 // Template Class
 
@@ -51,6 +54,7 @@ public:
 	triarray stattri;
 	triarray dynatri;
 	tripointarray trivert;
+	trisurfarray trisurf;
 
 	snake* snakeDep=NULL; // Pointer to the Snake referred to in triangles
 	mesh* meshDep=NULL; // Pointer to the Mesh referred to in triangles
@@ -127,6 +131,32 @@ public:
 
 };
 
+class trianglesurf : public meshpart , public snakpart {
+
+public:
+	vector<int> indvert;
+	vector<int> typevert;
+	int parentsurfmesh=0;
+	
+	// interface functions
+	void disp() const override;
+	void disptree(const mesh &meshin, int n) const override;
+	int Key() const override {return (index);};
+	int KeyParent() const override {return (parentsurfmesh);};
+	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
+	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
+	void PrepareForUse() override {};
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	bool isready(bool isInMesh) const override {return(true);}
+	void SwitchIndex(int typeInd, int oldInd, int newInd){}
+	#pragma GCC diagnostic pop
+	void read(FILE * fid) override;
+	void write(FILE * fid) const override;
+	void TightenConnectivity() override {}
+
+};
+
 void CalculateSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
@@ -135,9 +165,14 @@ void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
 void MaintainTriangulateSnake(triangulation &triangleRSVS);
-void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
+void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake);
+void TriangulateGridSnakeIntersect(triangulation &triangleRSVS);
+int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,int &returnType, int &nextEdge);
+int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
+bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);
+
 int Test_snakeRSVS();
 int Test_surfcentre();
 #endif // SNAKEVEL_H_INCLUDED

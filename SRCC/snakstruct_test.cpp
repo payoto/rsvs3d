@@ -69,7 +69,8 @@ int Test_coordvec(){
 		unitCoord.disp();
 
 		cout << "unit access: ";
-		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< testCoord.Unit(2) << "] norm 1" << endl;
+		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< 
+			testCoord.Unit(2) << "] norm 1" << endl;
 
 		cout << "base oper(): ";
 		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1)<< ","<< testCoord(2) << "] " << endl;
@@ -676,6 +677,6 @@ int Test_snakeRSVS(){
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake){
 
 	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
+	TriangulateGridSnakeIntersect(RSVStri);
 	MaintainTriangulateSnake(RSVStri);
-
 }

@@ -49,7 +49,7 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		// Still need to recompute coordinates
 		for (ii=0;ii<n;++ii){
 			if(triangleRSVS.trivert(ii)->parentType==2){
-				SurfaceCentroid_fun(triangleRSVS.trivert[ii].coord,
+				SnakeSurfaceCentroid_fun(triangleRSVS.trivert[ii].coord,
 					*(triangleRSVS.snakeDep->snakeconn.surfs.isearch(triangleRSVS.trivert(ii)->parentsurf)),
 					 triangleRSVS.snakeDep->snakeconn); 
 			}
@@ -161,7 +161,31 @@ void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin
 }
 
 
-void SurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
+void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
+	int ii,n;
+	vector<int> vertind;
+	vector<vector<double> const *> veccoord;
+	SurfCentroid tempCalc;
+	ArrayVec<double> tempCoord,jac,hes;
+
+	coord.assign(0,0,0);
+	n=int(surfin.edgeind.size());
+
+	veccoord.reserve(n);
+	ConnVertFromConnEdge(meshin, surfin.edgeind,vertind);
+
+	for(ii=0; ii<n; ++ii){
+		veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
+	}
+
+	tempCalc.assign(veccoord);
+	tempCalc.Calc();
+
+	tempCalc.ReturnDat(tempCoord,jac,hes);
+	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
+}
+
+void HybridSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
 	int ii,n;
 	vector<int> vertind;
 	vector<vector<double> const *> veccoord;
@@ -512,12 +536,14 @@ void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
 	int actIndex, actSurf,actEdge,actSurfSub;
 	int returnType, returnIndex, returnEdge, actType;
 	bool flagDone;
-	vector<int> listInd, listType;
 	HashedVector<int,int> hashedEdgeInd, vertSurfList;
+	vector<int> edgeSub;
+	trianglesurf newTrisSurf;
 
 	n2=triangleRSVS.snakeDep->snaxedges.size();
 	isSnaxEdgeDone.assign(n2,false);
-
+	triangleRSVS.trisurf.clear();
+	
 	for(ii=0;ii<n2;ii++){
 		if(!isSnaxEdgeDone[ii]){
 
@@ -526,24 +552,25 @@ void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
 			actSurf=triangleRSVS.snakeDep->snaxedges(ii)->surfind;
 			actSurfSub=triangleRSVS.meshDep->surfs.find(actSurf);
 			if(actSurfSub>0){
-
-				listInd.clear();
-				listType.clear();
-				listInd.reserve(8);
-				listType.reserve(8);
+				newTrisSurf.parentsurfmesh=actSurf;
+				newTrisSurf.indvert.clear();
+				newTrisSurf.typevert.clear();
+				newTrisSurf.indvert.reserve(8);
+				newTrisSurf.typevert.reserve(8);
 
 				hashedEdgeInd.vec=triangleRSVS.meshDep->surfs(actSurfSub)->edgeind;
+				edgeSub=triangleRSVS.meshDep->edges.find_list(hashedEdgeInd.vec);
 				hashedEdgeInd.GenerateHash();
 				vertSurfList.vec=ConcatenateVectorField(triangleRSVS.meshDep->edges, &edge::vertind, 
-					hashedEdgeInd.vec);
+					edgeSub);
 				vertSurfList.GenerateHash();
 
 				actIndex=triangleRSVS.snakeDep->snakeconn.edges(ii)->vertind[0];
 				actType=2;
 				// Prepare edge lists and vertlists
 				while(!flagDone){
-					listInd.push_back(actIndex);
-					listType.push_back(actType);
+					newTrisSurf.indvert.push_back(actIndex);
+					newTrisSurf.typevert.push_back(actType);
 
 					if (actType==1){
 						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
@@ -556,8 +583,8 @@ void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
 						if(!flagDone){
 							actIndex=returnIndex;
 
-							listInd.push_back(actIndex);
-							listType.push_back(actType);
+							newTrisSurf.indvert.push_back(actIndex);
+							newTrisSurf.typevert.push_back(actType);
 							returnIndex=-1;returnType=-1;
 							FollowSnaxelDirection(actIndex,*(triangleRSVS.snakeDep), returnIndex, returnType,actEdge);
 							actType=returnType;
@@ -565,7 +592,7 @@ void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
 						}
 					}
 				}
-
+				triangleRSVS.trisurf.push_back(newTrisSurf);
 			}
 			isSnaxEdgeDone[ii]=true;
 		}
@@ -608,7 +635,8 @@ void triangulation::CleanDynaTri(){
 
 
 	n=dynatri.size();
-	for (ii=0;ii<n;++ii){
+	// remove the triangles of which the surface is gone or modif
+	for (ii=0;ii<n;++ii){ 
 		if(snakeDep->snakeconn.surfs.find(dynatri(ii)->KeyParent())==-1){
 			triDel.push_back(dynatri(ii)->index);
 		} else if (snakeDep->snakeconn.surfs.isearch(dynatri(ii)->KeyParent())->returnIsModif()) { 
@@ -616,7 +644,8 @@ void triangulation::CleanDynaTri(){
 		}
 	}
 	n=triDel.size();
-	for (ii=0;ii<n;++ii){
+	// Remove the surface centroid points that were in the removed triangles
+	for (ii=0;ii<n;++ii){ 
 		n2=3;//dynatri.isearch(triDel[ii])->pointtype.size();
 		for(jj=0;jj<n2;++jj){
 			if(dynatri.isearch(triDel[ii])->pointtype[jj]==3){
@@ -645,4 +674,11 @@ void trianglepoint::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglepoint::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglepoint::read(FILE * fid){}
 void trianglepoint::write(FILE * fid) const {}
+
+void trianglesurf::disp() const{} 
+void trianglesurf::disptree(mesh const&, int) const {}
+void trianglesurf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
+void trianglesurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}
+void trianglesurf::read(FILE * fid){}
+void trianglesurf::write(FILE * fid) const {}
 #pragma GCC diagnostic pop
