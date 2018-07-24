@@ -677,6 +677,5 @@ int Test_snakeRSVS(){
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake){
 
 	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
-	TriangulateGridSnakeIntersect(RSVStri);
 	MaintainTriangulateSnake(RSVStri);
 }

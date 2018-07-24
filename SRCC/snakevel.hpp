@@ -53,6 +53,8 @@ public:
 	vector<int> acttri; // 
 	triarray stattri;
 	triarray dynatri;
+	triarray intertri;
+	
 	tripointarray trivert;
 	trisurfarray trisurf;
 
@@ -160,12 +162,15 @@ public:
 void CalculateSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
+void TriangulateSurface(const trianglesurf &surfin,const mesh& meshin, 
+	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList={});
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
 void MaintainTriangulateSnake(triangulation &triangleRSVS);
 void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
+void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake);
 void TriangulateGridSnakeIntersect(triangulation &triangleRSVS);

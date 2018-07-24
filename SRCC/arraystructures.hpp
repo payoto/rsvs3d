@@ -206,6 +206,7 @@ public:
 
 template <class T> 
 class ModiftrackArray : public ArrayStruct<T>{
+protected:
 	using ArrayStruct<T>::elems;
 	friend class mesh;
 	friend class snake;

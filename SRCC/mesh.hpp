@@ -264,6 +264,8 @@ public:
 
 class edge: public meshpart , public modiftrackpart {
 public:
+	friend class mesh;
+	friend edgearray;
 	
 
 	vector<int> vertind;
