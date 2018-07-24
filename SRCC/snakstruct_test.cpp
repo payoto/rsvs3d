@@ -334,7 +334,7 @@ int Test_snakeinitflat(){
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
 			}
 
-			Test_stepalgo(testSnake, dt, isImpact,outSnake);
+			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
@@ -355,7 +355,7 @@ int Test_snakeinitflat(){
 
 }
 
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
+void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 
 	int start_s,stop_s,start_f;
 
@@ -674,8 +674,8 @@ int Test_snakeRSVS(){
 	return(errTest);
 
 }
-void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake){
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact){
 
-	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
+	Test_stepalgo(testSnake,  dt, isImpact);
 	MaintainTriangulateSnake(RSVStri);
 }
