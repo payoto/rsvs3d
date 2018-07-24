@@ -173,7 +173,7 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact, tecplotfile &outSnake);
-void TriangulateGridSnakeIntersect(triangulation &triangleRSVS);
+void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS);
 int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,int &returnType, int &nextEdge);
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
 bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);

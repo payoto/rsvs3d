@@ -48,7 +48,10 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		triangleRSVS.trivert.SetMaxIndex();
 		TriangulateContainer(triangleRSVS.snakeDep->snakeconn, triangleRSVS , 2,surfReTriangulate);
 
-	TriangulateGridSnakeIntersect(triangleRSVS);
+		BuildTriSurfGridSnakeIntersect(triangleRSVS);
+		surfReTriangulate.clear();
+		TriangulateContainer(triangleRSVS.snakeDep->snakeconn, triangleRSVS , 3,surfReTriangulate);
+
 		n=triangleRSVS.trivert.size();
 		// Still need to recompute coordinates
 		for (ii=0;ii<n;++ii){
@@ -86,13 +89,15 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 	
 	nTriS=int((triangleRSVS.*mp).size());
 	if (int(subList.size())==0){ // if there is no list of surfaces to triangulate
-		n=meshin.surfs.size();
+		
 		if (typeMesh!=3) {
+			n=meshin.surfs.size();
 			for (ii=0; ii<n; ++ii){
 				TriangulateSurface(*(meshin.surfs(ii)),meshin,triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 		} else { // trisurf triangulation
+			n=triangleRSVS.trisurf.size();
 			for (ii=0; ii<n; ++ii){
 				TriangulateSurface(*(triangleRSVS.trisurf(ii)),meshin,triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
@@ -278,7 +283,7 @@ void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const
 
 
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert){
-
+	// Adds a triarray and corresponding 
 	int ii,jj,kk,ll,n, nSub,subSurf,nSurfInd,mm;
 	int nNewVert, nNewEdge, nNewSurf,maxIndVert, maxIndEdge, maxIndSurf,vertSub;
 	vector<bool> isTriDone;
@@ -425,6 +430,7 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 	meshout.PrepareForUse();
 	//meshout.TestConnectivityBiDir();
 }
+
 
 bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex){
 	// Snaxel Operation:
@@ -596,7 +602,7 @@ int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int
 	return(0);
 }
 
-void TriangulateGridSnakeIntersect(triangulation &triangleRSVS){
+void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 
 	vector<bool> isSnaxEdgeDone;
 	int ii,n2;
@@ -692,7 +698,9 @@ void triangulation::disp() const{
 void triangulation::PrepareForUse() {
 	stattri.PrepareForUse();
 	dynatri.PrepareForUse();
+	intertri.PrepareForUse();
 	trivert.PrepareForUse();
+	trisurf.PrepareForUse();
 	
 } 
 
