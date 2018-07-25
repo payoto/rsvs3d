@@ -266,7 +266,7 @@ int Test_snakeinit(){
 				outSnake.PrintMesh(triMesh,2,totT);
 			}
 
-			Test_stepalgo(testSnake, dt, isImpact,outSnake);
+			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
@@ -626,7 +626,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<100;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();
@@ -641,10 +641,13 @@ int Test_snakeRSVS(){
 				outSnake.PrintMesh(triMesh,2,totT);
 				MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
 				outSnake.PrintMesh(triMesh,3,totT);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+				
 			}
 
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact,outSnake);
-			
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
+			//cout << endl <<  "intertri size: " << triRSVS.intertri.size() << endl;
 			totT=totT+1;
 		}
 
@@ -658,9 +661,11 @@ int Test_snakeRSVS(){
 			outSnake.PrintMesh(triMesh,2,totT);
 			MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
 			outSnake.PrintMesh(triMesh,3,totT);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 		}
 		stop_s=clock();
-		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
 	// the code you wish to time goes here
 		

@@ -65,8 +65,8 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 50
-$!ACTIVEFIELDMAPS  =  [3-5]
+  SOLUTIONTIME = 49
+$!ACTIVEFIELDMAPS  =  [3,6-7]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
   GREENCHANNELVAR = 4
@@ -379,6 +379,7 @@ $!CONTOURLEVELS NEW
 0.9
 0.95
 $!GLOBALSCATTER 
+  VAR = 4
   LEGEND
     {
     XYPOS
@@ -499,6 +500,7 @@ $!FIELDMAP  [3]
     }
   SCATTER
     {
+    SHOW = NO
     COLOR = BLUE
     }
   SHADE
@@ -557,7 +559,7 @@ $!FIELDMAP  [4]
 $!FIELDMAP  [5]
   MESH
     {
-    COLOR = YELLOW
+    COLOR = CUSTOM24
     }
   CONTOUR
     {
@@ -569,6 +571,7 @@ $!FIELDMAP  [5]
     }
   SCATTER
     {
+    SHOW = NO
     COLOR = YELLOW
     }
   SHADE
@@ -587,6 +590,76 @@ $!FIELDMAP  [5]
   SURFACES
     {
     SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [6]
+  MESH
+    {
+    COLOR = CUSTOM11
+    }
+  CONTOUR
+    {
+    COLOR = PURPLE
+    }
+  VECTOR
+    {
+    COLOR = PURPLE
+    }
+  SCATTER
+    {
+    SHOW = NO
+    COLOR = PURPLE
+    }
+  SHADE
+    {
+    COLOR = RED
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = PURPLE
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [7]
+  MESH
+    {
+    COLOR = BLACK
+    }
+  CONTOUR
+    {
+    COLOR = RED
+    }
+  VECTOR
+    {
+    COLOR = RED
+    }
+  SCATTER
+    {
+    COLOR = CUSTOM38
+    }
+  SHADE
+    {
+    SHOW = NO
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = RED
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = BOUNDARYFACES
     }
 $!THREEDAXIS 
   XDETAIL
@@ -640,7 +713,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 3
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -907,17 +980,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 62.806
-  THETAANGLE = -138.651
-  ALPHAANGLE = -3.16684
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 9.181389735654372
-    Y = 10.03252750763893
-    Z = 7.210273300509797
+    X = 11.50991565394449
+    Y = 6.695643648162557
+    Z = 7.707626294548084
     }
-  VIEWWIDTH = 1.32589
+  VIEWWIDTH = 1.20535
 $!FIELDLAYERS 
+  SHOWCONTOUR = YES
   SHOWSHADE = YES
   SHOWEDGE = NO
   USETRANSLUCENCY = YES
@@ -1493,6 +1565,74 @@ $!FIELDMAP  [5]
     {
     SHOW = YES
     COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [6]
+  MESH
+    {
+    COLOR = PURPLE
+    }
+  CONTOUR
+    {
+    COLOR = PURPLE
+    }
+  VECTOR
+    {
+    COLOR = PURPLE
+    }
+  SCATTER
+    {
+    COLOR = PURPLE
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = PURPLE
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [7]
+  MESH
+    {
+    COLOR = RED
+    }
+  CONTOUR
+    {
+    COLOR = RED
+    }
+  VECTOR
+    {
+    COLOR = RED
+    }
+  SCATTER
+    {
+    COLOR = RED
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = RED
     }
   POINTS
     {

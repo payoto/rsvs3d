@@ -267,46 +267,57 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, in
 // Functions
 void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
-	int ii;
 
-	*nVert=grid.verts.size();
-	*nVolu=grid.volus.size();
-	*nSurf=grid.surfs.size();
-	*nEdge=grid.edges.size();
-	*totNumFaceNode=0;
-	for (ii=0;ii<*nSurf;++ii){
-		*totNumFaceNode=*totNumFaceNode+grid.surfs(ii)->edgeind.size();
-	}
+
+	*nVert=(triout.*mp).size()*3;
+	*nVolu=1;
+	*nSurf=(triout.*mp).size();
+	*nEdge=(triout.*mp).size()*3;
+	*totNumFaceNode=(triout.*mp).size()*3;
 }
 
 int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj;
+	int ii,jj,kk;
+	int nTri,currInd,currType,nCoord;
+	nTri=(triout.*mp).size();
+	nCoord=int(triout.meshDep->verts(0)->coord.size());
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+	for (jj=0;jj<nCoord;++jj){
+		for ( ii = 0; ii<nTri; ++ii){
+			for ( kk = 0; kk < (3); ++kk){
+				currType=(triout.*mp)(ii)->pointtype[kk];
+				currInd=(triout.*mp)(ii)->pointind[kk];
+				if(currType==1) {
+					this->Print("%.16lf ",triout.meshDep->verts.isearch(currInd)->coord[jj]);
+				} else if (currType==2) {
+					this->Print("%.16lf ",triout.snakeDep->snakeconn.verts.isearch(currInd)->coord[jj]);
+				} else if (currType==3) {
+					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
+				}
+			}
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
+
 	// Print Cell Data
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->fill);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->target);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->error);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	return(0);
@@ -315,31 +326,45 @@ int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulatio
 int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nSurf, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj;
+	int ii,jj,kk;
+	int nTri,currInd,currType,nCoord;
+	nTri=(triout.*mp).size();
+	nCoord=int(triout.meshDep->verts(0)->coord.size());
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+	for (jj=0;jj<nCoord;++jj){
+		for ( ii = 0; ii<nTri; ++ii){
+			for ( kk = 0; kk < (3); ++kk){
+				currType=(triout.*mp)(ii)->pointtype[kk];
+				currInd=(triout.*mp)(ii)->pointind[kk];
+				if(currType==1) {
+					this->Print("%.16lf ",triout.meshDep->verts.isearch(currInd)->coord[jj]);
+				} else if (currType==2) {
+					this->Print("%.16lf ",triout.snakeDep->snakeconn.verts.isearch(currInd)->coord[jj]);
+				} else if (currType==3) {
+					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
+				}
+			}
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	// Print Cell Data
+
+	// Print Cell Data 
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout.surfs(ii)->fill);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout.surfs(ii)->target);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	for ( ii = 0; ii<nSurf; ++ii){
-		this->Print("%.16lf ",meshout.surfs(ii)->error);
+		this->Print("%.16lf ",0);
 	}
 	fprintf(fid,"\n");this->ResetLine();
 	return(0);
@@ -348,15 +373,30 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulati
 int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj;
+	int ii,jj,kk;
+	int nTri,currInd,currType,nCoord;
+	nTri=(triout.*mp).size();
+	nCoord=int(triout.meshDep->verts(0)->coord.size());
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+	for (jj=0;jj<nCoord;++jj){
+		for ( ii = 0; ii<nTri; ++ii){
+			for ( kk = 0; kk < (3); ++kk){
+				currType=(triout.*mp)(ii)->pointtype[kk];
+				currInd=(triout.*mp)(ii)->pointind[kk];
+				if(currType==1) {
+					this->Print("%.16lf ",triout.meshDep->verts.isearch(currInd)->coord[jj]);
+				} else if (currType==2) {
+					this->Print("%.16lf ",triout.snakeDep->snakeconn.verts.isearch(currInd)->coord[jj]);
+				} else if (currType==3) {
+					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
+				} else {
+					throw invalid_argument("unknown point type");
+				}
+			}
 		}
 		fprintf(fid,"\n");this->ResetLine();
 	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
@@ -372,128 +412,108 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 	return(0);
 }
 int tecplotfile::SurfFaceMap(const triangulation &triout, triarray triangulation::*mp,int nEdge){
-	int ii,jj,actVert;
-	int verts[2];
+	int ii,jj,kk;
 
-	for (ii=0;ii<nEdge;++ii){ // Print Number of vertices per face
-		verts[0]=meshout.edges(ii)->vertind[0];
-		verts[1]=meshout.edges(ii)->vertind[1];
-		this->Print("%i %i\n",meshout.verts.find(verts[0])+1,meshout.verts.find(verts[1])+1);
-		this->ResetLine();
+	int nTri;
+	nTri=(triout.*mp).size();
+	//throw invalid_argument("Surface Map not supported for triangulation")
+	kk=1;
+	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
+		for(jj=0;jj<3;++jj){
+			if (jj==2){
+				this->Print("%i %i\n",kk-2,kk);
+			} else {
+				this->Print("%i %i\n",kk,kk+1);
+			}
+			this->ResetLine();
+			++kk;
+		}
 	}
 	
 
-
-	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
-		for (ii=0;ii<nEdge;++ii){
-			//cout << ii << "," << jj << endl ;
-			actVert=meshout.edges(ii)->surfind[jj];
-			this->Print("%i ",meshout.surfs.find(actVert)+1);
+	for (ii=0;ii<nTri;++ii){ // Print connectedFace number
+		for(jj=0;jj<3;++jj){
+			this->Print("%i ",ii+1);
 		}
-		fprintf(fid,"\n");this->ResetLine();
 	}
-
+	fprintf(fid,"\n");this->ResetLine();
+	for (ii=0;ii<3*nTri;++ii){ // Print 0
+			this->Print("%i ",0);
+	}
+	fprintf(fid,"\n");this->ResetLine();
 	return(0);
 }
 
 int tecplotfile::LineFaceMap(const triangulation &triout, triarray triangulation::*mp,int nEdge){
-	int ii;
-	int verts[2];
+	int ii,jj,kk;
 
-	for (ii=0;ii<nEdge;++ii){ // Print Number of vertices per face
-		verts[0]=meshout.edges(ii)->vertind[0];
-		verts[1]=meshout.edges(ii)->vertind[1];
-		this->Print("%i %i\n",meshout.verts.find(verts[0])+1,meshout.verts.find(verts[1])+1);
-		this->ResetLine();
+	int nTri;
+	nTri=(triout.*mp).size();
+	//throw invalid_argument("Surface Map not supported for triangulation")
+	kk=1;
+	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
+		for(jj=0;jj<3;++jj){
+			if (jj==2){
+				this->Print("%i %i\n",kk-2,kk);
+			} else {
+				this->Print("%i %i\n",kk,kk+1);
+			}
+			this->ResetLine();
+			++kk;
+		}
 	}
 
 	return(0);
 }
 
 int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf){
-	int ii,jj,actVert,edgeCurr;
-	int verts[2],vertsPast[2];
+	int ii,jj,kk;
+
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
-		this->Print("%i ",meshout.surfs(ii)->edgeind.size());
+		this->Print("%i ",3);
 	}
 	fprintf(fid,"\n");this->ResetLine();
-
+	kk=1;
 	for (ii=0;ii<nSurf;++ii){// print ordered  list of vertices in face
-		jj=int(meshout.surfs(ii)->edgeind.size())-1;
-
-		edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
-		verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
-		verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
-		vertsPast[0]=verts[0];
-		vertsPast[1]=verts[1];
-
-		for(jj=0;jj<int(meshout.surfs(ii)->edgeind.size());++jj){
-			edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
-
-			verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
-			verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
-
-			if ((verts[0]==vertsPast[0]) || (verts[1]==vertsPast[0])){
-				actVert=0;
-			} 
-			#ifdef TEST_POSTPROCESSING
-			else if ((verts[0]==vertsPast[1]) || (verts[1]==vertsPast[1])) {
-				actVert=1;
-			}
-			#endif //TEST_POSTPROCESSING
-			else {
-				actVert=1;
-				#ifdef TEST_POSTPROCESSING
-				//meshout.surfs(ii)->disptree(meshout,4);
-				
-				cerr << "Warning: postprocessing.cpp:tecplotfile::VolFaceMap"<< endl ;
-				cerr << "		Mesh Output failed in output of facemap data" << endl;
-				cerr << "		Surface is not ordered " << endl;
-				return(-1);
-				#endif
-			}
-
-			this->Print("%i ",vertsPast[actVert]+1);
-			vertsPast[0]=verts[0];
-			vertsPast[1]=verts[1];
-
+		for(jj=0;jj<3;++jj){
+			this->Print("%i ",kk);
+			kk++;
 		}
 		fprintf(fid,"\n");this->ResetLine();
-		
-
 	}
-	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
-		for (ii=0;ii<nSurf;++ii){
-			//cout << ii << "," << jj << endl ;
-			actVert=meshout.surfs(ii)->voluind[jj];
-			this->Print("%i ",meshout.volus.find(actVert)+1);
-		}
-		fprintf(fid,"\n");this->ResetLine();
+	for (ii=0;ii<nSurf;++ii){
+		this->Print("%i ",1);
+	}
+	fprintf(fid,"\n");this->ResetLine();
+	for (ii=0;ii<nSurf;++ii){
+		this->Print("%i ",0);
 	}
 
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintMesh(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType){
+int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
-	if(nZones==0){
-		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
-	}
+	
+	ExtractTriData(triout,mp,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert>0){
+		if(nZones==0){
+			fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
+		}
 
-	this->NewZone();
+		this->NewZone();
 
-	if(strandID>0){
-		this->StrandTime(strandID, timeStep);
-	}
-	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+		if(strandID>0){
+			this->StrandTime(strandID, timeStep);
+		}
 	// Fixed by the dimensionality of the mesh
-	nVertDat=3;
-	nCellDat=3;
+		nVertDat=3;
+		nCellDat=3;
 
-	if (forceOutType==0){
-		if(nVolu>0){
+		if (forceOutType==0){
+			if(nVolu>0){
 			forceOutType=1; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
 			forceOutType=2;// output as Surface data (FEPOLYGON)
@@ -505,19 +525,20 @@ int tecplotfile::PrintMesh(const triangulation &triout, triarray triangulation::
 
 	if (forceOutType==1){
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
-		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
-		this->VolFaceMap(meshout,nSurf);
+		this->VolDataBlock(triout,mp,nVert,nVolu, nVertDat);
+		this->VolFaceMap(triout,mp,nSurf);
 	}
 	else if (forceOutType==2){
 		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
-		this->SurfDataBlock(meshout,nVert,nSurf, nVertDat);
-		this->SurfFaceMap(meshout,nEdge);
+		this->SurfDataBlock(triout,mp,nVert,nSurf, nVertDat);
+		this->SurfFaceMap(triout,mp,nEdge);
 	} else if (forceOutType==3){
 		this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
-		this->LineDataBlock(meshout,nVert,nEdge, nVertDat,nCellDat);
-		this->LineFaceMap(meshout,nEdge);
+		this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
+		this->LineFaceMap(triout,mp,nEdge);
 	}
-	return(0);
+}
+return(0);
 }
 
 

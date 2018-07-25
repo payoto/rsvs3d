@@ -64,7 +64,7 @@ public:
 	int SurfFaceMap(const triangulation &triout, triarray triangulation::*mp,int nEdge);
 	int LineFaceMap(const triangulation &triout, triarray triangulation::*mp,int nEdge);
 	int VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf);
-	int PrintMesh(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType);
+	int PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID=0, double timeStep=0, int forceOutType=0);
 
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
 

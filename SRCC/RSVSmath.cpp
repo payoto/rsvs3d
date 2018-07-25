@@ -298,8 +298,16 @@ the jacobian is arranged :
 			}
 			
 		}
-		for(ii=0; ii<nDim; ++ii){
-			funA[ii][0]=centroid[ii]/edgeLength;
+		if(edgeLength<0.000000000000001){
+			cout << "Warning edgeLength is 0" << endl;
+			for(ii=0; ii<nDim; ++ii){
+				funA[ii][0]=(*(coords[0]))[ii];
+			}
+			edgeLength=0.0000001;
+		} else {
+			for(ii=0; ii<nDim; ++ii){
+				funA[ii][0]=centroid[ii]/edgeLength;
+			}
 		}
 		if  (nCoord<4){
 			throw invalid_argument("nCoord <= 3 surfCentroid Not implemented");

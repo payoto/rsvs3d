@@ -193,12 +193,12 @@ void TriangulateSurface(const trianglesurf &surfin,const mesh& meshin,
 	triangleEdge.pointind[2]=trivertMaxInd+1;
 	triangleEdge.parentsurf=surfin.index;
 	if (n>3){
-		for(ii=0; ii<n-1; ++ii){
+		for(ii=0; ii<n; ++ii){
 
-			triangleEdge.SetPointType(surfin.indvert[ii],surfin.indvert[ii+1],3);
+			triangleEdge.SetPointType(surfin.typevert[ii],surfin.typevert[(ii+1)%n],3);
 
 			triangleEdge.pointind[0]=surfin.indvert[ii];
-			triangleEdge.pointind[1]=surfin.indvert[ii+1];
+			triangleEdge.pointind[1]=surfin.indvert[(ii+1)%n];
 			triangul.push_back(triangleEdge);
 		}
 
@@ -208,13 +208,14 @@ void TriangulateSurface(const trianglesurf &surfin,const mesh& meshin,
 		trivert.push_back(surfCentre);
 	} else if (n==3) {
 
-		triangleEdge.SetPointType(surfin.indvert[0],surfin.indvert[1],surfin.indvert[2]);
+		triangleEdge.SetPointType(surfin.typevert[0],surfin.typevert[1],surfin.typevert[2]);
 
-		triangleEdge.pointind=surfin.typevert;
+		triangleEdge.pointind=surfin.indvert;
 		triangleEdge.parentsurf=surfin.index;
 		triangul.push_back(triangleEdge);
 	}
 }
+
 void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin){
 	int ii,n;
 	coordvec edgeCentre;
@@ -469,6 +470,7 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 	}
 	
 	snaxedgeSub=snakeRSVS.snaxedges.find(followSnaxEdge);
+
 	isRepeat=(isSnaxEdgeDone[snaxedgeSub]);
 	isSnaxEdgeDone[snaxedgeSub]=true;
 	// Find the snaxel to look from
@@ -605,8 +607,8 @@ int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int
 void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 
 	vector<bool> isSnaxEdgeDone;
-	int ii,n2;
-	int actIndex, actSurf,actEdge,actSurfSub;
+	int ii,n2,nVert,nSnax;
+	int actIndex, actSurf,actEdge,actSurfSub,maxNEdge;
 	int returnType, returnIndex, returnEdge, actType;
 	bool flagDone;
 	HashedVector<int,int> hashedEdgeInd, vertSurfList;
@@ -616,7 +618,7 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 	n2=triangleRSVS.snakeDep->snaxedges.size();
 	isSnaxEdgeDone.assign(n2,false);
 	triangleRSVS.trisurf.clear();
-	
+	newTrisSurf.index=0;
 	for(ii=0;ii<n2;ii++){
 		if(!isSnaxEdgeDone[ii]){
 
@@ -630,7 +632,8 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 				newTrisSurf.typevert.clear();
 				newTrisSurf.indvert.reserve(8);
 				newTrisSurf.typevert.reserve(8);
-
+				newTrisSurf.index++;
+				
 				hashedEdgeInd.vec=triangleRSVS.meshDep->surfs(actSurfSub)->edgeind;
 				edgeSub=triangleRSVS.meshDep->edges.find_list(hashedEdgeInd.vec);
 				hashedEdgeInd.GenerateHash();
@@ -640,20 +643,29 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 
 				actIndex=triangleRSVS.snakeDep->snakeconn.edges(ii)->vertind[0];
 				actType=2;
+				flagDone=false;
+				nVert=0;nSnax=0;
+				maxNEdge=hashedEdgeInd.vec.size();
 				// Prepare edge lists and vertlists
-				while(!flagDone){
-					newTrisSurf.indvert.push_back(actIndex);
-					newTrisSurf.typevert.push_back(actType);
+				while(!flagDone && nVert<maxNEdge+2){
 
 					if (actType==1){
+						newTrisSurf.indvert.push_back(actIndex);
+						newTrisSurf.typevert.push_back(actType);
 						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
 							*(triangleRSVS.meshDep), returnIndex, returnType, returnEdge);
 						actEdge=returnEdge;
-
+						actType=returnType;
+						actIndex=returnIndex;
+						nVert++;
 					} else if (actType==2) { // Snaxel operations
 						flagDone=FollowSnaxEdgeConnection(actIndex, actSurf,actEdge, 
 							*(triangleRSVS.snakeDep), isSnaxEdgeDone,returnIndex);
+						nSnax++;
 						if(!flagDone){
+							newTrisSurf.indvert.push_back(actIndex);
+							newTrisSurf.typevert.push_back(actType);
+							nSnax++;
 							actIndex=returnIndex;
 
 							newTrisSurf.indvert.push_back(actIndex);
@@ -663,6 +675,13 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 							actType=returnType;
 							actIndex=returnIndex;
 						}
+					}
+					if (actType==2) {
+						actEdge=0;
+					}
+					//cout << endl << "nVert= "<< nVert << "  nSnax=" << nSnax ;
+					if (nVert>maxNEdge) {
+						cout << "Error";
 					}
 				}
 				triangleRSVS.trisurf.push_back(newTrisSurf);
@@ -729,8 +748,18 @@ void triangulation::CleanDynaTri(){
 		}
 	}
 
+	n=trivert.size();
+	// Remove the surface centroid points that are in the intertri
+	for (ii=0;ii<n;++ii){ 
+		if(trivert(ii)->parentType==3){
+			pDEl.push_back(trivert(ii)->index);
+		}
+	}
+
 	dynatri.remove(triDel);
 	trivert.remove(pDEl);
+	intertri.clear();
+	trisurf.clear();
 
 	PrepareForUse();
 }
