@@ -162,7 +162,7 @@ public:
 void CalculateSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
-void TriangulateSurface(const trianglesurf &surfin,const mesh& meshin, 
+void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList={});
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);

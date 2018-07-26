@@ -99,7 +99,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 		} else { // trisurf triangulation
 			n=triangleRSVS.trisurf.size();
 			for (ii=0; ii<n; ++ii){
-				TriangulateSurface(*(triangleRSVS.trisurf(ii)),meshin,triangleRSVS.*mp, 
+				TriangulateTriSurface(*(triangleRSVS.trisurf(ii)),meshin,triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 
@@ -113,7 +113,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , cons
 			}
 		} else { // trisurf triangulation
 			for (ii=0; ii<n; ++ii){ 
-				TriangulateSurface(*(triangleRSVS.trisurf(subList[ii])),meshin,triangleRSVS.*mp, 
+				TriangulateTriSurface(*(triangleRSVS.trisurf(subList[ii])),meshin,triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 		}
@@ -174,7 +174,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	}
 }
 
-void TriangulateSurface(const trianglesurf &surfin,const mesh& meshin, 
+void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd){
 	// Generates the triangulation parts 
 	// typeMesh=1 is a static mesh, type 2 is a dynamic one (snake)
@@ -474,7 +474,7 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 	isRepeat=(isSnaxEdgeDone[snaxedgeSub]);
 	isSnaxEdgeDone[snaxedgeSub]=true;
 	// Find the snaxel to look from
-	kk=0;	
+	kk=1;	
 	kk=snakeRSVS.snakeconn.edges(snaxedgeSub)->vertind[kk]!=actSnax;
 
 	actSnax=snakeRSVS.snakeconn.edges(snaxedgeSub)->vertind[kk];
@@ -649,7 +649,7 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 				// Prepare edge lists and vertlists
 				while(!flagDone && nVert<maxNEdge+2){
 
-					if (actType==1){
+					if (actType==1){ // Type vert
 						newTrisSurf.indvert.push_back(actIndex);
 						newTrisSurf.typevert.push_back(actType);
 						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
@@ -779,7 +779,13 @@ void trianglepoint::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVo
 void trianglepoint::read(FILE * fid){}
 void trianglepoint::write(FILE * fid) const {}
 
-void trianglesurf::disp() const{} 
+void trianglesurf::disp() const{
+	cout << "trianglesurf " << index << " parent " << parentsurfmesh << endl;
+	cout << "indvert: " ;DisplayVector(indvert);
+	cout << endl;
+	cout << "typevert: " ;DisplayVector(typevert);
+	cout << endl;
+} 
 void trianglesurf::disptree(mesh const&, int) const {}
 void trianglesurf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglesurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}

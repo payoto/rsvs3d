@@ -362,16 +362,6 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	start_s=clock();
 	start_f=clock();
 
-	CleanupSnakeConnec(testSnake);
-
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	stop_s=clock();
-	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
-	start_s=clock();
 	CalculateSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
@@ -427,6 +417,19 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	//testSnake.PrepareForUse();
 	stop_s=clock();
 	cout << "Impact merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
+
+	start_s=clock();
+	CleanupSnakeConnec(testSnake);
+
+	#ifdef SAFE_ALGO
+	if (testSnake.Check3D()){
+		testSnake.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
+	stop_s=clock();
+	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
 	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;
 
 
@@ -643,6 +646,7 @@ int Test_snakeRSVS(){
 				outSnake.PrintMesh(triMesh,3,totT);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
 				
 			}
 
@@ -663,6 +667,7 @@ int Test_snakeRSVS(){
 			outSnake.PrintMesh(triMesh,3,totT);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
 		}
 		stop_s=clock();
 		//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
