@@ -629,7 +629,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<300;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();
@@ -685,7 +685,10 @@ int Test_snakeRSVS(){
 
 }
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact){
-
+	int start_s,stop_s;
 	Test_stepalgo(testSnake,  dt, isImpact);
+	start_s=clock();
 	MaintainTriangulateSnake(RSVStri);
+	stop_s=clock();
+	cout << "triangulation: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 }
