@@ -198,9 +198,6 @@ public:
 		nCoord=a;
 		centroid.assign(nDim,0);
 	};
-
-	
-
 };
 
 #endif

@@ -67,6 +67,11 @@ public:
 };
 
 
+class tri2mesh {
+public:
+	vector<int> celltarg;
+	vector<double> constrinfluence;
+};
 
 
 class triangle : public meshpart , public snakpart {	
@@ -77,8 +82,11 @@ public:
 	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
 	vector<int> pointind;
 	int parentsurf=0; // Element in the constraint vector
-	double constrinfluence=0; //usually 1 or -1 to do with the ordering
+	int parenttype=0;
+	//double constrinfluence=0; //usually 1 or -1 to do with the ordering
 
+	tri2mesh connec;
+ 
 	// interface functions
 	void disp() const override;
 	void disptree(const mesh &meshin, int n) const override;
