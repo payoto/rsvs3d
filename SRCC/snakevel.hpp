@@ -64,6 +64,10 @@ public:
 	void disp() const;
 	void PrepareForUse();
 	void CleanDynaTri();
+	void CalcTriVertPosDyna(int ii);
+	void CalcTriVertPosDyna();
+	void CalcTriVertPos(int ii);
+	void CalcTriVertPos();
 };
 
 

@@ -428,7 +428,7 @@ public:
 	voluarray volus;
 
 	meshdependence meshtree;
-// Mesh Lineage
+	// Mesh Lineage
 	void RemoveFromFamily();
 	void AddChild(mesh* meshin);
 	void AddParent(mesh* meshin);
@@ -437,7 +437,7 @@ public:
 	void SetMeshDepElm();
 	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
 	int WhatDim(){return(meshDim);}
-// basic operations grouped from each field
+	// basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
@@ -452,12 +452,12 @@ public:
 	void TightenConnectivity();
 	void TestConnectivity();
 	void TestConnectivityBiDir();
-//File I/o
+	//File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
 	int write(const char *str) const;
 	int read(const char *str);
-// Mesh merging
+	// Mesh merging
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -465,9 +465,10 @@ public:
 	void RemoveIndex(int typeInd, int oldInd);
 	int ConnectedVertex(vector<int> &vertBlock) const;
 	void ForceCloseContainers();
-// Mesh Quality
+	// Mesh Quality
 	int OrderEdges();
 	void OrientSurfaceVolume();
+	void OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
 
 

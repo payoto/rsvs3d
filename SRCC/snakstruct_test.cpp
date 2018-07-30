@@ -495,6 +495,7 @@ int Test_MeshRefinement(){
 		outSnake.PrintMesh(snakeMesh);
 
 		snakeMesh.OrderEdges();
+		snakeMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(snakeMesh);
 		//testSnake.disp();
 		for (ii=0;ii<snakeMesh.volus.size();++ii){
@@ -518,8 +519,12 @@ int Test_MeshRefinement(){
 		voluMesh.TightenConnectivity();
 		voluMesh.OrderEdges();
 		testTriangle.PrepareForUse();
+		testTriangle.CalcTriVertPos();
 		MeshTriangulation(triMesh,voluMesh,testTriangle.stattri, testTriangle.trivert);
+
+		voluMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(voluMesh);
+		triMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(triMesh);
 
 
@@ -590,6 +595,7 @@ int Test_snakeRSVS(){
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		snakeMesh.PrepareForUse();
+		snakeMesh.OrientSurfaceVolume();
 
 		///// Generate Coarser Volume Mesh
 		testSnake.snakemesh=&snakeMesh;
@@ -610,7 +616,6 @@ int Test_snakeRSVS(){
 		}
 		voluMesh.PrepareForUse();
 		voluMesh.OrientSurfaceVolume();
-		snakeMesh.OrientSurfaceVolume();
 		snakeMesh.AddParent(&voluMesh,elmMapping);
 		outSnake.PrintMesh(voluMesh);
 
@@ -637,7 +642,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
-		for(ii=0;ii<300;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				//testSnake.snakeconn.TightenConnectivity();

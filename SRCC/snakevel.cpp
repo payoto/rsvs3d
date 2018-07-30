@@ -55,15 +55,7 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		n=triangleRSVS.trivert.size();
 		// Still need to recompute coordinates
 		for (ii=0;ii<n;++ii){
-			if(triangleRSVS.trivert(ii)->parentType==2){
-				SnakeSurfaceCentroid_fun(triangleRSVS.trivert[ii].coord,
-					*(triangleRSVS.snakeDep->snakeconn.surfs.isearch(
-						triangleRSVS.trivert(ii)->parentsurf)),triangleRSVS.snakeDep->snakeconn); 
-			} else if(triangleRSVS.trivert(ii)->parentType==3){
-				HybridSurfaceCentroid_fun(triangleRSVS.trivert[ii].coord,*(triangleRSVS.trisurf.isearch(
-					triangleRSVS.trivert(ii)->parentsurf)),*(triangleRSVS.meshDep),
-					triangleRSVS.snakeDep->snakeconn);  
-			}
+			triangleRSVS.CalcTriVertPosDyna(ii);
 		}
 
 		triangleRSVS.snakeDep->snakeconn.surfs.SetNoModif();
@@ -763,6 +755,46 @@ void triangulation::CleanDynaTri(){
 	trisurf.clear();
 
 	PrepareForUse();
+}
+void triangulation::CalcTriVertPos(){
+	int ii,n;
+	n=trivert.size();
+	for (ii=0 ; ii<n ; ++ii) {
+		CalcTriVertPos(ii);
+	}
+}
+void triangulation::CalcTriVertPos(int ii){ 
+	if(trivert(ii)->parentType==1 ){
+		SnakeSurfaceCentroid_fun(trivert[ii].coord,
+			*(meshDep->surfs.isearch(
+				trivert(ii)->parentsurf)),*meshDep); 
+	} else if(trivert(ii)->parentType==2 ){
+		SnakeSurfaceCentroid_fun(trivert[ii].coord,
+			*(snakeDep->snakeconn.surfs.isearch(
+				trivert(ii)->parentsurf)),snakeDep->snakeconn); 
+	} else if(trivert(ii)->parentType==3){
+		HybridSurfaceCentroid_fun(trivert[ii].coord,*(trisurf.isearch(
+			trivert(ii)->parentsurf)),*(meshDep),
+			snakeDep->snakeconn);  
+	}
+}
+void triangulation::CalcTriVertPosDyna(){
+	int ii,n;
+	n=trivert.size();
+	for (ii=0 ; ii<n ; ++ii) {
+		CalcTriVertPosDyna(ii);
+	}
+}
+void triangulation::CalcTriVertPosDyna(int ii){ 
+	if(trivert(ii)->parentType==2){
+		SnakeSurfaceCentroid_fun(trivert[ii].coord,
+			*(snakeDep->snakeconn.surfs.isearch(
+				trivert(ii)->parentsurf)),snakeDep->snakeconn); 
+	} else if(trivert(ii)->parentType==3){
+		HybridSurfaceCentroid_fun(trivert[ii].coord,*(trisurf.isearch(
+			trivert(ii)->parentsurf)),*(meshDep),
+			snakeDep->snakeconn);  
+	}
 }
 
 #pragma GCC diagnostic push

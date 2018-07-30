@@ -1908,13 +1908,18 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 }
 
 void mesh::OrientSurfaceVolume(){
+	vector<int> surfOrient;
+	
+	OrientRelativeSurfaceVolume(surfOrient);
+}
+void mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 
 	int nSurfExplored,nSurfs,nBlocks,nCurr,currEdge,testSurf,relOrient;
 	int ii,jj,kk,nj,nk;
 	vector<bool> surfStatus; // 1 explored 0 not explored
 	vector<vector<int>> orderVert;
 	bool isConnec, t0,t1,t3,t4,isFlip;
-	vector<int> currQueue, nextQueue, surfOrient, emptVert; // Current and next queues of indices
+	vector<int> currQueue, nextQueue, emptVert; // Current and next queues of indices
 
 	// Preparation of the arrays;
 	nSurfs=surfs.size();
@@ -2010,10 +2015,7 @@ void mesh::OrientSurfaceVolume(){
 		currQueue.swap(nextQueue);
 	}
 
-	//============================
-	// Need to tanslate that in ordered Volume
 }
-
 
 
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2){
