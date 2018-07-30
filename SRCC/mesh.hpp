@@ -219,8 +219,10 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void OrderEdges(mesh *meshin);
+	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
+	void FlipVolus();
 	//bool returnIsModif() const {return(isModif);}
 
 	surf(){ // Constructor
@@ -465,6 +467,7 @@ public:
 	void ForceCloseContainers();
 // Mesh Quality
 	int OrderEdges();
+	void OrientSurfaceVolume();
 	void SetBorders();
 
 
@@ -476,7 +479,7 @@ public:
 // Function declarations
 
 void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind);
-
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2);
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();

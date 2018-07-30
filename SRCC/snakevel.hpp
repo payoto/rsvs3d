@@ -69,8 +69,8 @@ public:
 
 class tri2mesh {
 public:
-	vector<int> celltarg;
-	vector<double> constrinfluence;
+	vector<int> celltarg; // cell need to be indexed in a support array which maps to constraints etc
+	vector<double> constrinfluence; // +1 -1 to indicate 
 };
 
 

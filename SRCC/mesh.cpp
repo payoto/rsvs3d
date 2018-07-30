@@ -1625,6 +1625,58 @@ void surf::OrderEdges(mesh *meshin)
 }
 }
 
+
+void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
+	int jj,n,actVert,edgeCurr;
+	int verts[2],vertsPast[2];
+	
+	
+	n=int(edgeind.size());
+	vertList.clear();
+	vertList.reserve(n);
+
+	edgeCurr=meshin->edges.find(edgeind[n-1]);
+	verts[0]=(meshin->edges(edgeCurr)->vertind[0]);
+	verts[1]=(meshin->edges(edgeCurr)->vertind[1]);
+	vertsPast[0]=verts[0];
+	vertsPast[1]=verts[1];
+
+	for(jj=0;jj<int(n);++jj){
+		edgeCurr=meshin->edges.find(edgeind[jj]);
+
+		verts[0]=(meshin->edges(edgeCurr)->vertind[0]);
+		verts[1]=(meshin->edges(edgeCurr)->vertind[1]);
+
+		if ((verts[0]==vertsPast[0]) || (verts[1]==vertsPast[0])){
+			actVert=0;
+		} 
+		#ifdef SAFE_ALGO
+		else if ((verts[0]==vertsPast[1]) || (verts[1]==vertsPast[1])) {
+			actVert=1;
+		}
+		#endif //TEST_POSTPROCESSING
+		else {
+			actVert=1;
+			#ifdef SAFE_ALGO
+			cerr << "Error: Surface is not ordered " << endl;
+			cerr << "	in " << __PRETTY_FUNCTION__ << endl;
+			throw invalid_argument("Surface not ordered");
+			#endif
+		}
+
+		vertList.push_back(vertsPast[actVert]);
+		vertsPast[0]=verts[0];
+		vertsPast[1]=verts[1];
+	}
+} 
+
+void surf::FlipVolus(){
+	int interm;
+	interm=voluind[0];
+	voluind[0]=voluind[1];
+	voluind[1]=interm;
+}
+
 int mesh::OrderEdges(){
 	int ii;
 	bool kk;
@@ -1855,6 +1907,166 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	return(nBlocks);
 }
 
+void mesh::OrientSurfaceVolume(){
+
+	int nSurfExplored,nSurfs,nBlocks,nCurr,currEdge,testSurf,relOrient;
+	int ii,jj,kk,nj,nk;
+	vector<bool> surfStatus; // 1 explored 0 not explored
+	vector<vector<int>> orderVert;
+	bool isConnec, t0,t1,t3,t4,isFlip;
+	vector<int> currQueue, nextQueue, surfOrient, emptVert; // Current and next queues of indices
+
+	// Preparation of the arrays;
+	nSurfs=surfs.size();
+	
+
+	surfStatus.assign(nSurfs,false);
+	surfOrient.assign(nSurfs,0);
+	currQueue.reserve(nSurfs/2); // list of positions
+	nextQueue.reserve(nSurfs/2);
+	orderVert.reserve(nSurfs);
+
+	// =======================================
+	// Collect surface vertex lists
+	emptVert.assign(6,0);
+	for(ii=0; ii< nSurfs; ii++){
+		orderVert.push_back(emptVert);
+		surfs(ii)->OrderedVerts(this,orderVert[ii]);		
+	}
+
+	// ========================================
+	// Flooding to find relative orientations of surfaces
+	// Start from a surf that is in no list, 
+	//		look at each its edges 
+	//		find adjacent surfaces(checking they share a cell)
+	//			-> compute relative orientation (using idea of contra-rotating adjacent surfs) 
+	//			-> add surface to queue
+	nBlocks=0;
+	nSurfExplored=0;
+	//cout << " " << nSurfs << " | " ;
+	while(nSurfExplored<nSurfs){
+		// if currQueue is empty start new block
+		//cout << " " << nSurfExplored ;
+		if(currQueue.size()<1){
+			ii=0;
+			while(ii<nSurfs && surfStatus[ii])
+				{ ii++; }
+			if (ii==nSurfs){
+				//cout << " | " << nSurfs << " | " ;
+				throw range_error (" Start point not found");
+			}
+			currQueue.push_back(ii);
+			nBlocks++;
+			surfStatus[ii]=true;
+			nSurfExplored++;
+			surfOrient[ii]=nBlocks;
+
+		}
+		// Explore current queue
+		nCurr=currQueue.size();
+		for (ii = 0; ii < nCurr; ++ii){
+			nj=surfs(currQueue[ii])->edgeind.size();
+			for (jj=0; jj < nj; ++jj){
+				currEdge=edges.find(surfs(currQueue[ii])->edgeind[jj]);
+				nk=edges(currEdge)->surfind.size();
+				for (kk=0; kk < nk; ++kk){
+					// tN -> volu[N] is shared 
+					testSurf=surfs.find(edges(currEdge)->surfind[kk]);
+					t0 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0] ||
+						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[0]) && 
+						(surfs(currQueue[ii])->voluind[0]!=0);
+
+					t1 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[1] ||
+						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]) && 
+						(surfs(currQueue[ii])->voluind[1]!=0);
+					// if either volume is shared surface is to be flooded
+					isConnec = (edges(currEdge)->surfind[kk]!=surfs(currQueue[ii])->index) 
+						&& (t0 || t1) && (!surfStatus[testSurf]);
+
+					if(isConnec){
+						// Test rotation
+						relOrient=OrderMatchLists(orderVert[currQueue[ii]], orderVert[testSurf], 
+							 edges(currEdge)->vertind[0],edges(currEdge)->vertind[1]);
+						// Add to the next queue
+						nextQueue.push_back(testSurf);
+						nSurfExplored++;
+						surfStatus[testSurf]=true;
+						surfOrient[testSurf]=-1*relOrient*surfOrient[currQueue[ii]];
+
+						// Flip volumes to match
+						t3=(surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0]);
+						t4=(surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]);
+						isFlip=((relOrient==-1) && ((t0 && !t3) || (t1 && !t4))) 
+							|| ((relOrient==1) && ((t0 && t3) || (t1 && t4)));
+						if(isFlip){
+							surfs.elems[testSurf].FlipVolus();
+						}
+					}
+				}
+			}
+		}
+		// Reset current queue and set to next queue
+		currQueue.clear();
+		currQueue.swap(nextQueue);
+	}
+
+	//============================
+	// Need to tanslate that in ordered Volume
+}
+
+
+
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2){
+	// compares the list vec1 and vec2 returning 
+	// 1 if indices p1 and p2 appear in the same order 
+	// -1 if indices p1 and p2 appear in opposite orders
+	int ii, n, ord1, ord2, retVal, kk;
+
+	
+	ord1=0;kk=0;
+	n=vec1.size();
+	for(ii=0; ii<n; ++ii){
+		if (vec1[ii]==p1) {
+			ord1+=ii;
+			kk++;
+		} else if (vec1[ii]==p2) {
+			ord1+=-ii;
+			kk++;
+		}
+	}
+	if(ord1>1){ord1=-1;}
+	if(ord1<-1){ord1=1;}
+	if (kk!=2) {
+		cerr << "Error : indices were not found in lists " << endl;
+		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
+		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument("Incaompatible list and index");
+	}
+
+	ord2=0;kk=0;
+	n=vec2.size();
+	for(ii=0; ii<n; ++ii){
+		if (vec2[ii]==p1) {
+			ord2+=ii;
+			kk++;
+		} else if (vec2[ii]==p2) {
+			ord2+=-ii;
+			kk++;
+		}
+	}
+	if(ord2>1){ord2=-1;}
+	if(ord2<-1){ord2=1;}
+	if (kk!=2) {
+		cerr << "Error : indices were not found in lists " << endl;
+		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
+		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument("Incaompatible list and index");
+	}
+
+	retVal=(ord1==ord2)*2-1;
+
+	return(retVal);
+}
 
 void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind){
 	// Returns a list of connected vertices matching a list of connected edges

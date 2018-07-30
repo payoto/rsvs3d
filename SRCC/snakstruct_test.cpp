@@ -430,6 +430,12 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	stop_s=clock();
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 
+	start_s=clock();
+	testSnake.snakeconn.OrientSurfaceVolume();
+
+	stop_s=clock();
+	cout << "Volu Orientation: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
 	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;
 
 
@@ -603,6 +609,8 @@ int Test_snakeRSVS(){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
+		voluMesh.OrientSurfaceVolume();
+		snakeMesh.OrientSurfaceVolume();
 		snakeMesh.AddParent(&voluMesh,elmMapping);
 		outSnake.PrintMesh(voluMesh);
 
