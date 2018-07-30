@@ -431,7 +431,7 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 
 	start_s=clock();
-	testSnake.snakeconn.OrientSurfaceVolume();
+	testSnake.OrientSurfaceVolume();
 
 	stop_s=clock();
 	cout << "Volu Orientation: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;

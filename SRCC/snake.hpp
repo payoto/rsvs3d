@@ -119,7 +119,7 @@ public:
 	void Flip(); // reverses snake directions
 	// Snake connectivity operations
 	void SetSnaxSurfs() {}
-
+	void OrientSurfaceVolume();
 };
 
  

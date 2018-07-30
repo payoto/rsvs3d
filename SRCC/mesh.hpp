@@ -101,10 +101,13 @@ public:
 	void min(const vector<double> &vecin);
 	void add(const vector<double> &vecin);
 	void substract(const vector<double> &vecin);
+	void substractfrom(const vector<double> &vecin);
 	void div(const vector<double> &vecin);
 	void div(double scalin);
 	void mult(const vector<double> &vecin);
 	void mult(double scalin);
+	vector<double> cross(const vector<double> &vecin);
+	double dot(const vector<double> &vecin);
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -115,7 +118,7 @@ public:
 		cout << "constructor called for coordvec" << endl;
 		#endif
 	}
-	void operator=(vector<double> a){
+	void operator=(const vector<double> &a){
 		if(int(a.size())!=3){
 			cout << "Warning : Coordinate vector is being a vecetor other than 3 long" << endl;
 		}
@@ -468,9 +471,11 @@ public:
 	// Mesh Quality
 	int OrderEdges();
 	void OrientSurfaceVolume();
-	void OrientRelativeSurfaceVolume(vector<int> &surfOrient);
+	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
-
+	// Mesh calculations
+	coordvec CalcCentreVolu(int ind) const;
+	coordvec CalcPseudoNormalSurf(int ind) const;
 
 	~mesh(){
 		RemoveFromFamily();

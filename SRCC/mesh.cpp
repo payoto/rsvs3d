@@ -125,6 +125,13 @@ int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 		elems[ii]=elems[ii]-vecin[ii];
 	}
 }
+void coordvec::substractfrom(const vector<double> &vecin){
+int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
+	for (int ii = 0; ii < n; ++ii)
+	{
+		elems[ii]=vecin[ii]-elems[ii];
+	}
+}
 void coordvec::div(const vector<double> &vecin){
 int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
@@ -154,6 +161,29 @@ int n=int(elems.size());
 		elems[ii]=elems[ii]*scalin;
 	}
 }
+
+vector<double> coordvec::cross(const std::vector<double> &vecin){
+
+	vector<double> retVec;
+	retVec.assign(3,0.0);
+
+	for(int ii=3; ii<6; ii++){
+		retVec[ii%3]=elems[(ii+1)%3]*vecin[(ii+2)%3]
+			-elems[(ii-1)%3]*vecin[(ii-2)%3];
+	}
+	return(retVec);
+}
+
+double coordvec::dot(const std::vector<double> &vecin){
+
+	double retVec=0.0;
+	
+	for(int ii=0; ii<3; ii++){
+		retVec+=elems[ii]*vecin[ii];
+	}
+	return(retVec);
+}
+
 //// ----------------------------------------
 // Implementation of mesh dependence
 //// ----------------------------------------
@@ -1907,12 +1937,130 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	return(nBlocks);
 }
 
-void mesh::OrientSurfaceVolume(){
-	vector<int> surfOrient;
-	
-	OrientRelativeSurfaceVolume(surfOrient);
+coordvec mesh::CalcCentreVolu(int ind) const{
+	//takes the position int
+
+	coordvec ret;
+	coordvec temp;
+	double edgeLength; 
+	double voluLength;
+	int ii,ni,jj,nj;
+	int cSurf,a;
+	voluLength=0;
+	a=volus.find(ind);
+	ni=volus(a)->surfind.size();
+	for(ii=0; ii<ni ; ++ii){
+		cSurf=surfs.find(volus(a)->surfind[ii]);
+		nj=surfs(cSurf)->edgeind.size();
+		for(jj=0; jj<nj ; ++jj){
+			temp.assign(0,0,0);
+			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[0])->coord);
+			temp.substract(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
+
+			edgeLength=temp.CalcNorm();
+			voluLength+=edgeLength;
+
+			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
+			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
+			temp.mult(edgeLength);
+
+			ret.add(temp.usedata());
+		}	
+	}
+	ret.div(voluLength);
+	return(ret);
 }
-void mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
+
+
+coordvec mesh::CalcPseudoNormalSurf(int ind) const{
+	coordvec ret;
+	coordvec temp1,temp2,temp3;
+	double edgeLength;
+	double voluLength;
+	vector<int> vertList;
+	int jj,nj,cSurf;
+	
+	voluLength=0;
+	cSurf=surfs.find(ind);
+	surfs(cSurf)->OrderedVerts(this,vertList);
+
+	nj=vertList.size();
+	ret.assign(0,0,0);
+	for(jj=0; jj<nj ; ++jj){
+		temp1.assign(0,0,0);
+		temp2.assign(0,0,0);
+		temp1.add(verts.isearch(vertList[(jj+1)%nj])->coord);
+		temp2.add(verts.isearch(vertList[(jj+nj-1)%nj])->coord);
+		temp1.substract(verts.isearch(vertList[jj])->coord);
+		temp2.substract(verts.isearch(vertList[jj])->coord);
+
+		temp3=temp1.cross(temp2.usedata());
+
+		edgeLength=temp3.CalcNorm();
+		voluLength+=edgeLength;
+
+		ret.add(temp3.usedata());
+	}	
+	
+	ret.div(voluLength);
+	return(ret);
+}
+
+void mesh::OrientSurfaceVolume(){
+	// Orders the surf.voluind [c0 c1] such that the surface normal vector points
+	// from c0 to c1
+	// This is done by using the surface normals and checking they go towards
+	// the centre of the cell
+
+	int nBlocks,ii,jj, ni,nj,kk;
+	vector<int> surfOrient;
+	vector<bool> isFlip;
+	double dotProd;
+	coordvec centreVolu, normalVec;
+
+
+	nBlocks=OrientRelativeSurfaceVolume(surfOrient);
+	isFlip.assign(nBlocks,false);
+	//========================================
+	//  Select direction using coordinate geometry
+	//     use a surface 
+
+	for (ii=1; ii<= nBlocks; ii++){
+		jj=-1; nj=surfOrient.size();
+		do{
+			jj++;
+			while(jj<nj && ii!=abs(surfOrient[jj]))
+				{jj++;}
+			if(jj==nj){ // if the orientation cannot be defined
+				dotProd=1.0;
+				kk=0;
+				cerr << "Warning: Cell orientations could not be computed " << endl;
+				cerr << "			in " << __PRETTY_FUNCTION__ << endl;
+				break;
+			}
+			kk=surfs(jj)->voluind[0]==0;
+			centreVolu=CalcCentreVolu(surfs(jj)->voluind[kk]);
+			normalVec=CalcPseudoNormalSurf(surfs(jj)->index);
+
+			centreVolu.substractfrom(verts.isearch(
+				edges.isearch(surfs(jj)->edgeind[0])->vertind[0]
+				)->coord);
+			dotProd=centreVolu.dot(normalVec.usedata());
+		} while (!isfinite(dotProd) || (fabs(dotProd)<numeric_limits<double>::epsilon()));
+
+
+		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) || ((dotProd>0.0) && (kk==1)));
+	}
+	ni=surfOrient.size();
+	for(ii=0; ii< ni; ++ii){
+		if(isFlip[abs(surfOrient[ii])-1]){
+			surfs.elems[ii].FlipVolus();
+		}
+	}
+
+}
+
+int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 
 	int nSurfExplored,nSurfs,nBlocks,nCurr,currEdge,testSurf,relOrient;
 	int ii,jj,kk,nj,nk;
@@ -2014,7 +2162,7 @@ void mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 		currQueue.clear();
 		currQueue.swap(nextQueue);
 	}
-
+	return(nBlocks);
 }
 
 
@@ -2098,3 +2246,4 @@ void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector
 		}
 	}
 }
+
