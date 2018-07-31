@@ -127,15 +127,20 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	//double surfLength,edgeLength;
 	trianglepoint surfCentre;
 	triangle triangleEdge;
+	vector<int> orderVert;
 
 	// Loop around edges calculating centre and length of each edge
 	//surfLength=0;
 	//edgeLength=0;
 	n=int(surfin.edgeind.size());
-
+	surfin.OrderedVerts(&meshin,orderVert);
 	triangleEdge.SetPointType(typeMesh,typeMesh,3);
 	triangleEdge.pointind[2]=trivertMaxInd+1;
 	triangleEdge.parentsurf=surfin.index;
+
+	triangleEdge.connec.celltarg=surfin.voluind;
+	triangleEdge.connec.constrinfluence={-1.0, 1.0};
+
 	if (n>3){
 		for(ii=0; ii<n; ++ii){
 			//meshin.edges.isearch(surfin.edgeind[ii])->
@@ -144,8 +149,10 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 			//surfCentre.coord.add(edgeCentre.usedata());
 			//surfLength+=edgeLength;
 
-			triangleEdge.pointind[0]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[0];
-			triangleEdge.pointind[1]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[1];
+			// triangleEdge.pointind[0]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[0];
+			// triangleEdge.pointind[1]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[1];
+			triangleEdge.pointind[0]=orderVert[ii];
+			triangleEdge.pointind[1]=orderVert[(ii+1)%n];
 			triangul.push_back(triangleEdge);
 		}
 
@@ -158,9 +165,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 
 		triangleEdge.SetPointType(typeMesh,typeMesh,typeMesh);
 
-		triangleEdge.pointind=ConcatenateVectorField(meshin.edges,&edge::vertind,meshin.edges.find_list(surfin.edgeind));
-		sort(triangleEdge.pointind);
-		unique(triangleEdge.pointind);
+		triangleEdge.pointind=orderVert;
 		triangleEdge.parentsurf=surfin.index;
 		triangul.push_back(triangleEdge);
 	}
@@ -183,7 +188,10 @@ void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin,
 
 	triangleEdge.SetPointType(typeMesh,typeMesh,3);
 	triangleEdge.pointind[2]=trivertMaxInd+1;
-	triangleEdge.parentsurf=surfin.index;
+	triangleEdge.parentsurf=surfin.index; 
+	triangleEdge.connec.celltarg=surfin.voluind;
+	triangleEdge.connec.constrinfluence={-1.0, 1.0};
+
 	if (n>3){
 		for(ii=0; ii<n; ++ii){
 
@@ -600,15 +608,16 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 
 	vector<bool> isSnaxEdgeDone;
 	int ii,n2,nVert,nSnax;
-	int actIndex, actSurf,actEdge,actSurfSub,maxNEdge;
+	int actIndex, actSurf,actEdge,actSurfSub,maxNEdge,isFlip;
 	int returnType, returnIndex, returnEdge, actType;
 	bool flagDone;
 	HashedVector<int,int> hashedEdgeInd, vertSurfList;
-	vector<int> edgeSub;
+	vector<int> edgeSub,pseudoEdgeInd;
 	trianglesurf newTrisSurf;
 
 	n2=triangleRSVS.snakeDep->snaxedges.size();
 	isSnaxEdgeDone.assign(n2,false);
+	pseudoEdgeInd.assign(4,0);
 	triangleRSVS.trisurf.clear();
 	newTrisSurf.index=0;
 	for(ii=0;ii<n2;ii++){
@@ -646,6 +655,8 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 						newTrisSurf.typevert.push_back(actType);
 						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
 							*(triangleRSVS.meshDep), returnIndex, returnType, returnEdge);
+						pseudoEdgeInd[1]=actEdge;
+						pseudoEdgeInd[2]=returnEdge;
 						actEdge=returnEdge;
 						actType=returnType;
 						actIndex=returnIndex;
@@ -666,6 +677,12 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 							FollowSnaxelDirection(actIndex,*(triangleRSVS.snakeDep), returnIndex, returnType,actEdge);
 							actType=returnType;
 							actIndex=returnIndex;
+						} else if (nVert==0){ // Define the direction of the trisurf if no vertex was explored
+							pseudoEdgeInd[1]=triangleRSVS.snakeDep->snaxs.isearch(actIndex)->edgeind;
+							FollowVertexConnection(triangleRSVS.snakeDep->snaxs.isearch(actIndex)->tovert, 
+								pseudoEdgeInd[1], hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
+								*(triangleRSVS.meshDep), returnIndex, returnType, returnEdge);
+							pseudoEdgeInd[2]=returnEdge;
 						}
 					}
 					if (actType==2) {
@@ -675,6 +692,15 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 					if (nVert>maxNEdge) {
 						cout << "Error";
 					}
+				}
+				
+				newTrisSurf.voluind=triangleRSVS.meshDep->surfs(actSurfSub)->voluind;
+				isFlip=OrderMatchLists(pseudoEdgeInd, triangleRSVS.meshDep->surfs(actSurfSub)->edgeind, 
+							 pseudoEdgeInd[1],pseudoEdgeInd[2]);
+				if(isFlip==-1){
+					isFlip=newTrisSurf.voluind[0];
+					newTrisSurf.voluind[0]=newTrisSurf.voluind[1];
+					newTrisSurf.voluind[1]=isFlip;
 				}
 				triangleRSVS.trisurf.push_back(newTrisSurf);
 			}

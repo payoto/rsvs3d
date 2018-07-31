@@ -150,6 +150,7 @@ class trianglesurf : public meshpart , public snakpart {
 public:
 	vector<int> indvert;
 	vector<int> typevert;
+	vector<int> voluind;
 	int parentsurfmesh=0;
 	
 	// interface functions
