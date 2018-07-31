@@ -52,7 +52,7 @@ bool TriFunc::MakeValid(){
 	return(isReady);
 }
 
-void TriFunc::assign(vector<double> &in0,vector<double> &in1,vector<double> &in2){
+void TriFunc::assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2){
 	p0=&in0;
 	p1=&in1;
 	p2=&in2;
@@ -60,16 +60,26 @@ void TriFunc::assign(vector<double> &in0,vector<double> &in1,vector<double> &in2
 	isCalc=false;
 	isReady=false;
 }
+void TriFunc::assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2){
+	p0=in0;
+	p1=in1;
+	p2=in2;
 
-void TriFunc::assign(int pRepI,vector<double> &pRep){
+	isCalc=false;
+	isReady=false;
+}
+void TriFunc::assign(int pRepI,const vector<double> &pRep){
 	
 	switch(pRepI){
 		case 0:
 		p0=&pRep;
+		break;
 		case 1: 
 		p1=&pRep;
+		break;
 		case 2:
 		p2=&pRep;
+		break;
 	}
 	
 	isCalc=false; 
@@ -214,6 +224,27 @@ void CoordFunc::InitialiseArrays(){
 // Derived classes
 
 void Volume::Calc(){
+		/* This function calculates Volume Jacobian and Hessian using
+matlab automatically generated code
+
+the jacobian is arranged :
+	  x0 y0 z0  x1 y1 z1  x2 y2 z2
+ V [                               ] 
+
+ The Hessian is arranged:
+ 					V 	
+	   x0 y0 z0  x1 y1 z1  x2 y2 z2
+ x0 [                               ]  
+ y0 [                               ] 
+ z0 [                               ] 
+ x1 [                               ] 
+ y1 [                               ] 
+ z1 [                               ] 
+ x2 [                               ] 
+ y2 [                               ] 
+ z2 [                               ] 
+
+*/
 	#ifdef SAFE_ALGO
 	PreCalc(); 
 	#endif
@@ -226,6 +257,27 @@ void Volume::Calc(){
 }
  
 void Area::Calc(){
+		/* This function calculates Area Jacobian and Hessian using
+matlab automatically generated code
+
+the jacobian is arranged :
+	  x0 y0 z0  x1 y1 z1  x2 y2 z2
+ A [                               ] 
+
+ The Hessian is arranged:
+ 					A 	
+	   x0 y0 z0  x1 y1 z1  x2 y2 z2
+ x0 [                               ]  
+ y0 [                               ] 
+ z0 [                               ] 
+ x1 [                               ] 
+ y1 [                               ] 
+ z1 [                               ] 
+ x2 [                               ] 
+ y2 [                               ] 
+ z2 [                               ] 
+
+*/
 	#ifdef SAFE_ALGO
 	PreCalc();
 	#endif
@@ -238,6 +290,7 @@ void Area::Calc(){
 }
  
 void LengthEdge::Calc(){  
+
 	#ifdef SAFE_ALGO
 	PreCalc();
 	#endif
@@ -478,3 +531,4 @@ void SurfCentroid::Disp(){
  	DisplayVector(centroid); 
  	cout << endl;
 }
+

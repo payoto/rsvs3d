@@ -64,7 +64,8 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 	triangleRSVS.PrepareForUse();
 }
 
-void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList){
+void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , 
+	const int typeMesh, const vector<int> &subList){
 	int ii,n,nTriS,nTriE,maxIndVert, maxIndTriangle;
 	triarray triangulation::*mp;
 
@@ -160,6 +161,9 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 		surfCentre.index=trivertMaxInd+1;
 		surfCentre.parentsurf=surfin.index;
 		surfCentre.parentType=typeMesh;
+		if(typeMesh==2){
+			surfCentre.nInfluences=n;
+		}
 		trivert.push_back(surfCentre);
 	} else {
 
@@ -176,7 +180,7 @@ void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin,
 	// Generates the triangulation parts 
 	// typeMesh=1 is a static mesh, type 2 is a dynamic one (snake)
 
-	int ii,n;
+	int ii,n,kk;
 	coordvec edgeCentre;
 	trianglepoint surfCentre;
 	triangle triangleEdge;
@@ -191,7 +195,7 @@ void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin,
 	triangleEdge.parentsurf=surfin.index; 
 	triangleEdge.connec.celltarg=surfin.voluind;
 	triangleEdge.connec.constrinfluence={-1.0, 1.0};
-
+	kk=0;
 	if (n>3){
 		for(ii=0; ii<n; ++ii){
 
@@ -200,11 +204,15 @@ void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin,
 			triangleEdge.pointind[0]=surfin.indvert[ii];
 			triangleEdge.pointind[1]=surfin.indvert[(ii+1)%n];
 			triangul.push_back(triangleEdge);
+			kk+=(surfin.typevert[ii]==2);
 		}
 
 		surfCentre.index=trivertMaxInd+1;
 		surfCentre.parentsurf=surfin.index;
 		surfCentre.parentType=typeMesh;
+		if(typeMesh==2){
+			surfCentre.nInfluences=kk;
+		}
 		trivert.push_back(surfCentre);
 	} else if (n==3) {
 
@@ -257,7 +265,8 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
 
-void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn){ 
+void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin,
+	const mesh& snakeconn){ 
 	int ii,n;
 	vector<int> vertind;
 	vector<vector<double> const *> veccoord;

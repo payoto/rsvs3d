@@ -96,6 +96,7 @@ public:
 	void disp() const;
 	bool isready() const {return(bool(isuptodate));};
 	const vector<double>& usedata() const {return(elems);}
+	const vector<double>* retPtr() const {return(&elems);}
 	// Math and logical operations (element wise)
 	void max(const vector<double> &vecin);
 	void min(const vector<double> &vecin);

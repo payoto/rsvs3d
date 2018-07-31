@@ -46,8 +46,9 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(vector<double> &in0,vector<double> &in1,vector<double> &in2);
-	void assign(int pRepI,vector<double> &pRep);
+	void assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2);
+	void assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2);
+	void assign(int pRepI,const vector<double> &pRep);
 	virtual void Calc() = 0; // Virtual function that calculates 
 
 	TriFunc(){

@@ -125,7 +125,8 @@ public:
 	coordvec coord;
 	int parentsurf=0;
 	int parentType=0;
-	
+	int nInfluences=0;
+
 	// interface functions
 	void disp() const override;
 	void disptree(const mesh &meshin, int n) const override;
