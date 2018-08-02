@@ -135,6 +135,7 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
  z0 [                               ]  [                               ]  [                               ] 
  z1 [                               ]  [                               ]  [                               ] 
  zn [                               ]  [                               ]  [                               ] 
+	vector expected as a row vector
 	*/
 
 	int nRow,nCol,nVec,nColFin;
@@ -145,11 +146,11 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	nColFin=nCol/nVec;
 
 	retArray.setZero(nRow,nColFin);
-
+	// needs to add checks for matching sizes
 	for (ii=0;ii<nRow;ii++){
 		for (jj=0;jj<nColFin;jj++){
 			for (kk=0;kk<nVec;kk++){
-				retArray(ii,jj)+=arr3dim(ii,jj*nVec+kk)*vec[kk];
+				retArray(ii,jj)+=arr3dim(ii,jj*nVec+kk)*vec(1,kk);
 			}	
 		}	
 	}
@@ -171,7 +172,7 @@ void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,
 }
 
 /// INSPIRATION
-
+/*
 void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
 	int ii,n;
 	vector<int> vertind;
@@ -221,5 +222,5 @@ void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const
 	tempCalc.ReturnDat(tempCoord,jac,hes);
 	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
-
+*/
 
