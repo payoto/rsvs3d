@@ -1,7 +1,7 @@
 
 #include "RSVSmath.hpp"
 #include "RSVSmath_automatic.hpp"
-
+#include "arraystructures.hpp" // for use of DisplayVector
 
 using namespace std;
 
@@ -9,9 +9,9 @@ using namespace std;
 bool TriFunc::MakeValidField(vector<double>* TriFunc::*mp){
 	// Tries to make a valid array
 	// Warning : This operates directly on the data stored in the field of the pointer
-	
+	 
 	int ii,n;
-	bool fieldReady; 
+	bool fieldReady=true; 
 	if ((this->*mp)==NULL){
 		fieldReady=false;
 	} else {
@@ -36,7 +36,7 @@ bool TriFunc::CheckValid(){
 	if (p2==NULL){isReady=false;} else if (int(p2->size())!=nTarg){isReady=false;}
 
 	return(isReady);
-}
+} 
 
 bool TriFunc::MakeValid(){
 	// Tries to make a valid array
@@ -52,7 +52,7 @@ bool TriFunc::MakeValid(){
 	return(isReady);
 }
 
-void TriFunc::assign(vector<double> &in0,vector<double> &in1,vector<double> &in2){
+void TriFunc::assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2){
 	p0=&in0;
 	p1=&in1;
 	p2=&in2;
@@ -60,16 +60,26 @@ void TriFunc::assign(vector<double> &in0,vector<double> &in1,vector<double> &in2
 	isCalc=false;
 	isReady=false;
 }
+void TriFunc::assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2){
+	p0=in0;
+	p1=in1;
+	p2=in2;
 
-void TriFunc::assign(int pRepI,vector<double> &pRep){
+	isCalc=false;
+	isReady=false;
+}
+void TriFunc::assign(int pRepI,const vector<double> &pRep){
 	
 	switch(pRepI){
 		case 0:
 		p0=&pRep;
+		break;
 		case 1: 
 		p1=&pRep;
+		break;
 		case 2:
 		p2=&pRep;
+		break;
 	}
 	
 	isCalc=false; 
@@ -214,6 +224,27 @@ void CoordFunc::InitialiseArrays(){
 // Derived classes
 
 void Volume::Calc(){
+		/* This function calculates Volume Jacobian and Hessian using
+matlab automatically generated code
+
+the jacobian is arranged :
+	  x0 y0 z0  x1 y1 z1  x2 y2 z2
+ V [                               ] 
+
+ The Hessian is arranged:
+ 					V 	
+	   x0 y0 z0  x1 y1 z1  x2 y2 z2
+ x0 [                               ]  
+ y0 [                               ] 
+ z0 [                               ] 
+ x1 [                               ] 
+ y1 [                               ] 
+ z1 [                               ] 
+ x2 [                               ] 
+ y2 [                               ] 
+ z2 [                               ] 
+
+*/
 	#ifdef SAFE_ALGO
 	PreCalc(); 
 	#endif
@@ -226,6 +257,27 @@ void Volume::Calc(){
 }
  
 void Area::Calc(){
+		/* This function calculates Area Jacobian and Hessian using
+matlab automatically generated code
+
+the jacobian is arranged :
+	  x0 y0 z0  x1 y1 z1  x2 y2 z2
+ A [                               ] 
+
+ The Hessian is arranged:
+ 					A 	
+	   x0 y0 z0  x1 y1 z1  x2 y2 z2
+ x0 [                               ]  
+ y0 [                               ] 
+ z0 [                               ] 
+ x1 [                               ] 
+ y1 [                               ] 
+ z1 [                               ] 
+ x2 [                               ] 
+ y2 [                               ] 
+ z2 [                               ] 
+
+*/
 	#ifdef SAFE_ALGO
 	PreCalc();
 	#endif
@@ -238,6 +290,7 @@ void Area::Calc(){
 }
  
 void LengthEdge::Calc(){  
+
 	#ifdef SAFE_ALGO
 	PreCalc();
 	#endif
@@ -292,12 +345,22 @@ the jacobian is arranged :
 			LengthEdge_f(*coords[jj],*coords[(jj+1)%nCoord],currEdge);
 			edgeLength+=currEdge;
 			for(ii=0; ii<nDim; ++ii){
-				centroid[ii]+=currEdge*((*coords[jj])[ii]+(*coords[(jj+1)%nCoord])[ii])/2;
+				centroid[ii]+=currEdge*(
+					(*(coords[jj]))[ii]
+					+(*(coords[(jj+1)%nCoord]))[ii])/2;
 			}
 			
 		}
-		for(ii=0; ii<nDim; ++ii){
-			funA[ii][0]=centroid[ii]/edgeLength;
+		if(edgeLength<0.000000000000001){
+			cout << "Warning edgeLength is 0" << endl;
+			for(ii=0; ii<nDim; ++ii){
+				funA[ii][0]=(*(coords[0]))[ii];
+			}
+			edgeLength=0.0000001;
+		} else {
+			for(ii=0; ii<nDim; ++ii){
+				funA[ii][0]=centroid[ii]/edgeLength;
+			}
 		}
 		if  (nCoord<4){
 			throw invalid_argument("nCoord <= 3 surfCentroid Not implemented");
@@ -316,12 +379,15 @@ the jacobian is arranged :
 				case 4:
 					//SurfCentroid4_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid4_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 				case 5:
 					//SurfCentroid5_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid5_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 				case 6:
 					//SurfCentroid6_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
 					SurfCentroid6_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					break;
 			}
 		} else {
 			/*the jacobian is arranged :
@@ -453,3 +519,16 @@ the jacobian is arranged :
 
 	}
 }
+
+
+void SurfCentroid::Disp(){
+	 for (int ii=0; ii< nCoord ; ii++){
+	 	cout << "c " << ii << " ";
+	 	DisplayVector(*coords[ii]); 
+	 	cout << endl;
+	 }
+ 	cout << "edgeLength" << edgeLength << endl << "centroid ";
+ 	DisplayVector(centroid); 
+ 	cout << endl;
+}
+

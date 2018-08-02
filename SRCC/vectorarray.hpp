@@ -65,6 +65,25 @@ public:
 
 };
 
+/*template<class T> class vectorsafe : public vector<T>{
+public: 
+	using vector<T>::size;
+
+	T& operator[](const int a) const { 
+	// [] Operator returns a reference to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if (((a)>=int(size())) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		return((*this)[a]);
+	}
+	void operator=(vector<T> &a){
+		(this)= dynamic_cast<vectorsafe*>(a);
+	}
+};*/
+
 #include "vectorarray_incl.cpp"
 
 #endif // SNAKEVEL_H_INCLUDED

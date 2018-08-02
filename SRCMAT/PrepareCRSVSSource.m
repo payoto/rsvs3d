@@ -71,17 +71,31 @@ end
 %% Code Generation functions
 
 function ccodeGen=ChangeUnderScoresToBrackets(ccodeGen)
-    pRBrack={'([0-9])__','$1]'};
-    pLBrack={'_([0-9])','[$1'};
+    pRBrack={'([0-9]*)__','$1-1]'};
+    pLBrack={'_([0-9]*)','[$1'};
     
     ccodeGen.f=regexprep(ccodeGen.f,pRBrack{1},pRBrack{2});
     ccodeGen.f=regexprep(ccodeGen.f,pLBrack{1},pLBrack{2});
+    [ccodeGen.f]=ChangeMinus1toNum(ccodeGen.f);
     
     ccodeGen.df=regexprep(ccodeGen.df,pRBrack{1},pRBrack{2});
     ccodeGen.df=regexprep(ccodeGen.df,pLBrack{1},pLBrack{2});
+    [ccodeGen.df]=ChangeMinus1toNum(ccodeGen.df);
     
     ccodeGen.ddf=regexprep(ccodeGen.ddf,pRBrack{1},pRBrack{2});
     ccodeGen.ddf=regexprep(ccodeGen.ddf,pLBrack{1},pLBrack{2});
+    [ccodeGen.ddf]=ChangeMinus1toNum(ccodeGen.ddf);
+end
+
+function [str]=ChangeMinus1toNum(str)
+    
+    [a,b,c]=regexp(str,'\[[0-9]-1\]','start','end','match');
+    
+    for ii=1:numel(a)
+       c{ii}=['[',int2str(str2double(c{ii}(2:end-3))-1),']'];
+       str(a(ii):b(ii))=[c{ii},blank(b(ii)-a(ii)-numel(c{ii}))];
+    end
+    
 end
 
 function [ccodeGen]=CCodeGenStruct(varargin)

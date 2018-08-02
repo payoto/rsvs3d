@@ -14,6 +14,7 @@
 #include <cmath> 
 #include "vectorarray.hpp" 
 #include "RSVSmath_automatic.hpp"
+
 using namespace std; 
 
 
@@ -45,8 +46,9 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(vector<double> &in0,vector<double> &in1,vector<double> &in2);
-	void assign(int pRepI,vector<double> &pRep);
+	void assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2);
+	void assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2);
+	void assign(int pRepI,const vector<double> &pRep);
 	virtual void Calc() = 0; // Virtual function that calculates 
 
 	TriFunc(){
@@ -57,7 +59,8 @@ public:
 		isReady=false;
 		isCalc=false;
 	}
-	TriFunc(int nTarg){
+	explicit TriFunc(int a){
+		nTarg=a;
 		fun=0;
 		jac.assign(1,3*nTarg,fun);
 		hes.assign(3*nTarg,3*nTarg,fun);
@@ -107,7 +110,7 @@ public:
 		nFun=1;
 		InitialiseArrays();
 	}
-	CoordFunc(int n1){
+	explicit CoordFunc(int n1){
 		nDim=n1;
 		nCoord=3;
 		nFun=1;
@@ -143,7 +146,7 @@ class Volume : public TriFunc {
 	using TriFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 };
 
 class Area : public TriFunc {
@@ -157,7 +160,7 @@ class Area : public TriFunc {
 	using TriFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 
 };
 
@@ -170,7 +173,7 @@ class LengthEdge : public CoordFunc {
 	using CoordFunc::hes;
 
 public:
-	void Calc();
+	void Calc() override;
 	LengthEdge() : CoordFunc(3,2){}
 };
 
@@ -188,16 +191,14 @@ protected:
 	vector<double> centroid;
 	double edgeLength=0.0;
 public:
-	
-	void Calc();
+	void Disp();
+	void Calc() override;
 	void assigncentroid(const vector<double> &vecin);
 	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
-	SurfCentroid(int nCoord) : CoordFunc(3,nCoord,3){centroid.assign(nDim,0);};
-
-	~SurfCentroid(){
-		coords.clear();
-	}
-
+	explicit SurfCentroid(int a) : CoordFunc(3,a,3){
+		nCoord=a;
+		centroid.assign(nDim,0);
+	};
 };
 
 #endif

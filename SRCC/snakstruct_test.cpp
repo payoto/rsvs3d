@@ -8,7 +8,7 @@
 #include "snakevel.hpp"
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp" 
-
+#include "RSVSmath.hpp"
 
 using namespace std;
 
@@ -22,7 +22,7 @@ int Test_SnakeStructures() {
    // Test the functionality provided by arraystructures
 
 	int errFlag,errTest;
-
+ 
 
 	errFlag=0;
 
@@ -69,7 +69,8 @@ int Test_coordvec(){
 		unitCoord.disp();
 
 		cout << "unit access: ";
-		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< testCoord.Unit(2) << "] norm 1" << endl;
+		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< 
+			testCoord.Unit(2) << "] norm 1" << endl;
 
 		cout << "base oper(): ";
 		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1)<< ","<< testCoord(2) << "] " << endl;
@@ -211,17 +212,17 @@ int Test_snake(){
 	return(errTest);
 
 }
-
-int Test_snakeinit(){
+ 
+int Test_snakeinit(){ 
 	snake testSnake;
 	mesh snakeMesh, triMesh;
 	triangulation testTriangle;
-	const char *fileToOpen;
-	tecplotfile outSnake;
-	double totT=0.0;
-	vector<double> dt;
+	const char *fileToOpen;    
+	tecplotfile outSnake;   
+	double totT=0.0;  
+	vector<double> dt;  
 	vector<int> isImpact;
-	int start_s,stop_s,ii;
+	int start_s,stop_s,ii;   
 	//bool errFlag;
 	int errTest=0;
 	
@@ -266,7 +267,7 @@ int Test_snakeinit(){
 				outSnake.PrintMesh(triMesh,2,totT);
 			}
 
-			Test_stepalgo(testSnake, dt, isImpact,outSnake);
+			Test_stepalgo(testSnake, dt, isImpact);
 			
 			totT=totT+1;
 		}
@@ -362,16 +363,6 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	start_s=clock();
 	start_f=clock();
 
-	CleanupSnakeConnec(testSnake);
-
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	stop_s=clock();
-	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
-	start_s=clock();
 	CalculateSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
@@ -427,6 +418,25 @@ void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 	//testSnake.PrepareForUse();
 	stop_s=clock();
 	cout << "Impact merge: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
+
+	start_s=clock();
+	CleanupSnakeConnec(testSnake);
+
+	#ifdef SAFE_ALGO
+	if (testSnake.Check3D()){
+		testSnake.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
+	stop_s=clock();
+	cout << "cleanup: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
+	start_s=clock();
+	testSnake.OrientSurfaceVolume();
+
+	stop_s=clock();
+	cout << "Volu Orientation: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
+
 	cout << "Total: " << double(stop_s-start_f)/double(CLOCKS_PER_SEC)*1000 << "ms  " << endl;
 
 
@@ -486,6 +496,7 @@ int Test_MeshRefinement(){
 		outSnake.PrintMesh(snakeMesh);
 
 		snakeMesh.OrderEdges();
+		snakeMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(snakeMesh);
 		//testSnake.disp();
 		for (ii=0;ii<snakeMesh.volus.size();++ii){
@@ -509,8 +520,12 @@ int Test_MeshRefinement(){
 		voluMesh.TightenConnectivity();
 		voluMesh.OrderEdges();
 		testTriangle.PrepareForUse();
+		testTriangle.CalcTriVertPos();
 		MeshTriangulation(triMesh,voluMesh,testTriangle.stattri, testTriangle.trivert);
+
+		voluMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(voluMesh);
+		triMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(triMesh);
 
 
@@ -522,6 +537,43 @@ int Test_MeshRefinement(){
 
 }
 
+int Test_surfcentre(){ 
+	// int ii,n;
+	// vector<int> vertind;
+    vector<vector<double> const *> veccoord;
+	SurfCentroid tempCalc;
+	vector<double> v1 = {0.0 , 0.0, 0.0 };
+	vector<double> v2 = {1.0 , 1.0, 0.0 };
+	vector<double> v3 = {0.0 , 1.0, 1.0 };
+	vector<double> v4 = {1.0 , 0.0, 0.0 };
+	vector<double> v5 = {1.0 , 0.0, 0.0 };
+	// ArrayVec<double> tempCoord,jac,hes;
+
+	// coord.assign(0,0,0);
+	// n=int(surfin.edgeind.size());
+
+	// veccoord.reserve(n);
+	// ConnVertFromConnEdge(meshin, surfin.edgeind,vertind);
+
+	// for(ii=0; ii<n; ++ii){
+	// 	veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
+	// }
+	veccoord.push_back(&v1);
+	veccoord.push_back(&v2);
+	veccoord.push_back(&v3);
+	veccoord.push_back(&v4);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
+	veccoord.push_back(&v5);
+	tempCalc.assign(veccoord);
+	tempCalc.Calc();
+
+	// tempCalc.ReturnDat(tempCoord,jac,hes);
+	// coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
+
+	return(0);
+}
 
 int Test_snakeRSVS(){
 	snake testSnake;
@@ -544,6 +596,7 @@ int Test_snakeRSVS(){
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		snakeMesh.PrepareForUse();
+		snakeMesh.OrientSurfaceVolume();
 
 		///// Generate Coarser Volume Mesh
 		testSnake.snakemesh=&snakeMesh;
@@ -563,6 +616,7 @@ int Test_snakeRSVS(){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
+		voluMesh.OrientSurfaceVolume();
 		snakeMesh.AddParent(&voluMesh,elmMapping);
 		outSnake.PrintMesh(voluMesh);
 
@@ -604,10 +658,14 @@ int Test_snakeRSVS(){
 				outSnake.PrintMesh(triMesh,2,totT);
 				MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
 				outSnake.PrintMesh(triMesh,3,totT);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+				
 			}
 
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact,outSnake);
-			
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
+			//cout << endl <<  "intertri size: " << triRSVS.intertri.size() << endl;
 			totT=totT+1;
 		}
 
@@ -621,9 +679,12 @@ int Test_snakeRSVS(){
 			outSnake.PrintMesh(triMesh,2,totT);
 			MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
 			outSnake.PrintMesh(triMesh,3,totT);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
 		}
 		stop_s=clock();
-		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
 	// the code you wish to time goes here
 		
@@ -637,9 +698,11 @@ int Test_snakeRSVS(){
 	return(errTest);
 
 }
-void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> dt, vector<int> isImpact, tecplotfile &outSnake){
-
-	Test_stepalgo(testSnake,  dt, isImpact, outSnake);
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact){
+	int start_s,stop_s;
+	Test_stepalgo(testSnake,  dt, isImpact);
+	start_s=clock();
 	MaintainTriangulateSnake(RSVStri);
-
+	stop_s=clock();
+	cout << "triangulation: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 }

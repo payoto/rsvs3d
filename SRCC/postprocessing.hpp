@@ -27,6 +27,7 @@ class mesh;
 #include <iostream>
 #include <stdarg.h>
 #include "arraystructures.hpp"
+#include "snakevel.hpp" 
 
 
 //==================================
@@ -46,6 +47,8 @@ private:
 public:
 	int OpenFile(const char *str);
 	void CloseFile();
+
+	// Mesh out
 	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0, int forceOutType=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
@@ -53,7 +56,27 @@ public:
 	int VolFaceMap(const mesh& meshout,int nSurf);
 	int SurfFaceMap(const mesh& meshout,int nEdge);
 	int LineFaceMap(const mesh& meshout,int nEdge);
+
+	// Triangulation out
+	int VolDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nVolu, int nVertDat);
+	int SurfDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nSurf, int nVertDat);
+	int LineDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat);
+	int SurfFaceMap(const triangulation &triout, triarray triangulation::*mp);
+	int LineFaceMap(const triangulation &triout, triarray triangulation::*mp);
+	int VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf);
+	int PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID=0, double timeStep=0, int forceOutType=0);
+
+	// Triangulation surface array out
+	int VolDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nVolu, int nVertDat);
+	int SurfDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nSurf, int nVertDat);
+	int LineDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat);
+	int SurfFaceMap(const triangulation &triout, trisurfarray triangulation::*mp);
+	int LineFaceMap(const triangulation &triout, trisurfarray triangulation::*mp);
+	int VolFaceMap(const triangulation &triout, trisurfarray triangulation::*mp,int nSurf);
+	int PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp,int strandID=0, double timeStep=0, int forceOutType=0);
+
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,int nVertDat, int nCellDat);
+
 	void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
 	void ZoneHeaderFelineseg(int nVert,int nEdge,int nVertDat, int nCellDat);
 

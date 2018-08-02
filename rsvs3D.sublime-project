@@ -52,42 +52,31 @@
 			"C++RSVS3D"
 		]
 	},
-	"SublimeLinter":
-    {
-		"linters": {
-	        // "cppcheck": {
-		       //  "@disable": false,
-		       //  "args": [],
-		       //  "enable": "style",
-		       //  "excludes": [],
-		       //  "std": ["c++11"],
-		       //  //"selector": "source.cpp, source.hpp"
-	        // },
-	        "gcc": {
-	              "disable": false,
-	              "selector": "source.c++",
-	              // C-specific settings
-	              "c_executable": "gcc",
-	              "c_extra_flags": [
-	                  "-fsyntax-only",
-	                  "-std=c90",
-	              ],
-	              
-	              // C++-specific settings
-	              "c++_executable": "g++",
-	              "c++_extra_flags": [
-	                  "-fsyntax-only",
-	                  "-std=c++11",
-	              ],
-	              
-	              // include_dirs for both C and C++
-	              "include_dirs": [
-	               //    "${project_folder}/include",
-	                   "C:\\ap1949include\\Eigen_all\\Eigen\\",
-	               ],
-	          },
-	    },
-	},
+	// "settings": {
+ //        "SublimeLinter.linters.cppcheck.disable": false, 
+ //        "SublimeLinter.linters.cppcheck.args": [], 
+ //        "SublimeLinter.linters.cppcheck.enable": "style", 
+ //        "SublimeLinter.linters.cppcheck.excludes": ["variableScope"], 
+ //        "SublimeLinter.linters.cppcheck.std": [
+ //            "c++11"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.c++_executable": "g++", 
+ //        "SublimeLinter.linters.gcc.c++_extra_flags": [
+ //            "-fsyntax-only", 
+ //            "-std=c++11"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.c_executable": "gcc", 
+ //        "SublimeLinter.linters.gcc.c_extra_flags": [
+ //            "-fsyntax-only", 
+ //            "-std=c90"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.disable": false, 
+ //        "SublimeLinter.linters.gcc.include_dirs": [
+ //            "C:\\ap1949include\\Eigen_all\\Eigen\\"
+ //        ], 
+ //        "SublimeLinter.linters.gcc.selector": "source.c++"
+ //    },
+    
     "settings":
     {
          "sublimegdb_workingdir": "${folder:${project_path:main_test.exe}}",

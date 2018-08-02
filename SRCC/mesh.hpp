@@ -62,11 +62,11 @@ class surf;
 class vert;
 class edge;
 class coordvec;
-class surfarray;
-//typedef ArrayStruct<surf> surfarray;
 
+//typedef ArrayStruct<surf> surfarray;
+typedef ModiftrackArray<surf> surfarray;
 typedef ArrayStruct<volu> voluarray;
-typedef ArrayStruct<edge> edgearray;
+typedef ModiftrackArray<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
 
 // Forward declared templated functions
@@ -96,15 +96,19 @@ public:
 	void disp() const;
 	bool isready() const {return(bool(isuptodate));};
 	const vector<double>& usedata() const {return(elems);}
+	const vector<double>* retPtr() const {return(&elems);}
 	// Math and logical operations (element wise)
 	void max(const vector<double> &vecin);
 	void min(const vector<double> &vecin);
 	void add(const vector<double> &vecin);
 	void substract(const vector<double> &vecin);
+	void substractfrom(const vector<double> &vecin);
 	void div(const vector<double> &vecin);
 	void div(double scalin);
 	void mult(const vector<double> &vecin);
 	void mult(double scalin);
+	vector<double> cross(const vector<double> &vecin);
+	double dot(const vector<double> &vecin);
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -115,7 +119,7 @@ public:
 		cout << "constructor called for coordvec" << endl;
 		#endif
 	}
-	void operator=(vector<double> a){
+	void operator=(const vector<double> &a){
 		if(int(a.size())!=3){
 			cout << "Warning : Coordinate vector is being a vecetor other than 3 long" << endl;
 		}
@@ -196,13 +200,13 @@ public:
 
 
 
-class surf: public meshpart {
+class surf: public meshpart , public modiftrackpart {
 protected:
 	bool isordered;
-	bool isModif=true;
+	//bool isModif=true;
 public:
 	friend class mesh;
-	friend class surfarray;
+	friend surfarray;
 	//friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
 	//friend void mesh::RemoveIndex(int typeInd, int oldInd);
 
@@ -219,9 +223,11 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void OrderEdges(mesh *meshin);
+	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
-	bool returnIsModif() const {return(isModif);}
+	void FlipVolus();
+	//bool returnIsModif() const {return(isModif);}
 
 	surf(){ // Constructor
 		index=0;
@@ -262,8 +268,10 @@ public:
 };
 
 
-class edge: public meshpart {
+class edge: public meshpart , public modiftrackpart {
 public:
+	friend class mesh;
+	friend edgearray;
 	
 
 	vector<int> vertind;
@@ -369,7 +377,7 @@ public:
 	
 };
 
-
+/*
 class surfarray : public ArrayStruct<surf>{
 	using ArrayStruct<surf>::elems;
 	friend class mesh;
@@ -386,7 +394,7 @@ public:
 		elems[a].isModif=true;
 		return(ArrayStruct<surf>::operator[](a));
 	}
-};
+};*/
 
 class meshdependence {
 	// Class for connecting meshes
@@ -424,7 +432,7 @@ public:
 	voluarray volus;
 
 	meshdependence meshtree;
-// Mesh Lineage
+	// Mesh Lineage
 	void RemoveFromFamily();
 	void AddChild(mesh* meshin);
 	void AddParent(mesh* meshin);
@@ -433,7 +441,7 @@ public:
 	void SetMeshDepElm();
 	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
 	int WhatDim(){return(meshDim);}
-// basic operations grouped from each field
+	// basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
@@ -448,12 +456,12 @@ public:
 	void TightenConnectivity();
 	void TestConnectivity();
 	void TestConnectivityBiDir();
-//File I/o
+	//File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
 	int write(const char *str) const;
 	int read(const char *str);
-// Mesh merging
+	// Mesh merging
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -461,10 +469,14 @@ public:
 	void RemoveIndex(int typeInd, int oldInd);
 	int ConnectedVertex(vector<int> &vertBlock) const;
 	void ForceCloseContainers();
-// Mesh Quality
+	// Mesh Quality
 	int OrderEdges();
+	void OrientSurfaceVolume();
+	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
-
+	// Mesh calculations
+	coordvec CalcCentreVolu(int ind) const;
+	coordvec CalcPseudoNormalSurf(int ind) const;
 
 	~mesh(){
 		RemoveFromFamily();
@@ -474,7 +486,7 @@ public:
 // Function declarations
 
 void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind);
-
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2);
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();

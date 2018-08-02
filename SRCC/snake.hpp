@@ -31,7 +31,6 @@
 #include <unordered_map>
 
 #include "arraystructures.hpp"
-#include "postprocessing.hpp"
 #include "mesh.hpp"
 
 //==================================
@@ -120,14 +119,10 @@ public:
 	void Flip(); // reverses snake directions
 	// Snake connectivity operations
 	void SetSnaxSurfs() {}
-
+	void OrientSurfaceVolume();
 };
 
-class snakpart { // required functions for parts of snake
-public: 
-	virtual int KeyParent() const =0;
-};
-
+ 
 class snax : public meshpart , public snakpart {	
 public:
 	

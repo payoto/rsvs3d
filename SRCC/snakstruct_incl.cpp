@@ -140,4 +140,38 @@ void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const
 	siblings=ReturnDataEqualRange(key, hashParent);
 }
 
+
+// Surfarray methods
+template<class T>
+void ModiftrackArray<T>::SetNoModif(){
+	int ii,n;
+	n=ArrayStruct<T>::size();
+	for(ii=0;ii<n;++ii){
+		elems[ii].isModif=false;
+	}
+}
+
+template<class T>
+void ModiftrackArray<T>::ReturnModifInd(vector<int> &vecind){
+	int ii,n;
+	n=ArrayStruct<T>::size();
+	vecind.clear();
+	for(ii=0;ii<n;++ii){
+		if(elems[ii].isModif){
+			vecind.push_back(elems[ii].index);
+		}
+	}
+}
+
+template<class T>
+void ModiftrackArray<T>::ReturnModifLog(vector<bool> &modiflog){
+	int ii,n;
+	n=ArrayStruct<T>::size();
+	modiflog.assign(n,false);
+	for(ii=0;ii<n;++ii){
+
+		modiflog[ii]=(elems[ii].index);
+	}
+}
+
 #endif // ARRAYSTRUCTS_INCL_H_INCLUDED 

@@ -436,9 +436,8 @@ void snaxarray::OrderOnEdge(){
 void snaxarray::ReorderOnEdge()
 {
 
-	vector<int> edgeInds,snaxSubs,orderSubs;
-	vector<double> orderSnax,unorderSnax;
-	unordered_multimap<double,int> hashOrder;
+	vector<int> edgeInds,snaxSubs;
+	vector<double> orderSnax;
 	int isBwd;
 	int ii, jj, nEdge, maxOrd=0;
 	bool needIncrement;
@@ -677,6 +676,60 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 }
 
 
+void snake::OrientSurfaceVolume(){ 
+	// Orders the surf.voluind [c0 c1] such that the surface normal vector points
+	// from c0 to c1
+	// This is done by using the surface normals and checking they go towards
+	// the centre of the cell
+
+	int nBlocks,ii,jj, ni,nj,kk,ll;
+	vector<int> surfOrient;
+	vector<bool> isFlip;
+	double dotProd;
+	coordvec centreVolu, normalVec;
+
+
+	nBlocks=snakeconn.OrientRelativeSurfaceVolume(surfOrient);
+	isFlip.assign(nBlocks,false);
+	//========================================
+	//  Select direction using coordinate geometry
+	//     use a surface 
+
+	for (ii=1; ii<= nBlocks; ii++){
+		jj=-1; nj=surfOrient.size();
+		do{
+			jj++;
+			while(jj<nj && ii!=abs(surfOrient[jj]))
+				{jj++;}
+			if(jj==nj){ // if the orientation cannot be defined
+				dotProd=1.0;
+				kk=0;
+				cerr << "Warning: Cell orientations could not be computed " << endl;
+				cerr << "			in " << __PRETTY_FUNCTION__ << endl;
+				break;
+			}
+			kk=snakeconn.surfs(jj)->voluind[0]==0;
+			ll=snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)->edgeind[0])->vertind[0])->tovert;
+			centreVolu=snakemesh->verts.isearch(ll)->coord;
+			ll=snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)->edgeind[0])->vertind[0])->fromvert;
+			centreVolu.substract(snakemesh->verts.isearch(ll)->coord);
+			
+			normalVec=snakeconn.CalcPseudoNormalSurf(snakeconn.surfs(jj)->index);
+
+			dotProd=centreVolu.dot(normalVec.usedata());
+		} while (!isfinite(dotProd) || (fabs(dotProd)<numeric_limits<double>::epsilon()));
+
+
+		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) || ((dotProd>0.0) && (kk==1)));
+	}
+	ni=surfOrient.size();
+	for(ii=0; ii< ni; ++ii){
+		if(isFlip[abs(surfOrient[ii])-1]){
+			snakeconn.surfs.elems[ii].FlipVolus();
+		}
+	}
+
+}
 
 
 // -------------------------------------------------------------------------------------------
