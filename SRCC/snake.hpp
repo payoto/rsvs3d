@@ -79,6 +79,7 @@ class snake  {
 private:
 	bool is3D=true;
 	void SetLastIndex(); // Baaaad function do not use if you're not sure.
+	bool isFlipped=false;
 public:
 	// Handling of data specific to snake
 	snaxarray snaxs; 			// properties associated with snakconn verts
@@ -88,7 +89,7 @@ public:
 	mesh snakeconn;
 	// pointer to snaking mesh
 	mesh *snakemesh=NULL;
-
+	vector<bool> isMeshVertIn;
 	// basic operations grouped from each field
 	void disp() const;
 
@@ -120,6 +121,10 @@ public:
 	// Snake connectivity operations
 	void SetSnaxSurfs() {}
 	void OrientSurfaceVolume();
+
+	void VertIsIn(int vertInd, bool isIn=true);
+	void VertIsIn(vector<int> vertInd, bool isIn=true);
+
 };
 
  

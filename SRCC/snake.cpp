@@ -272,7 +272,7 @@ void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 	snakeconn.Init(nSnax, nEdge, nSurf, nVolu);
 
 	snakemesh=snakemeshin;
-
+	isMeshVertIn.assign(snakemeshin->verts.size(),false);
 }
 
 void snake::reserve(int nSnax, int nEdge, int nSurf, int nVolu){
@@ -318,14 +318,31 @@ void snake::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 }
 
 void snake::Concatenate(const snake &other){
-
+	int i,ni;
 	if(this->snakemesh==other.snakemesh){
 		this->snaxs.Concatenate(other.snaxs);
 		this->snaxedges.Concatenate(other.snaxedges);
 		this->snaxsurfs.Concatenate(other.snaxsurfs);
 		this->snakeconn.Concatenate(other.snakeconn);
+		ni=isMeshVertIn.size();
+		if(!isFlipped && !other.isFlipped){
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
+			}
+		} else if (isFlipped && other.isFlipped) {
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
+			}
+		} else if (!isFlipped && other.isFlipped) {
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
+			} //xor
+		} else if (isFlipped && !other.isFlipped) {
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
+			} //xor
+		}
 	} else {
-
 		throw invalid_argument("Concatenation of snakes with different base meshes not supported");
 	}
 
@@ -346,6 +363,28 @@ void snake::MakeCompatible_inplace(snake &other) const{
 snake snake::MakeCompatible(snake other) const{
 	MakeCompatible_inplace(other);
 	return(other);
+}
+
+
+void snake::VertIsIn(int vertInd , bool isIn){
+
+	if (snakemesh!=NULL){
+		int i=snakemesh->verts.find(vertInd);
+		if (i!=-1){
+			isMeshVertIn[i]=isIn;
+		}
+	} 
+}
+void snake::VertIsIn(vector<int> vertInd, bool isIn){
+	if (snakemesh!=NULL){
+		int nj=vertInd.size();
+		for (int j=0; j<nj; j++){
+			int i=snakemesh->verts.find(vertInd[j]);
+			if (i!=-1){
+				isMeshVertIn[i]=isIn;
+			}
+		}
+	}
 }
 
 
@@ -566,6 +605,7 @@ void snake::Flip(){
 		snaxs[ii].d=1.0-snaxs[ii].d;
 		snaxs[ii].v=-snaxs[ii].v;
 	}
+	isFlipped= !isFlipped;
 	snaxs.ForceArrayReady();
 }
 

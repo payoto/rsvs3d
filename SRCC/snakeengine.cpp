@@ -60,6 +60,7 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	nVolu=int(is3D);
 
 	newsnake.Init(snakein.snakemesh,nVert,nEdge,nSurf,nVolu);
+	newsnake.VertIsIn(indVert);
 	// Generates snaxels and vertices
 	SpawnAtVertexVert(newsnake,nVert, indVert,subVert, surfInds,edgeInds,
 		edgeSubs,hashSurfInds);

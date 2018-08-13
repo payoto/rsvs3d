@@ -14,13 +14,27 @@ using namespace Eigen;
 
 void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 
-	int ii,jj,ni,nj;
+	int ii,ni;
 	int nDv, nConstr;
 	vector<int> vecin;
-	// Start prepare the SQP object
-
+	// prepare the SQP object
+	nConstr=triRSVS.meshDep->volus.size();
+	nDv=triRSVS.snakeDep->snaxs.size();
 	BuildMathArrays(nDv, nConstr);
+
+	vecin.reserve(nConstr);
+	for(ii=0; ii<nConstr; ++ii){
+		vecin.push_back(triRSVS.meshDep->volus(ii)->index);
+	}
 	BuildConstrMap(vecin);
+
+	vecin.clear();
+	vecin.reserve(nDv);
+	for(ii=0; ii<nDv; ++ii){
+		vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
+	}
+	BuildDVMap(vecin);
+
 	// Calculate the SQP object
 	ni=triRSVS.dynatri.size();
 	for(ii = 0; ii< ni ; ii++){
@@ -34,6 +48,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	for(ii = 0; ii< ni ; ii++){
 		CalcTriangle(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS);
 	} 
+
 	// Output some data to check it makes sense
 
 }
