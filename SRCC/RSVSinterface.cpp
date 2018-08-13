@@ -42,6 +42,7 @@ void SQPcalc::BuildDVMap(const vector<int> &vecin){
 
 void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
+
 	int ii,ni,jj,nj,kk;
 	int isCentre,posCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
@@ -117,7 +118,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// Total
 
 
-
 	// Assign to main part of the object
 } 
 
@@ -136,14 +136,21 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
  z1 [                               ]  [                               ]  [                               ] 
  zn [                               ]  [                               ]  [                               ] 
 	vector expected as a row vector
+	[xc yc zc]
+
+	will sum the three Hessians according to the values in the vector
 	*/
 
 	int nRow,nCol,nVec,nColFin;
 	int ii,jj,kk;
 	nRow=arr3dim.rows();
 	nCol=arr3dim.cols();
-	nVec=vec.size();
+	nVec=vec.rows();
 	nColFin=nCol/nVec;
+
+	#ifdef SAFE_ALGO
+
+	#endif
 
 	retArray.setZero(nRow,nColFin);
 	// needs to add checks for matching sizes
