@@ -49,6 +49,7 @@ public:
 	void assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2);
 	void assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2);
 	void assign(int pRepI,const vector<double> &pRep);
+	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c) ;
 	virtual void Calc() = 0; // Virtual function that calculates 
 
 	TriFunc(){
@@ -99,6 +100,8 @@ public:
 	void assign(int pRepI,vector<double> &pRep);
 	void ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c);
+	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c);
+	void ReturnDatPoint(ArrayVec<double> **a, ArrayVec<double> **b,ArrayVec<double> **c);
 	virtual void Calc() = 0; // Virtual function that calculates the function
 
 	void ResetDim(int n){nDim=n;InitialiseArrays();}

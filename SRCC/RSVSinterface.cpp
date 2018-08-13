@@ -11,7 +11,34 @@ using namespace std;
 using namespace Eigen; 
 
 
-void SQPcalc::BuildMathArrays (int nDvIn, int nConstrIn){
+
+void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
+
+	int ii,jj,ni,nj;
+	int nDv, nConstr;
+	vector<int> vecin;
+	// Start prepare the SQP object
+
+	BuildMathArrays(nDv, nConstr);
+	BuildConstrMap(vecin);
+	// Calculate the SQP object
+	ni=triRSVS.dynatri.size();
+	for(ii = 0; ii< ni ; ii++){
+		CalcTriangle(*(triRSVS.dynatri(ii)), triRSVS);
+	} 
+	ni=triRSVS.intertri.size();
+	for(ii = 0; ii< ni ; ii++){
+		CalcTriangle(*(triRSVS.intertri(ii)), triRSVS);
+	} 
+	ni=triRSVS.acttri.size();
+	for(ii = 0; ii< ni ; ii++){
+		CalcTriangle(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS);
+	} 
+	// Output some data to check it makes sense
+
+}
+
+void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	// Builds the target math arrays
 	
 	nDv=nDvIn;
@@ -43,7 +70,7 @@ void SQPcalc::BuildDVMap(const vector<int> &vecin){
 void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
 
-	int ii,ni,jj,nj,kk;
+	int ii,ni,jj,nj,kk,nCellTarg;
 	int isCentre,posCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
@@ -52,6 +79,13 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	HashedVector<int,int> dvListMap;
 	vector<vector<double> const *> veccoord;
 	MatrixXd HPos, dPos;
+	MatrixXd HVal, dVal;
+	MatrixXd dConstrPart,HConstrPart, HObjPart;
+	RowVectorXd dObjPart;
+	double constrPart, objPart;
+	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
+	double * retVal;
+
 
 	veccoord.reserve(3);
 	isCentre=0;posCentre=-1;
@@ -116,10 +150,57 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		}
 	}
 	// Total
+	VolumeCalc.Calc();
+	AreaCalc.Calc();
 
+	HVal.setZero(9,9);
+	dVal.setZero(1,9);
+	dConstrPart.setZero(1,nDvAct);
+	dObjPart.setZero(1,nDvAct);
+	HConstrPart.setZero(nDvAct,nDvAct);
+	HObjPart.setZero(nDvAct,nDvAct);
+
+	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+	ArrayVec2MatrixXd(*HValpnt, HVal);
+	ArrayVec2MatrixXd(*dValpnt, dVal);
+	Deriv1stChainScalar(dVal, dPos,dConstrPart);
+	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	constrPart=*retVal;
+
+	AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+	ArrayVec2MatrixXd(*HValpnt, HVal);
+	ArrayVec2MatrixXd(*dValpnt, dVal);
+	Deriv1stChainScalar(dVal, dPos,dConstrPart);
+	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	objPart=*retVal;
 
 	// Assign to main part of the object
+
+	obj+=objPart; // assign objective function
+
+	// assign constraint value
+	nCellTarg=triIn.connec.celltarg.size(); 
+	for(ii=0; ii< nCellTarg;++ii){
+		subTemp=constrMap.find(triIn.connec.celltarg[ii]);
+		if (subTemp!=-1){
+			constr[subTemp] += triIn.connec.constrinfluence[ii]*constrPart;
+		}
+	}
 } 
+
+void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut){
+
+	int nR,nC;
+	arrayIn.size(nR,nC);
+	matOut.setZero(nR,nC);
+
+	for(int i=0; i< nR; ++i){
+		for(int j=0; j< nC; ++j){
+			matOut(i,j)=arrayIn[i][j];
+		}
+	}
+
+}
 
 void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retArray){
 	/*
@@ -149,7 +230,10 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	nColFin=nCol/nVec;
 
 	#ifdef SAFE_ALGO
-
+	// size checks
+	if ((nVec*nColFin)!=nCol){
+		throw invalid_argument("Sizes do not match in 3D array collapse");
+	}
 	#endif
 
 	retArray.setZero(nRow,nColFin);
@@ -165,6 +249,8 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 
 
 }
+
+
 
 void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, MatrixXd &dSdd){
 	dSdd=dSdc*dcdd;

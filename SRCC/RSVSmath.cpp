@@ -100,6 +100,14 @@ void TriFunc::PreCalc(){
 	
 }
 
+
+void TriFunc::ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c) {
+	*a=&fun;
+	*b=&jac;
+	*c=&hes; 
+}
+
+
 /// CoordFunc supports the same stuff as tri func but can have any number of points
 
 bool CoordFunc::MakeValidField(vector<double> const * mp){
@@ -185,6 +193,16 @@ void CoordFunc::ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<doub
 	a=funA;
 	b=jac;
 	c=hes;
+}
+void CoordFunc::ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c){
+	*a=&fun;
+	*b=&jac;
+	*c=&hes; 
+}
+void CoordFunc::ReturnDatPoint(ArrayVec<double> **a, ArrayVec<double> **b,ArrayVec<double> **c){
+	*a=&funA;
+	*b=&jac;
+	*c=&hes;
 }
 
 void CoordFunc::PreCalc(){

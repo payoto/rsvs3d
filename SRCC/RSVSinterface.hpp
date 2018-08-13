@@ -39,13 +39,14 @@ public :
 	void BuildConstrMap(const vector<int> &vecin);
 	void BuildDVMap(const vector<int> &vecin);
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS);
-	
+	void CalculateTriangulation(const triangulation &triRSVS);
 };
 
 
 void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, MatrixXd &dSdd);
 void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,const MatrixXd &HSc,const MatrixXd &Hcd,MatrixXd &HSd);
 void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retArray);
+void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut);
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
