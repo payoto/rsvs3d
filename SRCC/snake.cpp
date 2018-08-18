@@ -202,6 +202,9 @@ void snake::PrepareForUse(bool needOrder) {
 	snakemesh->PrepareForUse();
 	is3D=int(snakemesh->volus.size())>0;
 
+	if (int(isMeshVertIn.size()) != int(snakemesh->verts.size())){
+		isMeshVertIn.assign(snakemesh->verts.size(),false);
+	}
 }
 void snake::HashArray(){
 	// prefer use of PrepareForUse in final code as it includes checks to 

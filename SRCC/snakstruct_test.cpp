@@ -22,7 +22,7 @@ int Test_SnakeStructures() {
    // Test the functionality provided by arraystructures
 
 	int errFlag,errTest;
- 
+
 
 	errFlag=0;
 
@@ -70,7 +70,7 @@ int Test_coordvec(){
 
 		cout << "unit access: ";
 		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< 
-			testCoord.Unit(2) << "] norm 1" << endl;
+		testCoord.Unit(2) << "] norm 1" << endl;
 
 		cout << "base oper(): ";
 		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1)<< ","<< testCoord(2) << "] " << endl;
@@ -212,7 +212,7 @@ int Test_snake(){
 	return(errTest);
 
 }
- 
+
 int Test_snakeinit(){ 
 	snake testSnake;
 	mesh snakeMesh, triMesh;
@@ -540,7 +540,7 @@ int Test_MeshRefinement(){
 int Test_surfcentre(){ 
 	// int ii,n;
 	// vector<int> vertind;
-    vector<vector<double> const *> veccoord;
+	vector<vector<double> const *> veccoord;
 	SurfCentroid tempCalc;
 	vector<double> v1 = {0.0 , 0.0, 0.0 };
 	vector<double> v2 = {1.0 , 1.0, 0.0 };
@@ -584,8 +584,8 @@ int Test_snakeRSVS(){
 	tecplotfile outSnake;
 	double totT=0.0;
 	vector<double> dt;
-	vector<int> isImpact;
-	int start_s,stop_s,ii;
+	vector<int> isImpact, vertList;
+	int start_s,stop_s,ii,jj;
 	//bool errFlag;
 	int errTest=0;
 	
@@ -643,6 +643,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
+		vertList.reserve(testSnake.snakemesh->verts.size());
 		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
@@ -662,6 +663,13 @@ int Test_snakeRSVS(){
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
 				
+				vertList.clear();
+				for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
+					if(testSnake.isMeshVertIn[jj]){
+						vertList.push_back(testSnake.snakemesh->verts(jj)->index);
+					}
+				}
+				outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
 			}
 
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
@@ -682,13 +690,17 @@ int Test_snakeRSVS(){
 			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+			vertList.clear();
+			for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
+				if(testSnake.isMeshVertIn[jj]){
+					vertList.push_back(testSnake.snakemesh->verts(jj)->index);
+				}
+			}
+			outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
 		}
 		stop_s=clock();
-		//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
-	// the code you wish to time goes here
-		
-		//testSnake.disp();
 
 
 	} catch (exception const& ex) { 
@@ -700,14 +712,29 @@ int Test_snakeRSVS(){
 }
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact){
 	int start_s,stop_s;
+	int n, nVertsIn;
 	Test_stepalgo(testSnake,  dt, isImpact);
 	start_s=clock();
 	MaintainTriangulateSnake(RSVStri);
 	stop_s=clock();
-	cout << "triangulation::  maintenance: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+	cout << "triangulation::  maintenance: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 <<
+	"ms" << endl;
 
 	start_s=clock();
 	MaintainTriangulateSnake(RSVStri);
 	stop_s=clock();
 	cout << " maths: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+
+	// Counts vertices inside the snake
+	n=testSnake.isMeshVertIn.size();
+	nVertsIn=0;
+	for (int ii=0; ii< n;++ii){
+		nVertsIn += int(testSnake.isMeshVertIn[ii]); 
+	}
+	if (testSnake.ReturnFlip()){
+		nVertsIn=n-nVertsIn;
+	}
+
+	cout << nVertsIn << " Vertices in the snake" << n << endl;
+
 }

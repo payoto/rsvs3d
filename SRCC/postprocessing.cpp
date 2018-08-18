@@ -113,6 +113,52 @@ int tecplotfile::LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVer
 	return(0);
 }
 
+int tecplotfile::VertDataBlock(const mesh &meshout,int nVert, int nVertDat,int nCellDat, const vector<int> &vertList){
+	// Prints the Coord and Fill Data blocks to the tecplot file
+
+	int ii,jj, nCoord;
+	nCoord=int(meshout.verts(0)->coord.size());
+	// Print vertex Data
+	if(vertList.size()>0){ // if vertList is a list of index
+		for (jj=0;jj<nCoord;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				this->Print("%.16lf ",meshout.verts.isearch(vertList[ii])->coord[jj]);
+			}
+			fprintf(fid,"\n");this->ResetLine();
+		}
+	} else if(int(vertList.size())==meshout.verts.size()) { // vertList is a boolean
+		for (jj=0;jj<nCoord;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				if(vertList[ii]){
+					this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+				}
+			}
+			fprintf(fid,"\n");this->ResetLine();
+		}
+	} else {
+		for (jj=0;jj<nCoord;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+			}
+			fprintf(fid,"\n");this->ResetLine();
+		}
+	}
+	for (jj=nCoord;jj<nVertDat;++jj){
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%lf ",0);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	// Print Cell Data
+	for(jj=0;jj<nCellDat;++jj){
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%i ",0);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	return(0);
+}
+
 int tecplotfile::SurfFaceMap(const mesh &meshout,int nEdge){
 	int ii,jj,actVert;
 	int verts[2];
@@ -216,7 +262,8 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, int forceOutType){
+int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, 
+	int forceOutType, const vector<int> &vertList){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
@@ -239,8 +286,10 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, in
 			forceOutType=1; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
 			forceOutType=2;// output as Surface data (FEPOLYGON)
-		} else {
+		} else if (nEdge>0){
 			forceOutType=3; // output as line data (FELINESEG)
+		} else {
+			forceOutType=4;
 		}
 	}
 
@@ -258,6 +307,18 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, in
 		this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 		this->LineDataBlock(meshout,nVert,nEdge, nVertDat,nCellDat);
 		this->LineFaceMap(meshout,nEdge);
+	} else if (forceOutType==4){
+		if(int(vertList.size())==nVert){
+			nVert=0;
+			for (int ii=0; ii< int(vertList.size());++ii){
+				nVert += int(vertList[ii]); 
+			}
+		} else if (vertList.size()>0){
+			nVert=vertList.size();
+		}
+		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
+		this->VertDataBlock(meshout,nVert, nVertDat,nCellDat,vertList);
+		// No map just points
 	}
 	return(0);
 }
@@ -862,6 +923,15 @@ void tecplotfile::ZoneHeaderFelineseg(int nVert,int nEdge,  int nVertDat, int nC
 	fprintf(fid, "ELEMENTS = %i\n",nEdge);
 	this->Print( "FACES = %i\n",nEdge);
 	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n",1,nVertDat, nVertDat+1,nVertDat+nCellDat);
+	fprintf(fid, "DATAPACKING=BLOCK\n");
+
+}
+
+void tecplotfile::ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat){
+
+	fprintf(fid, "ZONETYPE = ORDERED\n");
+	fprintf(fid, "I = %i\n", nVert);
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat);
 	fprintf(fid, "DATAPACKING=BLOCK\n");
 
 }

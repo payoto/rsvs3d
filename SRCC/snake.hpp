@@ -124,6 +124,7 @@ public:
 
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
+	bool ReturnFlip()const{return(isFlipped);}
 
 };
 
