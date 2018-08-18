@@ -320,36 +320,87 @@ void snake::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 
 }
 
-void snake::Concatenate(const snake &other){
-	int i,ni;
+int CompareSnakeInternalStatus(const vector<bool> & thisVec,bool thisFlipped,
+	 const vector<bool> & otherVec, bool otherFlipped){
+	/*
+	Checks if a snake is inside another using information from the points inside
+	the snaking mesh.
+	Works by finding counter examples. 
+	This is not a complete test and assumes a relatively simple relationship between
+	the two snakes. of either one completely internal or the two side by side.
+	*/
+	bool isIndep;
+	int ii, ni;
+	ni=thisVec.size();
+	isIndep=true;
+	for (ii=0; ii<ni; ++ii){
+		if((thisVec[ii]^thisFlipped) && (otherVec[ii]^otherFlipped)){
+			isIndep	= false;
+			break;
+		}
+	}
+
+	return(int(isIndep));
+}
+void snake::Concatenate(const snake &other, int isInternal){
+	/*
+	isInternal=0 status unknown
+	isInternal=1 other snake is inside this
+	isInternal=2 this snake is inside other
+	isInternal=-1 other and this are independant
+	*/
+	int i,ni, isIndep;
 	if(this->snakemesh==other.snakemesh){
 		this->snaxs.Concatenate(other.snaxs);
 		this->snaxedges.Concatenate(other.snaxedges);
 		this->snaxsurfs.Concatenate(other.snaxsurfs);
 		this->snakeconn.Concatenate(other.snakeconn);
+		// Maintain the internal status
 		ni=isMeshVertIn.size();
-		if(!isFlipped && !other.isFlipped){
-			for (i=0;i<ni;++i){
-				isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
-			}
-		} else if (isFlipped && other.isFlipped) {
-			for (i=0;i<ni;++i){
-				isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
-			}
-		} else if (!isFlipped && other.isFlipped) {
-			for (i=0;i<ni;++i){
-				isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
-			} //xor
-		} else if (isFlipped && !other.isFlipped) {
-			for (i=0;i<ni;++i){
-				isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
-			} //xor
+
+		if(isInternal==0){
+			isIndep=CompareSnakeInternalStatus(isMeshVertIn,ReturnFlip(),
+	 			other.isMeshVertIn, other.ReturnFlip());
+		} else {
+			isIndep=isInternal<=0;
 		}
+		//cout << "Indep status " << isIndep << isFlipped << other.isFlipped << " " ;
+		if(isIndep){
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i]= ((isMeshVertIn[i] ^ isFlipped)
+					|| (other.isMeshVertIn[i] ^ other.isFlipped)) ^ isFlipped;
+			}
+		} else {
+			for (i=0;i<ni;++i){
+				isMeshVertIn[i] = ((isMeshVertIn[i] ^ isFlipped)
+					&& (other.isMeshVertIn[i] ^ other.isFlipped)) ^ isFlipped;
+			}
+		}
+
+		// if(!isFlipped && !other.isFlipped){
+		// 	for (i=0;i<ni;++i){
+		// 		isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
+		// 	}
+		// } else if (isFlipped && other.isFlipped) {
+		// 	for (i=0;i<ni;++i){
+		// 		isMeshVertIn[i]= isMeshVertIn[i] || other.isMeshVertIn[i];
+		// 	}
+		// } else if (!isFlipped && other.isFlipped) {
+		// 	for (i=0;i<ni;++i){
+		// 		isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
+		// 	} //xor
+		// } else if (isFlipped && !other.isFlipped) {
+		// 	for (i=0;i<ni;++i){
+		// 		isMeshVertIn[i]= isMeshVertIn[i] ^ other.isMeshVertIn[i];
+		// 	} //xor
+		// }
 	} else {
 		throw invalid_argument("Concatenation of snakes with different base meshes not supported");
 	}
 
 }
+
+
 void snake::MakeCompatible_inplace(snake &other) const{
    // Makes other mesh compatible with this to be 
    // merged without index crashes

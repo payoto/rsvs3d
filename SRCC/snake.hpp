@@ -103,7 +103,7 @@ public:
 	void HashArrayNM(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndexNM(); // SetMaxIndex no mesh
-	void Concatenate(const snake &other);
+	void Concatenate(const snake &other, int isInternal=0);
 	bool Check3D() const {return(is3D);}
 	// Snake merging
 	void MakeCompatible_inplace(snake &other) const;
@@ -212,6 +212,8 @@ public:
 // Function prototypes
 double SnaxImpactDt(const snax &snax1,const snax &snax2);
 inline bool IsAproxEqual(double d1,double d2) {return(fabs(d1-d2)<DBL_EPSILON);}
+int CompareSnakeInternalStatus(const vector<bool> & thisVec,bool thisFlipped,
+	 const vector<bool> & otherVec, bool otherFlipped);
 // Test Function prototypes
 int Test_SnakeStructures();
 int Test_coordvec();

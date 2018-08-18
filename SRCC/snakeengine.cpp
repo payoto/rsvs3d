@@ -274,7 +274,7 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	start_s=clock();
 
 	bwdSnake.Flip();
-
+	/* Old process incompatible with internal vertex tracking
 	fwdSnake.SetMaxIndexNM();
 	fwdSnake.MakeCompatible_inplace(bwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
@@ -284,6 +284,18 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	fullsnake.MakeCompatible_inplace(fwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	fullsnake.Concatenate(fwdSnake);
+	*/
+
+	fullsnake.SetMaxIndexNM();
+	fullsnake.MakeCompatible_inplace(bwdSnake);
+	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
+	fullsnake.Concatenate(bwdSnake);
+
+	fullsnake.SetMaxIndexNM();
+	fullsnake.MakeCompatible_inplace(fwdSnake);
+	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
+	fullsnake.Concatenate(fwdSnake);
+
 	stop_s=clock();
 	cout << "Concatenate: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
 
@@ -324,7 +336,8 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 				nVert=nVert+fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind.size();
 
 
-				subList=fullsnake.snakemesh->edges.find_list(fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind);
+				subList=fullsnake.snakemesh->edges.find_list(
+					fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind);
 
 				for(kk=0;kk<int(subList.size());kk++){
 					nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
