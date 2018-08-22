@@ -20,8 +20,10 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 	switch (newparent.WhatDim()){
 		case 0: // verts
 		throw invalid_argument ("unhandled dimension");
+		break;
 		case 1: // edges
 		throw invalid_argument ("unhandled dimension");
+		break;
 		case 2: // surfs
 		n=int(newparent.surfs.size());
 		flag=false;
@@ -31,6 +33,7 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 				if (newparent.surfs.find(elmMapping[ii])==-1){flag=true;break;}
 			}
 		}
+		break;
 		case 3: // volumes
 		n=int(newparent.volus.size());
 		flag=false;
@@ -40,6 +43,7 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 				if (newparent.volus.find(elmMapping[ii])==-1){flag=true;break;}
 			}
 		}
+		break;
 	}
 
 	if(flag){
@@ -50,12 +54,16 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 	switch (nDim){
 		case 0:
 		for(ii=0;ii< n ;ii++){newparent.SwitchIndex(nDim+1,newparent.verts(ii)->index,elmMapping[ii]);}
+		break;
 			case 1:
 		for(ii=0;ii< n ;ii++){newparent.SwitchIndex(nDim+1,newparent.edges(ii)->index,elmMapping[ii]);}
+		break;
 			case 2:
 		for(ii=0;ii< n ;ii++){newparent.SwitchIndex(nDim+1,newparent.surfs(ii)->index,elmMapping[ii]);}
+		break;
 			case 3:
 		for(ii=0;ii< n ;ii++){newparent.SwitchIndex(nDim+1,newparent.volus(ii)->index,elmMapping[ii]);}
+		break;
 	}
 	newparent.TightenConnectivity();
 
@@ -92,20 +100,23 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 
 	switch (nDim){
 		case 0:
+		break;
 		case 1:
+		break;
 		case 2:
 		for (ii=0; ii<n ;++ii){
 			if(hashedMapping.find(newparent.surfs(ii)->index)==-1){
 				indRmvSurf.push_back(newparent.surfs(ii)->index);
 			}
 		}
-
+		break;
 		case 3:
 		for (ii=0; ii<n ;++ii){
 			if(hashedMapping.find(newparent.volus(ii)->index)==-1){
 				indRmvVolu.push_back(newparent.volus(ii)->index);
 			}
 		}
+		break;
 	}
 
 	
