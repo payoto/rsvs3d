@@ -25,7 +25,7 @@ void CalculateSnakeVel(snake &snakein){
 
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
-	// TODO build the list of valid surfaces
+	// build the list of valid surfaces
 	vector<int> subList;
 	int nSurf;
 
@@ -649,8 +649,9 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 			actEdge=triangleRSVS.snakeDep->snaxedges(ii)->index;
 			actSurf=triangleRSVS.snakeDep->snaxedges(ii)->surfind;
 			actSurfSub=triangleRSVS.meshDep->surfs.find(actSurf);
-			// TODO change this to make sure that this appears in 2 parents
-			if(actSurfSub>=0){
+			// change this to make sure that this appears in 2 parents
+			//if(actSurfSub>=0){
+			if(triangleRSVS.meshDep->SurfInParent(actSurf)>=0){
 				newTrisSurf.parentsurfmesh=actSurf;
 				newTrisSurf.indvert.clear();
 				newTrisSurf.typevert.clear();

@@ -340,7 +340,7 @@ void mesh::SurfInParent(vector<int> &listInParent) const{
 	listInParent.clear();
 	for (ii=0; ii< nSurf; ++ii){
 		if (SurfInParent(surfs(ii)->index)>=0){
-			listInParent.push_back(surfs(ii)->index);
+			listInParent.push_back((ii));
 		}
 	} 
 	

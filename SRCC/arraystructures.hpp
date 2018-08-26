@@ -286,7 +286,6 @@ public:
 			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
-		isHash=0;
 		return(vec[a]);
 	}
 	const T& isearch(const int b) const{ 

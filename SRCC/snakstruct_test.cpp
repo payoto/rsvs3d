@@ -609,6 +609,8 @@ int Test_snakeRSVS(){
 		dims[0]=2;dims[1]=3;dims[2]=1;
 		CartesianMapping(snakeMesh,  elmMapping, dims);
 		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+		snakeMesh.AddParent(&voluMesh,elmMapping);
+		
 		sort(elmMapping);
 		unique(elmMapping);
 		DisplayVector(elmMapping);
@@ -617,13 +619,12 @@ int Test_snakeRSVS(){
 		}
 		voluMesh.PrepareForUse();
 		voluMesh.OrientSurfaceVolume();
-		snakeMesh.AddParent(&voluMesh,elmMapping);
 		outSnake.PrintMesh(voluMesh);
 
 		triRSVS.stattri.clear();
 		triRSVS.trivert.clear();
 		triRSVS.PrepareForUse();
-		TriangulateMesh(voluMesh,triRSVS);
+		TriangulateMesh(snakeMesh,triRSVS);
 
 		start_s=clock();
 		testSnake.PrepareForUse();
