@@ -402,7 +402,7 @@ class meshdependence {
 	// Needs to support partial meshes for constraint handling
 protected:
 	friend class mesh;
-
+	int nParents = 0;
 	vector<int> elemind; // active element index
 	vector<mesh*> parentmesh; // use references as cannot be null
 	vector<mesh*> childmesh;
@@ -413,6 +413,7 @@ protected:
 	void AddParent(mesh* meshin, vector<int> &parentind);
 	void RemoveChild(mesh* meshin);
 	void RemoveParent(mesh* meshin);
+
 public:
 
 };
@@ -440,6 +441,9 @@ public:
 	void AddChild(mesh* meshin, vector<int> &parentind);
 	void SetMeshDepElm();
 	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
+	int CountParents() const;
+	int SurfInParent(int surfind) const;
+	void SurfInParent(vector<int> &listInParent) const;
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();

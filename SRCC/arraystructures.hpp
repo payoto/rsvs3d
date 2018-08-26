@@ -278,6 +278,17 @@ public:
 		isHash=0;
 		return(vec[a]);
 	}
+	const T& operator[](const int a) const { 
+	// [] Operator returns a reference to the corresponding elems.
+		#ifdef SAFE_ACCESS // adds a check in debug mode
+		if ((unsigned_int(a)>=vec.size()) | (0>a)){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Index is out of range");
+		}
+		#endif //SAFE_ACCESS
+		isHash=0;
+		return(vec[a]);
+	}
 	const T& isearch(const int b) const{ 
 	// () Operator returns a constant pointer to the corresponding elems.
 	// Cannot be used on the left hand side and can't be used to edit data in elems

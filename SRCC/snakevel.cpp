@@ -25,7 +25,17 @@ void CalculateSnakeVel(snake &snakein){
 
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
-	TriangulateContainer(meshin,triangleRSVS , 1); 
+	// TODO build the list of valid surfaces
+	vector<int> subList;
+	int nSurf;
+
+	nSurf = meshin.surfs.size();
+	subList.reserve(nSurf);
+
+	meshin.SurfInParent(subList);
+
+
+	TriangulateContainer(meshin,triangleRSVS , 1, subList); 
 	triangleRSVS.meshDep=&meshin;
 
 }
@@ -92,7 +102,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS ,
 		} else { // trisurf triangulation
 			n=triangleRSVS.trisurf.size();
 			for (ii=0; ii<n; ++ii){
-				TriangulateTriSurface(*(triangleRSVS.trisurf(ii)),meshin,triangleRSVS.*mp, 
+				TriangulateTriSurface(*(triangleRSVS.trisurf(ii)) ,meshin, triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 
@@ -492,13 +502,14 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 }
 
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge){
-	// - reverse onto edge
-	// -if its the final snaxel on the edge -> Go to Vertex
-	// - else find the correct snaxel -> Has it been explored?
-	//    - No: got to snaxel
-	//    - Yes: finish 
-	// returnType 0 (unassigned) 1 (vertex) 2 ()
-
+	/*
+	- reverse onto edge
+	-if its the final snaxel on the edge -> Go to Vertex
+	- else find the correct snaxel -> Has it been explored?
+	   - No: got to snaxel
+	   - Yes: finish 
+	returnType 0 (unassigned) 1 (vertex) 2 ()
+	*/
 
 	bool dirSnax; // 0 reverse, 1 forward;
 	int snaxSub,nSib;
@@ -614,7 +625,9 @@ int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int
 }
 
 void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
-
+	/*
+	Builds inter triangulation
+	*/
 	vector<bool> isSnaxEdgeDone;
 	int ii,n2,nVert,nSnax;
 	int actIndex, actSurf,actEdge,actSurfSub,maxNEdge,isFlip;
@@ -636,7 +649,8 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 			actEdge=triangleRSVS.snakeDep->snaxedges(ii)->index;
 			actSurf=triangleRSVS.snakeDep->snaxedges(ii)->surfind;
 			actSurfSub=triangleRSVS.meshDep->surfs.find(actSurf);
-			if(actSurfSub>0){
+			// TODO change this to make sure that this appears in 2 parents
+			if(actSurfSub>=0){
 				newTrisSurf.parentsurfmesh=actSurf;
 				newTrisSurf.indvert.clear();
 				newTrisSurf.typevert.clear();
@@ -662,7 +676,8 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 					if (actType==1){ // Type vert
 						newTrisSurf.indvert.push_back(actIndex);
 						newTrisSurf.typevert.push_back(actType);
-						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd, vertSurfList, *(triangleRSVS.snakeDep),
+						FollowVertexConnection(actIndex, actEdge, hashedEdgeInd,
+							vertSurfList, *(triangleRSVS.snakeDep),
 							*(triangleRSVS.meshDep), returnIndex, returnType, returnEdge);
 						pseudoEdgeInd[1]=actEdge;
 						pseudoEdgeInd[2]=returnEdge;

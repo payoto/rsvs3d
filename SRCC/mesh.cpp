@@ -220,6 +220,7 @@ void meshdependence::RemoveParent(mesh *meshin){
 			break;
 		}
 	}
+	nParents=parentmesh.size();
 }
 
 void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
@@ -230,6 +231,7 @@ void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
 	 
 	parentmesh.push_back(meshin);
 	parentconn.push_back(temp);
+	nParents=parentmesh.size();
 }
 
 void mesh::RemoveFromFamily(){
@@ -277,21 +279,25 @@ void mesh::SetMeshDepElm(){
 		for (ii=0; ii<int(verts.size());ii++){
 			meshtree.elemind[ii]=verts(ii)->index;
 		}
+		break;
 		case 1:
 		meshtree.elemind.reserve(edges.size());
 		for (ii=0; ii<int(edges.size());ii++){
 			meshtree.elemind[ii]=edges(ii)->index;
 		}
+		break;
 		case 2:
 		meshtree.elemind.reserve(surfs.size());
 		for (ii=0; ii<int(surfs.size());ii++){
 			meshtree.elemind[ii]=surfs(ii)->index;
 		}
+		break;
 		case 3:
 		meshtree.elemind.reserve(volus.size());
 		for (ii=0; ii<int(volus.size());ii++){
 			meshtree.elemind[ii]=volus(ii)->index;
 		}
+		break;
 	}
 	meshDepIsSet=true;
 
@@ -302,7 +308,43 @@ void mesh::MaintainLineage(){
 	//    - Modify the parentconn vec 
 
 }
+int mesh::CountParents() const {
+	return(meshtree.parentmesh.size());
+}
+int mesh::SurfInParent(int surfind) const{
+	int kk1,kk2;
+ 	int jj=-1;
+ 	int ii = surfs.find(surfind);
+	bool isParentSurf=false;
+	if(ii>=0){
+		while(!isParentSurf && jj<meshtree.nParents-1){
+			++jj;
+			kk1=volus.find(surfs(ii)->voluind[0]);
+			kk2=volus.find(surfs(ii)->voluind[1]);
+			if((kk1!=-1) ^ (kk2!=-1)){
+				isParentSurf=true;
+			} else if (kk1!=-1){
+				isParentSurf= meshtree.parentconn[jj][kk1] != meshtree.parentconn[jj][kk2];
+			}
+		}
+	}
+	if (isParentSurf){
+		return(jj);
+	} else {
+		return(-1);
+	}
+}
 
+void mesh::SurfInParent(vector<int> &listInParent) const{
+	int ii, nSurf = surfs.size();
+	listInParent.clear();
+	for (ii=0; ii< nSurf; ++ii){
+		if (SurfInParent(surfs(ii)->index)>=0){
+			listInParent.push_back(surfs(ii)->index);
+		}
+	} 
+	
+}
 
 /// MAth operations in mesh
 void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const {
