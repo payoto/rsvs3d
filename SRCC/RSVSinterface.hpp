@@ -25,6 +25,7 @@ class SQPcalc {
 protected:
 	int nDv;
 	int nConstr;
+	int falseaccess=0;
 public :
 	MatrixXd dConstr,HConstr, HObj;
 	RowVectorXd dObj;
@@ -34,7 +35,7 @@ public :
 
 	HashedVector<int, int> dvMap;
 	HashedVector<int,int> constrMap;
-
+	void Print2Screen()const;
 	void BuildMathArrays(int nDv, int nConstr);
 	void BuildConstrMap(const vector<int> &vecin);
 	void BuildDVMap(const vector<int> &vecin);

@@ -727,8 +727,8 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	start_s=clock();
 	calcObj.CalculateTriangulation(RSVStri);
 	stop_s=clock();
-	cout << " maths: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-
+	cout << " maths: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" ;
+	calcObj.Print2Screen();
 	// Counts vertices inside the snake
 	n=testSnake.isMeshVertIn.size();
 	nVertsIn=0;

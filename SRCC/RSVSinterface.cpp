@@ -55,6 +55,16 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 
 }
 
+void SQPcalc::Print2Screen()const {
+	cout << "Math result: obj " << obj << " false access " << falseaccess << endl;
+	cout << "Constr " ;
+	for (int i = 0; i < nConstr; ++i)
+	{
+		cout << constr[i] << " ";
+	}
+	cout << endl;
+}
+
 void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	// Builds the target math arrays
 	
@@ -127,7 +137,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2){
-			dvList.push_back(triIn.pointtype[ii]);
+			dvList.push_back(triIn.pointind[ii]);
 		} else if (triIn.pointtype[ii]==3 && false){
 			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
 			nj=triRSVS.trisurf(subTemp)->indvert.size();
@@ -201,6 +211,8 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		subTemp=constrMap.find(triIn.connec.celltarg[ii]);
 		if (subTemp!=-1){
 			constr[subTemp] += triIn.connec.constrinfluence[ii]*constrPart;
+		} else {
+			falseaccess++;
 		}
 	}
 } 
@@ -258,7 +270,7 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	for (ii=0;ii<nRow;ii++){
 		for (jj=0;jj<nColFin;jj++){
 			for (kk=0;kk<nVec;kk++){
-				retArray(ii,jj)+=arr3dim(ii,jj*nVec+kk)*vec(1,kk);
+				retArray(ii,jj)+=arr3dim(ii,jj*nVec+kk)*vec(0,kk);
 			}	
 		}	
 	}
