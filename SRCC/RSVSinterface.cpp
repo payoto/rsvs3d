@@ -18,7 +18,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	int nDv, nConstr;
 	vector<int> vecin;
 	// prepare the SQP object
-	nConstr=triRSVS.meshDep->volus.size();
+	nConstr=triRSVS.meshDep->CountVoluParent(); 
 	nDv=triRSVS.snakeDep->snaxs.size();
 	BuildMathArrays(nDv, nConstr);
 
@@ -26,6 +26,8 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	for(ii=0; ii<nConstr; ++ii){
 		vecin.push_back(triRSVS.meshDep->volus(ii)->index);
 	}
+	// TODO this needs to be supported by mapping each volume to the constraint position
+	// There can be more than one constraint for each cell.
 	BuildConstrMap(vecin);
 
 	vecin.clear();

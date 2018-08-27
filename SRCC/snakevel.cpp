@@ -72,7 +72,11 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		triangleRSVS.snakeDep->snakeconn.edges.SetNoModif();
 	}
 	triangleRSVS.PrepareForUse();
+	if(triangleRSVS.snakeDep!=NULL){
+		triangleRSVS.SetActiveStaticTri();
+	}
 }
+
 
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , 
 	const int typeMesh, const vector<int> &subList){
@@ -846,6 +850,45 @@ void triangulation::CalcTriVertPosDyna(int ii){
 			trivert(ii)->parentsurf)),*(meshDep),
 			snakeDep->snakeconn);  
 	}
+}
+void triangulation::SetActiveStaticTri()
+{
+
+	vector<int> subList;
+	vector<bool> isObjDone;
+	int ii , ni, jj, nj;
+	// Look through all statri if
+	acttri.clear();
+	ni=stattri.size();
+	isObjDone.assign(ni,false);
+
+	for(ii=0; ii< ni; ++ii){
+		if(!isObjDone[ii]){
+			stattri.findsiblings(stattri(ii)->KeyParent(),subList);
+			if(trisurf.findparent(stattri(ii)->KeyParent())==-1){
+				nj=stattri(ii)->pointtype.size();
+				for(jj=0;jj<nj;++jj){
+					if (stattri(ii)->pointtype[jj]==1){
+						break;
+					}
+				}
+				if(jj==nj){
+					throw invalid_argument("Static triangulation failed to return a mesh vertex");
+				}
+				if(snakeDep->isMeshVertIn[meshDep->verts.find(stattri(ii)->pointind[jj])]){
+					nj=subList.size();
+					for (jj=0; jj<nj; ++jj){
+						acttri.push_back(stattri(subList[jj])->index);
+					}
+				}
+			}
+			nj=subList.size();
+			for (jj=0; jj<nj; ++jj){
+				isObjDone[subList[jj]]=true;
+			}
+		}
+	}
+
 }
 
 #pragma GCC diagnostic push

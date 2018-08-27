@@ -137,7 +137,7 @@ void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const
 		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
 		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
 	}
-	siblings=ReturnDataEqualRange(key, hashParent);
+	ReturnDataEqualRange(key, hashParent, siblings);
 }
 
 

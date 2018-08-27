@@ -9,6 +9,7 @@
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp" 
 #include "RSVSmath.hpp"
+#include "RSVSinterface.hpp"
 
 using namespace std;
 
@@ -714,6 +715,8 @@ int Test_snakeRSVS(){
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt, vector<int> &isImpact){
 	int start_s,stop_s;
 	int n, nVertsIn;
+	SQPcalc calcObj;
+
 	Test_stepalgo(testSnake,  dt, isImpact);
 	start_s=clock();
 	MaintainTriangulateSnake(RSVStri);
@@ -722,7 +725,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	"ms" << endl;
 
 	start_s=clock();
-	MaintainTriangulateSnake(RSVStri);
+	calcObj.CalculateTriangulation(RSVStri);
 	stop_s=clock();
 	cout << " maths: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 

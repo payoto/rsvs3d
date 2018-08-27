@@ -70,6 +70,7 @@ template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,in
 template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat);
 template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
+template<class T, class R> void ReturnDataEqualRange(T key,const unordered_multimap<T,R> &hashTable, vector<R> &subList);
 
 
 

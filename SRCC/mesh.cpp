@@ -345,7 +345,14 @@ void mesh::SurfInParent(vector<int> &listInParent) const{
 	} 
 	
 }
-
+int mesh::CountVoluParent() const {
+	int n=0;
+	for (int i = 0; i < int(meshtree.parentmesh.size()); ++i)
+	{
+		n+=meshtree.parentmesh[i]->volus.size();
+	}
+	return(n);
+}
 /// MAth operations in mesh
 void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const {
 

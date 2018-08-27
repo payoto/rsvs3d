@@ -121,6 +121,19 @@ template<class T, class R> vector<R> ReturnDataEqualRange(T key,const unordered_
 
 	return(subList);
 }
+template<class T, class R> void ReturnDataEqualRange(T key,const unordered_multimap<T,R> &hashTable, vector<R> &subList)
+{
+	
+	subList.clear();
+	subList.reserve(5);
+	auto range=hashTable.equal_range(key);
+	for (auto it = range.first; it != range.second; ++it) {
+
+		subList.push_back(it->second);
+	}
+
+	
+}
 template <typename T> inline void sort(vector<T> &vec)
 {
 	sort(vec.begin(),vec.end());
