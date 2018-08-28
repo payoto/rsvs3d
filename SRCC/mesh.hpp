@@ -447,6 +447,8 @@ public:
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		vector<pair<int,int>> &parentcases) const;
+	void MapFill2Parent(const vector<double> &fillIn,
+		const vector<pair<int,int>> &parentcases);
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();

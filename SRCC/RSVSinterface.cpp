@@ -48,7 +48,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	} 
 
 	// Output some data to check it makes sense
-
+	ReturnConstrToMesh(triRSVS);
 }
 
 void SQPcalc::Print2Screen()const {
@@ -59,6 +59,22 @@ void SQPcalc::Print2Screen()const {
 		cout << constr[i] << " ";
 	}
 	cout << endl;
+}
+
+void SQPcalc::ReturnConstrToMesh(const triangulation &triRSVS) const {
+	
+	int ii, ni;
+	vector<double> temp;
+	ni=constr.size();
+	temp.reserve(ni);
+
+	for(ii=0; ii<ni; ii++){
+		temp.push_back(constr[ii]);
+	}
+
+	triRSVS.meshDep->MapFill2Parent(temp, this->constrList);
+
+
 }
 
 void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){

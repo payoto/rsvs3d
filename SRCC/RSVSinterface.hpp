@@ -43,6 +43,7 @@ public :
 	void BuildDVMap(const vector<int> &vecin);
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS);
 	void CalculateTriangulation(const triangulation &triRSVS);
+	void ReturnConstrToMesh(const triangulation &triRSVS) const ;
 };
 
 

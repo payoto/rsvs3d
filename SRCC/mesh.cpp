@@ -352,6 +352,18 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 	}
 }
 
+void mesh::MapFill2Parent(const vector<double> &fillIn, const vector<pair<int,int>> &parentcases){
+	int ii, ni; 
+
+	ni=parentcases.size();
+	for(ii=0; ii< ni; ii++){
+		this->meshtree.parentmesh[parentcases[ii].first]
+			->volus[parentcases[ii].second].fill=fillIn[ii];
+		this->meshtree.parentmesh[parentcases[ii].first]->volus.isHash=1;
+	}
+
+}
+
 void mesh::MaintainLineage(){
 	// Method not implemented yet, features:
 	//    - recognise the modifications needed depending on child and parent dimensionality 
