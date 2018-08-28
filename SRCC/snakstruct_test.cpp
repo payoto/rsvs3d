@@ -671,9 +671,9 @@ int Test_snakeRSVS(){
 				}
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
-				
-				outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
-				
+				if (int(triRSVS.acttri.size())>0){
+					outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
+				}
 				
 				vertList.clear();
 				for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
