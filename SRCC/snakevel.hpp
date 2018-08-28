@@ -69,6 +69,10 @@ public:
 	void CalcTriVertPos(int ii);
 	void CalcTriVertPos();
 	void SetActiveStaticTri();
+	void SetConnectivity();
+	void SetConnectivityDyna();
+	void SetConnectivity(int ii);
+	void SetConnectivityDyna(int ii);
 };
 
 

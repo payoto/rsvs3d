@@ -152,9 +152,16 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	triangleEdge.SetPointType(typeMesh,typeMesh,3);
 	triangleEdge.pointind[2]=trivertMaxInd+1;
 	triangleEdge.parentsurf=surfin.index;
-
-	triangleEdge.connec.celltarg=surfin.voluind;
-	triangleEdge.connec.constrinfluence={-1.0, 1.0};
+	// Wrong needs to be always onto the base grid
+	if(typeMesh!=2){
+		triangleEdge.connec.celltarg=surfin.voluind;
+		triangleEdge.connec.constrinfluence={-1.0, 1.0};
+	} else {
+		// Need to map onto snakemesh
+		// Do it outside in triangulate snake?
+		triangleEdge.connec.celltarg={};
+		triangleEdge.connec.constrinfluence={};
+	}
 
 	if (n>3){
 		for(ii=0; ii<n; ++ii){
@@ -207,6 +214,8 @@ void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin,
 	triangleEdge.SetPointType(typeMesh,typeMesh,3);
 	triangleEdge.pointind[2]=trivertMaxInd+1;
 	triangleEdge.parentsurf=surfin.index; 
+
+	// Probably fine
 	triangleEdge.connec.celltarg=surfin.voluind;
 	triangleEdge.connec.constrinfluence={-1.0, 1.0};
 	kk=0;
