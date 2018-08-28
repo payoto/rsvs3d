@@ -400,6 +400,17 @@ void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, in
 	*totNumFaceNode=(triout.*mp).size()*3;
 }
 
+void ExtractTriData(const triangulation &triout, int nTriangles, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+	// Extracts Data needed to write out a mesh to tecplot
+
+
+	*nVert=nTriangles*3;
+	*nVolu=1;
+	*nSurf=nTriangles;
+	*nEdge=nTriangles*3;
+	*totNumFaceNode=nTriangles*3;
+}
+
 int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
@@ -535,6 +546,50 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 	}
 	return(0);
 }
+
+
+int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat, const vector<int> &triList){
+	// Prints the Coord and Fill Data blocks to the tecplot file
+
+	int ii,jj,kk;
+	int nTri,currInd,currType,nCoord;
+	nTri=triList.size();
+	nCoord=int(triout.meshDep->verts(0)->coord.size());
+	// Print vertex Data
+	for (jj=0;jj<nCoord;++jj){
+		for ( ii = 0; ii<nTri; ++ii){
+			for ( kk = 0; kk < (3); ++kk){
+				currType=(triout.*mp).isearch(triList[ii])->pointtype[kk];
+				currInd=(triout.*mp).isearch(triList[ii])->pointind[kk];
+				if(currType==1) {
+					this->Print("%.16lf ",triout.meshDep->verts.isearch(currInd)->coord[jj]);
+				} else if (currType==2) {
+					this->Print("%.16lf ",triout.snakeDep->snakeconn.verts.isearch(currInd)->coord[jj]);
+				} else if (currType==3) {
+					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
+				} else {
+					throw invalid_argument("unknown point type");
+				}
+			}
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	for (jj=nCoord;jj<nVertDat;++jj){
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%lf ",0);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	// Print Cell Data
+	for(jj=0;jj<nCellDat;++jj){
+		for ( ii = 0; ii<nEdge; ++ii){
+			this->Print("%i ",0);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	return(0);
+}
+
 int tecplotfile::SurfFaceMap(const triangulation &triout, triarray triangulation::*mp){
 	int ii,jj,kk;
 
@@ -590,6 +645,28 @@ int tecplotfile::LineFaceMap(const triangulation &triout, triarray triangulation
 	return(0);
 }
 
+int tecplotfile::LineFaceMap(const triangulation &triout, const vector<int> &triList){
+	int ii,jj,kk;
+
+	int nTri;
+	nTri=triList.size();
+	//throw invalid_argument("Surface Map not supported for triangulation")
+	kk=1;
+	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
+		for(jj=0;jj<3;++jj){
+			if (jj==2){
+				this->Print("%i %i\n",kk-2,kk);
+			} else {
+				this->Print("%i %i\n",kk,kk+1);
+			}
+			this->ResetLine();
+			++kk;
+		}
+	}
+
+	return(0);
+}
+
 int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf){
 	int ii,jj,kk,n;
 	n=(triout.*mp)(0)->pointind.size();
@@ -616,12 +693,15 @@ int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation:
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType){
+int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType, const vector<int> &triList){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
-	
-	ExtractTriData(triout,mp,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(triList.size()==0 || forceOutType!=3){
+		ExtractTriData(triout,mp,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	} else {
+		ExtractTriData(triout,triList.size(),&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	}
 	if(nVert>0){
 		if(nZones==0){
 			fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
@@ -658,8 +738,14 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
 			this->SurfFaceMap(triout,mp);
 		} else if (forceOutType==3){
 			this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
-			this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
-			this->LineFaceMap(triout,mp);
+			if(triList.size()==0){
+				this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
+				this->LineFaceMap(triout,mp);
+			} else {
+				this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat,triList);
+				this->LineFaceMap(triout,triList);
+			}
+			
 		}
 	}
 	return(0);

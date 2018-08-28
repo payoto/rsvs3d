@@ -666,9 +666,14 @@ int Test_snakeRSVS(){
 				if (ii==0){
 					outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,3);
 					outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,3);
+					outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,3);
 				}
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+				if(int(triRSVS.acttri.size())!=0){
+					outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
+				}
+				
 				vertList.clear();
 				for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
 					if(testSnake.isMeshVertIn[jj]){
@@ -678,8 +683,8 @@ int Test_snakeRSVS(){
 				if(int(testSnake.isMeshVertIn.size())==0){
 					vertList.push_back(testSnake.snakemesh->verts(0)->index);
 				}
-				outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
-				outSnake.PrintVolumeDat(voluMesh,nVoluZone,8,totT);
+				outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
+				outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 			}
 
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
@@ -700,6 +705,7 @@ int Test_snakeRSVS(){
 			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 			outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+				outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
 			vertList.clear();
 			for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
 				if(testSnake.isMeshVertIn[jj]){
@@ -709,8 +715,8 @@ int Test_snakeRSVS(){
 			if(int(testSnake.isMeshVertIn.size())==0){
 				vertList.push_back(testSnake.snakemesh->verts(0)->index);
 			}
-			outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
-			outSnake.PrintVolumeDat(voluMesh,nVoluZone,8,totT);
+			outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
+			outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
