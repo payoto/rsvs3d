@@ -245,13 +245,13 @@ public:
 };
 
 template <class T,class Q, class R>  
-class HashedMap : protected HashedVector<T,Q,R> {
+class HashedMap : public HashedVector<T,Q,R> {
 public:
 	using HashedVector<T,Q,R>::hashTable;
 	using HashedVector<T,Q,R>::vec;
 	using HashedVector<T,Q,R>::isHash;
-	
-	vector<T> targ;
+
+	vector<R> targ;
 	inline void GenerateHash();
 
 };
@@ -259,18 +259,18 @@ public:
 template <class T,class Q, class R=int>  
 class HashedVectorSafe : protected HashedVector<T,Q,R> { // container for 
 protected:
-	using HashedVector<T,Q>::vec;
-    using HashedVector<T,Q>::isHash; 
-    using HashedVector<T,Q>::hashTable; 
+	using HashedVector<T,Q,R>::vec;
+    using HashedVector<T,Q,R>::isHash; 
+    using HashedVector<T,Q,R>::hashTable; 
 public:
 	
-	using HashedVector<T,Q>::GenerateHash;
-	using HashedVector<T,Q>::find;
-	using HashedVector<T,Q>::findall;
-	using HashedVector<T,Q>::count;
-	using HashedVector<T,Q>::find_list;
-	using HashedVector<T,Q>::operator();
-	using HashedVector<T,Q>::IsInVec;
+	using HashedVector<T,Q,R>::GenerateHash;
+	using HashedVector<T,Q,R>::find;
+	using HashedVector<T,Q,R>::findall;
+	using HashedVector<T,Q,R>::count;
+	using HashedVector<T,Q,R>::find_list;
+	using HashedVector<T,Q,R>::operator();
+	using HashedVector<T,Q,R>::IsInVec;
 
 	void operator=(const vector<T> &a){
 		vec=a;

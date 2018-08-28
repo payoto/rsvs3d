@@ -507,6 +507,8 @@ int Test_MeshRefinement(){
 		dims[0]=2;dims[1]=3;dims[2]=1;
 		CartesianMapping(snakeMesh,  elmMapping, dims);
 		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+		snakeMesh.AddParent(&voluMesh,elmMapping);
+
 		sort(elmMapping);
 		unique(elmMapping);
 		DisplayVector(elmMapping);
@@ -514,8 +516,6 @@ int Test_MeshRefinement(){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
-		snakeMesh.AddParent(&voluMesh,elmMapping);
-
 		testTriangle.PrepareForUse();
 		TriangulateMesh(voluMesh,testTriangle);
 		voluMesh.TightenConnectivity();
@@ -739,6 +739,6 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 		nVertsIn=n-nVertsIn;
 	}
 
-	cout << nVertsIn << " Vertices in the snake" << n << endl;
+	cout << nVertsIn << " Vertices in the snake of " << n << endl;
 
 }

@@ -98,11 +98,11 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
 
 	int ii,ni,jj,nj,kk,nCellTarg;
-	int isCentre,posCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
 	Area AreaCalc;
-	vector<int> dvList;
+	vector<int> dvList,subTempVec;
 	HashedVector<int,int> dvListMap;
 	vector<vector<double> const *> veccoord;
 	MatrixXd HPos, dPos;
@@ -115,7 +115,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
 
 	veccoord.reserve(3);
-	isCentre=0;posCentre=-1;
+	isCentre=0;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
 		if(triIn.pointtype[ii]==1){
@@ -125,7 +125,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		} else if (triIn.pointtype[ii]==3){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
 			isCentre++;
-			posCentre=ii;
 		}
 	}
 
@@ -208,11 +207,14 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// assign constraint value
 	nCellTarg=triIn.connec.celltarg.size(); 
 	for(ii=0; ii< nCellTarg;++ii){
-		subTemp=constrMap.find(triIn.connec.celltarg[ii]);
-		if (subTemp!=-1){
-			constr[subTemp] += triIn.connec.constrinfluence[ii]*constrPart;
-		} else {
-			falseaccess++;
+		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+		nj=subTempVec.size();
+		for(jj=0; jj< nj; ++jj){
+			if (subTempVec[jj]!=-1){
+				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+			} else {
+				falseaccess++;
+			}
 		}
 	}
 } 

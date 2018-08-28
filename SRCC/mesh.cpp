@@ -290,25 +290,25 @@ void mesh::SetMeshDepElm(){
 		case 0:
 		meshtree.elemind.reserve(verts.size());
 		for (ii=0; ii<int(verts.size());ii++){
-			meshtree.elemind[ii]=verts(ii)->index;
+			meshtree.elemind.push_back(verts(ii)->index);
 		}
 		break;
 		case 1:
 		meshtree.elemind.reserve(edges.size());
 		for (ii=0; ii<int(edges.size());ii++){
-			meshtree.elemind[ii]=edges(ii)->index;
+			meshtree.elemind.push_back(edges(ii)->index);
 		}
 		break;
 		case 2:
 		meshtree.elemind.reserve(surfs.size());
 		for (ii=0; ii<int(surfs.size());ii++){
-			meshtree.elemind[ii]=surfs(ii)->index;
+			meshtree.elemind.push_back(surfs(ii)->index);
 		}
 		break;
 		case 3:
 		meshtree.elemind.reserve(volus.size());
 		for (ii=0; ii<int(volus.size());ii++){
-			meshtree.elemind[ii]=volus(ii)->index;
+			meshtree.elemind.push_back(volus(ii)->index);
 		}
 		break;
 	}
@@ -346,7 +346,7 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		for (jj = 0; jj < nElm; ++jj){
 			currind.push_back(meshtree.elemind[jj]);
 			parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
-				meshtree.parentconn[ii](jj))+nParCases);
+				meshtree.parentconn[ii][jj])+nParCases);
 		}
 		nParCases+=nj;
 	}

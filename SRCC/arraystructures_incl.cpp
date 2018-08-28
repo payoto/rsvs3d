@@ -680,7 +680,7 @@ template <class T,class Q,class R>  bool HashedVector<T,Q,R>::operator()(const Q
 
 template <class T,class Q,class R> inline void HashedMap<T,Q,R>::GenerateHash()
 {
-	 
+
 	hashTable.clear();
 	HashVector(vec, hashTable, targ);
 	isHash=true;
@@ -697,7 +697,7 @@ template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &ha
 	return(search->second);
 }
 
-template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList,unordered_multimap<T,int> &hashTable) 
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList, unordered_multimap<T,int> &hashTable) 
 {
 	vector<int> returnSub;
 	int ii;

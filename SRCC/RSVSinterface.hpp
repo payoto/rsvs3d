@@ -34,8 +34,8 @@ public :
 
 
 	HashedVector<int, int> dvMap;
-	HashedMap<int,int,int> constrMap;
-	vector<pair<int,int>> constrList;
+	HashedMap<int,int,int> constrMap; // maps snakemesh volu onto constr
+	vector<pair<int,int>> constrList; // keeps pairs with parentindex and voluindex
 
 	void Print2Screen()const;
 	void BuildMathArrays(int nDv, int nConstr);
