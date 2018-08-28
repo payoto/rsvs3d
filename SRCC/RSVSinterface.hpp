@@ -34,10 +34,12 @@ public :
 
 
 	HashedVector<int, int> dvMap;
-	HashedVector<int,int> constrMap;
+	HashedMap<int,int,int> constrMap;
+	vector<pair<int,int>> constrList;
+
 	void Print2Screen()const;
 	void BuildMathArrays(int nDv, int nConstr);
-	void BuildConstrMap(const vector<int> &vecin);
+	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildDVMap(const vector<int> &vecin);
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS);
 	void CalculateTriangulation(const triangulation &triRSVS);

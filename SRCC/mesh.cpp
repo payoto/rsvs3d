@@ -224,7 +224,20 @@ void meshdependence::RemoveParent(mesh *meshin){
 }
 
 void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
+	/*
+	parentind needs to be a list of the parent.volus.index matched to elemind
+	that means that running temp.find(parent.volus.index) will return the 
+	subscribts of all the child.volus that are contained in that volu
+
+	Alternatively running temp(volu.find(volus[a].index)) will return the 
+	corresponding parent.volus index.
+	*/
 	HashedVectorSafe<int,int> temp;
+
+	if (parentind.size()!=elemind.size()){
+		cerr << "Error in " << __PRETTY_FUNCTION__ << endl; 
+		throw invalid_argument("parent and child index list must be the same size.");
+	}
 
 	temp=parentind;
 	temp.GenerateHash(); 

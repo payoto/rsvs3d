@@ -22,13 +22,9 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	nDv=triRSVS.snakeDep->snaxs.size();
 	BuildMathArrays(nDv, nConstr);
 
-	vecin.reserve(nConstr);
-	for(ii=0; ii<nConstr; ++ii){
-		vecin.push_back(triRSVS.meshDep->volus(ii)->index);
-	}
 	// TODO this needs to be supported by mapping each volume to the constraint position
 	// There can be more than one constraint for each cell.
-	BuildConstrMap(vecin);
+	BuildConstrMap(triRSVS);
 
 	vecin.clear();
 	vecin.reserve(nDv);
@@ -80,10 +76,12 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 }
 
 
-void SQPcalc::BuildConstrMap(const vector<int> &vecin){
-	constrMap.vec=vecin;
-	sort(constrMap.vec);
-	unique(constrMap.vec);
+void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
+
+	// explore parents of mesh adding 1 by 1 elemind
+	// for each parent
+	// for each snakemesh.volu
+	// Assign to constrMap.targ = the position in parent.volu of the parentconn[]
 	constrMap.GenerateHash();
 }
 
