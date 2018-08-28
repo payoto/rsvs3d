@@ -415,6 +415,7 @@ protected:
 	void RemoveParent(mesh* meshin);
 
 public:
+
 };
 
 
@@ -444,6 +445,8 @@ public:
 	int SurfInParent(int surfind) const;
 	void SurfInParent(vector<int> &listInParent) const;
 	int CountVoluParent() const ;
+	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
+		vector<pair<int,int>> &parentcases) const;
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();

@@ -315,6 +315,43 @@ void mesh::SetMeshDepElm(){
 	meshDepIsSet=true;
 
 }
+
+void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
+	vector<pair<int,int>> &parentcases) const {
+
+	int ii, ni, jj, nj, nElm, nParCases;
+	pair<int,int> tempPair;
+
+	currind.clear();
+	parentpos.clear();
+	parentcases.clear();
+
+	nParCases=0;
+	ni=meshtree.nParents;
+	nj=meshtree.elemind.size();
+	nElm=meshtree.elemind.size();
+
+	currind.reserve(nElm*meshtree.nParents);
+	parentpos.reserve(nElm*meshtree.nParents);
+	parentcases.reserve(this->CountVoluParent());
+
+	for (ii=0; ii< ni; ++ii){
+		// Build the list of parent cases
+		nj=meshtree.parentmesh[ii]->volus.size();
+		tempPair.first=ii;
+		for (jj = 0; jj < nj; ++jj){
+			tempPair.second=meshtree.parentmesh[ii]->volus(jj)->index;
+		}
+
+		for (jj = 0; jj < nElm; ++jj){
+			currind.push_back(meshtree.elemind[jj]);
+			parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
+				meshtree.parentconn[ii](jj))+nParCases);
+		}
+		nParCases+=nj;
+	}
+}
+
 void mesh::MaintainLineage(){
 	// Method not implemented yet, features:
 	//    - recognise the modifications needed depending on child and parent dimensionality 
