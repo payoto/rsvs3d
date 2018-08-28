@@ -635,25 +635,26 @@ template<class T> inline void ArrayStruct <T>::clear()
 }
 // Hashed Vector Template class implementations
 
-template <class T,class Q> inline void HashedVector<T,Q>::GenerateHash(){
-hashTable.clear();
-HashVector(vec, hashTable);
-isHash=true;
+template <class T,class Q,class R> inline void HashedVector<T,Q,R>::GenerateHash()
+{
+	hashTable.clear();
+	HashVector(vec, hashTable);
+	isHash=true;
 }
-template <class T,class Q> inline int HashedVector<T,Q>::find(const T key) const
+template <class T,class Q,class R> inline int HashedVector<T,Q,R>::find(const T key) const
 {
 	return(FindSub(key, hashTable) );
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::findall(const T key) const
+template <class T,class Q,class R> inline vector<int> HashedVector<T,Q,R>::findall(const T key) const
 {
 	return(ReturnDataEqualRange(key,hashTable));
 }
 
-template <class T,class Q> inline int HashedVector<T,Q>::count(const T key) const
+template <class T,class Q,class R> inline int HashedVector<T,Q,R>::count(const T key) const
 {
 	return(hashTable.count(key) );
 }
-template <class T,class Q> vector<int> HashedVector<T,Q>::count(const vector<T> &key) const
+template <class T,class Q,class R> vector<int> HashedVector<T,Q,R>::count(const vector<T> &key) const
 {
 	vector<int> subOut;
 	subOut.reserve(key.size());
@@ -664,17 +665,25 @@ template <class T,class Q> vector<int> HashedVector<T,Q>::count(const vector<T> 
 
 	return(subOut);
 }
-template <class T,class Q> inline vector<int> HashedVector<T,Q>::find_list(const vector<T> &key) const
+template <class T,class Q,class R> inline vector<int> HashedVector<T,Q,R>::find_list(const vector<T> &key) const
 {
 	return(FindSubList(key, vec, hashTable) );
 }
-template <class T,class Q> inline bool HashedVector<T,Q>::IsInVec(const Q &key) const
+template <class T,class Q,class R> inline bool HashedVector<T,Q,R>::IsInVec(const Q &key) const
 {
 	return(FindSub(key.Key(), hashTable)!=-1);
 }
-template <class T,class Q>  bool HashedVector<T,Q>::operator()(const Q &key) const
+template <class T,class Q,class R>  bool HashedVector<T,Q,R>::operator()(const Q &key) const
 {
 	return(FindSub(key.Key(), hashTable)!=-1);
+}
+
+template <class T,class Q,class R> inline void HashedMap<T,Q,R>::GenerateHash()
+{
+	 
+	hashTable.clear();
+	HashVector(vec, hashTable, targ);
+	isHash=true;
 }
 template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &hashTable)  
 {
@@ -714,15 +723,25 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<
 
 
 
-template<class T> void HashVector(const vector<T> &elems, unordered_multimap<T,int> &hashTable)
+template<class T, class Q> void HashVector(const vector<T> &elems, unordered_multimap<T,Q> &hashTable,
+	 const vector<Q> &targElems)
 {
    // Generates a valid unordered_map for the current ArrayStruct
    // Function should not be called repeatedly 
 
 	hashTable.reserve(elems.size());
-	for (int i = 0; i < int(elems.size()); ++i)
-	{
-		hashTable.emplace(elems[i],i);
+	if(targElems.size()==0){
+		for (int i = 0; i < int(elems.size()); ++i)
+		{
+			hashTable.emplace(elems[i],i);
+		}
+	} else if (targElems.size()==elems.size()){
+		for (int i = 0; i < int(elems.size()); ++i)
+		{
+			hashTable.emplace(elems[i],targElems[i]);
+		}
+	} else {
+		throw invalid_argument("HashVector failed as input vectors are of different sizes");
 	}
 
 }

@@ -52,7 +52,7 @@ using namespace std;
 
 
 template <class T> class ArrayStruct;
-template <class T,class Q> class HashedVector;
+template <class T,class Q, class R=int> class HashedVector;
 template <class T> class SnakStruct; 
 
 typedef unsigned int unsigned_int;
@@ -66,7 +66,8 @@ template <typename T> inline void unique(vector<T> &vec);
 // template <typename T> inline void set_intersection(vector<T> &targVec,vector<T> &vec1,vector<T> &vec2,bool isSort=true);
 template <typename T> inline void set_intersection(vector<T> &targVec,const vector<T> &vec1,const vector<T> &vec2,bool isSort);
 template<class T> vector<int> FindSubList(const vector<T> &keyFind, const vector<T> &keyList,unordered_multimap<T,int> &hashTable) ;
-template<class T> void HashVector(const vector<T> &elems,unordered_multimap<T,int> &hashTable);
+template<class T, class Q> void HashVector(const vector<T> &elems,unordered_multimap<T,Q> &hashTable,
+	 const vector<Q> &targElems={});
 template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat);
 template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
@@ -225,11 +226,11 @@ public:
 	}
 };
 
-template <class T,class Q>  
+template <class T,class Q, class R>  
 class HashedVector { // container for 
 public:
 	vector<T> vec;
-	unordered_multimap<T,int> hashTable;
+	unordered_multimap<T,R> hashTable;
 	bool isHash=false;
 
 	inline void GenerateHash();
@@ -243,8 +244,20 @@ public:
 
 };
 
-template <class T,class Q>  
-class HashedVectorSafe : protected HashedVector<T,Q> { // container for 
+template <class T,class Q, class R>  
+class HashedMap : protected HashedVector<T,Q,R> {
+public:
+	using HashedVector<T,Q,R>::hashTable;
+	using HashedVector<T,Q,R>::vec;
+	using HashedVector<T,Q,R>::isHash;
+	
+	vector<T> targ;
+	inline void GenerateHash();
+
+};
+
+template <class T,class Q, class R=int>  
+class HashedVectorSafe : protected HashedVector<T,Q,R> { // container for 
 protected:
 	using HashedVector<T,Q>::vec;
     using HashedVector<T,Q>::isHash; 
