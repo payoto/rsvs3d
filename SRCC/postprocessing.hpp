@@ -47,7 +47,7 @@ private:
 public:
 	int OpenFile(const char *str);
 	void CloseFile();
-
+	int ZoneNum() const {return(nZones);}
 	// Mesh out
 	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0, 
 		int forceOutType=0, const vector<int> &vertList={});
@@ -55,10 +55,13 @@ public:
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
 	int LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVertDat,int nCellDat);
 	int VertDataBlock(const mesh &meshout,int nVert, int nVertDat,int nCellDat,
-		const vector<int> &vertList);
+		const vector<int> &vertList={});
 	int VolFaceMap(const mesh& meshout,int nSurf);
 	int SurfFaceMap(const mesh& meshout,int nEdge);
 	int LineFaceMap(const mesh& meshout,int nEdge);
+	// Partial Mesh Out with variable sharing
+	int PrintVolumeDat(const mesh &meshout, int shareZone, int strandID, double timeStep);
+	int DefShareZoneVolume(int shareZone, int nVertDat);
 
 	// Triangulation out
 	int VolDataBlock(const triangulation &triout, triarray triangulation::*mp,
@@ -86,9 +89,9 @@ public:
 	int PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp,
 		int strandID=0, double timeStep=0, int forceOutType=0);
 
+	// Zone Headers
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
 		int nVertDat, int nCellDat);
-
 	void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
 	void ZoneHeaderFelineseg(int nVert,int nEdge,int nVertDat, int nCellDat);
 	void ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat);

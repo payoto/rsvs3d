@@ -156,7 +156,6 @@ int Test_snaxedge(){
 
 }
 
-
 int Test_snake(){
 	snake testSnake,testSnake2,testSnake3;
 	mesh snakeMesh,snakeMesh2;
@@ -577,6 +576,7 @@ int Test_surfcentre(){
 }
 
 int Test_snakeRSVS(){
+	int nVoluZone;
 	snake testSnake;
 	mesh snakeMesh, triMesh,voluMesh;
 	triangulation testTriangle,triRSVS;
@@ -616,11 +616,12 @@ int Test_snakeRSVS(){
 		unique(elmMapping);
 		DisplayVector(elmMapping);
 		for (ii=0;ii<voluMesh.volus.size();++ii){
-			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
+			voluMesh.volus[ii].target=(double(rand()%1001)/1000.0);
 		}
 		voluMesh.PrepareForUse();
 		voluMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(voluMesh);
+		nVoluZone=outSnake.ZoneNum();
 
 		triRSVS.stattri.clear();
 		triRSVS.trivert.clear();
@@ -662,16 +663,23 @@ int Test_snakeRSVS(){
 				MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
 				outSnake.PrintMesh(triMesh,3,totT);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+				if (ii==0){
+					outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,3);
+					outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,3);
+				}
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
-				
 				vertList.clear();
 				for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
 					if(testSnake.isMeshVertIn[jj]){
 						vertList.push_back(testSnake.snakemesh->verts(jj)->index);
 					}
 				}
+				if(int(testSnake.isMeshVertIn.size())==0){
+					vertList.push_back(testSnake.snakemesh->verts(0)->index);
+				}
 				outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
+				outSnake.PrintVolumeDat(voluMesh,nVoluZone,8,totT);
 			}
 
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
@@ -698,7 +706,11 @@ int Test_snakeRSVS(){
 					vertList.push_back(testSnake.snakemesh->verts(jj)->index);
 				}
 			}
+			if(int(testSnake.isMeshVertIn.size())==0){
+				vertList.push_back(testSnake.snakemesh->verts(0)->index);
+			}
 			outSnake.PrintMesh(*(testSnake.snakemesh),7,totT,4,vertList);
+			outSnake.PrintVolumeDat(voluMesh,nVoluZone,8,totT);
 		}
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
@@ -726,6 +738,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 
 	start_s=clock();
 	calcObj.CalculateTriangulation(RSVStri);
+	calcObj.ReturnConstrToMesh(RSVStri);
 	stop_s=clock();
 	cout << " maths: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" ;
 	calcObj.Print2Screen();

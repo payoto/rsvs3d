@@ -23,9 +23,11 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *n
 int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj;
+	int ii,jj,nCoord;
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
+	nCoord=int(meshout.verts(0)->coord.size());
+	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
+	for (jj=0;jj<nCoord;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
 		}
@@ -56,9 +58,11 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVert
 int tecplotfile::SurfDataBlock(const mesh &meshout,int nVert,int nSurf, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj;
+	int ii,jj, nCoord;
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
+	nCoord=int(meshout.verts(0)->coord.size());
+	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
+	for (jj=0;jj<nCoord;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
 		}
@@ -323,7 +327,66 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 	return(0);
 }
 
+int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, int strandID, double timeStep){
 
+	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
+	int forceOutType;
+	if(nZones==0){
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
+	}
+
+	this->NewZone();
+
+	if(strandID>0){
+		this->StrandTime(strandID, timeStep);
+	}
+	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	// Fixed by the dimensionality of the mesh
+	nVertDat=3;
+	nCellDat=3;
+	// forceOutType=0;
+	// if (forceOutType==0){
+	if(nVolu>0){
+		forceOutType=1; // output as volume data (FEPOLYHEDRON)
+	} else if (nSurf>0){
+		forceOutType=2;// output as Surface data (FEPOLYGON)
+	} else if (nEdge>0){
+		forceOutType=3; // output as line data (FELINESEG)
+	} else {
+		forceOutType=4;
+	}
+	// }
+
+
+	if (forceOutType==1){
+		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
+		this->DefShareZoneVolume(shareZone, nVertDat);
+		this->VolDataBlock(meshout,nVert,nVolu, 0);
+		//this->VolFaceMap(meshout,nSurf);
+	}
+	else if (forceOutType==2){
+		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
+		this->DefShareZoneVolume(shareZone, nVertDat);
+		this->SurfDataBlock(meshout,nVert,nSurf, 0);
+		//this->SurfFaceMap(meshout,nEdge);
+
+	} else if (forceOutType==3){
+		throw invalid_argument("Cannot output volume of line");
+	} else if (forceOutType==4){
+		throw invalid_argument("Cannot output volume of point");
+	}
+	return(0);
+	//CONNECTIVITYSHAREZONE=<zone>
+	//VARSHARELIST=([set-of-vars]=<zone>, [set-ofvars]=<zone>)
+
+}
+int tecplotfile::DefShareZoneVolume(int shareZone, int nVertDat){
+
+	fprintf(fid, "CONNECTIVITYSHAREZONE=%i\n",shareZone);
+	fprintf(fid, "VARSHARELIST=([%i-%i]=%i )\n",1, nVertDat, shareZone);
+
+	return(0);
+}
 
 // Functions triarray
 void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){

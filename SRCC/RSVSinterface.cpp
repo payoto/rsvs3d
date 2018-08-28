@@ -48,7 +48,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	} 
 
 	// Output some data to check it makes sense
-	ReturnConstrToMesh(triRSVS);
+	
 }
 
 void SQPcalc::Print2Screen()const {
@@ -61,7 +61,7 @@ void SQPcalc::Print2Screen()const {
 	cout << endl;
 }
 
-void SQPcalc::ReturnConstrToMesh(const triangulation &triRSVS) const {
+void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	
 	int ii, ni;
 	vector<double> temp;

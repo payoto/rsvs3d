@@ -341,8 +341,8 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		tempPair.first=ii;
 		for (jj = 0; jj < nj; ++jj){
 			tempPair.second=meshtree.parentmesh[ii]->volus(jj)->index;
+			parentcases.push_back(tempPair);
 		}
-
 		for (jj = 0; jj < nElm; ++jj){
 			currind.push_back(meshtree.elemind[jj]);
 			parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
@@ -353,14 +353,25 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 }
 
 void mesh::MapFill2Parent(const vector<double> &fillIn, const vector<pair<int,int>> &parentcases){
-	int ii, ni; 
+	int ii, ni, sub; 
 
 	ni=parentcases.size();
+	cout << endl << "new fills: ";
+	DisplayVector(fillIn);
+	cout << endl << "replacing: " << ni << " | " ;
 	for(ii=0; ii< ni; ii++){
+		sub=this->meshtree.parentmesh[parentcases[ii].first]
+			->volus.find(parentcases[ii].second);
+		cout << "(" << this->meshtree.parentmesh[parentcases[ii].first]
+			->volus[sub].fill << " , ";
 		this->meshtree.parentmesh[parentcases[ii].first]
-			->volus[parentcases[ii].second].fill=fillIn[ii];
+			->volus[sub].fill=fillIn[ii];
+
+		cout  << this->meshtree.parentmesh[parentcases[ii].first]
+			->volus[sub].fill << ") ";
 		this->meshtree.parentmesh[parentcases[ii].first]->volus.isHash=1;
 	}
+	cout<< endl;
 
 }
 
