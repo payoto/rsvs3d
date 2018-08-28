@@ -646,6 +646,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
+		triRSVS.CalcTriVertPos();
 		vertList.reserve(testSnake.snakemesh->verts.size());
 		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
@@ -670,9 +671,9 @@ int Test_snakeRSVS(){
 				}
 				outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 				outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
-				if(int(triRSVS.acttri.size())!=0){
-					outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
-				}
+				
+				outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
+				
 				
 				vertList.clear();
 				for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){

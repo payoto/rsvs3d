@@ -70,7 +70,7 @@ $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'All'
 $!GLOBALTIME 
   SOLUTIONTIME = 50
-$!ACTIVEFIELDMAPS  =  [3,5,7-9]
+$!ACTIVEFIELDMAPS  =  [3,5,7-10]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
   GREENCHANNELVAR = 4
@@ -715,9 +715,7 @@ $!FIELDMAP  [8]
 $!FIELDMAP  [9]
   MESH
     {
-    SHOW = NO
-    COLOR = GREEN
-    LINETHICKNESS = 0.4
+    COLOR = CUSTOM6
     }
   CONTOUR
     {
@@ -729,6 +727,7 @@ $!FIELDMAP  [9]
     }
   SCATTER
     {
+    SHOW = NO
     COLOR = BLUE
     FRAMESIZE = 0.5
     }
@@ -752,6 +751,7 @@ $!FIELDMAP  [9]
 $!FIELDMAP  [10]
   MESH
     {
+    SHOW = NO
     COLOR = CYAN
     }
   CONTOUR
@@ -764,7 +764,12 @@ $!FIELDMAP  [10]
     }
   SCATTER
     {
-    COLOR = CYAN
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = BLUE
+    FRAMESIZE = 0.5
     }
   SHADE
     {
@@ -774,6 +779,40 @@ $!FIELDMAP  [10]
     {
     SHOW = YES
     COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
     }
   POINTS
     {
@@ -811,7 +850,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -835,7 +874,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -1352,16 +1391,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWSHADE = YES
@@ -1395,7 +1432,7 @@ $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'VOS'
 $!GLOBALTIME 
   SOLUTIONTIME = 50
-$!ACTIVEFIELDMAPS  =  [7-10]
+$!ACTIVEFIELDMAPS  =  [7-11]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
   GREENCHANNELVAR = 4
@@ -1404,6 +1441,7 @@ $!GLOBALRGB
   RANGEMAX = 1
 $!GLOBALCONTOUR  1
   VAR = 4
+  COLORMAPNAME = 'Diverging - Blue/Yellow/Red'
   DEFNUMLEVELS = 11
   LEGEND
     {
@@ -2050,9 +2088,7 @@ $!FIELDMAP  [8]
 $!FIELDMAP  [9]
   MESH
     {
-    SHOW = NO
-    COLOR = GREEN
-    LINETHICKNESS = 0.4
+    COLOR = CUSTOM6
     }
   CONTOUR
     {
@@ -2064,6 +2100,7 @@ $!FIELDMAP  [9]
     }
   SCATTER
     {
+    SHOW = NO
     SYMBOLSHAPE
       {
       GEOMSHAPE = SPHERE
@@ -2104,8 +2141,12 @@ $!FIELDMAP  [10]
     }
   SCATTER
     {
-    SHOW = NO
-    COLOR = CYAN
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = BLUE
+    FRAMESIZE = 0.5
     }
   SHADE
     {
@@ -2115,6 +2156,42 @@ $!FIELDMAP  [10]
     {
     SHOW = YES
     COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    SHOW = NO
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    SHOW = NO
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
     }
   POINTS
     {
@@ -2152,7 +2229,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -2176,7 +2253,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -2317,15 +2394,15 @@ $!SLICEATTRIBUTES  1
     INCLUDE = NO
     ORIGIN
       {
-      X = 0
-      Y = 0
-      Z = 0
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0
-      Y = 0
-      Z = 0
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  2
@@ -2375,15 +2452,15 @@ $!SLICEATTRIBUTES  2
     INCLUDE = NO
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  3
@@ -2433,15 +2510,15 @@ $!SLICEATTRIBUTES  3
     INCLUDE = NO
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  4
@@ -2476,15 +2553,15 @@ $!SLICEATTRIBUTES  4
     {
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  5
@@ -2520,15 +2597,15 @@ $!SLICEATTRIBUTES  5
     {
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  6
@@ -2564,15 +2641,15 @@ $!SLICEATTRIBUTES  6
     {
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  7
@@ -2607,15 +2684,15 @@ $!SLICEATTRIBUTES  7
     {
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!SLICEATTRIBUTES  8
@@ -2651,15 +2728,15 @@ $!SLICEATTRIBUTES  8
     {
     ORIGIN
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     BOXDIMENSION
       {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
+      X = 0.4
+      Y = 0.3333333333333334
+      Z = 0.25
       }
     }
 $!STREAMATTRIBUTES 
@@ -2711,16 +2788,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWEDGE = NO
@@ -2753,7 +2828,7 @@ $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Intersection'
 $!GLOBALTIME 
   SOLUTIONTIME = 50
-$!ACTIVEFIELDMAPS  =  [5,7-9]
+$!ACTIVEFIELDMAPS  =  [5,7-11]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
   GREENCHANNELVAR = 4
@@ -3402,9 +3477,7 @@ $!FIELDMAP  [8]
 $!FIELDMAP  [9]
   MESH
     {
-    SHOW = NO
-    COLOR = GREEN
-    LINETHICKNESS = 0.4
+    COLOR = CUSTOM6
     }
   CONTOUR
     {
@@ -3416,6 +3489,7 @@ $!FIELDMAP  [9]
     }
   SCATTER
     {
+    SHOW = NO
     SYMBOLSHAPE
       {
       GEOMSHAPE = SPHERE
@@ -3443,6 +3517,7 @@ $!FIELDMAP  [9]
 $!FIELDMAP  [10]
   MESH
     {
+    SHOW = NO
     COLOR = CYAN
     }
   CONTOUR
@@ -3455,7 +3530,12 @@ $!FIELDMAP  [10]
     }
   SCATTER
     {
-    COLOR = CYAN
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = BLUE
+    FRAMESIZE = 0.5
     }
   SHADE
     {
@@ -3465,6 +3545,42 @@ $!FIELDMAP  [10]
     {
     SHOW = YES
     COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    SHOW = NO
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    SHOW = NO
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
     }
   POINTS
     {
@@ -3502,7 +3618,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -3526,7 +3642,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -4043,16 +4159,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWEDGE = NO
@@ -4781,6 +4895,40 @@ $!FIELDMAP  [10]
     }
   SURFACES
     {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
     SURFACESTOPLOT = EXPOSEDCELLFACES
     }
 $!THREEDAXIS 
@@ -4811,7 +4959,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -4835,7 +4983,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -5102,16 +5250,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWCONTOUR = YES
   SHOWSHADE = YES
@@ -5872,6 +6018,40 @@ $!FIELDMAP  [10]
     }
   SURFACES
     {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
     SURFACESTOPLOT = EXPOSEDCELLFACES
     }
 $!THREEDAXIS 
@@ -5902,7 +6082,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -5926,7 +6106,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -6461,16 +6641,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWEDGE = NO
 $!SLICELAYERS 
@@ -7225,6 +7403,40 @@ $!FIELDMAP  [10]
     }
   SURFACES
     {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
     SURFACESTOPLOT = EXPOSEDCELLFACES
     }
 $!THREEDAXIS 
@@ -7255,7 +7467,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -7279,7 +7491,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -7546,16 +7758,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWCONTOUR = YES
   SHOWSHADE = YES
@@ -8317,6 +8527,40 @@ $!FIELDMAP  [10]
     }
   SURFACES
     {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [11]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
     SURFACESTOPLOT = EXPOSEDCELLFACES
     }
 $!THREEDAXIS 
@@ -8347,7 +8591,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 1
+      EDGE = 2
       }
     }
 $!THREEDAXIS 
@@ -8371,7 +8615,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 2
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -8888,16 +9132,14 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 68.7489
-  THETAANGLE = -67.9208
-  ALPHAANGLE = -2.44085
+  THETAANGLE = 240
   VIEWERPOSITION
     {
-    X = 13.06946789368779
-    Y = -4.72454605165598
-    Z = 5.654624564623351
+    X = 11.31168039718871
+    Y = 6.773274564516909
+    Z = 7.631697388077383
     }
-  VIEWWIDTH = 1.67926
+  VIEWWIDTH = 1.45
 $!FIELDLAYERS 
   SHOWEDGE = NO
   USETRANSLUCENCY = YES
