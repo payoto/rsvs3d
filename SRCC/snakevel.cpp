@@ -861,7 +861,7 @@ void triangulation::SetActiveStaticTri()
 	acttri.clear();
 	ni=stattri.size();
 	isObjDone.assign(ni,false);
-	trisurf.HashParent();
+	//trisurf.HashParent();
 	for(ii=0; ii< ni; ++ii){
 		if(!isObjDone[ii]){
 			stattri.findsiblings(stattri(ii)->KeyParent(),subList);

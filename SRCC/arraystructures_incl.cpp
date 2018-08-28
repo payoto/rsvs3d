@@ -632,6 +632,8 @@ template<class T> inline void ArrayStruct <T>::reserve(int n)
 template<class T> inline void ArrayStruct <T>::clear()  
 {
 	elems.clear();
+	hashTable.clear();
+	//isHash=0;
 }
 // Hashed Vector Template class implementations
 

@@ -194,6 +194,8 @@ public:
 	void DeHashParent(const int pos);
 	bool memberIsHashParent(const int pos) const;
 	// Functions that need modification
+	inline void push_back(T& newelem);
+	inline void clear();
 	bool checkready();
 	void ForceArrayReady();
 	void PrepareForUse();

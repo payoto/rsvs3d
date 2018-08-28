@@ -105,7 +105,12 @@ void SnakStruct<T>::ForceArrayReady()
 	isHashParent=1;
 
 }
-
+template<class T> inline void SnakStruct <T>::clear()
+{
+	ArrayStruct<T>::clear();
+	hashParent.clear();
+	//isHashParent=0; 
+}
 template<class T>
 int SnakStruct<T>::findparent(int key) const 
 {
@@ -123,7 +128,7 @@ int SnakStruct<T>::findparent(int key) const
 	int key2;
 	key2=elems[search->second].KeyParent();
 	if (key2!=key){
-		throw  invalid_argument ("FIND returned an invalid output ");
+		throw  invalid_argument ("FINDPARENT returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);
@@ -139,7 +144,13 @@ void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const
 	}
 	ReturnDataEqualRange(key, hashParent, siblings);
 }
-
+template<class T> inline void SnakStruct <T>::push_back(T& newelem)  
+{
+	ArrayStruct<T>::push_back(newelem);
+	
+	hashParent.emplace(newelem.KeyParent(),elems.size()-1);
+	//isHashParent=0;
+}
 
 // Surfarray methods
 template<class T>
