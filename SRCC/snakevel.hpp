@@ -35,16 +35,22 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
+template <class T> class TriStruct;
+
 class triangle;
 class trianglepoint;
 class trianglesurf;
 
-typedef SnakStruct<triangle> triarray;
-typedef SnakStruct<trianglepoint>  tripointarray;
-typedef SnakStruct<trianglesurf>  trisurfarray;
+typedef TriStruct<triangle> triarray;
+typedef TriStruct<trianglepoint>  tripointarray;
+typedef TriStruct<trianglesurf>  trisurfarray;
 
 // Template Class
 
+template <class T>
+class TriStruct : public SnakStruct<T>{
+	friend class triangulation;
+};
 
 // Base classes
 class triangulation  
@@ -69,9 +75,10 @@ public:
 	void CalcTriVertPos(int ii);
 	void CalcTriVertPos();
 	void SetActiveStaticTri();
+
 	void SetConnectivity();
-	void SetConnectivityDyna();
-	void SetConnectivity(int ii);
+	void SetConnectivityStat(int ii);
+	void SetConnectivityInter(int ii);
 	void SetConnectivityDyna(int ii);
 };
 

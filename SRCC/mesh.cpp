@@ -1786,8 +1786,8 @@ void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
 	n=int(edgeind.size());
 	vertList.clear();
 	vertList.reserve(n);
-
-	edgeCurr=meshin->edges.find(edgeind[n-1]);
+	//This comes out in the same order as edgeind
+ 	edgeCurr=meshin->edges.find(edgeind[n-1]);
 	verts[0]=(meshin->edges(edgeCurr)->vertind[0]);
 	verts[1]=(meshin->edges(edgeCurr)->vertind[1]);
 	vertsPast[0]=verts[0];
