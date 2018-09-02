@@ -51,8 +51,8 @@ int main(){
 	#endif //TEST_ALL
  
 	gridTest.Run(Test_surfcentre,"test SurfCentroid"); 
-	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
+	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 
 
 	gridTest.PrintSummary();

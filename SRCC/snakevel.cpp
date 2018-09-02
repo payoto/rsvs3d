@@ -70,13 +70,13 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 
 		triangleRSVS.snakeDep->snakeconn.surfs.SetNoModif();
 		triangleRSVS.snakeDep->snakeconn.edges.SetNoModif();
+		triangleRSVS.SetConnectivity();
 	}
 	triangleRSVS.PrepareForUse();
 	if(triangleRSVS.snakeDep!=NULL){
 		triangleRSVS.SetActiveStaticTri();
 	}
 }
-
 
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , 
 	const int typeMesh, const vector<int> &subList){
@@ -899,6 +899,67 @@ void triangulation::SetActiveStaticTri()
 	}
 
 }
+
+void triangulation::SetConnectivity(){
+	int ii, ni;
+	ni=stattri.size();
+	for (ii = 0; ii < ni; ++ii)	{
+		if(stattri(ii)->connec.celltarg.size()==0){
+			this->SetConnectivityStat(ii);
+		}
+	}
+
+	ni=intertri.size();
+	for (ii = 0; ii < ni; ++ii)	{
+		if(intertri(ii)->connec.celltarg.size()==0){
+			this->SetConnectivityInter(ii);
+		}
+	}
+	ni=dynatri.size();
+	for (ii = 0; ii < ni; ++ii)	{
+		if(dynatri(ii)->connec.celltarg.size()==0){
+			this->SetConnectivityDyna(ii);
+		}
+	}
+}
+
+void triangulation::SetConnectivityInter(int ii){
+
+	int prevHash=intertri.isHash;
+	intertri[ii].connec.celltarg=
+		meshDep->surfs.isearch(dynatri(ii)->parentsurf)->voluind;
+	intertri[ii].connec.constrinfluence={-1.0,1.0};
+	intertri.isHash=prevHash;
+
+}
+void triangulation::SetConnectivityStat(int ii){
+
+	int prevHash=intertri.isHash;
+	intertri[ii].connec.celltarg=
+		meshDep->surfs.isearch(dynatri(ii)->parentsurf)->voluind;
+	intertri[ii].connec.constrinfluence={-1.0,1.0};
+	intertri.isHash=prevHash;
+
+}
+void triangulation::SetConnectivityDyna(int ii){
+	// Set the tri.connec of snake surfaces
+	// Look at the tri surface, find the side which points in
+	// if it is jj=0 influence is -1 if jj=1 influence is 1
+	// 
+	int voluStore,jj, prevHash; 
+
+	voluStore=snakeDep->snaxsurfs.isearch(dynatri(ii)->parentsurf)->voluind;
+	jj=0;
+	jj=snakeDep->snakeconn.surfs.isearch(dynatri(ii)->parentsurf)->voluind[jj]==0;
+
+	prevHash=dynatri.isHash;
+	dynatri[ii].connec.celltarg.clear();
+	dynatri[ii].connec.constrinfluence.clear();
+	dynatri[ii].connec.celltarg.push_back(voluStore);
+	dynatri[ii].connec.constrinfluence.push_back(float(-1+2*jj));
+	dynatri.isHash=prevHash;
+}
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"

@@ -482,6 +482,7 @@ int Test_MeshRefinement(){
 	tecplotfile outSnake;
 	vector<int> elmMapping,dims;
 	triangulation testTriangle;
+	SQPcalc calcObj;
 	int ii;
 	
 	//bool errFlag;
@@ -513,19 +514,34 @@ int Test_MeshRefinement(){
 		DisplayVector(elmMapping);
 		for (ii=0;ii<voluMesh.volus.size();++ii){
 			voluMesh.volus[ii].fill=(double(rand()%1001)/1000.0);
+			voluMesh.volus[ii].target=voluMesh.volus[ii].fill;
+			voluMesh.volus[ii].error=voluMesh.volus[ii].fill;
 		}
 		voluMesh.PrepareForUse();
-		testTriangle.PrepareForUse();
-		TriangulateMesh(voluMesh,testTriangle);
 		voluMesh.TightenConnectivity();
 		voluMesh.OrderEdges();
+		snakeMesh.OrientSurfaceVolume();
+		voluMesh.OrientSurfaceVolume();
+		triMesh.OrientSurfaceVolume();
+
+		testTriangle.PrepareForUse();
+		TriangulateMesh(snakeMesh,testTriangle);
 		testTriangle.PrepareForUse();
 		testTriangle.CalcTriVertPos();
+
+		testTriangle.acttri.clear();
+		testTriangle.acttri.reserve(testTriangle.stattri.size());
+		for (ii=0; ii< testTriangle.stattri.size(); ++ii){
+			testTriangle.acttri.push_back(testTriangle.stattri(ii)->index);
+		}
+		testTriangle.PrepareForUse();
+		calcObj.CalculateTriangulation(testTriangle);
+		calcObj.ReturnConstrToMesh(testTriangle);
+		calcObj.Print2Screen();
+
 		MeshTriangulation(triMesh,voluMesh,testTriangle.stattri, testTriangle.trivert);
 
-		voluMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(voluMesh);
-		triMesh.OrientSurfaceVolume();
 		outSnake.PrintMesh(triMesh);
 
 
