@@ -400,7 +400,7 @@ void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, in
 	*totNumFaceNode=(triout.*mp).size()*3;
 }
 
-void ExtractTriData(const triangulation &triout, int nTriangles, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractTriData(int nTriangles, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 
 
@@ -645,7 +645,7 @@ int tecplotfile::LineFaceMap(const triangulation &triout, triarray triangulation
 	return(0);
 }
 
-int tecplotfile::LineFaceMap(const triangulation &triout, const vector<int> &triList){
+int tecplotfile::LineFaceMap(const vector<int> &triList){
 	int ii,jj,kk;
 
 	int nTri;
@@ -700,7 +700,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
 	if(triList.size()==0 || forceOutType!=3){
 		ExtractTriData(triout,mp,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	} else {
-		ExtractTriData(triout,triList.size(),&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+		ExtractTriData(triList.size(),&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	}
 	if(nVert>0){
 		if(nZones==0){
@@ -743,7 +743,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
 				this->LineFaceMap(triout,mp);
 			} else {
 				this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat,triList);
-				this->LineFaceMap(triout,triList);
+				this->LineFaceMap(triList);
 			}
 			
 		}

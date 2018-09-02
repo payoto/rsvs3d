@@ -74,7 +74,7 @@ public:
 		int nVert,int nEdge, int nVertDat,int nCellDat, const vector<int> &triList);
 	int SurfFaceMap(const triangulation &triout, triarray triangulation::*mp);
 	int LineFaceMap(const triangulation &triout, triarray triangulation::*mp);
-	int LineFaceMap(const triangulation &triout, const vector<int> &triList);
+	int LineFaceMap( const vector<int> &triList);
 	int VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf);
 	int PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,
 		int strandID=0, double timeStep=0, int forceOutType=0,

@@ -106,7 +106,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS ,
 		} else { // trisurf triangulation
 			n=triangleRSVS.trisurf.size();
 			for (ii=0; ii<n; ++ii){
-				TriangulateTriSurface(*(triangleRSVS.trisurf(ii)) ,meshin, triangleRSVS.*mp, 
+				TriangulateTriSurface(*(triangleRSVS.trisurf(ii)) , triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 
@@ -120,7 +120,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS ,
 			}
 		} else { // trisurf triangulation
 			for (ii=0; ii<n; ++ii){ 
-				TriangulateTriSurface(*(triangleRSVS.trisurf(subList[ii])),meshin,triangleRSVS.*mp, 
+				TriangulateTriSurface(*(triangleRSVS.trisurf(subList[ii])),triangleRSVS.*mp, 
 					triangleRSVS.trivert, typeMesh, maxIndVert+ii+1);
 			}
 		}
@@ -196,7 +196,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	}
 }
 
-void TriangulateTriSurface(const trianglesurf &surfin,const mesh& meshin, 
+void TriangulateTriSurface(const trianglesurf &surfin,
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd){
 	// Generates the triangulation parts 
 	// typeMesh=1 is a static mesh, type 2 is a dynamic one (snake)

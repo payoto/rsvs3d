@@ -255,7 +255,6 @@ void MergeAllContactVertices(snake &fullsnake, vector<int> &isImpact){
 void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 	snake fwdSnake, bwdSnake;
-	int start_s,stop_s;
 	HashedVector<int,int> vertNoSpawn;
 
 	fwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
@@ -263,15 +262,10 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 
 	// Generate fwd spawn
 	
-	start_s=clock();
 	vertNoSpawn.vec.push_back(0);
 	vertNoSpawn.GenerateHash();
 	SpawnArrivedSnaxelsDir(fullsnake,bwdSnake,isImpact,-1,vertNoSpawn);
 	SpawnArrivedSnaxelsDir(fullsnake,fwdSnake,isImpact,-2,vertNoSpawn);
-
-	stop_s=clock();
-	cout << "Spawn: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
-	start_s=clock();
 
 	bwdSnake.Flip();
 	/* Old process incompatible with internal vertex tracking
@@ -295,11 +289,7 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	fullsnake.MakeCompatible_inplace(fwdSnake);
 	// DO NOT RUN TO MAITAIN orederedge newsnake.PrepareForUse();
 	fullsnake.Concatenate(fwdSnake);
-
-	stop_s=clock();
-	cout << "Concatenate: " << double(stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms  " ;
-
-	cout << " nSnax " << fwdSnake.snaxs.size() << "  ";
+	
 	fullsnake.PrepareForUse();
 
 }
