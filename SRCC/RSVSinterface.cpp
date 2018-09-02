@@ -55,6 +55,46 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	
 }
 
+
+void SQPcalc::CalculateMesh(mesh &meshin){
+
+	int ii,ni, jj, nj;
+	int nDv, nConstr;
+	vector<int> vecin;
+	triangulation triRSVS(meshin);
+	// prepare the SQP object
+	
+	nConstr=meshin.volus.size(); 
+	
+	nDv=0;
+	
+	BuildMathArrays(nDv, nConstr);
+
+	// TODO this needs to be supported by mapping each volume to the constraint position
+	// There can be more than one constraint for each cell.
+	//BuildConstrMap(triRSVS);
+	BuildConstrMap(meshin);
+
+	// Calculate the SQP object
+	nj=meshin.surfs.size();
+	for(jj = 0; jj< nj ; jj++){
+		TriangulateSurface(*(meshin.surfs(jj)),meshin,triRSVS.stattri, 
+					triRSVS.trivert, 1, 1);
+		triRSVS.PrepareForUse();
+		triRSVS.CalcTriVertPos();
+		triRSVS.PrepareForUse();
+		ni=triRSVS.stattri.size();
+		for(ii = 0; ii< ni ; ii++){
+			CalcTriangle(*(triRSVS.stattri(ii)), triRSVS);
+		} 
+		triRSVS.stattri.clear();
+		triRSVS.trivert.clear();
+	}
+
+	// Output some data to check it makes sense
+	
+}
+
 void SQPcalc::Print2Screen()const {
 	cout << "Math result: obj " << obj << " false access " << falseaccess << endl;
 	cout << "Constr " ;
@@ -76,9 +116,21 @@ void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 		temp.push_back(constr[ii]);
 	}
 
-	triRSVS.meshDep->MapFill2Parent(temp, this->constrList);
+	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::fill);
 
 
+}
+void SQPcalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
+	
+	int ii, ni;
+	vector<double> temp;
+	ni=constr.size();
+	temp.reserve(ni);
+
+	for(ii=0; ii<ni; ii++){
+		temp.push_back(constr[ii]);
+	}
+	meshin.MapVolu2Self(temp, constrMap.vec, mp);
 }
 
 void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
@@ -105,6 +157,22 @@ void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
 	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList);
 
 	constrMap.GenerateHash();
+}
+void SQPcalc::BuildConstrMap(const mesh &meshin){
+	int ni, ii;
+	ni=meshin.volus.size();
+	constrMap.vec.clear();
+	constrMap.targ.clear();
+	constrMap.vec.reserve(ni);
+	constrMap.targ.reserve(ni);
+	for(ii=0; ii<ni; ++ii){
+		constrMap.vec.push_back(meshin.volus(ii)->index);
+		constrMap.targ.push_back(ii);
+	}
+
+
+	constrMap.GenerateHash();
+
 }
 
 void SQPcalc::BuildDVMap(const vector<int> &vecin){

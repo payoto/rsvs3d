@@ -80,6 +80,15 @@ public:
 	void SetConnectivityStat(int ii);
 	void SetConnectivityInter(int ii);
 	void SetConnectivityDyna(int ii);
+
+	triangulation(){
+		meshDep=NULL;
+		snakeDep=NULL;
+	}
+	explicit triangulation(mesh &meshin){
+		meshDep=&meshin;
+		snakeDep=NULL;
+	}
 };
 
 

@@ -482,7 +482,7 @@ int Test_MeshRefinement(){
 	tecplotfile outSnake;
 	vector<int> elmMapping,dims;
 	triangulation testTriangle;
-	SQPcalc calcObj;
+	SQPcalc calcObj,calcObj2;
 	int ii;
 	
 	//bool errFlag;
@@ -538,6 +538,10 @@ int Test_MeshRefinement(){
 		calcObj.CalculateTriangulation(testTriangle);
 		calcObj.ReturnConstrToMesh(testTriangle);
 		calcObj.Print2Screen();
+
+		calcObj2.CalculateMesh(voluMesh);
+		calcObj2.ReturnConstrToMesh(voluMesh,&volu::error);
+		calcObj2.Print2Screen();
 
 		MeshTriangulation(triMesh,voluMesh,testTriangle.stattri, testTriangle.trivert);
 

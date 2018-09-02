@@ -139,7 +139,7 @@ class meshpart : public ArrayStructpart { // Abstract class to ensure interface 
 class volu: public meshpart {
 public:
 	
-	double fill,target,error;
+	double fill,target,error, volume;
 	vector<int> surfind;
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -210,7 +210,7 @@ public:
 	//friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
 	//friend void mesh::RemoveIndex(int typeInd, int oldInd);
 
-	double fill,target,error;
+	double fill,target,error,area;
 	vector<int> edgeind;
 	vector<int> voluind;
 	 // reserves 2 as this is the size of the array
@@ -447,8 +447,10 @@ public:
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		vector<pair<int,int>> &parentcases) const;
-	void MapFill2Parent(const vector<double> &fillIn,
-		const vector<pair<int,int>> &parentcases);
+	void MapVolu2Parent(const vector<double> &fillIn,
+		const vector<pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
+	void MapVolu2Self(const vector<double> &fillIn, 
+		const vector<int> &elms, double volu::*mp=&volu::fill);
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();

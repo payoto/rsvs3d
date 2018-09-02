@@ -40,10 +40,13 @@ public :
 	void Print2Screen()const;
 	void BuildMathArrays(int nDv, int nConstr);
 	void BuildConstrMap(const triangulation &triangleRSVS);
+	void BuildConstrMap(const mesh &meshin);
 	void BuildDVMap(const vector<int> &vecin);
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS);
 	void CalculateTriangulation(const triangulation &triRSVS);
+	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
+	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
 };
 
 
