@@ -2233,6 +2233,9 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	//			-> add surface to queue
 	nBlocks=0;
 	nSurfExplored=0;
+	if(meshDim<3){
+		return(nBlocks);
+	}
 	//cout << " " << nSurfs << " | " ;
 	while(nSurfExplored<nSurfs){
 		// if currQueue is empty start new block

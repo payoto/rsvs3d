@@ -66,6 +66,42 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triang
 	}
 }
 
+
+void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
+	vector<int> &dims, triangulation &triRSVS){
+	vector<int> elmMapping;
+	int ii;
+
+	snakeMesh.PrepareForUse();
+	snakeMesh.OrientSurfaceVolume();
+
+	///// Generate Coarser Volume Mesh
+	testSnake.snakemesh=&snakeMesh;
+	//testSnake.disp();
+	for (ii=0;ii<snakeMesh.volus.size();++ii){
+		elmMapping.push_back(1);
+	}
+	CartesianMapping(snakeMesh,  elmMapping, dims);
+	CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+	snakeMesh.AddParent(&voluMesh,elmMapping);
+	
+	sort(elmMapping);
+	unique(elmMapping);
+	DisplayVector(elmMapping);
+	for (ii=0;ii<voluMesh.volus.size();++ii){
+		voluMesh.volus[ii].target=(double(rand()%1001)/1000.0);
+	}
+	voluMesh.PrepareForUse();
+	voluMesh.OrientSurfaceVolume();
+
+	triRSVS.stattri.clear();
+	triRSVS.trivert.clear();
+	triRSVS.PrepareForUse();
+	TriangulateMesh(snakeMesh,triRSVS);
+
+	testSnake.PrepareForUse();
+}
+
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
@@ -387,7 +423,7 @@ int Test_snakeinitflat(){
 			}
 
 			Test_stepalgo(testSnake, dt, isImpact);
-			
+			cout << endl;
 			totT=totT+1;
 		}
 		//testSnake.disp();
@@ -630,7 +666,7 @@ int Test_snakeRSVS(){
 	snake testSnake;
 	mesh snakeMesh, triMesh,voluMesh;
 	triangulation testTriangle,triRSVS;
-	vector<int> elmMapping,dims;
+	vector<int> dims;
 	const char *fileToOpen;
 	tecplotfile outSnake;
 	double totT=0.0;
@@ -641,45 +677,19 @@ int Test_snakeRSVS(){
 	int errTest=0;
 	
 
+	dims.assign(3,0);
+	dims[0]=2;dims[1]=3;dims[2]=1;
 	try {
 		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
 
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
-		snakeMesh.PrepareForUse();
-		snakeMesh.OrientSurfaceVolume();
-
-		///// Generate Coarser Volume Mesh
-		testSnake.snakemesh=&snakeMesh;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
-		//testSnake.disp();
-		for (ii=0;ii<snakeMesh.volus.size();++ii){
-			elmMapping.push_back(1);
-		}
-		dims.assign(3,0);
-		dims[0]=2;dims[1]=3;dims[2]=1;
-		CartesianMapping(snakeMesh,  elmMapping, dims);
-		CoarsenMesh(snakeMesh,voluMesh,elmMapping);
-		snakeMesh.AddParent(&voluMesh,elmMapping);
 		
-		sort(elmMapping);
-		unique(elmMapping);
-		DisplayVector(elmMapping);
-		for (ii=0;ii<voluMesh.volus.size();++ii){
-			voluMesh.volus[ii].target=(double(rand()%1001)/1000.0);
-		}
-		voluMesh.PrepareForUse();
-		voluMesh.OrientSurfaceVolume();
+		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+
+		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
 		nVoluZone=outSnake.ZoneNum();
-
-		triRSVS.stattri.clear();
-		triRSVS.trivert.clear();
-		triRSVS.PrepareForUse();
-		TriangulateMesh(snakeMesh,triRSVS);
-
-		start_s=clock();
-		testSnake.PrepareForUse();
 		
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
@@ -688,12 +698,11 @@ int Test_snakeRSVS(){
 		SpawnAtVertex(testSnake,729);
 		SpawnAtVertex(testSnake,731);
 		testSnake.displight();
-		stop_s=clock();
-		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 
 		start_s=clock();
 		testSnake.PrepareForUse();
 		triRSVS.PrepareForUse();
+
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
@@ -724,6 +733,7 @@ int Test_snakeRSVS(){
 	return(errTest);
 
 }
+
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
 	vector<int> &isImpact){
 	int start_s;

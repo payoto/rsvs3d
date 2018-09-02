@@ -816,10 +816,12 @@ void snake::OrientSurfaceVolume(){
 
 		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) || ((dotProd>0.0) && (kk==1)));
 	}
-	ni=surfOrient.size();
-	for(ii=0; ii< ni; ++ii){
-		if(isFlip[abs(surfOrient[ii])-1]){
-			snakeconn.surfs.elems[ii].FlipVolus();
+	if(nBlocks>0){
+		ni=surfOrient.size();
+		for(ii=0; ii< ni; ++ii){
+			if(isFlip[abs(surfOrient[ii])-1]){
+				snakeconn.surfs.elems[ii].FlipVolus();
+			}
 		}
 	}
 
