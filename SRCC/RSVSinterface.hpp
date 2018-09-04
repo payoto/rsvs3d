@@ -26,6 +26,7 @@ protected:
 	int nDv;
 	int nConstr;
 	int falseaccess=0;
+	bool returnDeriv=true;
 public :
 	MatrixXd dConstr,HConstr, HObj;
 	RowVectorXd dObj;
@@ -54,6 +55,9 @@ void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, MatrixXd &dS
 void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,const MatrixXd &HSc,const MatrixXd &Hcd,MatrixXd &HSd);
 void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retArray);
 void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut);
+void PrintMatrix(const MatrixXd mat);
+void PrintMatrix(const RowVectorXd mat);
+void PrintMatrix(const VectorXd mat);
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 

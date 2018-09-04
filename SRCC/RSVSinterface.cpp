@@ -17,6 +17,9 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	int ii,ni;
 	int nDv, nConstr;
 	vector<int> vecin;
+
+	this->returnDeriv=true;
+
 	// prepare the SQP object
 	nConstr=triRSVS.meshDep->CountVoluParent(); 
 	if(triRSVS.snakeDep!=NULL){
@@ -64,6 +67,7 @@ void SQPcalc::CalculateMesh(mesh &meshin){
 	triangulation triRSVS(meshin);
 	// prepare the SQP object
 	
+	this->returnDeriv=false;
 	nConstr=meshin.volus.size(); 
 	
 	nDv=0;
@@ -103,6 +107,21 @@ void SQPcalc::Print2Screen()const {
 		cout << constr[i] << " ";
 	}
 	cout << endl;
+	if(nConstr<10 && nDv < 10){
+		cout << "constr :" <<  endl ;	
+		PrintMatrix(constr);
+		cout << "dObj :" <<  endl ;	
+		PrintMatrix(dObj);
+		cout << "lagMult :" <<  endl ;	
+		PrintMatrix(lagMult);
+
+		cout << "dConstr :" <<  endl ;	
+		PrintMatrix(dConstr);
+		cout << "HConstr :" <<  endl ;	
+		PrintMatrix(HConstr);
+		cout << "HObj :" <<  endl ;	
+		PrintMatrix(HObj);
+	}
 }
 
 void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
@@ -185,7 +204,7 @@ void SQPcalc::BuildDVMap(const vector<int> &vecin){
 void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 
 
-	int ii,ni,jj,nj,kk,nCellTarg;
+	int ii,ni,jj,nj,kk,ll,nCellTarg;
 	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
@@ -196,7 +215,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;
-	RowVectorXd dObjPart;
+	MatrixXd dObjPart;
 	double constrPart, objPart;
 	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
 	double * retVal;
@@ -284,15 +303,28 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
 	ArrayVec2MatrixXd(*HValpnt, HVal);
 	ArrayVec2MatrixXd(*dValpnt, dVal);
-	Deriv1stChainScalar(dVal, dPos,dConstrPart);
-	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	Deriv1stChainScalar(dVal, dPos,dObjPart);
+	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
 	objPart=*retVal;
 
 	// Assign to main part of the object
+	// assign objective function
+	obj+=objPart; 
+	// Assign objective derivative
+	// cout << endl << "dObjPart " << nDvAct << " " ;
+	// PrintMatrix(dObjPart);
+	// cout <<  endl << "done" <<endl; 
+	for(ii=0; ii< nDvAct; ++ii){
+		dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+		for(jj=0; jj< nDvAct; ++jj){
+			HObj(dvMap.find(dvListMap.vec[jj]),
+				 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+		}
+	}
 
-	obj+=objPart; // assign objective function
-
-	// assign constraint value
+	// Assign Constraint
+	// and constraint derivative
+	// and Hessian		
 	nCellTarg=triIn.connec.celltarg.size(); 
 	for(ii=0; ii< nCellTarg;++ii){
 		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
@@ -300,12 +332,24 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		for(jj=0; jj< nj; ++jj){
 			if (subTempVec[jj]!=-1){
 				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+				for(kk=0; kk< nDvAct; ++kk){
+					dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
+						triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+					for(ll=0; ll< nDvAct; ++ll){
+						HObj(dvMap.find(dvListMap.vec[ll]),
+							 dvMap.find(dvListMap.vec[kk])) += HObjPart(ll,kk);
+					}
+				}
 			} else {
 				falseaccess++;
 			}
 		}
 	}
-} 
+	// Assign Objective Hessian
+
+	// Assign Constraint Hessian
+}
+
 
 void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut){
 
@@ -381,6 +425,38 @@ void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,
 	VecBy3DimArray(dSdc, Hcd, HSd);
 	HSd+=(dcdd.transpose()*HSc*dcdd);
 
+}
+
+void PrintMatrix(const MatrixXd mat){
+	int ii,jj, ni, nj;
+
+	ni=mat.rows();
+	nj=mat.cols();
+	for(ii=0;ii<ni;++ii){
+		for(jj=0;jj<nj;++jj){
+			cout << mat(ii,jj) << " ";
+		}
+		cout << endl;
+	}
+}
+void PrintMatrix(const VectorXd mat){
+	int ii, ni;
+
+	ni=mat.size();
+	for(ii=0;ii<ni;++ii){
+		cout << mat[ii] << " ";
+		cout << endl;
+	}
+}
+void PrintMatrix(const RowVectorXd mat){
+	int ii, ni;
+
+	ni=mat.size();
+	for(ii=0;ii<ni;++ii){
+		cout << mat[ii] << " ";
+		
+	}
+	cout << endl;
 }
 
 /// INSPIRATION

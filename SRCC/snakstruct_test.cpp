@@ -326,7 +326,6 @@ int Test_snakeinit(){
 		start_s=clock();
 		testSnake.PrepareForUse();
 		
-		SpawnAtVertex(testSnake,1);
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
 		SpawnAtVertex(testSnake,675);
@@ -750,6 +749,6 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" tri-maths:", start_s);
 
-	//calcObj.Print2Screen();
+	// calcObj.Print2Screen();
 
 }
