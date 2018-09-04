@@ -326,6 +326,7 @@ int Test_snakeinit(){
 		start_s=clock();
 		testSnake.PrepareForUse();
 		
+		SpawnAtVertex(testSnake,1);
 		SpawnAtVertex(testSnake,1022);
 		SpawnAtVertex(testSnake,674);
 		SpawnAtVertex(testSnake,675);

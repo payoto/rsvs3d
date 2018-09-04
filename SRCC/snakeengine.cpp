@@ -156,7 +156,7 @@ void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds, 
 		newsnake.snaxsurfs[ii].voluind=voluInds[ii];
 		newsnake.snakeconn.surfs[ii].voluind[0]=1;
 		// Assign edgeind (can be done WAY more efficiently the other way round)
-		// But liek this we can check the logic
+		// But like this we can check the logic
 		surfSubsTemp=FindSubList(newsnake.snakemesh->volus(voluSubs[ii])->surfind,
 			surfInds,hashSurfInds);
 		// Needs to be modified to work with 2D (surfSubsTemps does not come out right) 
