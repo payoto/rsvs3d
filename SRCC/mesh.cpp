@@ -489,9 +489,9 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
 	listInParent.clear();
 
 	if(outerVolume){
-		boundVolume = 1.0;
-	} else {
 		boundVolume = 0.0;
+	} else {
+		boundVolume = 1.0;
 	}// Mesh component comparison
 
 	vals0.reserve(meshtree.nParents);
@@ -506,15 +506,18 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
 			this->VoluValuesofParents(surfs(ii)->voluind[0],vals0, &volu::target);
 			this->VoluValuesofParents(surfs(ii)->voluind[1],vals1, &volu::target);
 			jj=0;
+			// DisplayVector(vals0);
+			// DisplayVector(vals1);
 			while(!isOnBound && jj< meshtree.nParents){
 
 				isOnBound = (vals0[jj]!=vals1[jj]) 
-					&& ((vals0[jj]==boundVolume)||(vals1[jj]==boundVolume));
+					&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
 				++jj;
 			}
+			//cout << "? " << isOnBound << " || ";
 		}
 		if (isOnBound){
-			listInParent.push_back((ii));
+			listInParent.push_back(surfs(ii)->index);
 		}
 		
 	} 
@@ -2010,7 +2013,7 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume) const{
 		if(surfCond){
 			nl=volus(ii)->surfind.size();
 			for(ll=0; ll<nl; ++ll){
-				surfSub=volus.find(volus(ii)->surfind[ll]);
+				surfSub=surfs.find(volus(ii)->surfind[ll]);
 				nj=surfs(surfSub)->edgeind.size();
 				for(jj=0; jj<nj; ++jj){
 					edgeSub=edges.find(surfs(surfSub)->edgeind[jj]);

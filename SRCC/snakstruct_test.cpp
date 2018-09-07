@@ -688,19 +688,20 @@ int Test_RSVSalgo(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-
+		voluMesh.volus[0].target=0.0;
+		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
 		// nVoluZone=outSnake.ZoneNum();
 		
 		start_s=clock();
 		SpawnRSVS(testSnake);
-
-		outSnake.PrintMesh(testSnake.snakeconn);
+		testSnake.PrepareForUse();
 
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
+		outSnake.PrintMesh(testSnake.snakeconn);
 
 
 	} catch (exception const& ex) { 
