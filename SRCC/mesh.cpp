@@ -492,7 +492,7 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
 		boundVolume = 1.0;
 	} else {
 		boundVolume = 0.0;
-	}
+	}// Mesh component comparison
 
 	vals0.reserve(meshtree.nParents);
 	vals1.reserve(meshtree.nParents);
@@ -1943,6 +1943,89 @@ int mesh::OrderEdges(){
 		}
 	}
 	return(kk);
+}
+
+
+void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume){
+	/*
+	Gets vertices that are in a vlume that is on the edge of the design
+	space but off th eedge themselves
+
+	outerVolume indicates the additional condition of the volume needing 
+	to be full or empty in the parents.
+	-1 return all vertices
+	0 return vertices where the target volume is 1.0
+	1 return vertices where the target volume is >0.0
+	*/
+
+	if(!borderIsSet){
+		this->SetBorders();
+	}
+	this->GetOffBorderVert(vertInd, outerVolume);
+}
+
+void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume) const{
+	/*
+	Gets vertices that are in a vlume that is on the edge of the design
+	space but off th eedge themselves
+
+	outerVolume indicates the additional condition of the volume needing 
+	to be full or empty in the parents.
+	-1 return all vertices
+	0 return vertices where the target volume is 1.0
+	1 return vertices where the target volume is >0.0
+	*/
+	int ii, ni, jj, nj,kk,nk,ll,nl, vertTemp, edgeSub,surfSub;
+	vector<double> vals;
+	bool surfCond;
+
+	ni=volus.size();
+	nj=verts.size();
+	vertInd.clear();
+	vertInd.reserve(nj);
+
+	for (ii=0; ii<ni; ++ii){
+		surfCond=volus(ii)->isBorder;
+		if(surfCond){
+			if(outerVolume==0){
+				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
+				surfCond=false;
+				jj=0;
+				while (!surfCond && jj<meshtree.nParents){
+					surfCond=vals[jj]==1.0;
+					++jj;
+				}
+			} else if(outerVolume==1){
+				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
+				surfCond=false;
+				jj=0;
+				while (!surfCond && jj<meshtree.nParents){
+					surfCond=vals[jj]>0.0;
+					++jj;
+				}
+			} else if(outerVolume!=-1){
+				throw invalid_argument("Unkownn value of outerVolume -1,0, or 1");
+			}
+		} 
+		if(surfCond){
+			nl=volus(ii)->surfind.size();
+			for(ll=0; ll<nl; ++ll){
+				surfSub=volus.find(volus(ii)->surfind[ll]);
+				nj=surfs(surfSub)->edgeind.size();
+				for(jj=0; jj<nj; ++jj){
+					edgeSub=edges.find(surfs(surfSub)->edgeind[jj]);
+					nk=edges(edgeSub)->vertind.size();
+					for (kk=0; kk<nk; ++kk){
+						vertTemp=edges(edgeSub)->vertind[kk];
+						if (!verts.isearch(vertTemp)->isBorder){
+							vertInd.push_back(vertTemp);
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
 
 void mesh::SetBorders(){

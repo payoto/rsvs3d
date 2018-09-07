@@ -455,6 +455,7 @@ public:
 		const vector<int> &elms, double volu::*mp=&volu::fill);
 	void VoluValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
 	void VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const;
+	// Mesh property
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();
@@ -489,6 +490,9 @@ public:
 	void OrientSurfaceVolume();
 	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
+	// Mesh component comparison
+	void GetOffBorderVert(vector<int> &vertList, int outerVolume=-1) const;
+	void GetOffBorderVert(vector<int> &vertList, int outerVolume=-1);
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;
