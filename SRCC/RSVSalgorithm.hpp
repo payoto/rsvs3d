@@ -1,5 +1,5 @@
-#ifndef SNAKEINITIALISATION_H_INCLUDED 
-#define SNAKEINITIALISATION_H_INCLUDED 
+#ifndef RSVSALGORITHM_H_INCLUDED 
+#define RSVSALGORITHM_H_INCLUDED 
 
 
 //=================================
@@ -19,5 +19,7 @@
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 	
+void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
+	int outerBorder=1);
 
 #endif
