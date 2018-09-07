@@ -10,6 +10,7 @@
 #include "meshrefinement.hpp" 
 #include "RSVSmath.hpp"
 #include "RSVSinterface.hpp"
+#include "RSVSalgorithm.hpp"
 
 using namespace std;
 
@@ -659,6 +660,54 @@ int Test_surfcentre(){
 	// coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 
 	return(0);
+}
+
+int Test_RSVSalgo(){
+	// int nVoluZone, ii;
+	snake testSnake;
+	mesh snakeMesh, voluMesh;
+	// mesh triMesh;
+	triangulation testTriangle,triRSVS;
+	vector<int> dims;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	// double totT=0.0;
+	// vector<double> dt;
+	// vector<int> isImpact;
+	int start_s,stop_s;
+	//bool errFlag;
+	int errTest=0;
+	
+
+	dims.assign(3,0);
+	dims[0]=2;dims[1]=3;dims[2]=1;
+	try {
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVS.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		
+		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(voluMesh);
+		// nVoluZone=outSnake.ZoneNum();
+		
+		start_s=clock();
+		SpawnRSVS(testSnake);
+
+		outSnake.PrintMesh(testSnake.snakeconn);
+
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		testSnake.displight();
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
 }
 
 int Test_snakeRSVS(){

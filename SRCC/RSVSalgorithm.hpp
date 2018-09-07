@@ -21,5 +21,9 @@
 	
 void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	int outerBorder=1);
+void SpawnRSVS(snake &snakein);
+
+
+int Test_RSVSalgo();
 
 #endif

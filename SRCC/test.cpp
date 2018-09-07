@@ -21,6 +21,7 @@
 #include "snakeengine.hpp"
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
+#include "RSVSalgorithm.hpp"
 
 int main(){
 	customtest gridTest;
@@ -52,6 +53,7 @@ int main(){
 	gridTest.Run(Test_snakeinit,"Snake spawning");
 	#endif //TEST_ALL
  
+	gridTest.Run(Test_RSVSalgo,"RSVS spawn");
 	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 
 

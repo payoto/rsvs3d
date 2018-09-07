@@ -2,10 +2,8 @@
 #include <cstdlib>
 
 #include "RSVSalgorithm.hpp"
-
-
-
 #include "snake.hpp"
+#include "snakeengine.hpp"
 
 void FindSpawnVerts(const mesh &meshin, vector<int> &vertList, int outerBorder){
 	// Function which identifies spawn points
@@ -50,13 +48,22 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList, int outerBorder){
 
 }
 
+void SpawnRSVS(snake &snakein){
+	// Function which handles
+	// - spawning 
+	// - growing the snake
+	// - Identifying snaxels to remove
+	// - update connectivity:
+	//     + find snaxsurfs in invalid snake volus(surfs)
+	//     + find snaxedges in these surfs
+	//     + find snaxels
+	//     * invalid snakevolus=[border cell, empty cell]
+	int ii,ni;
+	vector<int> vertSpawn;
 
-// Function which handles
-// - spawning 
-// - growing the snake
-// - Identifying snaxels to remove
-// - update connectivity:
-//     + find snaxsurfs in invalid snake volus(surfs)
-//     + find snaxedges in these surfs
-//     + find snaxels
-//     * invalid snakevolus=[border cell, empty cell]
+	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,1);
+	ni=vertSpawn.size();
+	for(ii=0; ii< ni; ++ii){
+		SpawnAtVertex(snakein, vertSpawn[ii]);
+	}
+}
