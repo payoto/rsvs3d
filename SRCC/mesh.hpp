@@ -444,6 +444,8 @@ public:
 	int CountParents() const;
 	int SurfInParent(int surfind) const;
 	void SurfInParent(vector<int> &listInParent) const;
+	void SurfOnParentBound(vector<int> &listInParent, bool isBorderBound=true,
+		bool outerVolume=true) const;
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		vector<pair<int,int>> &parentcases) const;
@@ -451,6 +453,8 @@ public:
 		const vector<pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
 	void MapVolu2Self(const vector<double> &fillIn, 
 		const vector<int> &elms, double volu::*mp=&volu::fill);
+	void VoluValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
+	void VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const;
 	int WhatDim(){return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();

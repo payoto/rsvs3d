@@ -405,10 +405,10 @@ int mesh::SurfInParent(int surfind) const{
  	int ii = surfs.find(surfind);
 	bool isParentSurf=false;
 	if(ii>=0){
+		kk1=volus.find(surfs(ii)->voluind[0]);
+		kk2=volus.find(surfs(ii)->voluind[1]);
 		while(!isParentSurf && jj<meshtree.nParents-1){
 			++jj;
-			kk1=volus.find(surfs(ii)->voluind[0]);
-			kk2=volus.find(surfs(ii)->voluind[1]);
 			if((kk1!=-1) ^ (kk2!=-1)){
 				isParentSurf=true;
 			} else if (kk1!=-1){
@@ -431,8 +431,95 @@ void mesh::SurfInParent(vector<int> &listInParent) const{
 			listInParent.push_back((ii));
 		}
 	} 
-	
 }
+
+
+void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, int volType) const{
+		/*
+	Extracts the volumes in the parents corresponding to element elmInd
+	volType is a selector for which value to extract
+	*/
+	
+	double volu::*mp;
+
+	switch(volType){
+		case 0:
+		mp=&volu::volume;
+		break;
+		case 1:
+		mp=&volu::fill;
+		break;
+		case 2:
+		mp=&volu::target;
+		break;
+		case 3:
+		mp=&volu::error;
+		break;
+	}
+
+	this->VoluValuesofParents(elmInd, vals, mp);
+}
+
+void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const{
+	/*
+	Extracts the volumes in the parents corresponding to element elmInd
+	volType is a selector for which value to extract
+	*/
+	int sub, ii;
+	vals.clear();
+
+
+	sub = volus.find(elmInd);
+	for (ii=0; ii < meshtree.nParents; ++ii){
+		vals.push_back(meshtree.parentmesh[ii]->volus.isearch
+			(meshtree.parentconn[ii][sub])->*mp);
+
+	}
+
+}
+
+void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
+	bool outerVolume) const{
+	/*
+	Returns a list of surfaces which are on the outer or inner boundaries.
+	*/
+	int ii, jj, boundVolume, nSurf = surfs.size();
+	bool isOnBound;
+	vector<double> vals0, vals1;
+	listInParent.clear();
+
+	if(outerVolume){
+		boundVolume = 1.0;
+	} else {
+		boundVolume = 0.0;
+	}
+
+	vals0.reserve(meshtree.nParents);
+	vals1.reserve(meshtree.nParents);
+
+	for (ii=0; ii< nSurf; ++ii){
+		isOnBound=false;
+		if (surfs(ii)->voluind[0]==0 || surfs(ii)->voluind[1]==0){
+			isOnBound=isBorderBound;
+		} else if (SurfInParent(surfs(ii)->index)>=0){
+			// Check parent volume values
+			this->VoluValuesofParents(surfs(ii)->voluind[0],vals0, &volu::target);
+			this->VoluValuesofParents(surfs(ii)->voluind[1],vals1, &volu::target);
+			jj=0;
+			while(!isOnBound && jj< meshtree.nParents){
+
+				isOnBound = (vals0[jj]!=vals1[jj]) 
+					&& ((vals0[jj]==boundVolume)||(vals1[jj]==boundVolume));
+				++jj;
+			}
+		}
+		if (isOnBound){
+			listInParent.push_back((ii));
+		}
+		
+	} 
+}
+
 int mesh::CountVoluParent() const {
 	int n=0;
 	for (int i = 0; i < int(meshtree.parentmesh.size()); ++i)
