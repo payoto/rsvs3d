@@ -444,7 +444,8 @@ public:
 	int CountParents() const;
 	int SurfInParent(int surfind) const;
 	void SurfInParent(vector<int> &listInParent) const;
-	void SurfOnParentBound(vector<int> &listInParent, bool isBorderBound=true,
+	void SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+		bool isBorderBound=true,
 		bool outerVolume=true) const;
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
@@ -491,8 +492,10 @@ public:
 	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
 	// Mesh component comparison
-	void GetOffBorderVert(vector<int> &vertList, int outerVolume=-1) const;
-	void GetOffBorderVert(vector<int> &vertList, int outerVolume=-1);
+	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
+		int outerVolume=-1) const;
+	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
+		int outerVolume=-1);
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;

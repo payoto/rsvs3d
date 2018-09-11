@@ -20,7 +20,7 @@
 //       ie replaced by their code at compile time
 	
 void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
-	int outerBorder=1);
+	vector<int> &voluOutList, int outerBorder=1);
 void SpawnRSVS(snake &snakein);
 
 

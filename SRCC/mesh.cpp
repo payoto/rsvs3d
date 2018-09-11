@@ -478,7 +478,8 @@ void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*m
 
 }
 
-void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
+void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	bool isBorderBound,
 	bool outerVolume) const{
 	/*
 	Returns a list of surfaces which are on the outer or inner boundaries.
@@ -496,11 +497,19 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
 
 	vals0.reserve(meshtree.nParents);
 	vals1.reserve(meshtree.nParents);
+	voluInd.clear();
+	voluInd.reserve(volus.size());
 
 	for (ii=0; ii< nSurf; ++ii){
 		isOnBound=false;
 		if (surfs(ii)->voluind[0]==0 || surfs(ii)->voluind[1]==0){
 			isOnBound=isBorderBound;
+			if(isOnBound && (surfs(ii)->voluind[0]!=0)){
+				voluInd.push_back(surfs(ii)->voluind[0]);
+			}
+			if(isOnBound && (surfs(ii)->voluind[1]!=0)){
+				voluInd.push_back(surfs(ii)->voluind[1]);
+			}
 		} else if (SurfInParent(surfs(ii)->index)>=0){
 			// Check parent volume values
 			this->VoluValuesofParents(surfs(ii)->voluind[0],vals0, &volu::target);
@@ -513,6 +522,12 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, bool isBorderBound,
 				isOnBound = (vals0[jj]!=vals1[jj]) 
 					&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
 				++jj;
+			}
+			if(isOnBound && (vals1[jj]==boundVolume)){
+				voluInd.push_back(surfs(ii)->voluind[1]);
+			}
+			if(isOnBound && (vals0[jj]==boundVolume)){
+				voluInd.push_back(surfs(ii)->voluind[0]);
 			}
 			//cout << "? " << isOnBound << " || ";
 		}
@@ -1949,7 +1964,8 @@ int mesh::OrderEdges(){
 }
 
 
-void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume){
+void mesh::GetOffBorderVert(vector<int> &vertInd,  vector<int> &voluInd,
+	int outerVolume){
 	/*
 	Gets vertices that are in a vlume that is on the edge of the design
 	space but off th eedge themselves
@@ -1964,10 +1980,11 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume){
 	if(!borderIsSet){
 		this->SetBorders();
 	}
-	this->GetOffBorderVert(vertInd, outerVolume);
+	this->GetOffBorderVert(vertInd, voluInd, outerVolume);
 }
 
-void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume) const{
+void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
+	int outerVolume) const{
 	/*
 	Gets vertices that are in a vlume that is on the edge of the design
 	space but off th eedge themselves
@@ -1986,10 +2003,13 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, int outerVolume) const{
 	nj=verts.size();
 	vertInd.clear();
 	vertInd.reserve(nj);
+	voluInd.clear();
+	voluInd.reserve(ni);
 
 	for (ii=0; ii<ni; ++ii){
 		surfCond=volus(ii)->isBorder;
 		if(surfCond){
+			voluInd.push_back(volus(ii)->index);
 			if(outerVolume==0){
 				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
 				surfCond=false;

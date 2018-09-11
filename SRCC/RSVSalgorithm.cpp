@@ -5,7 +5,8 @@
 #include "snake.hpp"
 #include "snakeengine.hpp"
 
-void FindSpawnVerts(const mesh &meshin, vector<int> &vertList, int outerBorder){
+void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
+	vector<int> &voluOutList, int outerBorder){
 	// Function which identifies spawn points
 	// Spawn points are:
 	//  - Any point part of a cell which touches the void
@@ -15,15 +16,15 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList, int outerBorder){
 	//    One without.
 
 	int ii, ni, jj, nj, surfSurb, vert_i;
-	vector<int> offBorderVert, internalSurf;
+	vector<int> offBorderVert, internalSurf, voluIndIntern;
 
 
 	if (outerBorder==1){ // spawn at outer borders
-		meshin.GetOffBorderVert(offBorderVert,1);
-		meshin.SurfOnParentBound(internalSurf,false,true);
+		meshin.GetOffBorderVert(offBorderVert,voluOutList,1);
+		meshin.SurfOnParentBound(internalSurf,voluIndIntern,false,true);
 	} else if (outerBorder==0){
-		meshin.GetOffBorderVert(offBorderVert,0);
-		meshin.SurfOnParentBound(internalSurf,false,false);
+		meshin.GetOffBorderVert(offBorderVert,voluOutList,0);
+		meshin.SurfOnParentBound(internalSurf,voluIndIntern,false,false);
 	} else {
 		throw invalid_argument("outerBorder has an unknown value");
 	}
@@ -59,6 +60,14 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList, int outerBorder){
 	sort(vertList);
 	unique(vertList);
 
+	ni=voluIndIntern.size();
+	for (ii=0; ii< ni; ++ii){
+		voluOutList.push_back(voluIndIntern[ii]);
+	}
+
+	sort(voluOutList);
+	unique(voluOutList);
+
 
 
 }
@@ -75,10 +84,11 @@ void SpawnRSVS(snake &snakein){
 	//     * invalid snakevolus=[border cell, empty cell]
 	int ii,ni;
 	vector<int> vertSpawn;
+	vector<int> voluSnaxDelete;
 	vector<int> isImpact;
 	vector<double> dt;
 
-	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,1);
+	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,1);
 	ni=vertSpawn.size();
 	cout << "vertices to output " << ni << endl;
 	for(ii=0; ii< ni; ++ii){
