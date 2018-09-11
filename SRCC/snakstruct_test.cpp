@@ -695,7 +695,7 @@ int Test_RSVSalgo(){
 		// nVoluZone=outSnake.ZoneNum();
 		
 		start_s=clock();
-		SpawnRSVS(testSnake);
+		SpawnRSVS(testSnake,1);
 		testSnake.PrepareForUse();
 
 		stop_s=clock();

@@ -360,7 +360,7 @@ void snake::Concatenate(const snake &other, int isInternal){
 
 		if(isInternal==0){
 			isIndep=CompareSnakeInternalStatus(isMeshVertIn,ReturnFlip(),
-	 			other.isMeshVertIn, other.ReturnFlip());
+				other.isMeshVertIn, other.ReturnFlip());
 		} else {
 			isIndep=isInternal<=0;
 		}
@@ -609,10 +609,10 @@ void snake::ForceCloseContainers(){
 	this->snakeconn.ForceCloseContainers();
 	if(!Check3D()){
 		snaxsurfs.elems.clear();
-      	snaxsurfs.Init(snakeconn.surfs.size());
-     	snaxsurfs.PopulateIndices();
-      	snaxsurfs.HashArray();
-      	this->SetSnaxSurfs();
+		snaxsurfs.Init(snakeconn.surfs.size());
+		snaxsurfs.PopulateIndices();
+		snaxsurfs.HashArray();
+		this->SetSnaxSurfs();
 	}
 }
 
@@ -826,6 +826,120 @@ void snake::OrientSurfaceVolume(){
 	}
 
 }
+
+
+void snake::AssignInternalVerts() {
+	/*
+	Assigns internal vertices to the snake based on the snakemesh connectivity.
+	*/
+	int ii, ni;
+	vector<int> vertBlock;
+
+	FindBlockSnakeMeshVerts(vertBlock);
+	this->isFlipped=false;
+	ni=vertBlock.size();
+	for(ii=0; ii < ni; ++ii){
+		isMeshVertIn[ii] = vertBlock[ii]>0;
+	}
+}
+
+int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
+	// int mesh::ConnectedVertex(vector<int> &vertBlock) const{
+	// Fills a vector with a number for each vertex corresponding to a
+    // group of connected edges it is part of , can be used close surfaces in 2D or volumes
+    // in 3D.
+    // Uses a flood fill with queue method
+
+
+	int nVertExplored,nVerts,nBlocks,nCurr,nEdgesCurr,ii,jj,kk,nSnaxs,ll,nl;
+   vector<bool> vertStatus, snaxStatus; // 1 explored 0 not explored
+
+   vector<int> currQueue, nextQueue, tempSnax; // Current and next queues of indices
+
+   // Preparation of the arrays;
+   nVerts=snakemesh->verts.size();
+   nSnaxs=snaxs.size();
+   nBlocks=0;
+   nVertExplored=0;
+
+   vertStatus.assign(nSnaxs,false);
+   snaxStatus.assign(nVerts,false);
+   vertBlock.assign(nVerts,0);
+   currQueue.reserve(nVerts/2);
+   nextQueue.reserve(nVerts/2);
+
+   
+   // While Loop, while not all vertices explored
+   while(nVertExplored<nSnaxs){
+
+	  // if currQueue is empty start new block
+	if(currQueue.size()<1){
+
+		 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+		ii=0;
+		while(snaxStatus[ii] && ii<nSnaxs){
+			ii++;
+		}
+		if (snaxStatus[ii]){
+			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			throw range_error (" : Starting point for block not found");
+		}
+		currQueue.push_back(snakemesh->verts.find(snaxs(ii)->fromvert));
+		nBlocks++;
+
+	}
+	  // Explore current queue
+	nCurr=currQueue.size();
+	for (ii = 0; ii < nCurr; ++ii){
+		if (!vertStatus[currQueue[ii]]){
+			vertBlock[currQueue[ii]]=nBlocks;
+			nEdgesCurr=snakemesh->verts(currQueue[ii])->edgeind.size();
+			for(jj=0;jj<nEdgesCurr;++jj){
+				// only follow edge if no snaxel exists on it
+				if(snaxs.countparent(snakemesh->verts(currQueue[ii])->edgeind[jj])<1){
+					kk=int(snakemesh->edges.isearch(
+						snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[0]
+						==snakemesh->verts(currQueue[ii])->index);
+					nextQueue.push_back(snakemesh->verts.find(
+						snakemesh->edges.isearch(
+							snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
+					#ifdef SAFE_ALGO
+					if (snakemesh->verts.find(
+						snakemesh->edges.isearch(snakemesh->verts(
+							currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
+						cerr << "Edge index: " << snakemesh->verts(
+							currQueue[ii])->edgeind[jj] << " vertex index:" <<  
+						snakemesh->edges.isearch(snakemesh->verts(
+							currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+						cerr << "Edge connected to non existant vertex" <<endl;
+						cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+						throw range_error (" : Vertex not found");
+					}
+					#endif
+				} else {
+					snaxs.findsiblings(snakemesh->verts(currQueue[ii])->edgeind[jj],
+						tempSnax);
+					nl=tempSnax.size();
+					for(ll=0; ll<nl; ++ll){
+						nVertExplored+=int(!snaxStatus[tempSnax[ll]]);
+						snaxStatus[tempSnax[ll]]=true;
+					}
+				}
+			}
+			vertStatus[currQueue[ii]]=true;
+		}
+	   }
+
+		  // Reset current queue and set to next queue
+	   currQueue.clear();
+	   currQueue.swap(nextQueue);
+
+	}
+	return(nBlocks);
+}
+
+
 
 
 // -------------------------------------------------------------------------------------------

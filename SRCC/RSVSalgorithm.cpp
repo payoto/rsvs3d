@@ -72,7 +72,7 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 
 }
 
-void SpawnRSVS(snake &snakein){
+void SpawnRSVS(snake &snakein, int outerBorder){
 	// Function which handles
 	// - spawning 
 	// - growing the snake
@@ -88,7 +88,7 @@ void SpawnRSVS(snake &snakein){
 	vector<int> isImpact;
 	vector<double> dt;
 
-	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,1);
+	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,outerBorder);
 	ni=vertSpawn.size();
 	cout << "vertices to output " << ni << endl;
 	for(ii=0; ii< ni; ++ii){
@@ -110,4 +110,61 @@ void SpawnRSVS(snake &snakein){
 	CleanupSnakeConnec(snakein);
 
 	// Remove one of the 'snakes'
+	RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
+}
+
+void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
+
+	int ii, ni, jj, nj;
+	vector<int> delSurf, delEdge, delSnax, tempSurf, tempEdge, tempSnax,
+		subSurf, subEdge;
+
+	delSurf.reserve(snakein.snaxsurfs.size());
+	delEdge.reserve(snakein.snaxedges.size());
+	delSnax.reserve(snakein.snaxs.size());
+
+	ni=voluInd.size();
+
+	for(ii=0; ii<ni; ++ii){
+		snakein.snaxsurfs.findsiblings(voluInd[ii],tempSurf);
+		nj=tempSurf.size();
+		for(jj=0; jj<nj; ++jj){
+			delSurf.push_back(snakein.snaxsurfs(tempSurf[jj])->index);
+		}
+
+		tempEdge=ConcatenateVectorField(snakein.snakeconn.surfs, &surf::edgeind,tempSurf);
+		subEdge=snakein.snakeconn.edges.find_list(tempEdge);
+		nj=tempEdge.size();
+		for(jj=0; jj<nj; ++jj){
+			delEdge.push_back(tempEdge[jj]);
+		}
+
+		tempSnax=ConcatenateVectorField(snakein.snakeconn.edges, &edge::vertind,subEdge);
+		nj=tempSnax.size();
+		for(jj=0; jj<nj; ++jj){
+			delSnax.push_back(tempSnax[jj]);
+		}
+	}
+
+	sort(delSnax);
+	unique(delSnax);
+	sort(delEdge);
+	unique(delEdge);
+	sort(delSurf);
+	unique(delSurf);
+
+	snakein.snaxs.remove(delSnax);
+	snakein.snaxedges.remove(delEdge);
+	snakein.snaxsurfs.remove(delSurf);
+	snakein.snakeconn.verts.remove(delSnax);
+	snakein.snakeconn.edges.remove(delEdge);
+	snakein.snakeconn.surfs.remove(delSurf);
+
+	snakein.snakeconn.TightenConnectivity();
+	snakein.HashArrayNM();
+	snakein.ForceCloseContainers();
+	if (outerBorder>0){
+		snakein.Flip();
+	}
+	snakein.AssignInternalVerts();
 }

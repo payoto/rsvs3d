@@ -121,6 +121,8 @@ public:
 	// Snake connectivity operations
 	void SetSnaxSurfs() {}
 	void OrientSurfaceVolume();
+	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
+	void AssignInternalVerts();
 
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
