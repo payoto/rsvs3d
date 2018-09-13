@@ -523,12 +523,14 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 					&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
 				++jj;
 			}
-			if(isOnBound && (vals1[jj]==boundVolume)){
+			
+			if(isOnBound && (vals1[jj-1]==boundVolume)){
 				voluInd.push_back(surfs(ii)->voluind[1]);
 			}
-			if(isOnBound && (vals0[jj]==boundVolume)){
+			if(isOnBound && (vals0[jj-1]==boundVolume)){
 				voluInd.push_back(surfs(ii)->voluind[0]);
 			}
+			
 			//cout << "? " << isOnBound << " || ";
 		}
 		if (isOnBound){

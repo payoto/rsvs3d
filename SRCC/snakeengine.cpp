@@ -343,7 +343,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	}
 	
 
-	nSurf=nEdge/2;
+	nSurf=nEdge;
 	partSnake.reserve(nVert, nEdge, nSurf, nVolu);
 
 	sort(vertSpawn);

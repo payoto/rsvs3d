@@ -862,78 +862,83 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
    nBlocks=0;
    nVertExplored=0;
 
-   vertStatus.assign(nSnaxs,false);
-   snaxStatus.assign(nVerts,false);
+   snaxStatus.assign(nSnaxs,false);
+   vertStatus.assign(nVerts,false);
    vertBlock.assign(nVerts,0);
    currQueue.reserve(nVerts/2);
    nextQueue.reserve(nVerts/2);
 
    
    // While Loop, while not all vertices explored
-   while(nVertExplored<nSnaxs){
+	while(nVertExplored<nSnaxs){
 
-	  // if currQueue is empty start new block
-	if(currQueue.size()<1){
+		  // if currQueue is empty start new block
+		if(currQueue.size()<1){
 
-		 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
-		ii=0;
-		while(snaxStatus[ii] && ii<nSnaxs){
-			ii++;
+			 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+			ii=0;
+			while(snaxStatus[ii] && ii<nSnaxs){
+				ii++;
+			}
+			if (snaxStatus[ii]){
+				cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
+				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+				throw range_error (" : Starting point for block not found");
+			}
+			currQueue.push_back(snakemesh->verts.find(snaxs(ii)->fromvert));
+			nBlocks++;
+
 		}
-		if (snaxStatus[ii]){
-			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Starting point for block not found");
-		}
-		currQueue.push_back(snakemesh->verts.find(snaxs(ii)->fromvert));
-		nBlocks++;
-
-	}
-	  // Explore current queue
-	nCurr=currQueue.size();
-	for (ii = 0; ii < nCurr; ++ii){
-		if (!vertStatus[currQueue[ii]]){
-			vertBlock[currQueue[ii]]=nBlocks;
-			nEdgesCurr=snakemesh->verts(currQueue[ii])->edgeind.size();
-			for(jj=0;jj<nEdgesCurr;++jj){
-				// only follow edge if no snaxel exists on it
-				if(snaxs.countparent(snakemesh->verts(currQueue[ii])->edgeind[jj])<1){
-					kk=int(snakemesh->edges.isearch(
-						snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[0]
-						==snakemesh->verts(currQueue[ii])->index);
-					nextQueue.push_back(snakemesh->verts.find(
-						snakemesh->edges.isearch(
-							snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
-					#ifdef SAFE_ALGO
-					if (snakemesh->verts.find(
-						snakemesh->edges.isearch(snakemesh->verts(
-							currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
-						cerr << "Edge index: " << snakemesh->verts(
-							currQueue[ii])->edgeind[jj] << " vertex index:" <<  
-						snakemesh->edges.isearch(snakemesh->verts(
-							currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
-						cerr << "Edge connected to non existant vertex" <<endl;
-						cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-						throw range_error (" : Vertex not found");
-					}
-					#endif
-				} else {
-					snaxs.findsiblings(snakemesh->verts(currQueue[ii])->edgeind[jj],
-						tempSnax);
-					nl=tempSnax.size();
-					for(ll=0; ll<nl; ++ll){
-						nVertExplored+=int(!snaxStatus[tempSnax[ll]]);
-						snaxStatus[tempSnax[ll]]=true;
+		  // Explore current queue
+		nCurr=currQueue.size();
+		cout << "nCurr " << nCurr << " nVertExplored " << nVertExplored << 
+			" nSnax " << nSnaxs << " " << nBlocks << endl;
+		for (ii = 0; ii < nCurr; ++ii){
+			if (!vertStatus[currQueue[ii]]){
+				vertBlock[currQueue[ii]]=nBlocks;
+				nEdgesCurr=snakemesh->verts(currQueue[ii])->edgeind.size();
+				for(jj=0;jj<nEdgesCurr;++jj){
+					// only follow edge if no snaxel exists on it
+					if(snaxs.countparent(snakemesh->verts(currQueue[ii])->edgeind[jj])<1){
+						kk=int(snakemesh->edges.isearch(
+							snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[0]
+							==snakemesh->verts(currQueue[ii])->index);
+						nextQueue.push_back(snakemesh->verts.find(
+							snakemesh->edges.isearch(
+								snakemesh->verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
+						#ifdef SAFE_ALGO
+						if (snakemesh->verts.find(
+							snakemesh->edges.isearch(snakemesh->verts(
+								currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
+							cerr << "Edge index: " << snakemesh->verts(
+								currQueue[ii])->edgeind[jj] << " vertex index:" <<  
+							snakemesh->edges.isearch(snakemesh->verts(
+								currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+							cerr << "Edge connected to non existant vertex" <<endl;
+							cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+							throw range_error (" : Vertex not found");
+						}
+						#endif
+					} else {
+						snaxs.findsiblings(snakemesh->verts(currQueue[ii])->edgeind[jj],
+							tempSnax);
+						nl=tempSnax.size();
+						for(ll=0; ll<nl; ++ll){
+							if(snakemesh->verts(currQueue[ii])->index
+								==snaxs(tempSnax[ll])->fromvert){
+								nVertExplored+=int(!snaxStatus[tempSnax[ll]]);
+								snaxStatus[tempSnax[ll]]=true;
+							}
+						}
 					}
 				}
+				vertStatus[currQueue[ii]]=true;
 			}
-			vertStatus[currQueue[ii]]=true;
-		}
-	   }
+	    }
 
-		  // Reset current queue and set to next queue
-	   currQueue.clear();
-	   currQueue.swap(nextQueue);
+		// Reset current queue and set to next queue
+		currQueue.clear();
+		currQueue.swap(nextQueue);
 
 	}
 	return(nBlocks);

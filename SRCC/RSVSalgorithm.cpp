@@ -91,9 +91,12 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,outerBorder);
 	ni=vertSpawn.size();
 	cout << "vertices to output " << ni << endl;
+	snakein.reserve(ni*15,ni*15,ni*15,ni*15);
 	for(ii=0; ii< ni; ++ii){
 		SpawnAtVertex(snakein, vertSpawn[ii]);
+		cout << ii << " " ;
 	}
+	cout << " vertices Dones" << endl;
 	// Move to half distances
 	ni=snakein.snaxs.size();
 	for(ii=0; ii<ni; ++ii){
@@ -108,16 +111,17 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
 	CleanupSnakeConnec(snakein);
-
+	snakein.PrepareForUse();
 	// Remove one of the 'snakes'
 	RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
 }
 
 void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 
-	int ii, ni, jj, nj;
+	int ii, ni, jj, nj, nBlocks;
 	vector<int> delSurf, delEdge, delSnax, tempSurf, tempEdge, tempSnax,
-		subSurf, subEdge;
+		subSurf, subEdge, vertBlocks;
+	vector<bool> isBlockDel;
 
 	delSurf.reserve(snakein.snaxsurfs.size());
 	delEdge.reserve(snakein.snaxedges.size());
@@ -126,18 +130,10 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	ni=voluInd.size();
 
 	for(ii=0; ii<ni; ++ii){
+		tempSurf.clear();
 		snakein.snaxsurfs.findsiblings(voluInd[ii],tempSurf);
-		nj=tempSurf.size();
-		for(jj=0; jj<nj; ++jj){
-			delSurf.push_back(snakein.snaxsurfs(tempSurf[jj])->index);
-		}
-
 		tempEdge=ConcatenateVectorField(snakein.snakeconn.surfs, &surf::edgeind,tempSurf);
 		subEdge=snakein.snakeconn.edges.find_list(tempEdge);
-		nj=tempEdge.size();
-		for(jj=0; jj<nj; ++jj){
-			delEdge.push_back(tempEdge[jj]);
-		}
 
 		tempSnax=ConcatenateVectorField(snakein.snakeconn.edges, &edge::vertind,subEdge);
 		nj=tempSnax.size();
@@ -145,6 +141,48 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 			delSnax.push_back(tempSnax[jj]);
 		}
 	}
+	cout << "nSnax " << delSnax.size() << endl;
+	cout << "Find snax to del" << endl;
+	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
+	isBlockDel.assign(nBlocks,false);
+	ni=delSnax.size();
+	for(ii=0; ii<ni; ++ii){
+		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=true;
+	}
+	cout << "Find All snax to del" << endl;
+	delSnax.clear();
+	delSurf.clear();
+	delEdge.clear();
+	ni=vertBlocks.size();
+	cout << "is block del " ;
+	DisplayVector(isBlockDel);
+	cout<< endl;
+	snakein.displight();
+
+	for(ii=0; ii<ni; ++ii){
+		if(isBlockDel[vertBlocks[ii]-1]){
+			delSnax.push_back(snakein.snaxs(ii)->index);
+
+			subEdge=snakein.snakeconn.edges.find_list(snakein.snakeconn.verts(ii)->edgeind);
+			nj=snakein.snakeconn.verts(ii)->edgeind.size();
+			for(jj=0; jj<nj; ++jj){
+				delEdge.push_back(snakein.snakeconn.verts(ii)->edgeind[jj]);
+			}
+
+			tempSurf=ConcatenateVectorField(snakein.snakeconn.edges, &edge::surfind,subEdge);
+			nj=tempSurf.size();
+			for(jj=0; jj<nj; ++jj){
+				delSurf.push_back(tempSurf[jj]);
+			}
+		}
+	}
+
+	cout << "nSnax " << delSnax.size() << endl;
+	cout << "nEdge " << delEdge.size() << endl;	
+
+	cout << "Find All lists to del" << endl;
+	ni=delSurf.size();
+	for(ii=0; ii<ni; ++ii){snakein.snakeconn.RemoveIndex(3,delSurf[ii]);}
 
 	sort(delSnax);
 	unique(delSnax);
@@ -153,6 +191,11 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	sort(delSurf);
 	unique(delSurf);
 
+	//ni=delEdge.size();
+	// for(ii=0; ii<ni; ++ii){snakein.snakeconn.RemoveIndex(2,delEdge[ii]);}
+
+	snakein.displight();
+	cout << "Cleanup" << endl;
 	snakein.snaxs.remove(delSnax);
 	snakein.snaxedges.remove(delEdge);
 	snakein.snaxsurfs.remove(delSurf);
@@ -160,11 +203,17 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	snakein.snakeconn.edges.remove(delEdge);
 	snakein.snakeconn.surfs.remove(delSurf);
 
+
 	snakein.snakeconn.TightenConnectivity();
-	snakein.HashArrayNM();
+	snakein.HashArray();
+	snakein.snakeconn.TestConnectivityBiDir();
 	snakein.ForceCloseContainers();
+	snakein.PrepareForUse();
+	snakein.displight();
 	if (outerBorder>0){
 		snakein.Flip();
 	}
+	cout << "Before Assignement of internal verts" << endl;
 	snakein.AssignInternalVerts();
+	cout << "After Assignement of internal verts" << endl;
 }
