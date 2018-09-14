@@ -526,9 +526,15 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 			
 			if(isOnBound && (vals1[jj-1]==boundVolume)){
 				voluInd.push_back(surfs(ii)->voluind[1]);
+				if(boundVolume==1.0 && volus.isearch(voluInd.back())->isBorder){
+					voluInd.pop_back();
+				}
 			}
 			if(isOnBound && (vals0[jj-1]==boundVolume)){
 				voluInd.push_back(surfs(ii)->voluind[0]);
+				if(boundVolume==1.0 && volus.isearch(voluInd.back())->isBorder){
+					voluInd.pop_back();
+				}
 			}
 			
 			//cout << "? " << isOnBound << " || ";
@@ -2011,7 +2017,6 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 	for (ii=0; ii<ni; ++ii){
 		surfCond=volus(ii)->isBorder;
 		if(surfCond){
-			voluInd.push_back(volus(ii)->index);
 			if(outerVolume==0){
 				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
 				surfCond=false;
@@ -2032,7 +2037,24 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 				throw invalid_argument("Unkownn value of outerVolume -1,0, or 1");
 			}
 		} 
+		// THIS IS DODGY HOW to pick the side to delete can fail
 		if(surfCond){
+			// Pick one of the volumes to delete
+			if(outerVolume==0){
+				nj = volus(ii)->surfind.size();
+				for(jj=0;jj<nj;++jj){
+					surfSub = surfs.find(volus(ii)->surfind[jj]);
+					for(kk=0;kk<2;++kk){
+						if(surfs(surfSub)->voluind[kk]!=0){
+							if(!(volus.isearch(surfs(surfSub)->voluind[kk])->isBorder)){
+								voluInd.push_back(surfs(surfSub)->voluind[kk]);
+							}
+						}
+					}
+				}
+			} else {
+				voluInd.push_back(volus(ii)->index);
+			}
 			nl=volus(ii)->surfind.size();
 			for(ll=0; ll<nl; ++ll){
 				surfSub=surfs.find(volus(ii)->surfind[ll]);

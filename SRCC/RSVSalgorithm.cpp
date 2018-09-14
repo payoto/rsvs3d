@@ -60,6 +60,7 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	sort(vertList);
 	unique(vertList);
 
+	
 	ni=voluIndIntern.size();
 	for (ii=0; ii< ni; ++ii){
 		voluOutList.push_back(voluIndIntern[ii]);
@@ -90,13 +91,13 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 
 	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,outerBorder);
 	ni=vertSpawn.size();
-	cout << "vertices to output " << ni << endl;
+	// cout << "vertices to output " << ni << endl;
 	snakein.reserve(ni*15,ni*15,ni*15,ni*15);
 	for(ii=0; ii< ni; ++ii){
 		SpawnAtVertex(snakein, vertSpawn[ii]);
-		cout << ii << " " ;
+		//cout << ii << " " ;
 	}
-	cout << " vertices Dones" << endl;
+	// cout << " vertices Dones" << endl;
 	// Move to half distances
 	ni=snakein.snaxs.size();
 	for(ii=0; ii<ni; ++ii){
@@ -114,6 +115,9 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	snakein.PrepareForUse();
 	// Remove one of the 'snakes'
 	RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
+	snakein.PrepareForUse();
+	snakein.OrientSurfaceVolume();
+	cout << "Initialisation DONE!" << endl;
 }
 
 void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
@@ -141,23 +145,19 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 			delSnax.push_back(tempSnax[jj]);
 		}
 	}
-	cout << "nSnax " << delSnax.size() << endl;
-	cout << "Find snax to del" << endl;
+	// cout << "nSnax " << delSnax.size() << endl;
+	// cout << "Find snax to del" << endl;
 	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
 	isBlockDel.assign(nBlocks,false);
 	ni=delSnax.size();
 	for(ii=0; ii<ni; ++ii){
 		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=true;
 	}
-	cout << "Find All snax to del" << endl;
+	// cout << "Find All snax to del" << endl;
 	delSnax.clear();
 	delSurf.clear();
 	delEdge.clear();
 	ni=vertBlocks.size();
-	cout << "is block del " ;
-	DisplayVector(isBlockDel);
-	cout<< endl;
-	snakein.displight();
 
 	for(ii=0; ii<ni; ++ii){
 		if(isBlockDel[vertBlocks[ii]-1]){
@@ -177,10 +177,6 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 		}
 	}
 
-	cout << "nSnax " << delSnax.size() << endl;
-	cout << "nEdge " << delEdge.size() << endl;	
-
-	cout << "Find All lists to del" << endl;
 	ni=delSurf.size();
 	for(ii=0; ii<ni; ++ii){snakein.snakeconn.RemoveIndex(3,delSurf[ii]);}
 
@@ -195,7 +191,6 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	// for(ii=0; ii<ni; ++ii){snakein.snakeconn.RemoveIndex(2,delEdge[ii]);}
 
 	snakein.displight();
-	cout << "Cleanup" << endl;
 	snakein.snaxs.remove(delSnax);
 	snakein.snaxedges.remove(delEdge);
 	snakein.snaxsurfs.remove(delSurf);
@@ -213,7 +208,7 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	if (outerBorder>0){
 		snakein.Flip();
 	}
-	cout << "Before Assignement of internal verts" << endl;
+	// cout << "Before Assignement of internal verts" << endl;
 	snakein.AssignInternalVerts();
-	cout << "After Assignement of internal verts" << endl;
+	// cout << "After Assignement of internal verts" << endl;
 }

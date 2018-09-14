@@ -51,6 +51,7 @@ public:
 	// Mesh out
 	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0, 
 		int forceOutType=0, const vector<int> &vertList={});
+	int PrintSnakeInternalPts(const snake &snakein,int strandID=0, double timeStep=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat);
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
 	int LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVertDat,int nCellDat);

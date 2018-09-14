@@ -891,8 +891,8 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 		}
 		  // Explore current queue
 		nCurr=currQueue.size();
-		cout << "nCurr " << nCurr << " nVertExplored " << nVertExplored << 
-			" nSnax " << nSnaxs << " " << nBlocks << endl;
+		// cout << "nCurr " << nCurr << " nVertExplored " << nVertExplored << 
+		// 	" nSnax " << nSnaxs << " " << nBlocks << endl;
 		for (ii = 0; ii < nCurr; ++ii){
 			if (!vertStatus[currQueue[ii]]){
 				vertBlock[currQueue[ii]]=nBlocks;

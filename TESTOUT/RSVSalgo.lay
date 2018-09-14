@@ -65,7 +65,7 @@ $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
   SOLUTIONTIME = 0
-$!ACTIVEFIELDMAPS  =  [3]
+$!ACTIVEFIELDMAPS  =  [3-6]
 $!GLOBALRGB 
   RANGEMIN = 0
   RANGEMAX = 1
@@ -223,7 +223,7 @@ $!GLOBALSCATTER
 $!FIELDMAP  [1]
   MESH
     {
-    COLOR = BLACK
+    COLOR = CUSTOM1
     }
   CONTOUR
     {
@@ -246,7 +246,8 @@ $!FIELDMAP  [1]
     }
   SHADE
     {
-    COLOR = CUSTOM2
+    SHOW = NO
+    COLOR = WHITE
     }
   EDGELAYER
     {
@@ -318,7 +319,7 @@ $!FIELDMAP  [2]
 $!FIELDMAP  [3]
   MESH
     {
-    COLOR = BLACK
+    COLOR = CUSTOM30
     }
   CONTOUR
     {
@@ -332,6 +333,7 @@ $!FIELDMAP  [3]
     }
   SCATTER
     {
+    SHOW = NO
     SYMBOLSHAPE
       {
       GEOMSHAPE = SPHERE
@@ -365,6 +367,125 @@ $!FIELDMAP  [3]
     {
     LIGHTINGEFFECT = GOURAUD
     }
+$!FIELDMAP  [4]
+  MESH
+    {
+    SHOW = NO
+    COLOR = CYAN
+    }
+  CONTOUR
+    {
+    COLOR = CYAN
+    }
+  VECTOR
+    {
+    COLOR = CYAN
+    }
+  SCATTER
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = CYAN
+    FRAMESIZE = 1
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [5]
+  MESH
+    {
+    COLOR = CUSTOM6
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    SHOW = NO
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [6]
+  MESH
+    {
+    SHOW = NO
+    COLOR = PURPLE
+    }
+  CONTOUR
+    {
+    COLOR = PURPLE
+    }
+  VECTOR
+    {
+    COLOR = PURPLE
+    }
+  SCATTER
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = PURPLE
+    FRAMESIZE = 1
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = PURPLE
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
 $!THREEDAXIS 
   XDETAIL
     {
@@ -393,7 +514,7 @@ $!THREEDAXIS
     GRSPACING = 0.2
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -405,7 +526,7 @@ $!THREEDAXIS
     GRSPACING = 0.2
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 3
       }
     }
 $!THREEDAXIS 
@@ -417,7 +538,7 @@ $!THREEDAXIS
     GRSPACING = 0.2
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 1
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -681,19 +802,21 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 49.635
-  THETAANGLE = 56.2955
-  ALPHAANGLE = -158.961
+  PSIANGLE = 37.2328
+  THETAANGLE = -6.31306
+  ALPHAANGLE = 33.5937
   VIEWERPOSITION
     {
-    X = -5.900795935002879
-    Y = -3.769474014947378
-    Z = 7.040072339388609
+    X = 1.171920373101593
+    Y = -5.572764199194311
+    Z = 8.539975196696467
     }
   VIEWWIDTH = 1.74267
 $!FIELDLAYERS 
+  SHOWSCATTER = YES
   SHOWSHADE = YES
   SHOWEDGE = NO
+  USETRANSLUCENCY = YES
 $!STREAMTRACELAYERS 
   SHOW = NO
 $!FRAMECONTROL ACTIVATEBYNUMBER

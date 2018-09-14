@@ -662,12 +662,13 @@ int Test_surfcentre(){
 	return(0);
 }
 
-int Test_RSVSalgo(){
+int Test_RSVSalgo_init(){
 	// int nVoluZone, ii;
-	snake testSnake;
-	mesh snakeMesh, voluMesh;
+
+	snake testSnake, testSnake2;
+	mesh snakeMesh,  voluMesh, voluMesh2;
 	// mesh triMesh;
-	triangulation testTriangle,triRSVS;
+	triangulation testTriangle,triRSVS, triRSVS2;
 	vector<int> dims;
 	const char *fileToOpen;
 	tecplotfile outSnake;
@@ -688,21 +689,28 @@ int Test_RSVSalgo(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+		PrepareMultiLvlSnake(snakeMesh,voluMesh2,testSnake2,dims,triRSVS2);
 		voluMesh.volus[0].target=0.0;
+		voluMesh.volus[3].target=0.0;
+		voluMesh.volus[4].target=1.0;
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
 		// nVoluZone=outSnake.ZoneNum();
 		
 		start_s=clock();
+		SpawnRSVS(testSnake2,0);
 		SpawnRSVS(testSnake,1);
 		testSnake.PrepareForUse();
+		testSnake2.PrepareForUse();
 
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
 		outSnake.PrintMesh(testSnake.snakeconn);
-
+		outSnake.PrintSnakeInternalPts(testSnake);
+		outSnake.PrintMesh(testSnake2.snakeconn);
+		outSnake.PrintSnakeInternalPts(testSnake2);
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 

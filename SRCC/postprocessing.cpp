@@ -388,6 +388,22 @@ int tecplotfile::DefShareZoneVolume(int shareZone, int nVertDat){
 	return(0);
 }
 
+int tecplotfile::PrintSnakeInternalPts(const snake &snakein,int strandID, double timeStep){
+	int jj;
+	std::vector<int> vertList;
+	vertList.clear();
+		for(jj=0;jj<int(snakein.isMeshVertIn.size()); ++jj){
+			if(snakein.isMeshVertIn[jj]){
+				vertList.push_back(snakein.snakemesh->verts(jj)->index);
+			}
+		}
+		if(int(snakein.isMeshVertIn.size())==0){
+			vertList.push_back(snakein.snakemesh->verts(0)->index);
+		}
+		jj=PrintMesh(*(snakein.snakemesh),strandID,timeStep,4,vertList);
+		return(jj);
+}
+
 // Functions triarray
 void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
