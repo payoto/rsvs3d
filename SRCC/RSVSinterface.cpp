@@ -424,7 +424,7 @@ void SQPcalc::PrepareMatricesForSQP(
 		constrAct[jj]=constr[subDvAct[jj]];
 	}
 	lagMultAct.setZero(nConstrAct);
-
+	
 	HLag = HObj;
 }
 
