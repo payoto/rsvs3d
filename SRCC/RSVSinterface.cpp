@@ -99,7 +99,7 @@ void SQPcalc::CalculateMesh(mesh &meshin){
 	
 }
 
-void SQPcalc::Print2Screen()const {
+void SQPcalc::Print2Screen(int outType)const {
 	cout << "Math result: obj " << obj << " false access " << falseaccess << endl;
 	cout << "Constr " ;
 	for (int i = 0; i < nConstr; ++i)
@@ -107,7 +107,7 @@ void SQPcalc::Print2Screen()const {
 		cout << constr[i] << " ";
 	}
 	cout << endl;
-	if(nConstr<10 && nDv < 10){
+	if(nConstr<10 && nDv < 20 && outType==1){
 		cout << "constr :" <<  endl ;	
 		PrintMatrix(constr);
 		cout << "dObj :" <<  endl ;	
@@ -121,6 +121,17 @@ void SQPcalc::Print2Screen()const {
 		PrintMatrix(HConstr);
 		cout << "HObj :" <<  endl ;	
 		PrintMatrix(HObj);
+	}
+	if (outType==2){
+		cout << endl;
+		for(int i=0; i<nDv; ++i){
+			cout << deltaDV[i] << " ";
+		}
+		cout << endl;
+		for(int i=0; i<nConstr; ++i){
+			cout << lagMult[i] << " ";
+		}
+		cout << endl;
 	}
 }
 
@@ -157,7 +168,8 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	
 	nDv=nDvIn;
 	nConstr=nConstrIn;
-
+	isConstrAct.assign(nConstr,false);
+	isDvAct.assign(nConstr,false);
 	dConstr.setZero(nConstr,nDv);
 	HConstr.setZero(nDv,nDv); 
 	HObj.setZero(nDv,nDv);  
@@ -316,6 +328,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// cout <<  endl << "done" <<endl; 
 	for(ii=0; ii< nDvAct; ++ii){
 		dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+		isDvAct[dvMap.find(dvListMap.vec[ii])] = true;
 		for(jj=0; jj< nDvAct; ++jj){
 			HObj(dvMap.find(dvListMap.vec[jj]),
 				 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
@@ -331,6 +344,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		nj=subTempVec.size();
 		for(jj=0; jj< nj; ++jj){
 			if (subTempVec[jj]!=-1){
+				isConstrAct[subTempVec[jj]] = true;
 				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 				for(kk=0; kk< nDvAct; ++kk){
 					dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
@@ -350,6 +364,106 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// Assign Constraint Hessian
 }
 
+void SQPcalc::PrepareMatricesForSQP(
+	MatrixXd &dConstrAct,
+	MatrixXd &HConstrAct, 
+	MatrixXd &HObjAct,
+	RowVectorXd &dObjAct,
+	VectorXd &constrAct,
+	VectorXd &lagMultAct,
+	VectorXd &deltaDVAct
+	){
+
+	
+
+	int ii, jj, nDvAct, nConstrAct;
+
+	subDvAct.reserve(nDv);
+	nDvAct=0;
+	for(ii=0; ii<nDv; ++ii){
+		nDvAct += int(isDvAct[ii]);
+		if(isDvAct[ii]){
+			subDvAct.push_back(ii);
+		}
+	}
+
+	subConstrAct.reserve(nConstr);
+	nConstrAct=0;
+	for(ii=0; ii<nConstr; ++ii){
+		nConstrAct += int(isConstrAct[ii]);
+		if(isConstrAct[ii]){
+			subConstrAct.push_back(ii);
+		}
+	}
+
+
+	dConstrAct.setZero(nConstrAct,nDvAct);
+	for(ii=0; ii<nConstrAct;++ii){
+		for(jj=0; jj<nDvAct;++jj){
+			dConstrAct(ii,jj)=dConstr(subConstrAct[ii],subDvAct[jj]);
+		}
+	}
+	HConstrAct.setZero(nDvAct,nDvAct); 
+	for(ii=0; ii<nDvAct;++ii){
+		for(jj=0; jj<nDvAct;++jj){
+			HConstrAct(ii,jj)=HConstr(subDvAct[ii],subDvAct[jj]);
+		}
+	}
+	HObjAct.setZero(nDvAct,nDvAct);  
+	for(ii=0; ii<nDvAct;++ii){
+		for(jj=0; jj<nDvAct;++jj){
+			HObjAct(ii,jj)=HObj(subDvAct[ii],subDvAct[jj]);
+		}
+	}
+	dObjAct.setZero(nDvAct);
+	for(jj=0; jj<nDvAct;++jj){
+		dObjAct[jj]=dObj[subDvAct[jj]];
+	}
+	constrAct.setZero(nConstrAct);
+	for(jj=0; jj<nConstrAct;++jj){
+		constrAct[jj]=constr[subDvAct[jj]];
+	}
+	lagMultAct.setZero(nConstrAct);
+
+	HLag = HObj;
+}
+
+void SQPcalc::ComputeSQPstep(){
+
+	MatrixXd dConstrAct,HConstrAct, HObjAct;
+	RowVectorXd dObjAct;
+	VectorXd constrAct, lagMultAct, deltaDVAct;
+	MatrixXd temp1, temp2;
+	int ii, ni;
+	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
+		constrAct,lagMultAct,deltaDVAct
+		);
+	LLT<MatrixXd> HLagSystem(HLag);
+
+	temp1 = HLagSystem.solve(dConstrAct.transpose());
+	temp2 = HLagSystem.solve(dObjAct.transpose());
+
+	lagMultAct = (
+			dConstrAct*(temp1)
+		).llt().solve(
+			constr - (dConstrAct*(temp2))
+		);
+
+
+	deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() + dConstrAct.transpose()*lagMultAct));
+
+	ni = subDvAct.size();
+	for (ii=0; ii<ni; ++ii){
+		deltaDV[subDvAct[ii]]=deltaDVAct[ii];
+		
+	}
+	ni = subConstrAct.size();
+	for (ii=0; ii<ni; ++ii){
+		lagMult[subConstrAct[ii]]=lagMultAct[ii];
+		
+	}
+
+}
 
 void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut){
 

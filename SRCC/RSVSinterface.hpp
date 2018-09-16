@@ -28,17 +28,18 @@ protected:
 	int falseaccess=0;
 	bool returnDeriv=true;
 public :
-	MatrixXd dConstr,HConstr, HObj;
+	MatrixXd dConstr,HConstr, HObj, HLag;
 	RowVectorXd dObj;
-	VectorXd constr, lagMult;
+	VectorXd constr, lagMult, deltaDV;
 	double obj=0.0;
 
-
+	vector<bool> isConstrAct, isDvAct;
+	vector<int> subConstrAct, subDvAct;
 	HashedVector<int, int> dvMap;
 	HashedMap<int,int,int> constrMap; // maps snakemesh volu onto constr
 	vector<pair<int,int>> constrList; // keeps pairs with parentindex and voluindex
 
-	void Print2Screen()const;
+	void Print2Screen(int outType=0)const;
 	void BuildMathArrays(int nDv, int nConstr);
 	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildConstrMap(const mesh &meshin);
@@ -48,6 +49,17 @@ public :
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
+	void ComputeSQPstep();
+	void PrepareMatricesForSQP(
+		MatrixXd &dConstrAct,
+		MatrixXd &HConstrAct, 
+		MatrixXd &HObjAct,
+		RowVectorXd &dObjAct,
+		VectorXd &constrAct,
+		VectorXd &lagMultAct,
+		VectorXd &deltaDVAct
+		);
+
 };
 
 

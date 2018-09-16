@@ -749,9 +749,9 @@ int Test_snakeRSVS(){
 		outSnake.PrintMesh(voluMesh);
 		nVoluZone=outSnake.ZoneNum();
 		
-		SpawnAtVertex(testSnake,1022);
-		SpawnAtVertex(testSnake,674);
-		SpawnAtVertex(testSnake,675);
+		// SpawnAtVertex(testSnake,1022);
+		// SpawnAtVertex(testSnake,674);
+		// SpawnAtVertex(testSnake,675);
 		SpawnAtVertex(testSnake,728);
 		SpawnAtVertex(testSnake,729);
 		SpawnAtVertex(testSnake,731);
@@ -805,8 +805,10 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
+	calcObj.ComputeSQPstep();
 	start_s=TimeStamp(" tri-maths:", start_s);
 
-	// calcObj.Print2Screen();
+	calcObj.Print2Screen(1);
+	calcObj.Print2Screen(2);
 
 }

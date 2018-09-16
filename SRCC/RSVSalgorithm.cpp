@@ -190,7 +190,7 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	//ni=delEdge.size();
 	// for(ii=0; ii<ni; ++ii){snakein.snakeconn.RemoveIndex(2,delEdge[ii]);}
 
-	snakein.displight();
+	// snakein.displight();
 	snakein.snaxs.remove(delSnax);
 	snakein.snaxedges.remove(delEdge);
 	snakein.snaxsurfs.remove(delSurf);
@@ -204,7 +204,7 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	snakein.snakeconn.TestConnectivityBiDir();
 	snakein.ForceCloseContainers();
 	snakein.PrepareForUse();
-	snakein.displight();
+	// snakein.displight();
 	if (outerBorder>0){
 		snakein.Flip();
 	}
