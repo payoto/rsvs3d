@@ -774,7 +774,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
 		
-		for(ii=0;ii<170;++ii){
+		for(ii=0;ii<80;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -807,13 +807,6 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	SQPcalc calcObj;
 	start_s=clock();
 
-	calcObj.CalculateTriangulation(RSVStri);
-	calcObj.ReturnConstrToMesh(RSVStri);
-	// calcObj.ComputeSQPstep();
-	// calcObj.ReturnVelocities(RSVStri);
-	start_s=TimeStamp(" tri-maths:", start_s);
-	
-	calcObj.Print2Screen();
 	// calcObj.Print2Screen(1);
 	// calcObj.Print2Screen(2);
 	CalculateSnakeVel(testSnake);
@@ -829,5 +822,12 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	MaintainTriangulateSnake(RSVStri);
 	
 	start_s=TimeStamp(" triangulate:", start_s);
+	calcObj.CalculateTriangulation(RSVStri);
+	calcObj.ReturnConstrToMesh(RSVStri);
+	// calcObj.ComputeSQPstep();
+	// calcObj.ReturnVelocities(RSVStri);
+	start_s=TimeStamp(" tri-maths:", start_s);
+	
+	calcObj.Print2Screen();
 
 }
