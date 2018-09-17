@@ -1,6 +1,7 @@
 
 #include <cstdlib>
 #include <iostream> 
+#include <cmath> 
 #include "snake.hpp"
 #include "snakevel.hpp"
 #include "vectorarray.hpp"
@@ -107,7 +108,7 @@ void SQPcalc::Print2Screen(int outType)const {
 		cout << constr[i] << " ";
 	}
 	cout << endl;
-	if(nConstr<10 && nDv < 20 && outType==1){
+	if((nConstr<10 && nDv < 20 && outType==1) || outType==3){
 		cout << "constr :" <<  endl ;	
 		PrintMatrix(constr);
 		cout << "dObj :" <<  endl ;	
@@ -121,8 +122,12 @@ void SQPcalc::Print2Screen(int outType)const {
 		PrintMatrix(HConstr);
 		cout << "HObj :" <<  endl ;	
 		PrintMatrix(HObj);
+		cout << "constrMap :" <<  endl ;	
+		PrintMatrix(constrTarg);
 	}
 	if (outType==2){
+		cout << "constrMap :" <<  endl ;	
+		PrintMatrix(constrTarg);
 		cout << endl;
 		for(int i=0; i<nDv; ++i){
 			cout << deltaDV[i] << " ";
@@ -176,6 +181,8 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	dObj.setZero(nDv);
 	constr.setZero(nConstr);
 	lagMult.setZero(nConstr);
+	deltaDV.setZero(nDv);
+	// constrTarg.setZero(nConstr);
 }
 
 
@@ -185,9 +192,15 @@ void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
 	// for each parent
 	// for each snakemesh.volu
 	// Assign to constrMap.targ = the position in parent.volu of the parentconn
-	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList);
+	vector<double> voluVals;
+	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList,voluVals);
 
 	constrMap.GenerateHash();
+	constrTarg.setZero(voluVals.size());
+	for (int i = 0; i < int(voluVals.size()); ++i)
+	{
+		constrTarg[i] = voluVals[i];
+	}
 }
 void SQPcalc::BuildConstrMap(const mesh &meshin){
 	int ni, ii;
@@ -421,11 +434,12 @@ void SQPcalc::PrepareMatricesForSQP(
 	}
 	constrAct.setZero(nConstrAct);
 	for(jj=0; jj<nConstrAct;++jj){
-		constrAct[jj]=constr[subDvAct[jj]];
+		constrAct[jj]=constr[subDvAct[jj]] -constrTarg[subDvAct[jj]];
 	}
 	lagMultAct.setZero(nConstrAct);
-
-	HLag = HObj;
+	// DisplayVector(isDvAct);
+	// DisplayVector(isConstrAct);
+	HLag = HObjAct;
 }
 
 void SQPcalc::ComputeSQPstep(){
@@ -434,19 +448,22 @@ void SQPcalc::ComputeSQPstep(){
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
 	MatrixXd temp1, temp2;
+	bool isNan;
 	int ii, ni;
 	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
 		constrAct,lagMultAct,deltaDVAct
 		);
-	LLT<MatrixXd> HLagSystem(HLag);
+	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	// HouseholderQR<MatrixXd> HLagSystem(HLag);
+	// LLT<MatrixXd> HLagSystem(HLag);
 
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
 	temp2 = HLagSystem.solve(dObjAct.transpose());
 
 	lagMultAct = (
 			dConstrAct*(temp1)
-		).llt().solve(
-			constr - (dConstrAct*(temp2))
+		).colPivHouseholderQr().solve(
+			constrAct - (dConstrAct*(temp2))
 		);
 
 
@@ -457,10 +474,15 @@ void SQPcalc::ComputeSQPstep(){
 		deltaDV[subDvAct[ii]]=deltaDVAct[ii];
 		
 	}
+	
+	isNan = false;
 	ni = subConstrAct.size();
 	for (ii=0; ii<ni; ++ii){
 		lagMult[subConstrAct[ii]]=lagMultAct[ii];
-		
+		isNan = isNan || isnan(lagMultAct[ii]);
+	}
+	if (isNan){
+		Print2Screen(3);
 	}
 
 }

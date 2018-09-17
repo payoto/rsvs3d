@@ -71,6 +71,7 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triang
 void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	vector<int> &dims, triangulation &triRSVS){
 	vector<int> elmMapping;
+	SQPcalc calcVolus;
 	int ii;
 
 	snakeMesh.PrepareForUse();
@@ -94,6 +95,9 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	}
 	voluMesh.PrepareForUse();
 	voluMesh.OrientSurfaceVolume();
+
+	calcVolus.CalculateMesh(voluMesh);
+	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
 
 	triRSVS.stattri.clear();
 	triRSVS.trivert.clear();
@@ -808,7 +812,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.ComputeSQPstep();
 	start_s=TimeStamp(" tri-maths:", start_s);
 
-	calcObj.Print2Screen(1);
+	// calcObj.Print2Screen(1);
 	calcObj.Print2Screen(2);
 
 }

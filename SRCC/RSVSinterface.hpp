@@ -30,7 +30,7 @@ protected:
 public :
 	MatrixXd dConstr,HConstr, HObj, HLag;
 	RowVectorXd dObj;
-	VectorXd constr, lagMult, deltaDV;
+	VectorXd constr, lagMult, deltaDV, constrTarg;
 	double obj=0.0;
 
 	vector<bool> isConstrAct, isDvAct;
