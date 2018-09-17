@@ -59,6 +59,19 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	
 }
 
+void SQPcalc::ReturnVelocities(triangulation &triRSVS){
+
+	int ii, ni;
+
+	ni=triRSVS.snakeDep->snaxs.size();
+	for(ii=0; ii<ni; ii++){
+		triRSVS.snakeDep->snaxs[ii].v = 
+			deltaDV[dvMap.find(triRSVS.snakeDep->snaxs(ii)->index)];
+	}
+	triRSVS.snakeDep->snaxs.PrepareForUse();
+
+
+}
 
 void SQPcalc::CalculateMesh(mesh &meshin){
 
@@ -174,7 +187,7 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	nDv=nDvIn;
 	nConstr=nConstrIn;
 	isConstrAct.assign(nConstr,false);
-	isDvAct.assign(nConstr,false);
+	isDvAct.assign(nDv,false);
 	dConstr.setZero(nConstr,nDv);
 	HConstr.setZero(nDv,nDv); 
 	HObj.setZero(nDv,nDv);  
@@ -341,7 +354,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// cout <<  endl << "done" <<endl; 
 	for(ii=0; ii< nDvAct; ++ii){
 		dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-		isDvAct[dvMap.find(dvListMap.vec[ii])] = true;
+		isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
 		for(jj=0; jj< nDvAct; ++jj){
 			HObj(dvMap.find(dvListMap.vec[jj]),
 				 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
@@ -353,11 +366,11 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// and Hessian		
 	nCellTarg=triIn.connec.celltarg.size(); 
 	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+		subTempVec=constrMap.find(triIn.connec.celltarg[ii]);
 		nj=subTempVec.size();
 		for(jj=0; jj< nj; ++jj){
 			if (subTempVec[jj]!=-1){
-				isConstrAct[subTempVec[jj]] = true;
+				isConstrAct.at(subTempVec[jj]) = true;
 				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 				for(kk=0; kk< nDvAct; ++kk){
 					dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
@@ -383,8 +396,7 @@ void SQPcalc::PrepareMatricesForSQP(
 	MatrixXd &HObjAct,
 	RowVectorXd &dObjAct,
 	VectorXd &constrAct,
-	VectorXd &lagMultAct,
-	VectorXd &deltaDVAct
+	VectorXd &lagMultAct
 	){
 
 	
@@ -394,8 +406,8 @@ void SQPcalc::PrepareMatricesForSQP(
 	subDvAct.reserve(nDv);
 	nDvAct=0;
 	for(ii=0; ii<nDv; ++ii){
-		nDvAct += int(isDvAct[ii]);
-		if(isDvAct[ii]){
+		nDvAct += int(isDvAct.at(ii));
+		if(isDvAct.at(ii)){
 			subDvAct.push_back(ii);
 		}
 	}
@@ -403,8 +415,8 @@ void SQPcalc::PrepareMatricesForSQP(
 	subConstrAct.reserve(nConstr);
 	nConstrAct=0;
 	for(ii=0; ii<nConstr; ++ii){
-		nConstrAct += int(isConstrAct[ii]);
-		if(isConstrAct[ii]){
+		nConstrAct += int(isConstrAct.at(ii));
+		if(isConstrAct.at(ii)){
 			subConstrAct.push_back(ii);
 		}
 	}
@@ -448,10 +460,10 @@ void SQPcalc::ComputeSQPstep(){
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
 	MatrixXd temp1, temp2;
-	bool isNan;
+	bool isNan, isLarge;
 	int ii, ni;
 	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
-		constrAct,lagMultAct,deltaDVAct
+		constrAct,lagMultAct
 		);
 	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
 	// HouseholderQR<MatrixXd> HLagSystem(HLag);
@@ -463,11 +475,42 @@ void SQPcalc::ComputeSQPstep(){
 	lagMultAct = (
 			dConstrAct*(temp1)
 		).colPivHouseholderQr().solve(
+		// ).householderQr().solve(
+		// ).llt().solve(
 			constrAct - (dConstrAct*(temp2))
 		);
 
+	isNan = false;
+	isLarge = false;
+	ni = lagMultAct.size();
+	for (ii=0; ii<ni; ++ii){
+		if(lagMultAct[ii]<-limLag){
+			lagMultAct[ii]=-limLag;
+			isLarge=true;
+		}else if(lagMultAct[ii]>limLag){
+			lagMultAct[ii]=limLag;
+			isLarge=true;
+		} else if(isnan(lagMultAct[ii])){
+			//lagMultAct[ii]=0.0;
+			isNan=true;
+		}
+	}
+	if (isNan){
 
-	deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() + dConstrAct.transpose()*lagMultAct));
+		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	}else if(isLarge){
+
+		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	}else if(true) {
+		deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+
+	} else {
+
+		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+						+ dConstrAct.transpose()*lagMultAct));
+
+	}
+
 
 	ni = subDvAct.size();
 	for (ii=0; ii<ni; ++ii){
@@ -475,7 +518,6 @@ void SQPcalc::ComputeSQPstep(){
 		
 	}
 	
-	isNan = false;
 	ni = subConstrAct.size();
 	for (ii=0; ii<ni; ++ii){
 		lagMult[subConstrAct[ii]]=lagMultAct[ii];
@@ -483,6 +525,8 @@ void SQPcalc::ComputeSQPstep(){
 	}
 	if (isNan){
 		Print2Screen(3);
+		DisplayVector(isConstrAct);
+		DisplayVector(isDvAct);
 	}
 
 }

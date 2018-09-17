@@ -195,6 +195,7 @@ public:
 };
 
 void CalculateSnakeVel(snake &snakein);
+void CalculateNoNanSnakeVel(snake &snakein);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
 void TriangulateTriSurface(const trianglesurf &surfin,

@@ -448,17 +448,22 @@ int Test_snakeinitflat(){
 
 }
 
+void Test_basicvelstep(snake &testSnake, vector<double> dt, vector<int> isImpact){
+	CalculateSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,0.25);
+	testSnake.UpdateDistance(dt);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+	Test_stepalgo(testSnake, dt, isImpact);
+}
+
 void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
 
 	int start_s;
 
 	start_s=clock();
 
-	CalculateSnakeVel(testSnake);
-	testSnake.CalculateTimeStep(dt,0.25);
-	testSnake.UpdateDistance(dt);
-	testSnake.UpdateCoord();
-	testSnake.PrepareForUse();
+	
 
 	start_s=TimeStamp("position: ", start_s);
 
@@ -741,7 +746,7 @@ int Test_snakeRSVS(){
 
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;
-	try {
+	// try {
 		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
 
 		outSnake.OpenFile(fileToOpen);
@@ -756,8 +761,8 @@ int Test_snakeRSVS(){
 		// SpawnAtVertex(testSnake,1022);
 		// SpawnAtVertex(testSnake,674);
 		// SpawnAtVertex(testSnake,675);
-		SpawnAtVertex(testSnake,728);
-		SpawnAtVertex(testSnake,729);
+		// SpawnAtVertex(testSnake,728);
+		// SpawnAtVertex(testSnake,729);
 		SpawnAtVertex(testSnake,731);
 		testSnake.displight();
 
@@ -769,7 +774,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
 		
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<170;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -788,10 +793,10 @@ int Test_snakeRSVS(){
 		testSnake.displight();
 
 
-	} catch (exception const& ex) { 
-		cerr << "Exception: " << ex.what() <<endl; 
-		return -1;
-	} 
+	// } catch (exception const& ex) { 
+	// 	cerr << "Exception: " << ex.what() <<endl; 
+	// 	return -1;
+	// } 
 	return(errTest);
 
 }
@@ -800,19 +805,29 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	vector<int> &isImpact){
 	int start_s;
 	SQPcalc calcObj;
-
-	Test_stepalgo(testSnake,  dt, isImpact);
 	start_s=clock();
-	MaintainTriangulateSnake(RSVStri);
-	
-	start_s=TimeStamp(" triangulate:", start_s);
 
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
-	calcObj.ComputeSQPstep();
+	// calcObj.ComputeSQPstep();
+	// calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" tri-maths:", start_s);
-
+	
+	calcObj.Print2Screen();
 	// calcObj.Print2Screen(1);
-	calcObj.Print2Screen(2);
+	// calcObj.Print2Screen(2);
+	CalculateSnakeVel(testSnake);
+	CalculateNoNanSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,0.25);
+	testSnake.UpdateDistance(dt);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+
+	Test_stepalgo(testSnake,  dt, isImpact);
+	start_s=clock();
+	
+	MaintainTriangulateSnake(RSVStri);
+	
+	start_s=TimeStamp(" triangulate:", start_s);
 
 }
