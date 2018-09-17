@@ -107,6 +107,17 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	testSnake.PrepareForUse();
 }
 
+
+void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> isImpact){
+	CalculateSnakeVelRand(testSnake);
+	testSnake.CalculateTimeStep(dt,0.25);
+	testSnake.UpdateDistance(dt);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+	Test_stepalgo(testSnake, dt, isImpact);
+}
+
+
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
@@ -327,7 +338,8 @@ int Test_snakeinit(){
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
-
+		
+		snakeMesh.OrientSurfaceVolume();
 		start_s=clock();
 		testSnake.PrepareForUse();
 		
@@ -343,7 +355,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<31;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -355,11 +367,13 @@ int Test_snakeinit(){
 				testTriangle.trivert.clear();
 				testTriangle.PrepareForUse();
 				TriangulateMesh(testSnake.snakeconn,testTriangle);
+				testTriangle.CalcTriVertPos();
 				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 				outSnake.PrintMesh(triMesh,2,totT);
 			}
 
-			Test_stepalgo(testSnake, dt, isImpact);
+			Test_randvelstep(testSnake, dt, isImpact);
+			cout << endl;
 			
 			totT=totT+1;
 		}
@@ -370,6 +384,8 @@ int Test_snakeinit(){
 			testTriangle.trivert.clear();
 			testTriangle.PrepareForUse();
 			TriangulateMesh(testSnake.snakeconn,testTriangle);
+			testTriangle.CalcTriVertPos();
+
 			MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 			outSnake.PrintMesh(triMesh,2,totT);
 		}
@@ -446,15 +462,6 @@ int Test_snakeinitflat(){
 	} 
 	return(errTest);
 
-}
-
-void Test_basicvelstep(snake &testSnake, vector<double> dt, vector<int> isImpact){
-	CalculateSnakeVel(testSnake);
-	testSnake.CalculateTimeStep(dt,0.25);
-	testSnake.UpdateDistance(dt);
-	testSnake.UpdateCoord();
-	testSnake.PrepareForUse();
-	Test_stepalgo(testSnake, dt, isImpact);
 }
 
 void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
@@ -728,6 +735,86 @@ int Test_RSVSalgo_init(){
 	return(errTest);
 }
 
+int Test_RSVSalgo(){
+	// int nVoluZone, ii;
+
+	snake testSnake;
+	mesh snakeMesh,  voluMesh, triMesh;
+	// mesh triMesh;
+	triangulation testTriangle,triRSVS;
+	vector<int> dims;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	// double totT=0.0;
+	// vector<double> dt;
+	// vector<int> isImpact;
+	int start_s,stop_s;
+	//bool errFlag;
+	int errTest=0;
+	
+
+	dims.assign(3,0);
+	dims[0]=2;dims[1]=3;dims[2]=1;
+	try {
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		
+		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+
+		voluMesh.volus[0].target=0.0;
+		voluMesh.volus[3].target=0.0;
+		voluMesh.volus[4].target=1.0;
+		voluMesh.PrepareForUse();
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(voluMesh);
+		int nVoluZone;
+		nVoluZone=outSnake.ZoneNum();
+		
+		start_s=clock();
+
+		SpawnRSVS(testSnake,1);
+		testSnake.PrepareForUse();
+
+		triRSVS.PrepareForUse();
+
+		TriangulateSnake(testSnake,triRSVS);
+		triRSVS.PrepareForUse();
+		triRSVS.CalcTriVertPos();
+		int ii;
+		double totT=0.0;
+		vector<double> dt;
+		vector<int> isImpact;
+		for(ii=0;ii<5;++ii){
+			cout << ii << " ";
+			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+				triMesh, triRSVS, voluMesh, nVoluZone, ii);
+			stop_s=clock();
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact);
+			stop_s=TimeStamp("Total: ", stop_s);
+			cout << endl;
+			totT=totT+1;
+		}
+
+		PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+				triMesh, triRSVS, voluMesh, nVoluZone, ii);
+
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		testSnake.displight();
+		outSnake.PrintMesh(testSnake.snakeconn);
+		outSnake.PrintSnakeInternalPts(testSnake);
+
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+}
+
 int Test_snakeRSVS(){
 	int nVoluZone;
 	snake testSnake;
@@ -774,7 +861,7 @@ int Test_snakeRSVS(){
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
 		
-		for(ii=0;ii<80;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -809,7 +896,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 
 	// calcObj.Print2Screen(1);
 	// calcObj.Print2Screen(2);
-	CalculateSnakeVel(testSnake);
+	// CalculateSnakeVel(testSnake);
 	CalculateNoNanSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
@@ -824,10 +911,11 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	start_s=TimeStamp(" triangulate:", start_s);
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
-	// calcObj.ComputeSQPstep();
-	// calcObj.ReturnVelocities(RSVStri);
+	calcObj.ComputeSQPstep();
+	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" tri-maths:", start_s);
 	
-	calcObj.Print2Screen();
+	// calcObj.Print2Screen();
+	// calcObj.Print2Screen(2);
 
 }

@@ -135,11 +135,11 @@ void SQPcalc::Print2Screen(int outType)const {
 		PrintMatrix(HConstr);
 		cout << "HObj :" <<  endl ;	
 		PrintMatrix(HObj);
-		cout << "constrMap :" <<  endl ;	
+		cout << "constrTarg :" <<  endl ;	
 		PrintMatrix(constrTarg);
 	}
 	if (outType==2){
-		cout << "constrMap :" <<  endl ;	
+		cout << "constrTarg :" <<  endl ;	
 		PrintMatrix(constrTarg);
 		cout << endl;
 		for(int i=0; i<nDv; ++i){
@@ -331,12 +331,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	HConstrPart.setZero(nDvAct,nDvAct);
 	HObjPart.setZero(nDvAct,nDvAct);
 
-	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
-	ArrayVec2MatrixXd(*HValpnt, HVal);
-	ArrayVec2MatrixXd(*dValpnt, dVal);
-	Deriv1stChainScalar(dVal, dPos,dConstrPart);
-	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
-	constrPart=*retVal;
 
 	AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
 	ArrayVec2MatrixXd(*HValpnt, HVal);
@@ -361,12 +355,18 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		}
 	}
 
+	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+	ArrayVec2MatrixXd(*HValpnt, HVal);
+	ArrayVec2MatrixXd(*dValpnt, dVal);
+	Deriv1stChainScalar(dVal, dPos,dConstrPart);
+	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	constrPart=*retVal;
 	// Assign Constraint
 	// and constraint derivative
 	// and Hessian		
 	nCellTarg=triIn.connec.celltarg.size(); 
 	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.find(triIn.connec.celltarg[ii]);
+		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
 		nj=subTempVec.size();
 		for(jj=0; jj< nj; ++jj){
 			if (subTempVec[jj]!=-1){
@@ -501,8 +501,8 @@ void SQPcalc::ComputeSQPstep(){
 	}else if(isLarge){
 
 		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
-	}else if(true) {
-		deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+	// }else if(true) {
+	// 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
 
 	} else {
 

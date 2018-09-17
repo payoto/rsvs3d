@@ -16,6 +16,33 @@ void CalculateSnakeVel(snake &snakein){
 
 	for (ii=0;ii<int(snakein.snaxs.size());++ii){
 		if (snakein.snaxs(ii)->isfreeze==1){
+			snakein.snaxs[ii].v=(0.5-snakein.snaxs[ii].d)*0.3;
+			snakein.snaxs[ii].isfreeze=0;
+		}
+		//snakein.snaxs[ii].v=(double(rand()%1001)/1000.0+0.5)*snakein.snaxs[ii].v;
+		snakein.snaxs[ii].v=(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
+	}
+}
+void CalculateSnakeVelRand(snake &snakein){
+
+	int ii=0;
+
+	for (ii=0;ii<int(snakein.snaxs.size());++ii){
+		if (snakein.snaxs(ii)->isfreeze==1){
+			snakein.snaxs[ii].v=(0.5-snakein.snaxs[ii].d)*0.3;
+			snakein.snaxs[ii].isfreeze=0;
+		}
+		snakein.snaxs[ii].v=(double(rand()%1001)/1000.0+0.5)*snakein.snaxs[ii].v;
+		// snakein.snaxs[ii].v=(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
+	}
+}
+
+void CalculateSnakeVelUnit(snake &snakein){
+
+	int ii=0;
+
+	for (ii=0;ii<int(snakein.snaxs.size());++ii){
+		if (snakein.snaxs(ii)->isfreeze==1){
 			snakein.snaxs[ii].v=0;//(0.5-snakein.snaxs[ii].d)*0.3;
 			snakein.snaxs[ii].isfreeze=0;
 		}
@@ -23,7 +50,19 @@ void CalculateSnakeVel(snake &snakein){
 		snakein.snaxs[ii].v=1;//(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
 	}
 }
+void CalculateSnakeVelFast(snake &snakein){
 
+	int ii=0;
+
+	for (ii=0;ii<int(snakein.snaxs.size());++ii){
+		if (snakein.snaxs(ii)->isfreeze==1){
+			snakein.snaxs[ii].v=0;//(0.5-snakein.snaxs[ii].d)*0.3;
+			snakein.snaxs[ii].isfreeze=0;
+		}
+		//snakein.snaxs[ii].v=(double(rand()%1001)/1000.0+0.5)*snakein.snaxs[ii].v;
+		snakein.snaxs[ii].v=4;//(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
+	}
+}
 void CalculateNoNanSnakeVel(snake &snakein){
 
 	int ii=0;

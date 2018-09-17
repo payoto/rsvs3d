@@ -1831,8 +1831,9 @@ void surf::OrderEdges(mesh *meshin)
 				cerr << ii << " vert " << vertCurr << "  ";
 				DisplayVector(edge2Vert);
 				DisplayVector(edgeind);
-
+				meshin->verts.isearch(vertCurr)->disp();
 				cout << it->second << " " << 1/2 << 2/3 <<  endl;
+				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
 				cout<< "throw range_error (" <<"unordered_multimap went beyond its range in OrderEdges" <<")";
 			}
 			if (vert2Edge.count(vertCurr)==1){
@@ -1841,6 +1842,7 @@ void surf::OrderEdges(mesh *meshin)
 				DisplayVector(edgeind);
 				cerr <<endl;
 
+				meshin->verts.isearch(vertCurr)->disp();
 				cerr << "Error : Surface does not form closed loop" << endl;
 				cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
 				jj=vert2Edge.count(vertCurr);
