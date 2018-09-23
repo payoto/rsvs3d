@@ -101,6 +101,7 @@ public:
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void HashArray(); // Not really needed as handled by PrepareForUse
 	void HashArrayNM(); // Not really needed as handled by PrepareForUse
+	void HashParent();
 	void SetMaxIndex(); // Not really needed as handled by PrepareForUse
 	void SetMaxIndexNM(); // SetMaxIndex no mesh
 	void Concatenate(const snake &other, int isInternal=0);
@@ -123,6 +124,7 @@ public:
 	void OrientSurfaceVolume();
 	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
 	void AssignInternalVerts();
+	void CheckConnectivity() const; 
 
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
@@ -225,7 +227,7 @@ int Test_snake();
 int Test_snakeinit();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact);
+void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact);
 
 // Functions needed at Compile time
 

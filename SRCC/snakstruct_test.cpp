@@ -108,7 +108,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 }
 
 
-void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> isImpact){
+void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> &isImpact){
 	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
@@ -464,7 +464,7 @@ int Test_snakeinitflat(){
 
 }
 
-void Test_stepalgo(snake &testSnake, vector<double> dt, vector<int> isImpact){
+void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact){
 
 	int start_s;
 
@@ -892,7 +892,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	vector<int> &isImpact){
 	int start_s;
 	SQPcalc calcObj;
-	start_s=clock();
+	
 
 	// calcObj.Print2Screen(1);
 	// calcObj.Print2Screen(2);

@@ -1906,7 +1906,7 @@ void surf::OrderEdges(mesh *meshin)
     	cerr << "   in function:" <<  __PRETTY_FUNCTION__ << endl;
          //throw invalid_argument ("Incorrect surface connectivity");
     }
-      #endif //SAGE_ALGO
+      #endif //SAFE_ALGO
     isordered=true;
 }
 }

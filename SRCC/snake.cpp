@@ -217,6 +217,15 @@ void snake::HashArray(){
 	snakemesh->HashArray();
 
 }
+void snake::HashParent(){
+	// prefer use of PrepareForUse in final code as it includes checks to 
+	// avoid unnecessary repetiion of work
+	// Use HashArray when debugging to be sure that fields are correctly hashed
+	snaxs.HashParent();
+	snaxedges.HashParent();
+	snaxsurfs.HashParent();
+
+}
 void snake::HashArrayNM(){
 	// prefer use of PrepareForUse in final code as it includes checks to 
 	// avoid unnecessary repetiion of work
@@ -441,7 +450,146 @@ void snake::VertIsIn(vector<int> vertInd, bool isIn){
 	}
 }
 
+void snake::CheckConnectivity() const {
 
+	int ii,jj,ni,kk, ll,errCount, errTot;
+	vector<int> testSub;
+	bool isErr;
+
+	testSub.reserve(10);
+
+	errCount=0;
+	errTot=0;
+	ni=int(snaxs.size());
+	for (ii=0; ii<ni;++ii){
+		if (snaxs.countparent(snaxs(ii)->KeyParent())>1){
+			snaxs.findsiblings(snaxs(ii)->KeyParent(), testSub);
+			for(jj=0; jj< int(testSub.size());++jj){
+				isErr=false;
+				if(snaxedges(ii)->index!=snaxedges(testSub[jj])->index){
+					for(kk=0; kk< int(snakeconn.verts(ii)->edgeind.size());kk++){
+						if((snakeconn.edges.isearch(
+							snakeconn.verts(ii)->edgeind[kk]
+							)->vertind[0]==snaxs(testSub[jj])->index)
+							|| (snakeconn.edges.isearch(
+							snakeconn.verts(ii)->edgeind[kk]
+							)->vertind[1]==snaxs(testSub[jj])->index)){
+							isErr=true;
+							break;
+						}
+					}
+				}
+				if (isErr){
+					cerr << endl << " Test Snake Connectivity Error :" << errCount << " snaxel " << snakeconn.verts(ii)->index
+					<< " is connected to snaxel " << snaxs(testSub[jj])->index << " list: " << endl; 
+					snakeconn.verts(ii)->disp();
+					snakeconn.verts(testSub[jj])->disp();
+					errCount++;
+				}
+			}
+		}
+	}
+	if (errCount>0){
+		cerr << "Test Connectivity snax (same edge connectivity) Errors :" << errCount << endl;
+	}
+	errTot+=errCount;
+	errCount=0;
+	ni=int(snaxs.size());
+	for (ii=0; ii<ni;++ii){
+		if (snakeconn.verts(ii)->edgeind.size()
+				!=snakemesh->edges.isearch(
+					snaxs(ii)->edgeind
+					)->surfind.size()){
+			cerr << endl << " Test snax number of edges error :" << errCount << " snaxel-vertex " << snakeconn.verts(ii)->index
+					<< " is connected to snaxel " << snaxs(ii)->edgeind << " list: " << endl; 
+					snakeconn.verts(ii)->disp();
+					snakemesh->edges.isearch(snaxs(ii)->edgeind)->disp();
+					errCount++;
+		}
+	}
+	if (errCount>0){
+		cerr << "Test Connectivity snax (edges in surfs) Errors :" << errCount << endl;
+	}
+	errTot+=errCount;
+
+
+	errCount=0;
+	errTot=0;
+	ni=int(snaxedges.size());
+	for (ii=0; ii<ni;++ii){
+		if (snaxedges.countparent(snaxedges(ii)->KeyParent())>1){
+			snaxedges.findsiblings(snaxedges(ii)->KeyParent(), testSub);
+			for(jj=0; jj< int(testSub.size());++jj){
+				isErr=false;
+				if(snaxedges(ii)->index!=snaxedges(testSub[jj])->index){
+					for(kk=0; kk< int(snakeconn.edges(ii)->vertind.size());kk++){
+						if((snakeconn.edges(ii)->vertind[kk]
+								==snakeconn.edges(testSub[jj])->vertind[0])
+							|| 
+							(snakeconn.edges(ii)->vertind[kk]
+								==snakeconn.edges(testSub[jj])->vertind[1])){
+							isErr=true;
+							break;
+						}
+					}
+				}
+				if (isErr){
+					cerr << endl << " Test SnakeEdges Connectivity Error :" << errCount << " snaxedge " << snakeconn.edges(ii)->index
+					<< " is connected to snaxedge " << snaxedges(testSub[jj])->index << " list: " << endl; 
+					snakeconn.edges(ii)->disp();
+					snakeconn.edges(testSub[jj])->disp();
+					errCount++;
+				}
+			}
+		}
+	}
+	if (errCount>0){
+		cerr << "Test Connectivity snaxedge (same surf connectivity) Errors :" << errCount << endl;
+	}
+	errTot+=errCount;
+
+
+	errCount=0;
+	errTot=0;
+	ni=int(snaxsurfs.size());
+	for (ii=0; ii<ni;++ii){
+		if (snaxsurfs.countparent(snaxsurfs(ii)->KeyParent())>1){
+			snaxsurfs.findsiblings(snaxsurfs(ii)->KeyParent(), testSub);
+			for(jj=0; jj< int(testSub.size());++jj){
+				isErr=false;
+				if(snaxsurfs(ii)->index!=snaxsurfs(testSub[jj])->index){
+					for(kk=0; kk< int(snakeconn.surfs(ii)->edgeind.size());kk++){
+						for(ll=0; ll<int(snakeconn.surfs(testSub[jj])->edgeind.size());++ll){
+							if(snakeconn.surfs(testSub[jj])->edgeind[ll]==snakeconn.surfs(ii)->edgeind[kk]){
+								isErr=true;
+								break;
+							}
+						}
+						if(isErr){
+							break;
+						}
+					}
+				}
+				if (isErr){
+					cerr << endl << " Test SnakeSurf Connectivity Error :" << errCount << " snaxsurf " << snakeconn.surfs(ii)->index
+					<< " is connected to snaxsurf " << snaxsurfs(testSub[jj])->index << " list: " << endl; 
+					snakeconn.surfs(ii)->disp();
+					snakeconn.surfs(testSub[jj])->disp();
+					errCount++;
+				}
+			}
+		}
+	}
+	if (errCount>0){
+		cerr << "Test Connectivity snaxsurf (same volu connectivity) Errors :" << errCount << endl;
+	}
+	errTot+=errCount;
+
+	if (errTot>0){
+		cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+	}
+
+}
 
 // Snake Movement
 void snake::UpdateDistance(double dt){
@@ -877,7 +1025,7 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 
 			 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
 			ii=0;
-			while(snaxStatus[ii] && ii<nSnaxs){
+			while(ii<nSnaxs && snaxStatus[ii]){
 				ii++;
 			}
 			if (snaxStatus[ii]){

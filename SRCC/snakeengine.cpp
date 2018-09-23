@@ -435,15 +435,18 @@ void CleanupSnakeConnec(snake &snakein){
 	vector<int> tempSub,isImpact;
 	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
 		nEdgeSameSurfConn,nAbove3,nAboveN;
-	bool flag, iterFlag;
+	bool flag, iterFlag, contFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
+	contFlag=true;
 	//indRmvEdge.reserve(snakein.snakeconn.edges.size());
 	//indRmvSurf.reserve(snakein.snakeconn.surfs.size());
 	auto itVert=indRmvVert.begin();
 	auto itEdge=indRmvEdge.begin();
 	auto itSurf=indRmvSurf.begin();
 	auto itVolu=indRmvVolu.begin();
+
+	snakein.HashParent();
 
 	while(iterFlag){
 		indRmvVert.clear();
@@ -528,7 +531,7 @@ void CleanupSnakeConnec(snake &snakein){
 		IdentifyMergEdgeConnec(snakein, connecEdit);
 		nEdgeConn=int(connecEdit.size());
 		iterFlag=int(nEdgeConn)>0;
-		if(iterFlag){	
+		if(contFlag || iterFlag){
 
 			for(ii=nEdgeSameSurfConn; ii < nEdgeConn;++ii){
 				for(jj=0; jj < int(connecEdit[ii].rmvind.size());++jj){
@@ -713,11 +716,20 @@ void CleanupSnakeConnec(snake &snakein){
 				snakein.snakeconn.TestConnectivityBiDir();
 			}
 			#endif
-			//tecout.PrintMesh(snakein.snakeconn,2,ttt);
-			//tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
-			//ttt++;
+			// tecout.PrintMesh(snakein.snakeconn,2,ttt);
+			// tecout.PrintMesh(snakein.snakeconn,3,ttt,3);
+			// ttt++;
 
-		} else {
+			// Change iteration termination condition
+			iterFlag=int(connecEdit.size())>0;
+			if(!iterFlag) {
+				contFlag=false;
+				iterFlag=true;
+			} else {
+				contFlag=true;
+			}
+		} 
+		else { // Only executes at the end
 			snakein.HashArrayNM();
 			snakein.ForceCloseContainers();
 			#ifdef SAFE_ALGO
@@ -725,6 +737,7 @@ void CleanupSnakeConnec(snake &snakein){
 				snakein.snakeconn.TestConnectivityBiDir();
 			}
 			#endif
+			snakein.CheckConnectivity();
 			snakein.snakeconn.OrderEdges();
 		}
 	}

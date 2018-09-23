@@ -77,7 +77,7 @@ void SQPcalc::CalculateMesh(mesh &meshin){
 
 	int ii,ni, jj, nj;
 	int nDv, nConstr;
-	vector<int> vecin;
+	//vector<int> vecin;
 	triangulation triRSVS(meshin);
 	// prepare the SQP object
 	
