@@ -317,7 +317,7 @@ void mesh::SetMeshDepElm(){
 }
 
 void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
-	vector<pair<int,int>> &parentcases) const {
+	vector<pair<int,int>> &parentcases, vector<double> &voluVals) const {
 
 	int ii, ni, jj, nj, nElm, nParCases;
 	pair<int,int> tempPair;
@@ -333,6 +333,7 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 
 	currind.reserve(nElm*meshtree.nParents);
 	parentpos.reserve(nElm*meshtree.nParents);
+	voluVals.reserve(nElm*meshtree.nParents);
 	parentcases.reserve(this->CountVoluParent());
 
 	for (ii=0; ii< ni; ++ii){
@@ -342,11 +343,14 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		for (jj = 0; jj < nj; ++jj){
 			tempPair.second=meshtree.parentmesh[ii]->volus(jj)->index;
 			parentcases.push_back(tempPair);
+			voluVals.push_back(meshtree.parentmesh[ii]->volus(jj)->volume
+				* meshtree.parentmesh[ii]->volus(jj)->target);
 		}
 		for (jj = 0; jj < nElm; ++jj){
 			currind.push_back(meshtree.elemind[jj]);
 			parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
 				meshtree.parentconn[ii][jj])+nParCases);
+			
 		}
 		nParCases+=nj;
 	}
@@ -1827,8 +1831,9 @@ void surf::OrderEdges(mesh *meshin)
 				cerr << ii << " vert " << vertCurr << "  ";
 				DisplayVector(edge2Vert);
 				DisplayVector(edgeind);
-
+				meshin->verts.isearch(vertCurr)->disp();
 				cout << it->second << " " << 1/2 << 2/3 <<  endl;
+				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
 				cout<< "throw range_error (" <<"unordered_multimap went beyond its range in OrderEdges" <<")";
 			}
 			if (vert2Edge.count(vertCurr)==1){
@@ -1837,6 +1842,7 @@ void surf::OrderEdges(mesh *meshin)
 				DisplayVector(edgeind);
 				cerr <<endl;
 
+				meshin->verts.isearch(vertCurr)->disp();
 				cerr << "Error : Surface does not form closed loop" << endl;
 				cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
 				jj=vert2Edge.count(vertCurr);

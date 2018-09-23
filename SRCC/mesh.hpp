@@ -449,7 +449,7 @@ public:
 		bool outerVolume=true) const;
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
-		vector<pair<int,int>> &parentcases) const;
+		vector<pair<int,int>> &parentcases, vector<double> &voluVals) const;
 	void MapVolu2Parent(const vector<double> &fillIn,
 		const vector<pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
 	void MapVolu2Self(const vector<double> &fillIn, 

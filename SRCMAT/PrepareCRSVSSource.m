@@ -93,7 +93,7 @@ function [str]=ChangeMinus1toNum(str)
     
     for ii=1:numel(a)
        c{ii}=['[',int2str(str2double(c{ii}(2:end-3))-1),']'];
-       str(a(ii):b(ii))=[c{ii},blank(b(ii)-a(ii)-numel(c{ii}))];
+       str(a(ii):b(ii))=[c{ii},blanks(1+b(ii)-a(ii)-numel(c{ii}))];
     end
     
 end
@@ -216,12 +216,12 @@ function [ccodeGen]=Code_Area()
     p0=sym('p0_%d__',[3,1]);assume(p0,'real');
     p1=sym('p1_%d__',[3,1]);assume(p1,'real');
     p2=sym('p2_%d__',[3,1]);assume(p2,'real');
-    
+    eps=sym('eps'); assume(eps,'real'); assume(eps>0);
     ccodeGen=CCodeGenStruct('const vector<double>&','p0','p1','p2');
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='Area';
     
-    area=symfun(sqrt(transpose(cross((p2-p0),(p1-p0)))*cross((p2-p0),(p1-p0)))/2,[p0;p1;p2]);
+    area=symfun(sqrt(transpose(cross((p2-p0),(p1-p0)))*cross((p2-p0),(p1-p0))+eps)/2,[p0;p1;p2]);
     areaJac=jacobian(area);
     areaHes=hessian(area);
     

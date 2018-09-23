@@ -30,8 +30,9 @@ protected:
 public :
 	MatrixXd dConstr,HConstr, HObj, HLag;
 	RowVectorXd dObj;
-	VectorXd constr, lagMult, deltaDV;
+	VectorXd constr, lagMult, deltaDV, constrTarg;
 	double obj=0.0;
+	double limLag = 100000.0;
 
 	vector<bool> isConstrAct, isDvAct;
 	vector<int> subConstrAct, subDvAct;
@@ -56,9 +57,9 @@ public :
 		MatrixXd &HObjAct,
 		RowVectorXd &dObjAct,
 		VectorXd &constrAct,
-		VectorXd &lagMultAct,
-		VectorXd &deltaDVAct
+		VectorXd &lagMultAct
 		);
+	void ReturnVelocities(triangulation &triRSVS);
 
 };
 

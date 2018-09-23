@@ -675,7 +675,14 @@ void CleanupSnakeConnec(snake &snakein){
 				// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){
 				// 	snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
 				// }
-				if(snakein.snakemesh->edges.isearch(snakein.snaxs.isearch(indRmvVert[ii])->edgeind)->surfind.size()==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
+				if(snakein.snakemesh->edges.isearch(
+					snakein.snaxs.isearch(
+						indRmvVert[ii])->edgeind
+						)->surfind.size()
+					==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
+					if(nAboveN==0){
+						cout << endl << "displaying vertices about to be removed by nAboveN cond:" << endl;
+					}
 					snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
 					indRmvVert.erase(indRmvVert.begin()+ii);
 					ii--;

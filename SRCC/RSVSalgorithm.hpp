@@ -25,5 +25,6 @@ void SpawnRSVS(snake &snakein, int outerBorder=1);
 void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder);
 
 int Test_RSVSalgo_init();
+int Test_RSVSalgo();
 
 #endif

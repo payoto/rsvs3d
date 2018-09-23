@@ -1,6 +1,7 @@
 
 #include <cstdlib>
 #include <iostream> 
+#include <cmath> 
 #include "snake.hpp"
 #include "snakevel.hpp"
 #include "vectorarray.hpp"
@@ -58,6 +59,19 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	
 }
 
+void SQPcalc::ReturnVelocities(triangulation &triRSVS){
+
+	int ii, ni;
+
+	ni=triRSVS.snakeDep->snaxs.size();
+	for(ii=0; ii<ni; ii++){
+		triRSVS.snakeDep->snaxs[ii].v = 
+			deltaDV[dvMap.find(triRSVS.snakeDep->snaxs(ii)->index)];
+	}
+	triRSVS.snakeDep->snaxs.PrepareForUse();
+
+
+}
 
 void SQPcalc::CalculateMesh(mesh &meshin){
 
@@ -107,7 +121,7 @@ void SQPcalc::Print2Screen(int outType)const {
 		cout << constr[i] << " ";
 	}
 	cout << endl;
-	if(nConstr<10 && nDv < 20 && outType==1){
+	if((nConstr<10 && nDv < 20 && outType==1) || outType==3){
 		cout << "constr :" <<  endl ;	
 		PrintMatrix(constr);
 		cout << "dObj :" <<  endl ;	
@@ -121,8 +135,12 @@ void SQPcalc::Print2Screen(int outType)const {
 		PrintMatrix(HConstr);
 		cout << "HObj :" <<  endl ;	
 		PrintMatrix(HObj);
+		cout << "constrTarg :" <<  endl ;	
+		PrintMatrix(constrTarg);
 	}
 	if (outType==2){
+		cout << "constrTarg :" <<  endl ;	
+		PrintMatrix(constrTarg);
 		cout << endl;
 		for(int i=0; i<nDv; ++i){
 			cout << deltaDV[i] << " ";
@@ -169,13 +187,15 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	nDv=nDvIn;
 	nConstr=nConstrIn;
 	isConstrAct.assign(nConstr,false);
-	isDvAct.assign(nConstr,false);
+	isDvAct.assign(nDv,false);
 	dConstr.setZero(nConstr,nDv);
 	HConstr.setZero(nDv,nDv); 
 	HObj.setZero(nDv,nDv);  
 	dObj.setZero(nDv);
 	constr.setZero(nConstr);
 	lagMult.setZero(nConstr);
+	deltaDV.setZero(nDv);
+	// constrTarg.setZero(nConstr);
 }
 
 
@@ -185,9 +205,15 @@ void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
 	// for each parent
 	// for each snakemesh.volu
 	// Assign to constrMap.targ = the position in parent.volu of the parentconn
-	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList);
+	vector<double> voluVals;
+	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList,voluVals);
 
 	constrMap.GenerateHash();
+	constrTarg.setZero(voluVals.size());
+	for (int i = 0; i < int(voluVals.size()); ++i)
+	{
+		constrTarg[i] = voluVals[i];
+	}
 }
 void SQPcalc::BuildConstrMap(const mesh &meshin){
 	int ni, ii;
@@ -305,12 +331,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	HConstrPart.setZero(nDvAct,nDvAct);
 	HObjPart.setZero(nDvAct,nDvAct);
 
-	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
-	ArrayVec2MatrixXd(*HValpnt, HVal);
-	ArrayVec2MatrixXd(*dValpnt, dVal);
-	Deriv1stChainScalar(dVal, dPos,dConstrPart);
-	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
-	constrPart=*retVal;
 
 	AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
 	ArrayVec2MatrixXd(*HValpnt, HVal);
@@ -328,13 +348,19 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// cout <<  endl << "done" <<endl; 
 	for(ii=0; ii< nDvAct; ++ii){
 		dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-		isDvAct[dvMap.find(dvListMap.vec[ii])] = true;
+		isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
 		for(jj=0; jj< nDvAct; ++jj){
 			HObj(dvMap.find(dvListMap.vec[jj]),
 				 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
 		}
 	}
 
+	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+	ArrayVec2MatrixXd(*HValpnt, HVal);
+	ArrayVec2MatrixXd(*dValpnt, dVal);
+	Deriv1stChainScalar(dVal, dPos,dConstrPart);
+	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	constrPart=*retVal;
 	// Assign Constraint
 	// and constraint derivative
 	// and Hessian		
@@ -344,7 +370,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		nj=subTempVec.size();
 		for(jj=0; jj< nj; ++jj){
 			if (subTempVec[jj]!=-1){
-				isConstrAct[subTempVec[jj]] = true;
+				isConstrAct.at(subTempVec[jj]) = true;
 				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 				for(kk=0; kk< nDvAct; ++kk){
 					dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
@@ -370,8 +396,7 @@ void SQPcalc::PrepareMatricesForSQP(
 	MatrixXd &HObjAct,
 	RowVectorXd &dObjAct,
 	VectorXd &constrAct,
-	VectorXd &lagMultAct,
-	VectorXd &deltaDVAct
+	VectorXd &lagMultAct
 	){
 
 	
@@ -381,8 +406,8 @@ void SQPcalc::PrepareMatricesForSQP(
 	subDvAct.reserve(nDv);
 	nDvAct=0;
 	for(ii=0; ii<nDv; ++ii){
-		nDvAct += int(isDvAct[ii]);
-		if(isDvAct[ii]){
+		nDvAct += int(isDvAct.at(ii));
+		if(isDvAct.at(ii)){
 			subDvAct.push_back(ii);
 		}
 	}
@@ -390,8 +415,8 @@ void SQPcalc::PrepareMatricesForSQP(
 	subConstrAct.reserve(nConstr);
 	nConstrAct=0;
 	for(ii=0; ii<nConstr; ++ii){
-		nConstrAct += int(isConstrAct[ii]);
-		if(isConstrAct[ii]){
+		nConstrAct += int(isConstrAct.at(ii));
+		if(isConstrAct.at(ii)){
 			subConstrAct.push_back(ii);
 		}
 	}
@@ -421,11 +446,13 @@ void SQPcalc::PrepareMatricesForSQP(
 	}
 	constrAct.setZero(nConstrAct);
 	for(jj=0; jj<nConstrAct;++jj){
-		constrAct[jj]=constr[subDvAct[jj]];
+		constrAct[jj]=constr[subDvAct[jj]] -constrTarg[subDvAct[jj]];
 	}
 	lagMultAct.setZero(nConstrAct);
-	
-	HLag = HObj;
+
+	// DisplayVector(isDvAct);
+	// DisplayVector(isConstrAct);
+	HLag = HObjAct;
 }
 
 void SQPcalc::ComputeSQPstep(){
@@ -434,33 +461,73 @@ void SQPcalc::ComputeSQPstep(){
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
 	MatrixXd temp1, temp2;
+	bool isNan, isLarge;
 	int ii, ni;
 	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
-		constrAct,lagMultAct,deltaDVAct
+		constrAct,lagMultAct
 		);
-	LLT<MatrixXd> HLagSystem(HLag);
+	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	// HouseholderQR<MatrixXd> HLagSystem(HLag);
+	// LLT<MatrixXd> HLagSystem(HLag);
 
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
 	temp2 = HLagSystem.solve(dObjAct.transpose());
 
 	lagMultAct = (
 			dConstrAct*(temp1)
-		).llt().solve(
-			constr - (dConstrAct*(temp2))
+		).colPivHouseholderQr().solve(
+		// ).householderQr().solve(
+		// ).llt().solve(
+			constrAct - (dConstrAct*(temp2))
 		);
 
+	isNan = false;
+	isLarge = false;
+	ni = lagMultAct.size();
+	for (ii=0; ii<ni; ++ii){
+		if(lagMultAct[ii]<-limLag){
+			lagMultAct[ii]=-limLag;
+			isLarge=true;
+		}else if(lagMultAct[ii]>limLag){
+			lagMultAct[ii]=limLag;
+			isLarge=true;
+		} else if(isnan(lagMultAct[ii])){
+			//lagMultAct[ii]=0.0;
+			isNan=true;
+		}
+	}
+	if (isNan){
 
-	deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() + dConstrAct.transpose()*lagMultAct));
+		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	}else if(isLarge){
+
+		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	// }else if(true) {
+	// 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+
+	} else {
+
+		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+						+ dConstrAct.transpose()*lagMultAct));
+
+	}
+
 
 	ni = subDvAct.size();
 	for (ii=0; ii<ni; ++ii){
 		deltaDV[subDvAct[ii]]=deltaDVAct[ii];
 		
 	}
+	
 	ni = subConstrAct.size();
 	for (ii=0; ii<ni; ++ii){
 		lagMult[subConstrAct[ii]]=lagMultAct[ii];
-		
+		isNan = isNan || isnan(lagMultAct[ii]);
+	}
+	if (isNan){
+		Print2Screen(3);
+		DisplayVector(isConstrAct);
+		DisplayVector(isDvAct);
 	}
 
 }
