@@ -1828,7 +1828,7 @@ void surf::OrderEdges(mesh *meshin)
 			range=vert2Edge.equal_range(vertCurr);
 		 	#ifdef SAFE_ACCESS
 			if (range.first==vert2Edge.end()){
-				disptree((*meshin),1);
+				disptree((*meshin),0);
 
 				cerr << ii << " vert " << vertCurr << "  ";
 				DisplayVector(edge2Vert);
@@ -1840,7 +1840,7 @@ void surf::OrderEdges(mesh *meshin)
 			}
 			if (vert2Edge.count(vertCurr)==1){
 				cerr << "ERROR : Surface does not form closed loop" << endl;
-				disptree((*meshin),1);
+				disptree((*meshin),0);
 
 				jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
 				DisplayVector(edge2Vert);

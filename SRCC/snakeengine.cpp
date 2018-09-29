@@ -1300,14 +1300,14 @@ Edge can be removed if it is connected to one surface or one vertex.
 	ni = snakein.snakeconn.edges.size();
 	for (ii = 0; ii < ni; ++ii){
 		if (snakein.snakeconn.edges(ii)->surfind.size()>2){
-			snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
-			cerr << endl << "Edge is connected to too many surfaces" << endl; 
+			// snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
+			// cerr << endl << "Edge is connected to too many surfaces" << endl; 
 				ne++;
 		}
 	}
 	if(ne>0){
-		cerr << "There were " << ne << " Edge deletion errors:" ;
-		cerr << endl << __PRETTY_FUNCTION__;
+		cerr << endl << "There were " << ne << " Edge deletion errors:" ;
+		cerr << endl << __PRETTY_FUNCTION__ << endl;
 	}
 
 }
