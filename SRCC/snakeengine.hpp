@@ -82,5 +82,10 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, cons
 void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit);
 void SnaxNoConnecDetection(const mesh &snakeconn, vector<ConnecRemv> &connecEdit);
 void dispconnrmv(vector<ConnecRemv> conn);
+
+void CheckSnakeRemovalsVert(const snake &snakein, const vector<int> &indRmvVert);
+void CheckSnakeRemovalsEdge(const snake &snakein, const vector<int> &indRmvEdge);
+void CheckSnakeRemovalsSurf(const snake &snakein, const vector<int> &indRmvSurf);
+void CheckSnakeRemovalsVolu(const snake &snakein, const vector<int> &indRmvVolu);
 // Test Function prototypes
 #endif //SNAKSTRUCT_H_INCLUDED

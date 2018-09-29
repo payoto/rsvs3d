@@ -58,8 +58,8 @@ double coordvec::Unit(const int a) const
 	#endif // SAFE_ACCESS
 	if (isuptodate==0){
 		cerr << "Warning: NORM of coordvec potentially obsolete " << endl;
-		cerr << "          in coordvec::Unit(const int a) const" << endl; 
-		cerr << "          To avoid this message perform read operations on coordvec using the () operator" << endl; 
+		cerr << "		  in coordvec::Unit(const int a) const" << endl; 
+		cerr << "		  To avoid this message perform read operations on coordvec using the () operator" << endl; 
 	}
 	return(elems[a]/norm);
 }
@@ -110,7 +110,7 @@ void coordvec::min(const vector<double> &vecin){
 		elems[ii]=elems[ii]<=vecin[ii] ? elems[ii] : vecin[ii];
 	}
 }
- 
+
 void coordvec::add(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
@@ -119,28 +119,28 @@ void coordvec::add(const vector<double> &vecin){
 	}
 }
 void coordvec::substract(const vector<double> &vecin){
-int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
+	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]-vecin[ii];
 	}
 }
 void coordvec::substractfrom(const vector<double> &vecin){
-int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
+	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=vecin[ii]-elems[ii];
 	}
 }
 void coordvec::div(const vector<double> &vecin){
-int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
+	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]/vecin[ii];
 	}
 }
 void coordvec::mult(const vector<double> &vecin){
-int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
+	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]*vecin[ii];
@@ -148,14 +148,14 @@ int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
 } 
 
 void coordvec::div(double scalin){
-int n=int(elems.size());
+	int n=int(elems.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]/scalin;
 	}
 }
 void coordvec::mult(double scalin){
-int n=int(elems.size());
+	int n=int(elems.size());
 	for (int ii = 0; ii < n; ++ii)
 	{
 		elems[ii]=elems[ii]*scalin;
@@ -169,7 +169,7 @@ vector<double> coordvec::cross(const std::vector<double> &vecin){
 
 	for(int ii=3; ii<6; ii++){
 		retVec[ii%3]=elems[(ii+1)%3]*vecin[(ii+2)%3]
-			-elems[(ii-1)%3]*vecin[(ii-2)%3];
+		-elems[(ii-1)%3]*vecin[(ii-2)%3];
 	}
 	return(retVec);
 }
@@ -241,7 +241,7 @@ void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
 
 	temp=parentind;
 	temp.GenerateHash(); 
-	 
+
 	parentmesh.push_back(meshin);
 	parentconn.push_back(temp);
 	nParents=parentmesh.size();
@@ -367,11 +367,11 @@ void mesh::MapVolu2Parent(const vector<double> &fillIn, const vector<pair<int,in
 	for(ii=0; ii< ni; ii++){
 		sub2=this->meshtree.parentmesh[parentcases[ii].first]->volus.isHash;
 		sub=this->meshtree.parentmesh[parentcases[ii].first]
-			->volus.find(parentcases[ii].second);
+		->volus.find(parentcases[ii].second);
 		// cout << "(" << this->meshtree.parentmesh[parentcases[ii].first]
 		// 	->volus[sub].fill << " , ";
 		this->meshtree.parentmesh[parentcases[ii].first]
-			->volus[sub].*mp=fillIn[ii];
+		->volus[sub].*mp=fillIn[ii];
 
 		// cout  << this->meshtree.parentmesh[parentcases[ii].first]
 		// 	->volus[sub].fill << ") ";
@@ -396,8 +396,8 @@ void mesh::MapVolu2Self(const vector<double> &fillIn, const vector<int> &elms,
 
 void mesh::MaintainLineage(){
 	// Method not implemented yet, features:
-	//    - recognise the modifications needed depending on child and parent dimensionality 
-	//    - Modify the parentconn vec 
+	//	- recognise the modifications needed depending on child and parent dimensionality 
+	//	- Modify the parentconn vec 
 
 }
 int mesh::CountParents() const {
@@ -405,8 +405,8 @@ int mesh::CountParents() const {
 }
 int mesh::SurfInParent(int surfind) const{
 	int kk1,kk2;
- 	int jj=-1;
- 	int ii = surfs.find(surfind);
+	int jj=-1;
+	int ii = surfs.find(surfind);
 	bool isParentSurf=false;
 	if(ii>=0){
 		kk1=volus.find(surfs(ii)->voluind[0]);
@@ -524,7 +524,7 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 			while(!isOnBound && jj< meshtree.nParents){
 
 				isOnBound = (vals0[jj]!=vals1[jj]) 
-					&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
+				&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
 				++jj;
 			}
 			
@@ -865,139 +865,139 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 		newSub=verts.find(newInd);
 		oldSub=verts.find(oldInd);
 		subList=edges.find_list(verts[oldSub].edgeind);
-      for (ii=0;ii<int(subList.size());++ii){ // update vertind
-      	jj=edges(subList[ii])->vertind[1]==oldInd;
-      	edges[subList[ii]].vertind[jj]=newInd;
-         verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
-         //cout << " " << edges[subList[ii]].index <<  " ";
-         for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
-         	if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
-         		verts[oldSub].edgeind.erase(
-         			verts[oldSub].edgeind.begin()+jj);
-         		jj--;
-         	}
-         }
-     }
-     if(meshDepIsSet && meshDim==0){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
-     	meshtree.elemind[oldSub]=newInd;
-     }
-      // Hashing has not been invalidated
-     edges.isHash=1;
-     verts.isHash=1;
+	  for (ii=0;ii<int(subList.size());++ii){ // update vertind
+	  	jj=edges(subList[ii])->vertind[1]==oldInd;
+	  	edges[subList[ii]].vertind[jj]=newInd;
+		 verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
+		 //cout << " " << edges[subList[ii]].index <<  " ";
+		 for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
+		 	if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
+		 		verts[oldSub].edgeind.erase(
+		 			verts[oldSub].edgeind.begin()+jj);
+		 		jj--;
+		 	}
+		 }
+		}
+		if(meshDepIsSet && meshDim==0){
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
+			meshtree.elemind[oldSub]=newInd;
+		}
+	  // Hashing has not been invalidated
+		edges.isHash=1;
+		verts.isHash=1;
 
- } else if (typeInd==2){
- 	newSub=edges.find(newInd);
- 	oldSub=edges.find(oldInd);
- 	subList=verts.find_list(edges(edges.find(oldInd))->vertind);
- 	for (ii=0;ii<int(subList.size());++ii){
- 		for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
- 			if(verts(subList[ii])->edgeind[jj]==oldInd){
-               //cout << " " << verts(subList[ii])->index << " " << endl;DisplayVector(verts[subList[ii]].edgeind);cout << endl;
- 				verts[subList[ii]].edgeind[jj]=newInd;
-               //DisplayVector(verts[subList[ii]].edgeind);cout << endl;
+	} else if (typeInd==2){
+		newSub=edges.find(newInd);
+		oldSub=edges.find(oldInd);
+		subList=verts.find_list(edges(edges.find(oldInd))->vertind);
+		for (ii=0;ii<int(subList.size());++ii){
+			for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
+				if(verts(subList[ii])->edgeind[jj]==oldInd){
+			   //cout << " " << verts(subList[ii])->index << " " << endl;DisplayVector(verts[subList[ii]].edgeind);cout << endl;
+					verts[subList[ii]].edgeind[jj]=newInd;
+			   //DisplayVector(verts[subList[ii]].edgeind);cout << endl;
 
- 			}
- 		}  
- 	}
-      // Changes the indices of 
- 	subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
- 	for (ii=0;ii<int(subList.size());++ii){
- 		if(subList[ii]!=-1 || is3DMesh){
- 			for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
- 				if(surfs(subList[ii])->edgeind[jj]==oldInd){
- 					surfs[subList[ii]].edgeind[jj]=newInd;
- 					edges[newSub].surfind.push_back(surfs[subList[ii]].index);
- 					surfs[subList[ii]].isordered=false;
- 				}
- 			}
- 		}  
- 	}
+				}
+			}  
+		}
+	  // Changes the indices of 
+		subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
+		for (ii=0;ii<int(subList.size());++ii){
+			if(subList[ii]!=-1 || is3DMesh){
+				for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
+					if(surfs(subList[ii])->edgeind[jj]==oldInd){
+						surfs[subList[ii]].edgeind[jj]=newInd;
+						edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+						surfs[subList[ii]].isordered=false;
+					}
+				}
+			}  
+		}
 
- 	if(meshDepIsSet && meshDim==1){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
- 		meshtree.elemind[oldSub]=newInd;
- 	}
+		if(meshDepIsSet && meshDim==1){
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
+			meshtree.elemind[oldSub]=newInd;
+		}
 
- 	edges.isHash=1;
- 	verts.isHash=1;
- 	surfs.isHash=1;
- 	edges.isSetMI=1;
- 	verts.isSetMI=1;
- 	surfs.isSetMI=1;
+		edges.isHash=1;
+		verts.isHash=1;
+		surfs.isHash=1;
+		edges.isSetMI=1;
+		verts.isSetMI=1;
+		surfs.isSetMI=1;
 
 
- } else if (typeInd==3){
- 	newSub=surfs.find(newInd);
- 	oldSub=surfs.find(oldInd);
- 	subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
- 	for (ii=0;ii<int(subList.size());++ii){
- 		for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
- 			if(edges(subList[ii])->surfind[jj]==oldInd){
- 				edges[subList[ii]].surfind[jj]=newInd;
- 				surfs[newSub].edgeind.push_back(edges[subList[ii]].index);
- 			}
- 		}  
- 	}
- 	surfs.isHash=1;
+	} else if (typeInd==3){
+		newSub=surfs.find(newInd);
+		oldSub=surfs.find(oldInd);
+		subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
+		for (ii=0;ii<int(subList.size());++ii){
+			for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+				if(edges(subList[ii])->surfind[jj]==oldInd){
+					edges[subList[ii]].surfind[jj]=newInd;
+					surfs[newSub].edgeind.push_back(edges[subList[ii]].index);
+				}
+			}  
+		}
+		surfs.isHash=1;
 
- 	subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
- 	for (ii=0;ii<int(subList.size());++ii){
- 		if(subList[ii]!=-1){
- 			for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
- 				if(volus(subList[ii])->surfind[jj]==oldInd){
- 					volus[subList[ii]].surfind[jj]=newInd;
- 					surfs[newSub].voluind.push_back(volus[subList[ii]].index);
- 				}
- 			}
- 		}  
- 	}
+		subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
+		for (ii=0;ii<int(subList.size());++ii){
+			if(subList[ii]!=-1){
+				for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
+					if(volus(subList[ii])->surfind[jj]==oldInd){
+						volus[subList[ii]].surfind[jj]=newInd;
+						surfs[newSub].voluind.push_back(volus[subList[ii]].index);
+					}
+				}
+			}  
+		}
 
- 	if(meshDepIsSet && meshDim==2){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
- 		meshtree.elemind[oldSub]=newInd;
- 	}
+		if(meshDepIsSet && meshDim==2){
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
+			meshtree.elemind[oldSub]=newInd;
+		}
 
- 	surfs[newSub].isordered=false;
- 	surfs.isHash=1;
- 	edges.isHash=1;
- 	volus.isHash=1;
- 	surfs.isSetMI=1;
- 	edges.isSetMI=1;
- 	volus.isSetMI=1;
+		surfs[newSub].isordered=false;
+		surfs.isHash=1;
+		edges.isHash=1;
+		volus.isHash=1;
+		surfs.isSetMI=1;
+		edges.isSetMI=1;
+		volus.isSetMI=1;
 
- } else if (typeInd==4){
- 	newSub=volus.find(newInd);
- 	oldSub=volus.find(oldInd);
- 	subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
-      for (ii=0;ii<int(subList.size());++ii){ // update vertind
-         //jj=surfs(subList[ii])->voluind[1]==oldInd;
-         //surfs[subList[ii]].voluind[jj]=newInd;
-      	for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
-      		if(surfs[subList[ii]].voluind[jj]==oldInd){
-      			surfs[subList[ii]].voluind[jj]=newInd; 
-                  volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
-              }
-          }
+	} else if (typeInd==4){
+		newSub=volus.find(newInd);
+		oldSub=volus.find(oldInd);
+		subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
+	  for (ii=0;ii<int(subList.size());++ii){ // update vertind
+		 //jj=surfs(subList[ii])->voluind[1]==oldInd;
+		 //surfs[subList[ii]].voluind[jj]=newInd;
+	  	for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
+	  		if(surfs[subList[ii]].voluind[jj]==oldInd){
+	  			surfs[subList[ii]].voluind[jj]=newInd; 
+				  volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
+				}
+			}
 
-      }
-      if(meshDepIsSet && meshDim==3){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
-      	meshtree.elemind[oldSub]=newInd;
-      }
-      // Hashing has not been invalidated
-      volus.isHash=1;
-      surfs.isHash=1;
-      volus.isSetMI=1;
-      surfs.isSetMI=1;
+		}
+		if(meshDepIsSet && meshDim==3){
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
+			meshtree.elemind[oldSub]=newInd;
+		}
+	  // Hashing has not been invalidated
+		volus.isHash=1;
+		surfs.isHash=1;
+		volus.isSetMI=1;
+		surfs.isSetMI=1;
    } else if (typeInd==5){ // Modify vertex index in scoped mode
 
    	newSub=verts.find(newInd);
@@ -1013,7 +1013,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    					edges[subList[ii]].vertind[jj]=newInd;
    					verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
 
-                  //cout << " " << edges[subList[ii]].index <<  " ";
+				  //cout << " " << edges[subList[ii]].index <<  " ";
    					for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
    						if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
    							verts[oldSub].edgeind.erase(
@@ -1026,9 +1026,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    		}  
    	}
    	if(meshDepIsSet && meshDim==0){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
    		meshtree.elemind[oldSub]=newInd;
    	}
    	edges.isHash=1;
@@ -1047,7 +1047,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    				edges[subList[ii]].surfind[jj]=newInd;
    				surfs[newSub].edgeind.push_back(edges[subList[ii]].index); 
 
-               //cout << " " << edges[subList[ii]].index <<  " ";
+			   //cout << " " << edges[subList[ii]].index <<  " ";
    				for (kk=0;kk<int(surfs(oldSub)->edgeind.size());++kk){
    					if(surfs(oldSub)->edgeind[kk]==edges[subList[ii]].index){
    						surfs[oldSub].edgeind.erase(
@@ -1064,9 +1064,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
    		}
    	}
    	if(meshDepIsSet && meshDim==3){
-      	// for (ii=0;ii<int(oldSub.size());++ii){
-      	// 	meshtree.elemind[oldSub[ii]]=newInd;
-      	// }
+	  	// for (ii=0;ii<int(oldSub.size());++ii){
+	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
+	  	// }
    		meshtree.elemind[oldSub]=newInd;
    	}
    	edges.isHash=1;
@@ -1753,19 +1753,19 @@ void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
    /*int ii;
    // Volumes
    for(ii=0;ii<volus.size();++ii){
-      volus[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	  volus[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Surfaces
    for(ii=0;ii<surfs.size();++ii){
-      surfs[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	  surfs[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Volumes
    for(ii=0;ii<edges.size();++ii){
-      edges[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	  edges[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }
    // Surfaces
    for(ii=0;ii<verts.size();++ii){
-      verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
+	  verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
    }*/
 	volus.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 	edges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
@@ -1800,6 +1800,111 @@ void mesh::PopulateIndices(){
 void surf::OrderEdges(mesh *meshin)
 {
 	unordered_multimap<int,int> vert2Edge;
+	vector<int> edge2Vert,edgeSub,edgeIndOrig;
+	vector<bool> isDone;
+	bool isTruncated;
+	int vertCurr,edgeCurr;
+	int ii,jj;
+	std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
+	unordered_multimap<int,int>::iterator it;
+	isTruncated=false;
+	if (edgeind.size()>0){
+		// edgeIndOrig2=edgeind;
+		sort(edgeind);
+		unique(edgeind);
+
+		edgeIndOrig=edgeind;
+		isDone.assign(edgeIndOrig.size(),false);
+		edgeSub=meshin->edges.find_list(edgeind);
+		edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);
+
+		HashVector(edge2Vert, vert2Edge);
+
+		vertCurr=edge2Vert[0];
+		edgeCurr=edgeind[0];
+		isDone[0]=true;
+		it=vert2Edge.end();
+		for(ii=1;ii<int(edgeind.size());++ii){
+			range=vert2Edge.equal_range(vertCurr);
+		 	#ifdef SAFE_ACCESS
+			if (range.first==vert2Edge.end()){
+				disptree((*meshin),1);
+
+				cerr << ii << " vert " << vertCurr << "  ";
+				DisplayVector(edge2Vert);
+				DisplayVector(edgeind);
+				meshin->verts.isearch(vertCurr)->disp();
+				cout << it->second << " " << 1/2 << 2/3 <<  endl;
+				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+				throw range_error ("unordered_multimap went beyond its range in OrderEdges");
+			}
+			if (vert2Edge.count(vertCurr)==1){
+				cerr << "ERROR : Surface does not form closed loop" << endl;
+				disptree((*meshin),1);
+
+				jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
+				DisplayVector(edge2Vert);
+				DisplayVector(edgeind);
+				cerr <<endl;
+
+				meshin->verts.isearch(vertCurr)->disp();
+				cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
+				jj=vert2Edge.count(vertCurr);
+				cerr << jj  <<  endl; 
+				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+				//throw range_error ("Found a single vertex - surface is not closed");
+				cerr << "Found a single vertex - surface is not closed" << endl;
+				return;
+			}
+		 	#endif // SAFe_ACCESS
+			jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
+
+			it=range.first;
+			if (jj){++it;}
+			if (!isDone[(it->second)/2]){
+				isDone[(it->second)/2]=true;
+				edgeCurr=edgeIndOrig[(it->second)/2];
+				jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
+				vertCurr=edge2Vert[((it->second)/2)*2+jj];
+				edgeind[ii]=edgeCurr;
+			} else {
+				cerr << endl;
+				// edgeind = edgeIndOrig;
+				edgeind.erase(edgeind.begin()+ii, edgeind.end());
+				// DisplayVector(edgeIndOrig);
+				disptree((*meshin),1);
+
+				// cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+
+				isTruncated=true;
+				break;
+			}
+		}
+		if (isTruncated){ 
+			// This adds a second surface if the surface closes early
+
+			surf newSurf=*this;
+			meshin->surfs.SetMaxIndex();
+			newSurf.index=meshin->surfs.GetMaxIndex()+1;
+			newSurf.voluind=voluind;
+			newSurf.edgeind.clear();
+			for (ii=0;ii<int(edgeIndOrig.size());++ii){
+				if(!isDone[ii]){
+					newSurf.edgeind.push_back(edgeIndOrig[ii]);
+				}
+			}
+			newSurf.OrderEdges(meshin);
+			meshin->surfs.push_back(newSurf);
+			meshin->SwitchIndex(6,index,newSurf.index,newSurf.edgeind);
+			meshin->surfs(meshin->surfs.size()-1)->disptree(*meshin,1);
+
+		}
+		isordered=true;
+	}
+}
+/*void surf::OrderEdges(mesh *meshin)
+{
+	unordered_multimap<int,int> vert2Edge;
 	vector<int> edge2Vert,edgeSub,edgeIndOrig,edgeIndOrig2,edgeFinalShrunk;
 	vector<bool> isDone;
 	bool isTruncated;
@@ -1826,7 +1931,7 @@ void surf::OrderEdges(mesh *meshin)
 		it=vert2Edge.end();
 		for(ii=1;ii<int(edgeind.size());++ii){
 			range=vert2Edge.equal_range(vertCurr);
-         #ifdef SAFE_ACCESS
+		 #ifdef SAFE_ACCESS
 			if (range.first==vert2Edge.end()){
 				cerr << ii << " vert " << vertCurr << "  ";
 				DisplayVector(edge2Vert);
@@ -1852,7 +1957,7 @@ void surf::OrderEdges(mesh *meshin)
 				cout << endl;
 				disp();
 			}
-         #endif // SAFe_ACCESS
+		 #endif // SAFe_ACCESS
 			jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
 
 			it=range.first;
@@ -1860,56 +1965,56 @@ void surf::OrderEdges(mesh *meshin)
 			if (!isDone[(it->second)/2]){
 				isDone[(it->second)/2]=true;
 				edgeCurr=edgeIndOrig[(it->second)/2];
-            jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
-            vertCurr=edge2Vert[((it->second)/2)*2+jj];
-            edgeind[ii]=edgeCurr;
-        } else {
-        	edgeind.erase(edgeind.begin()+ii);
-        	isTruncated=true;
-        	break;
-        }
-    }
-    if (isTruncated){
+			jj=edge2Vert[((it->second)/2)*2]==vertCurr; // Warnign ((x/2)*2) not necessarily equal x
+			vertCurr=edge2Vert[((it->second)/2)*2+jj];
+			edgeind[ii]=edgeCurr;
+		} else {
+			edgeind.erase(edgeind.begin()+ii);
+			isTruncated=true;
+			break;
+		}
+	}
+	if (isTruncated){
 
-    	surf newSurf=*this;
-    	newSurf.index=meshin->surfs.GetMaxIndex()+1;
-    	newSurf.voluind=voluind;
-    	newSurf.edgeind.clear();
-    	for (ii=0;ii<int(edgeIndOrig.size());++ii){
-    		if(!isDone[ii]){
-    			newSurf.edgeind.push_back(edgeIndOrig[ii]);
-    		}
-    	}
-    	meshin->surfs.push_back(newSurf);
-    	meshin->SwitchIndex(6,index,newSurf.index,newSurf.edgeind);
-    	meshin->surfs(meshin->surfs.size()-1)->disptree(*meshin,1);
-    }
-      #ifdef SAFE_ALGO
-    edgeFinalShrunk=edgeind;
-    sort(edgeFinalShrunk);
-    unique(edgeFinalShrunk);
-    if(edgeFinalShrunk.size()!=edgeIndOrig.size()){
-    	cout << endl;
-    	cout << "edgeind (pre)- ";
-    	DisplayVector(edgeIndOrig2);
-    	cout << endl;
-    	cout << "edgeind (sort)- ";
-    	DisplayVector(edgeIndOrig);
-    	cout << endl;
-    	cout << "edgeind (final)- ";
-    	DisplayVector(edgeind);
-    	cout << endl;
+		surf newSurf=*this;
+		newSurf.index=meshin->surfs.GetMaxIndex()+1;
+		newSurf.voluind=voluind;
+		newSurf.edgeind.clear();
+		for (ii=0;ii<int(edgeIndOrig.size());++ii){
+			if(!isDone[ii]){
+				newSurf.edgeind.push_back(edgeIndOrig[ii]);
+			}
+		}
+		meshin->surfs.push_back(newSurf);
+		meshin->SwitchIndex(6,index,newSurf.index,newSurf.edgeind);
+		meshin->surfs(meshin->surfs.size()-1)->disptree(*meshin,1);
+	}
+	  #ifdef SAFE_ALGO
+	edgeFinalShrunk=edgeind;
+	sort(edgeFinalShrunk);
+	unique(edgeFinalShrunk);
+	if(edgeFinalShrunk.size()!=edgeIndOrig.size()){
+		cout << endl;
+		cout << "edgeind (pre)- ";
+		DisplayVector(edgeIndOrig2);
+		cout << endl;
+		cout << "edgeind (sort)- ";
+		DisplayVector(edgeIndOrig);
+		cout << endl;
+		cout << "edgeind (final)- ";
+		DisplayVector(edgeind);
+		cout << endl;
 
-         //disptree((*meshin),2);
-    	cerr << "Warning: OrderEdges removed some edges from the surface list "<< endl;
-    	cerr << " The surface had incorrect connectivity, it was self crossing "<< endl;
-    	cerr << "   in function:" <<  __PRETTY_FUNCTION__ << endl;
-         //throw invalid_argument ("Incorrect surface connectivity");
-    }
-      #endif //SAFE_ALGO
-    isordered=true;
+		 //disptree((*meshin),2);
+		cerr << "Warning: OrderEdges removed some edges from the surface list "<< endl;
+		cerr << " The surface had incorrect connectivity, it was self crossing "<< endl;
+		cerr << "   in function:" <<  __PRETTY_FUNCTION__ << endl;
+		 //throw invalid_argument ("Incorrect surface connectivity");
+	}
+	  #endif //SAFE_ALGO
+	isordered=true;
 }
-}
+}*/
 
 
 void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
@@ -1921,7 +2026,7 @@ void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
 	vertList.clear();
 	vertList.reserve(n);
 	//This comes out in the same order as edgeind
- 	edgeCurr=meshin->edges.find(edgeind[n-1]);
+	edgeCurr=meshin->edges.find(edgeind[n-1]);
 	verts[0]=(meshin->edges(edgeCurr)->vertind[0]);
 	verts[1]=(meshin->edges(edgeCurr)->vertind[1]);
 	vertsPast[0]=verts[0];
@@ -2084,7 +2189,7 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 void mesh::SetBorders(){
 	int ii,jj,nT;
 	if (int(volus.size())>0){
-      // Update border status of edges
+	  // Update border status of edges
 		for(ii=0;ii<surfs.size();++ii){
 			jj=0;
 			nT=surfs(ii)->voluind.size();
@@ -2096,7 +2201,7 @@ void mesh::SetBorders(){
 		}
 		surfs.ForceArrayReady();
 
-      // Update border status of volus
+	  // Update border status of volus
 		for(ii=0;ii<volus.size();++ii){
 			jj=0;
 			nT=volus(ii)->surfind.size();
@@ -2108,7 +2213,7 @@ void mesh::SetBorders(){
 		}
 		volus.ForceArrayReady();
 
-      // Update border status of edges  
+	  // Update border status of edges  
 		for(ii=0;ii<edges.size();++ii){
 			jj=0;
 			nT=edges(ii)->surfind.size();
@@ -2172,7 +2277,7 @@ void mesh::ForceCloseContainers(){
 
 	nVert=verts.size();
 	if (is3DMesh){
-      // reassign volumes
+	  // reassign volumes
 		volus.elems.clear();
 		volus.Init(nBlocks);
 		volus.PopulateIndices();
@@ -2192,7 +2297,7 @@ void mesh::ForceCloseContainers(){
 			}
 		}
 	} else {
-      // reassign surfaces
+	  // reassign surfaces
 		surfs.elems.clear();
 		surfs.Init(nBlocks);
 		surfs.PopulateIndices();
@@ -2244,10 +2349,10 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
    // While Loop, while not all vertices explored
    while(nVertExplored<nVerts){
 
-      // if currQueue is empty start new block
+	  // if currQueue is empty start new block
    	if(currQueue.size()<1){
 
-         //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+		 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
    		ii=0;
    		while(vertStatus[ii] && ii<nVerts){
    			ii++;
@@ -2261,7 +2366,7 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
    		nBlocks++;
 
    	}
-      // Explore current queue
+	  // Explore current queue
    	nCurr=currQueue.size();
    	for (ii = 0; ii < nCurr; ++ii){
    		if (!vertStatus[currQueue[ii]]){
@@ -2272,29 +2377,29 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
    					==verts(currQueue[ii])->index);
    				nextQueue.push_back(verts.find(
    					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
-               	#ifdef SAFE_ALGO
+			   	#ifdef SAFE_ALGO
    				if (verts.find(
    					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
    					cerr << "Edge index: " << verts(currQueue[ii])->edgeind[jj] << " vertex index:" <<  
-	   				edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
-	   				cerr << "Edge connected to non existant vertex" <<endl;
-	   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-	   				throw range_error (" : Vertex not found");
-	   			}
-                #endif
+   				edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+   				cerr << "Edge connected to non existant vertex" <<endl;
+   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+   				throw range_error (" : Vertex not found");
+   			}
+				#endif
 
-	   		}
-	   		vertStatus[currQueue[ii]]=true;
-	   		nVertExplored++;
-	   	}
-	   }
+   		}
+   		vertStatus[currQueue[ii]]=true;
+   		nVertExplored++;
+   	}
+   }
 
-	      // Reset current queue and set to next queue
-	   currQueue.clear();
-	   currQueue.swap(nextQueue);
+		  // Reset current queue and set to next queue
+   currQueue.clear();
+   currQueue.swap(nextQueue);
 
-	}
-	return(nBlocks);
+}
+return(nBlocks);
 }
 
 coordvec mesh::CalcCentreVolu(int ind) const{
@@ -2383,7 +2488,7 @@ void mesh::OrientSurfaceVolume(){
 	isFlip.assign(nBlocks,false);
 	//========================================
 	//  Select direction using coordinate geometry
-	//     use a surface 
+	//	 use a surface 
 
 	for (ii=1; ii<= nBlocks; ii++){
 		jj=-1; nj=surfOrient.size();
@@ -2490,19 +2595,19 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 					testSurf=surfs.find(edges(currEdge)->surfind[kk]);
 					t0 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0] ||
 						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[0]) && 
-						(surfs(currQueue[ii])->voluind[0]!=0);
+					(surfs(currQueue[ii])->voluind[0]!=0);
 
 					t1 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[1] ||
 						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]) && 
-						(surfs(currQueue[ii])->voluind[1]!=0);
+					(surfs(currQueue[ii])->voluind[1]!=0);
 					// if either volume is shared surface is to be flooded
 					isConnec = (edges(currEdge)->surfind[kk]!=surfs(currQueue[ii])->index) 
-						&& (t0 || t1) && (!surfStatus[testSurf]);
+					&& (t0 || t1) && (!surfStatus[testSurf]);
 
 					if(isConnec){
 						// Test rotation
 						relOrient=OrderMatchLists(orderVert[currQueue[ii]], orderVert[testSurf], 
-							 edges(currEdge)->vertind[0],edges(currEdge)->vertind[1]);
+							edges(currEdge)->vertind[0],edges(currEdge)->vertind[1]);
 						// Add to the next queue
 						nextQueue.push_back(testSurf);
 						nSurfExplored++;
@@ -2513,7 +2618,7 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 						t3=(surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0]);
 						t4=(surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]);
 						isFlip=((relOrient==-1) && ((t0 && !t3) || (t1 && !t4))) 
-							|| ((relOrient==1) && ((t0 && t3) || (t1 && t4)));
+						|| ((relOrient==1) && ((t0 && t3) || (t1 && t4)));
 						if(isFlip){
 							surfs.elems[testSurf].FlipVolus();
 						}

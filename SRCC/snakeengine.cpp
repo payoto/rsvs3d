@@ -364,6 +364,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	}
 	vertNoSpawn.vec.insert(vertNoSpawn.vec.end(),vertSpawn.begin(),vertSpawn.end());
 	vertNoSpawn.GenerateHash();
+	// DisplayVector(vertNoSpawn.vec);
 }
 
 void dispconnrmv(vector<ConnecRemv> conn){
@@ -699,6 +700,8 @@ void CleanupSnakeConnec(snake &snakein){
 					//snakein.snakeconn.TestConnectivity();
 				}
 			}
+
+			CheckSnakeRemovalsEdge(snakein, indRmvEdge);
 
 			snakein.snakeconn.surfs.remove(indRmvSurf);
 			snakein.snakeconn.edges.remove(indRmvEdge);
@@ -1237,6 +1240,86 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, cons
 
 	}
 
+}
+
+
+// Checks before removal by snake engine
+// Most of these checks have to be performed on the remaining objects
+
+void CheckSnakeRemovalsVert(const snake &snakein, const vector<int> &indRmvVert){
+ /*
+ Vertex can be removed if
+ */
+}
+void CheckSnakeRemovalsEdge(const snake &snakein, const vector<int> &indRmvEdge){
+ /*
+Edge can be removed if it is connected to one surface or one vertex.
+ */
+	int ii, jj, kk, ni, nj, ne, sub;
+	bool cond1vert, cond1surf;
+	ni = indRmvEdge.size();
+	ne = 0;
+	for (ii = 0; ii < ni; ++ii){
+		sub = snakein.snakeconn.edges.find(indRmvEdge[ii]);
+		cond1vert=false;
+		cond1surf=false;
+
+		nj=snakein.snakeconn.edges(sub)->vertind.size();
+		if(nj>1){
+			jj=0;
+			kk = snakein.snakeconn.edges(sub)->vertind[jj];
+			for(jj=0; jj< nj; ++jj){
+				cond1vert = kk!=snakein.snakeconn.edges(sub)->vertind[jj];
+				if(cond1vert){
+					break;
+				}
+			}
+		}
+
+		nj=snakein.snakeconn.edges(sub)->surfind.size();
+		if(nj>1){
+			jj=0;
+			kk = snakein.snakeconn.edges(sub)->surfind[jj];
+			for(jj=0; jj< nj; ++jj){
+				cond1surf = kk!=snakein.snakeconn.edges(sub)->surfind[jj];
+				if(cond1surf){
+					break;
+				}
+			}
+		}
+
+		if(!(cond1surf || cond1vert)){
+			snakein.snakeconn.edges(sub)->disptree(snakein.snakeconn,2);
+			cerr << endl << "Edge was marked for deletion but is connected" 
+				<< " to more than 1 Surface and edge." << endl; 
+				ne++;
+		}
+
+	}
+
+	ni = snakein.snakeconn.edges.size();
+	for (ii = 0; ii < ni; ++ii){
+		if (snakein.snakeconn.edges(ii)->surfind.size()>2){
+			snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
+			cerr << endl << "Edge is connected to too many surfaces" << endl; 
+				ne++;
+		}
+	}
+	if(ne>0){
+		cerr << "There were " << ne << " Edge deletion errors:" ;
+		cerr << endl << __PRETTY_FUNCTION__;
+	}
+
+}
+void CheckSnakeRemovalsSurf(const snake &snakein, const vector<int> &indRmvSurf){
+ /*
+ Surf can be removed if
+ */
+}
+void CheckSnakeRemovalsVolu(const snake &snakein, const vector<int> &indRmvVolu){
+ /*
+ Vertex can be removed if
+ */
 }
 
 
