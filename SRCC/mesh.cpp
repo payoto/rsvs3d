@@ -1544,10 +1544,10 @@ void mesh::TestConnectivityBiDir(){
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << volus(ii)->index
-					<< " makes uni-directional reference to volume " << volus(ii)->surfind[jj] << " list: " ; 
+					cerr << " Test Connectivity Error :" << errCountBiDir << " volu " << volus(ii)->index
+					<< " makes uni-directional reference to surface " << volus(ii)->surfind[jj] << " list: " ; 
 					DisplayVector(volus(ii)->surfind); cout << " list (surfs.voluind): " ; 
-					DisplayVector(surfs(jj)->voluind);cerr << endl;
+					DisplayVector(surfs(testSub[jj])->voluind);cerr << endl;
 				}
 			}
 		}
@@ -1804,7 +1804,7 @@ int surf::OrderEdges(mesh *meshin)
 	vector<bool> isDone;
 	bool isTruncated;
 	int vertCurr,edgeCurr;
-	int ii,jj, newSurfInd;
+	int ii,jj, newSurfInd, kk, prevHash;
 	std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
 	unordered_multimap<int,int>::iterator it;
 	isTruncated=false;
@@ -1901,8 +1901,19 @@ int surf::OrderEdges(mesh *meshin)
 			meshin->surfs.push_back(newSurf);
 			// meshin->surfs(meshin->surfs.size()-1)->disp();
 			meshin->SwitchIndex(6,index,newSurf.index,newSurfedgeind);
+			prevHash = meshin->surfs.isHash;
 			meshin->surfs[meshin->surfs.size()-1].OrderEdges(meshin);
-			meshin->surfs.isHash=1;
+			meshin->surfs.isHash=prevHash;
+			prevHash = meshin->volus.isHash;
+			for (int i = 0; i < 2; ++i)
+			{
+				kk=meshin->volus.find(voluind[i]);
+				if(kk!=-1){
+					meshin->volus[kk].surfind.push_back(newSurf.index);
+				}
+				meshin->volus.isHash=prevHash;
+			}
+			
 			newSurfInd = newSurf.index;
 		}
 		isordered=true;
@@ -2342,75 +2353,75 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 
 
 	int nVertExplored,nVerts,nBlocks,nCurr,nEdgesCurr,ii,jj,kk;
-   vector<bool> vertStatus; // 1 explored 0 not explored
+	vector<bool> vertStatus; // 1 explored 0 not explored
 
-   vector<int> currQueue, nextQueue; // Current and next queues of indices
+	vector<int> currQueue, nextQueue; // Current and next queues of indices
 
-   // Preparation of the arrays;
-   nVerts=verts.size();
-   nBlocks=0;
-   nVertExplored=0;
+	// Preparation of the arrays;
+	nVerts=verts.size();
+	nBlocks=0;
+	nVertExplored=0;
 
-   vertStatus.assign(nVerts,false);
-   vertBlock.assign(nVerts,0);
-   currQueue.reserve(nVerts/2);
-   nextQueue.reserve(nVerts/2);
+	vertStatus.assign(nVerts,false);
+	vertBlock.assign(nVerts,0);
+	currQueue.reserve(nVerts/2);
+	nextQueue.reserve(nVerts/2);
 
    
-   // While Loop, while not all vertices explored
-   while(nVertExplored<nVerts){
+   	// While Loop, while not all vertices explored
+   	while(nVertExplored<nVerts){
 
-	  // if currQueue is empty start new block
-   	if(currQueue.size()<1){
+	  	// if currQueue is empty start new block
+		if(currQueue.size()<1){
 
-		 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
-   		ii=0;
-   		while(vertStatus[ii] && ii<nVerts){
-   			ii++;
-   		}
-   		if (vertStatus[ii]){
-   			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
-   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   			throw range_error (" : Starting point for block not found");
-   		}
-   		currQueue.push_back(ii);
-   		nBlocks++;
+			 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
+	   		ii=0;
+	   		while(ii<nVerts && vertStatus[ii]){
+	   			ii++;
+	   		}
+	   		if (vertStatus[ii]){
+	   			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
+	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+	   			throw range_error (" : Starting point for block not found");
+	   		}
+	   		currQueue.push_back(ii);
+	   		nBlocks++;
 
-   	}
-	  // Explore current queue
-   	nCurr=currQueue.size();
-   	for (ii = 0; ii < nCurr; ++ii){
-   		if (!vertStatus[currQueue[ii]]){
-   			vertBlock[currQueue[ii]]=nBlocks;
-   			nEdgesCurr=verts(currQueue[ii])->edgeind.size();
-   			for(jj=0;jj<nEdgesCurr;++jj){
-   				kk=int(edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[0]
-   					==verts(currQueue[ii])->index);
-   				nextQueue.push_back(verts.find(
-   					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
-			   	#ifdef SAFE_ALGO
-   				if (verts.find(
-   					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
-   					cerr << "Edge index: " << verts(currQueue[ii])->edgeind[jj] << " vertex index:" <<  
-   				edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
-   				cerr << "Edge connected to non existant vertex" <<endl;
-   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   				throw range_error (" : Vertex not found");
-   			}
-				#endif
+	   	}
+		  // Explore current queue
+	   	nCurr=currQueue.size();
+	   	for (ii = 0; ii < nCurr; ++ii){
+	   		if (!vertStatus[currQueue[ii]]){
+	   			vertBlock[currQueue[ii]]=nBlocks;
+	   			nEdgesCurr=verts(currQueue[ii])->edgeind.size();
+	   			for(jj=0;jj<nEdgesCurr;++jj){
+	   				kk=int(edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[0]
+	   					==verts(currQueue[ii])->index);
+	   				nextQueue.push_back(verts.find(
+	   					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk]));
+				   	#ifdef SAFE_ALGO
+	   				if (verts.find(
+	   					edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk])==-1){
+	   					cerr << "Edge index: " << verts(currQueue[ii])->edgeind[jj] << " vertex index:" <<  
+		   				edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
+		   				cerr << "Edge connected to non existant vertex" <<endl;
+		   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+	   					throw range_error (" : Vertex not found");
+	   				}
+					#endif
 
-   		}
-   		vertStatus[currQueue[ii]]=true;
-   		nVertExplored++;
-   	}
-   }
+	   			}
+				vertStatus[currQueue[ii]]=true;
+				nVertExplored++;
+	   		}
+	   	}
 
-		  // Reset current queue and set to next queue
-   currQueue.clear();
-   currQueue.swap(nextQueue);
+		// Reset current queue and set to next queue
+		currQueue.clear();
+		currQueue.swap(nextQueue);
 
-}
-return(nBlocks);
+	}
+	return(nBlocks);
 }
 
 coordvec mesh::CalcCentreVolu(int ind) const{

@@ -710,23 +710,25 @@ void CleanupSnakeConnec(snake &snakein){
 			nAbove3=0;
 			nAboveN=0;
 			snakein.snakeconn.TightenConnectivity();
-			for(ii=0;ii<int(indRmvVert.size());ii++){
-				// nAbove3+=int(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2);
-				// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){
-				// 	snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
-				// }
-				if(snakein.snakemesh->edges.isearch(
-					snakein.snaxs.isearch(
-						indRmvVert[ii])->edgeind
-						)->surfind.size()
-					==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
-					if(nAboveN==0){
-						cout << endl << "displaying vertices about to be removed by nAboveN cond:" << endl;
+			if(true){
+				for(ii=0;ii<int(indRmvVert.size());ii++){
+					// nAbove3+=int(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2);
+					// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){
+					// 	snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
+					// }
+					if(snakein.snakemesh->edges.isearch(
+						snakein.snaxs.isearch(
+							indRmvVert[ii])->edgeind
+							)->surfind.size()
+						==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
+						if(nAboveN==0){
+							cout << endl << "displaying vertices about to be removed by nAboveN cond:" << endl;
+						}
+						snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
+						indRmvVert.erase(indRmvVert.begin()+ii);
+						ii--;
+						nAboveN++;
 					}
-					snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
-					indRmvVert.erase(indRmvVert.begin()+ii);
-					ii--;
-					nAboveN++;
 				}
 			}
 			// cout << endl << "Above 3 : " << nAbove3 << endl;
@@ -749,6 +751,8 @@ void CleanupSnakeConnec(snake &snakein){
 
 			snakein.snakeconn.TightenConnectivity();
 			snakein.HashArrayNM();
+			// snakein.ForceCloseContainers();
+
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
@@ -769,8 +773,10 @@ void CleanupSnakeConnec(snake &snakein){
 			}
 		} 
 		else { // Only executes at the end
+			
 			snakein.HashArrayNM();
 			snakein.ForceCloseContainers();
+			snakein.snakeconn.TightenConnectivity();
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
 				snakein.snakeconn.TestConnectivityBiDir();
@@ -1325,6 +1331,7 @@ Edge can be removed if it is connected to one surface or one vertex.
 		}
 
 		if(!(cond1surf || cond1vert)){
+			if(ne==0){cerr<< endl;}
 			snakein.snakeconn.edges(sub)->disptree(snakein.snakeconn,2);
 			cerr << endl << "Edge was marked for deletion but is connected" 
 				<< " to more than 1 Surface and edge." << endl; 
@@ -1337,8 +1344,12 @@ Edge can be removed if it is connected to one surface or one vertex.
 	for (ii = 0; ii < ni; ++ii){
 		if (snakein.snakeconn.edges(ii)->surfind.size()>2){
 			// snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
-			// cerr << endl << "Edge is connected to too  many surfaces" << endl; 
-				ne++;
+			// cerr << endl << "Edge is connected to too  many surfaces" << endl;
+			if(ne==0){cerr<< endl;}
+			cerr << "Edge error " << ne << " edge should connect to single surface (surfind:)";
+			DisplayVector(snakein.snakeconn.edges(ii)->surfind);
+			cerr << endl; 
+			ne++;
 		}
 	}
 	if(ne>0){

@@ -364,7 +364,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<60;++ii){
+		for(ii=0;ii<77;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
