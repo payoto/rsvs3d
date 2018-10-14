@@ -457,78 +457,78 @@ void SQPcalc::PrepareMatricesForSQP(
 
 void SQPcalc::ComputeSQPstep(){
 
-	MatrixXd dConstrAct,HConstrAct, HObjAct;
-	RowVectorXd dObjAct;
-	VectorXd constrAct, lagMultAct, deltaDVAct;
-	MatrixXd temp1, temp2;
-	bool isNan, isLarge;
-	int ii, ni;
-	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
-		constrAct,lagMultAct
-		);
-	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
-	// HouseholderQR<MatrixXd> HLagSystem(HLag);
-	// LLT<MatrixXd> HLagSystem(HLag);
+	// MatrixXd dConstrAct,HConstrAct, HObjAct;
+	// RowVectorXd dObjAct;
+	// VectorXd constrAct, lagMultAct, deltaDVAct;
+	// MatrixXd temp1, temp2;
+	// bool isNan, isLarge;
+	// int ii, ni;
+	// PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
+	// 	constrAct,lagMultAct
+	// 	);
+	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	// // HouseholderQR<MatrixXd> HLagSystem(HLag);
+	// // LLT<MatrixXd> HLagSystem(HLag);
 
-	temp1 = HLagSystem.solve(dConstrAct.transpose());
-	temp2 = HLagSystem.solve(dObjAct.transpose());
+	// temp1 = HLagSystem.solve(dConstrAct.transpose());
+	// temp2 = HLagSystem.solve(dObjAct.transpose());
 
-	lagMultAct = (
-			dConstrAct*(temp1)
-		).colPivHouseholderQr().solve(
-		// ).householderQr().solve(
-		// ).llt().solve(
-			constrAct - (dConstrAct*(temp2))
-		);
+	// lagMultAct = (
+	// 		dConstrAct*(temp1)
+	// 	).colPivHouseholderQr().solve(
+	// 	// ).householderQr().solve(
+	// 	// ).llt().solve(
+	// 		constrAct - (dConstrAct*(temp2))
+	// 	);
 
-	isNan = false;
-	isLarge = false;
-	ni = lagMultAct.size();
-	for (ii=0; ii<ni; ++ii){
-		if(lagMultAct[ii]<-limLag){
-			lagMultAct[ii]=-limLag;
-			isLarge=true;
-		}else if(lagMultAct[ii]>limLag){
-			lagMultAct[ii]=limLag;
-			isLarge=true;
-		} else if(isnan(lagMultAct[ii])){
-			//lagMultAct[ii]=0.0;
-			isNan=true;
-		}
-	}
-	if (isNan){
+	// isNan = false;
+	// isLarge = false;
+	// ni = lagMultAct.size();
+	// for (ii=0; ii<ni; ++ii){
+	// 	if(lagMultAct[ii]<-limLag){
+	// 		lagMultAct[ii]=-limLag;
+	// 		isLarge=true;
+	// 	}else if(lagMultAct[ii]>limLag){
+	// 		lagMultAct[ii]=limLag;
+	// 		isLarge=true;
+	// 	} else if(isnan(lagMultAct[ii])){
+	// 		//lagMultAct[ii]=0.0;
+	// 		isNan=true;
+	// 	}
+	// }
+	// if (isNan){
 
-		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
-	}else if(isLarge){
+	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	// }else if(isLarge){
 
-		deltaDVAct = -dConstrAct.transpose()*lagMultAct;
-	// }else if(true) {
-	// 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
+	// // }else if(true) {
+	// // 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
 
-	} else {
+	// } else {
 
-		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
-						+ dConstrAct.transpose()*lagMultAct));
+	// 	deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+	// 					+ dConstrAct.transpose()*lagMultAct));
 
-	}
+	// }
 
 
-	ni = subDvAct.size();
-	for (ii=0; ii<ni; ++ii){
-		deltaDV[subDvAct[ii]]=deltaDVAct[ii];
+	// ni = subDvAct.size();
+	// for (ii=0; ii<ni; ++ii){
+	// 	deltaDV[subDvAct[ii]]=deltaDVAct[ii];
 		
-	}
+	// }
 	
-	ni = subConstrAct.size();
-	for (ii=0; ii<ni; ++ii){
-		lagMult[subConstrAct[ii]]=lagMultAct[ii];
-		isNan = isNan || isnan(lagMultAct[ii]);
-	}
-	if (isNan){
-		Print2Screen(3);
-		DisplayVector(isConstrAct);
-		DisplayVector(isDvAct);
-	}
+	// ni = subConstrAct.size();
+	// for (ii=0; ii<ni; ++ii){
+	// 	lagMult[subConstrAct[ii]]=lagMultAct[ii];
+	// 	isNan = isNan || isnan(lagMultAct[ii]);
+	// }
+	// if (isNan){
+	// 	Print2Screen(3);
+	// 	DisplayVector(isConstrAct);
+	// 	DisplayVector(isDvAct);
+	// }
 
 }
 

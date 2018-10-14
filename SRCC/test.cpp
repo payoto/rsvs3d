@@ -53,7 +53,8 @@ int main(){
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
 	#endif //TEST_ALL
  
-	gridTest.Run(Test_snakeinit,"Snake rand velocity");
+	gridTest.Run(Test_snakeinit,"Snake rand velocity"); // Non working tests
+	// gridTest.Run(Test_snakeinit_MC,"Merge 1 Clean ");
 	// gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 

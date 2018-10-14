@@ -1797,17 +1797,18 @@ void mesh::PopulateIndices(){
 
 
 // Field Specific operations
-void surf::OrderEdges(mesh *meshin)
+int surf::OrderEdges(mesh *meshin)
 {
 	unordered_multimap<int,int> vert2Edge;
 	vector<int> edge2Vert,edgeSub,edgeIndOrig;
 	vector<bool> isDone;
 	bool isTruncated;
 	int vertCurr,edgeCurr;
-	int ii,jj;
+	int ii,jj, newSurfInd;
 	std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
 	unordered_multimap<int,int>::iterator it;
 	isTruncated=false;
+	newSurfInd=-1; 
 	if (edgeind.size()>0){
 		// edgeIndOrig2=edgeind;
 		sort(edgeind);
@@ -1839,22 +1840,23 @@ void surf::OrderEdges(mesh *meshin)
 				throw range_error ("unordered_multimap went beyond its range in OrderEdges");
 			}
 			if (vert2Edge.count(vertCurr)==1){
-				cerr << "ERROR : Surface does not form closed loop" << endl;
-				disptree((*meshin),0);
+				// cerr << "ERROR : Surface does not form closed loop" << endl;
+				// disptree((*meshin),0);
 
-				jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
-				DisplayVector(edge2Vert);
-				DisplayVector(edgeind);
-				cerr <<endl;
+				// jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
+				// DisplayVector(edge2Vert);
+				// DisplayVector(edgeind);
+				// cerr <<endl;
 
-				meshin->verts.isearch(vertCurr)->disp();
-				cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
-				jj=vert2Edge.count(vertCurr);
-				cerr << jj  <<  endl; 
-				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+				// meshin->verts.isearch(vertCurr)->disp();
+				// cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
+				// jj=vert2Edge.count(vertCurr);
+				// cerr << jj  <<  endl; 
+				cerr << "Error in :" << __PRETTY_FUNCTION__ ;
 				//throw range_error ("Found a single vertex - surface is not closed");
-				cerr << "Found a single vertex - surface is not closed" << endl;
-				return;
+				cerr << " - surface "<< index <<" is not closed (single vertex "<<
+					 vertCurr <<")" << endl;
+				throw invalid_argument("Surface is not closed");
 			}
 		 	#endif // SAFe_ACCESS
 			jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
@@ -1868,11 +1870,11 @@ void surf::OrderEdges(mesh *meshin)
 				vertCurr=edge2Vert[((it->second)/2)*2+jj];
 				edgeind[ii]=edgeCurr;
 			} else {
-				cerr << endl;
+				// cerr << endl;
 				// edgeind = edgeIndOrig;
 				edgeind.erase(edgeind.begin()+ii, edgeind.end());
 				// DisplayVector(edgeIndOrig);
-				disptree((*meshin),1);
+				// disptree((*meshin),1);
 
 				// cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
 
@@ -1882,25 +1884,30 @@ void surf::OrderEdges(mesh *meshin)
 		}
 		if (isTruncated){ 
 			// This adds a second surface if the surface closes early
-
+			vector<int> newSurfedgeind;
 			surf newSurf=*this;
 			meshin->surfs.SetMaxIndex();
 			newSurf.index=meshin->surfs.GetMaxIndex()+1;
 			newSurf.voluind=voluind;
 			newSurf.edgeind.clear();
+			newSurfedgeind.clear();
 			for (ii=0;ii<int(edgeIndOrig.size());++ii){
 				if(!isDone[ii]){
-					newSurf.edgeind.push_back(edgeIndOrig[ii]);
+					newSurfedgeind.push_back(edgeIndOrig[ii]);
 				}
 			}
-			newSurf.OrderEdges(meshin);
-			meshin->surfs.push_back(newSurf);
-			meshin->SwitchIndex(6,index,newSurf.index,newSurf.edgeind);
-			meshin->surfs(meshin->surfs.size()-1)->disptree(*meshin,1);
 
+			// newSurf.OrderEdges(meshin);
+			meshin->surfs.push_back(newSurf);
+			// meshin->surfs(meshin->surfs.size()-1)->disp();
+			meshin->SwitchIndex(6,index,newSurf.index,newSurfedgeind);
+			meshin->surfs[meshin->surfs.size()-1].OrderEdges(meshin);
+			meshin->surfs.isHash=1;
+			newSurfInd = newSurf.index;
 		}
 		isordered=true;
 	}
+	return(newSurfInd);
 }
 /*void surf::OrderEdges(mesh *meshin)
 {
@@ -2068,18 +2075,22 @@ void surf::FlipVolus(){
 	voluind[1]=interm;
 }
 
-int mesh::OrderEdges(){
+vector<int> mesh::OrderEdges(){
 	int ii;
-	bool kk;
+	int newInd;
+	vector<int> newSurfPairs;
 
 	for (ii = 0; ii < surfs.size(); ++ii)
 	{
 		if (!surfs(ii)->isready(true)){
-			surfs.elems[ii].OrderEdges(this);
-			kk=true;
+			newInd=surfs.elems[ii].OrderEdges(this);
+			if(newInd>-1){
+				newSurfPairs.push_back(surfs(ii)->index);
+				newSurfPairs.push_back(newInd);
+			}
 		}
 	}
-	return(kk);
+	return(newSurfPairs);
 }
 
 

@@ -120,6 +120,7 @@ public:
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
 	// Snake connectivity operations
+	void OrderEdges();
 	void SetSnaxSurfs() {}
 	void OrientSurfaceVolume();
 	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
@@ -225,10 +226,11 @@ int Test_snax();
 int Test_snaxedge();
 int Test_snake();
 int Test_snakeinit();
+int Test_snakeinit_MC();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
 void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact);
-
+void Test_stepalgo_mergeclean(snake &testSnake, vector<double> &dt, vector<int> &isImpact);
 // Functions needed at Compile time
 
 // set constructors (used to avoid a variable being unknowingly forgotten)

@@ -591,6 +591,25 @@ void snake::CheckConnectivity() const {
 
 }
 
+void snake::OrderEdges(){
+
+	int nNewSurfs;
+	snaxsurf newSurf;
+	vector<int> newSurfPairs;
+
+
+	newSurfPairs=snakeconn.OrderEdges();
+	nNewSurfs = int(newSurfPairs.size()/2);
+	for (int i = 0; i < nNewSurfs; ++i)
+	{
+		newSurf=*(snaxsurfs.isearch(newSurfPairs[i*2]));
+		newSurf.index = newSurfPairs[i*2+1];
+		snaxsurfs.push_back(newSurf);
+	}
+
+
+}
+
 // Snake Movement
 void snake::UpdateDistance(double dt){
 	int ii;

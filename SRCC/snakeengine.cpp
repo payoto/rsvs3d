@@ -428,6 +428,42 @@ void SnaxNoConnecDetection(const mesh &snakeconn, vector<ConnecRemv> &connecEdit
 
 }
 
+void MergeCleanSnake(snake &fullsnake, vector<int> &isImpact){
+	/*
+	Perform one merge per clean operations
+	*/
+	int ii, nI, kk;
+	bool cond;
+	vector<int> temp;
+	fullsnake.SnaxImpactDetection(isImpact);
+	fullsnake.PrepareForUse();
+	temp.reserve(2);
+
+	cond=true;
+	while(cond){
+		kk=0;
+		fullsnake.SnaxImpactDetection(isImpact);
+		nI = isImpact.size()/2;
+		for(ii=0; ii<nI; ++ii){
+			temp.clear();
+			temp.push_back(isImpact[ii*2]);
+			temp.push_back(isImpact[ii*2+1]);
+			if(temp[0]>=0 && temp[1]>=0){
+				MergeAllContactVertices(fullsnake, temp);
+				CleanupSnakeConnec(fullsnake);
+				fullsnake.PrepareForUse();
+				break;
+			} else {
+				kk++;
+			}
+		}
+		if(kk==nI){
+			cond=false;
+		}
+	}
+	fullsnake.PrepareForUse();
+}
+
 void CleanupSnakeConnec(snake &snakein){
 
 	vector<ConnecRemv> connecEdit;
@@ -741,7 +777,7 @@ void CleanupSnakeConnec(snake &snakein){
 			}
 			#endif
 			snakein.CheckConnectivity();
-			snakein.snakeconn.OrderEdges();
+			snakein.OrderEdges();
 		}
 	}
 	snakein.PrepareForUse();
@@ -1301,7 +1337,7 @@ Edge can be removed if it is connected to one surface or one vertex.
 	for (ii = 0; ii < ni; ++ii){
 		if (snakein.snakeconn.edges(ii)->surfind.size()>2){
 			// snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
-			// cerr << endl << "Edge is connected to too many surfaces" << endl; 
+			// cerr << endl << "Edge is connected to too  many surfaces" << endl; 
 				ne++;
 		}
 	}

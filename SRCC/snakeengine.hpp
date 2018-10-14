@@ -58,6 +58,7 @@ void SpawnArrivedSnaxels(snake &fullsnake, const vector<int> &isImpact);
 void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const  vector<int> &isImpact,int dir, HashedVector<int,int> &vertNoSpawn);
 
 //
+void MergeCleanSnake(snake &fullsnake, vector<int> &isImpact);
 void CleanupSnakeConnec(snake &snakein);
 void IdentifyMergEdgeSameSurfConnec(const snake &snakein, vector<ConnecRemv> &connecEdit);
 void IndentifyEdgeSameSurf(const snake &snakein,int currSub, int &stepCheck,vector<int> &tempSub,

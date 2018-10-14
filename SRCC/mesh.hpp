@@ -222,7 +222,7 @@ public:
 	bool isready(bool isInMesh) const {return(isInMesh? isordered : true);}
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-	void OrderEdges(mesh *meshin);
+	int OrderEdges(mesh *meshin);
 	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
@@ -487,7 +487,7 @@ public:
 	int ConnectedVertex(vector<int> &vertBlock) const;
 	void ForceCloseContainers();
 	// Mesh Quality
-	int OrderEdges();
+	vector<int> OrderEdges();
 	void OrientSurfaceVolume();
 	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();

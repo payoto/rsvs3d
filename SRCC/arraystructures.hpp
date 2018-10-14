@@ -93,6 +93,7 @@ protected:
 public: 
 	friend class mesh;
 	friend class snake;
+	friend class surf;
 	friend int TestTemplate_ArrayStruct<T>();
 
 	void disp() const;
@@ -164,9 +165,9 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
+			throw range_error ("Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		isHash=0;

@@ -117,6 +117,15 @@ void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> &isImpact
 	Test_stepalgo(testSnake, dt, isImpact);
 }
 
+void Test_randvelstep_mc(snake &testSnake, vector<double> dt, vector<int> &isImpact){
+	CalculateSnakeVelRand(testSnake);
+	testSnake.CalculateTimeStep(dt,0.25);
+	testSnake.UpdateDistance(dt);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+	Test_stepalgo_mergeclean(testSnake, dt, isImpact);
+}
+
 
 // -------------------------------------------------------------------------------------------
 // TEST CODE
@@ -355,7 +364,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<31;++ii){
+		for(ii=0;ii<60;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -406,6 +415,99 @@ int Test_snakeinit(){
 	return(errTest);
 
 }
+
+
+int Test_snakeinit_MC(){ 
+	snake testSnake;
+	mesh snakeMesh, triMesh;
+	triangulation testTriangle;
+	const char *fileToOpen;    
+	tecplotfile outSnake;   
+	double totT=0.0;  
+	vector<double> dt;  
+	vector<int> isImpact;
+	int start_s,stop_s,ii;   
+	//bool errFlag;
+	int errTest=0;
+	
+
+	try {
+		fileToOpen="..\\TESTOUT\\TestSnake.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		snakeMesh.PrepareForUse();
+		testSnake.snakemesh=&snakeMesh;
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		
+		snakeMesh.OrientSurfaceVolume();
+		start_s=clock();
+		testSnake.PrepareForUse();
+		
+		SpawnAtVertex(testSnake,1022);
+		SpawnAtVertex(testSnake,674);
+		SpawnAtVertex(testSnake,675);
+		SpawnAtVertex(testSnake,728);
+		SpawnAtVertex(testSnake,729);
+		SpawnAtVertex(testSnake,731);
+		testSnake.displight();
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+
+		start_s=clock();
+		testSnake.PrepareForUse();
+		for(ii=0;ii<100;++ii){
+			cout << ii << " ";
+			
+			if(testSnake.snaxs.size()>0){
+				//testSnake.snakeconn.TightenConnectivity();
+				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+
+				testSnake.snakeconn.PrepareForUse();
+				testTriangle.stattri.clear();
+				testTriangle.trivert.clear();
+				testTriangle.PrepareForUse();
+				TriangulateMesh(testSnake.snakeconn,testTriangle);
+				testTriangle.CalcTriVertPos();
+				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
+				outSnake.PrintMesh(triMesh,2,totT);
+			}
+			if(ii==30){
+				cout << "break here" << endl;
+			}
+			Test_randvelstep_mc(testSnake, dt, isImpact);
+			cout << endl;
+			
+			totT=totT+1;
+		}
+
+		if(testSnake.snaxs.size()>0){
+			outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+			testTriangle.stattri.clear();
+			testTriangle.trivert.clear();
+			testTriangle.PrepareForUse();
+			TriangulateMesh(testSnake.snakeconn,testTriangle);
+			testTriangle.CalcTriVertPos();
+
+			MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
+			outSnake.PrintMesh(triMesh,2,totT);
+		}
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		testSnake.displight();
+	// the code you wish to time goes here
+		
+		//testSnake.disp();
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+
+}
+
 int Test_snakeinitflat(){
 	snake testSnake;
 	mesh snakeMesh;
@@ -526,6 +628,35 @@ void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact){
 
 }
 
+void Test_stepalgo_mergeclean(snake &testSnake, vector<double> &dt, vector<int> &isImpact){
+
+	int start_s;
+
+	start_s=clock();
+
+	
+
+	start_s=TimeStamp("position: ", start_s);
+
+	testSnake.PrepareForUse();
+	MergeCleanSnake(testSnake, isImpact);
+	testSnake.PrepareForUse();
+	start_s=TimeStamp("MergeClean: ", start_s);
+
+	testSnake.SnaxImpactDetection(isImpact);
+	SpawnArrivedSnaxels(testSnake,isImpact);
+	start_s=TimeStamp("Spawn: ", start_s);
+
+	testSnake.PrepareForUse();
+	MergeCleanSnake(testSnake, isImpact);
+	testSnake.PrepareForUse();
+
+	testSnake.OrientSurfaceVolume();
+	start_s=TimeStamp("Clean: ", start_s);
+
+	
+
+}
 
 int Test_snakeOrderEdges(){
 
