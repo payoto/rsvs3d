@@ -865,26 +865,28 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 		newSub=verts.find(newInd);
 		oldSub=verts.find(oldInd);
 		subList=edges.find_list(verts[oldSub].edgeind);
-	  for (ii=0;ii<int(subList.size());++ii){ // update vertind
-	  	jj=edges(subList[ii])->vertind[1]==oldInd;
-	  	edges[subList[ii]].vertind[jj]=newInd;
-		 verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
-		 //cout << " " << edges[subList[ii]].index <<  " ";
-		 for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
-		 	if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
-		 		verts[oldSub].edgeind.erase(
-		 			verts[oldSub].edgeind.begin()+jj);
-		 		jj--;
-		 	}
-		 }
+		for (ii=0;ii<int(subList.size());++ii){ // update vertind
+			jj=edges(subList[ii])->vertind[1]==oldInd;
+			edges[subList[ii]].vertind[jj]=newInd;
+			verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
+			//cout << " " << edges[subList[ii]].index <<  " ";
+			for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
+				if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
+					verts[oldSub].edgeind.erase(
+						verts[oldSub].edgeind.begin()+jj);
+					jj--;
+				}
+			}
 		}
+		sort(verts[newSub].edgeind);
+		unique(verts[newSub].edgeind);
 		if(meshDepIsSet && meshDim==0){
-	  	// for (ii=0;ii<int(oldSub.size());++ii){
-	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
-	  	// }
+			// for (ii=0;ii<int(oldSub.size());++ii){
+			// 	meshtree.elemind[oldSub[ii]]=newInd;
+			// }
 			meshtree.elemind[oldSub]=newInd;
 		}
-	  // Hashing has not been invalidated
+		// Hashing has not been invalidated
 		edges.isHash=1;
 		verts.isHash=1;
 
@@ -1180,7 +1182,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 }
 
-void mesh::TestConnectivity(){
+int mesh::TestConnectivity(){
 	int ii,jj,kk,kk2,errCount, errTot;
 	vector<int> testSub;
 
@@ -1315,10 +1317,11 @@ void mesh::TestConnectivity(){
 	if (errTot>0){
 		cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
 	}
+	return(errTot);
 }
 
 
-void mesh::TestConnectivityBiDir(){
+int mesh::TestConnectivityBiDir(){
 	int ii,jj,ll,ll2,kk,kk2,errCount, errTot,errCountBiDir,errTotBiDir;
 	bool flag;
 	vector<int> testSub;
@@ -1566,6 +1569,8 @@ void mesh::TestConnectivityBiDir(){
 	if (errTotBiDir>0){
 		cerr << errTotBiDir << "  Total errors were detected in the bi-directionality of the connectivity list" << endl;
 	}
+	return(errTot);
+
 }
 
 #pragma GCC diagnostic pop

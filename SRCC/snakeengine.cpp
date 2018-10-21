@@ -387,7 +387,20 @@ void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit){
 	for(ii=0;ii<nSnaxEdge;++ii){
 		snaxSub1=snakein.snaxs.find(snakein.snakeconn.edges(ii)->vertind[0]);
 		snaxSub2=snakein.snaxs.find(snakein.snakeconn.edges(ii)->vertind[1]);
-		if(snakein.snaxs(snaxSub1)->edgeind==snakein.snaxs(snaxSub2)->edgeind)
+		if(snaxSub1==-1 || snaxSub2==-1){
+			// tempConnec2.rmvind.clear();
+			// tempConnec2.keepind=snakein.snaxedges(ii)->index;
+			// tempConnec2.rmvind.push_back(snakein.snaxedges(ii)->index);
+			// connecEdit.push_back(tempConnec2);
+			cout << "SnaxEdgeConnecDetection invalid edge 2 snax inexistant";
+			snakein.snakeconn.edges(ii)->disp();
+		} else if (snaxSub1==-1){
+			cout << "SnaxEdgeConnecDetection invalid edge 1(1) snax inexistant";
+			snakein.snakeconn.edges(ii)->disp();
+		} else if (snaxSub2==-1){
+			cout << "SnaxEdgeConnecDetection invalid edge 1(2) snax inexistant";
+			snakein.snakeconn.edges(ii)->disp();
+		} else if(snakein.snaxs(snaxSub1)->edgeind==snakein.snaxs(snaxSub2)->edgeind)
 		{
 			tempConnec.rmvind.clear();
 			tempConnec.keepind=snakein.snaxs(snaxSub1)->index;
@@ -469,9 +482,9 @@ void CleanupSnakeConnec(snake &snakein){
 	vector<ConnecRemv> connecEdit;
 
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu,indDelSurf;
-	vector<int> tempSub,isImpact;
+
 	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
-		nEdgeSameSurfConn,nAbove3,nAboveN;
+		nEdgeSameSurfConn,nAboveN;
 	bool flag, iterFlag, contFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -484,7 +497,11 @@ void CleanupSnakeConnec(snake &snakein){
 	auto itVolu=indRmvVolu.begin();
 
 	snakein.HashParent();
-
+	#ifdef SAFE_ALGO
+	if (snakein.Check3D()){
+		snakein.snakeconn.TestConnectivityBiDir();
+	}
+	#endif
 	while(iterFlag){
 		indRmvVert.clear();
 		indRmvEdge.clear();
@@ -530,6 +547,7 @@ void CleanupSnakeConnec(snake &snakein){
 			// 	} 
 			// }
 		}
+		// cout << endl << nVertConn << endl;
 		// removes edges which are degenerate
 
 		for (ii=nSnaxConn+1;ii<nVertConn;ii=ii+2){
@@ -656,25 +674,6 @@ void CleanupSnakeConnec(snake &snakein){
 			}
 			indDelEdge.GenerateHash();
 
-			// Identify collapsed surfaces if all edges are collapsed in it
-			/*
-			indDelSurf.reserve(nEdgeSurfConn-nEdgeConn);
-			for (ii=nEdgeConn;ii<nEdgeSurfConn;++ii){
-				if (connecEdit[ii].typeobj==3){
-					flag=true;
-					jj=0;
-					tempSub=snakein.snakeconn.surfs.isearch(connecEdit[ii].keepind)->edgeind;
-					kk=tempSub.size();
-					while(flag && jj<kk){
-						flag=indDelEdge.find(tempSub[jj])!=-1;
-						++jj;
-					}
-					if(flag){
-						indDelSurf.push_back(connecEdit[ii].keepind);
-					}
-				}
-			}
-			*/
 			kk=indDelEdge.vec.size();
 			for (ii=0;ii<kk;++ii){
 				snakein.snakeconn.RemoveIndex(2,indDelEdge.vec[ii]);
@@ -693,11 +692,11 @@ void CleanupSnakeConnec(snake &snakein){
 			for (ii=0;ii<kk;++ii){
 				snakein.snakeconn.RemoveIndex(3,indDelSurf[ii]);
 			}
-			kk=indRmvSurf.size()+indDelSurf.size()+2;
+			// kk=indRmvSurf.size()+indDelSurf.size()+2;
 			//indRmvSurf.reserve(kk);
 			indRmvSurf.insert(indRmvSurf.end(), indDelSurf.begin(),indDelSurf.end());
 
-			kk=indRmvEdge.size()+indDelEdge.vec.size()+2;
+			// kk=indRmvEdge.size()+indDelEdge.vec.size()+2;
 			//indRmvEdge.reserve(kk);
 			indRmvEdge.insert(indRmvEdge.end(), indDelEdge.vec.begin(),indDelEdge.vec.end());
 
@@ -707,7 +706,7 @@ void CleanupSnakeConnec(snake &snakein){
 			unique(indRmvSurf);
 
 
-			nAbove3=0;
+			// nAbove3=0;
 			nAboveN=0;
 			snakein.snakeconn.TightenConnectivity();
 			if(true){
@@ -731,13 +730,6 @@ void CleanupSnakeConnec(snake &snakein){
 					}
 				}
 			}
-			// cout << endl << "Above 3 : " << nAbove3 << endl;
-			// cout << endl << "Above N : " << nAboveN << endl;
-			if (nAbove3>0){
-				if (snakein.Check3D()){
-					//snakein.snakeconn.TestConnectivity();
-				}
-			}
 
 			CheckSnakeRemovalsEdge(snakein, indRmvEdge);
 
@@ -756,7 +748,10 @@ void CleanupSnakeConnec(snake &snakein){
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
-				snakein.snakeconn.TestConnectivityBiDir();
+				ii=snakein.snakeconn.TestConnectivityBiDir();
+				if(ii>0){
+					// dispconnrmv(connecEdit);
+				}
 			}
 			#endif
 			// tecout.PrintMesh(snakein.snakeconn,2,ttt);
@@ -1288,6 +1283,8 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, cons
 // Checks before removal by snake engine
 // Most of these checks have to be performed on the remaining objects
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void CheckSnakeRemovalsVert(const snake &snakein, const vector<int> &indRmvVert){
  /*
  Vertex can be removed if
@@ -1369,7 +1366,7 @@ void CheckSnakeRemovalsVolu(const snake &snakein, const vector<int> &indRmvVolu)
  Vertex can be removed if
  */
 }
-
+#pragma GCC diagnostic pop
 
 /*
 void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,vector<ConnecRemv> &connecEdit, ConnecRemv &tempConnec,  ConnecRemv &tempConnec2,vector<int> &tempSub,vector<int> &tempSub2, vector<int> &tempCount, HashedVector<int,int> &tempIndHash) 

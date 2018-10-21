@@ -471,8 +471,8 @@ public:
 	bool isready() const;
 	void PopulateIndices();
 	void TightenConnectivity();
-	void TestConnectivity();
-	void TestConnectivityBiDir();
+	int TestConnectivity();
+	int TestConnectivityBiDir();
 	//File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);

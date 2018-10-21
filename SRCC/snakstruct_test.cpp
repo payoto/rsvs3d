@@ -380,9 +380,6 @@ int Test_snakeinit(){
 				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 				outSnake.PrintMesh(triMesh,2,totT);
 			}
-			if(ii==30){
-				cout << "break here" << endl;
-			}
 			Test_randvelstep(testSnake, dt, isImpact);
 			cout << endl;
 			
