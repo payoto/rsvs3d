@@ -13,9 +13,9 @@ using namespace std;
 // Class Method implementaton 
 
 
-// -------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 // Implementatation of snax - snaxedge - snaxsurf 
-// -------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 void snax::disp() const{
 	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind <<
 	"; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << " | isBorder " << isBorder << endl;

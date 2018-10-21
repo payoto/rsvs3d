@@ -2293,10 +2293,10 @@ void mesh::ForceCloseContainers(){
 	int nVert,nEdge,nSurf,nBlocks;
 	bool is3DMesh=volus.size()>0;
 	vector<int> vertBlock;
-
+	vector<bool> surfsIsDone;
 
 	nBlocks=this->ConnectedVertex(vertBlock);
-
+	surfsIsDone.assign(surfs.size(),false);
 	nVert=verts.size();
 	if (is3DMesh){
 	  // reassign volumes
@@ -2308,13 +2308,29 @@ void mesh::ForceCloseContainers(){
 			nEdge=verts(ii)->edgeind.size();
 			for(jj=0;jj<nEdge;++jj){
 				iEdge=edges.find(verts(ii)->edgeind[jj]);
+				#ifdef SAFE_ALGO
+				if(vertBlock[verts.find(edges(iEdge)->vertind[0])] 
+					!= vertBlock[verts.find(edges(iEdge)->vertind[1])]){
+					cerr << endl <<"An edge has connections in 2 vertBlocks:" << endl;
+							cerr << __PRETTY_FUNCTION__ << endl;
+				}
+				#endif //SAFE_ALGO
 				nSurf=edges(iEdge)->surfind.size();
 				for (kk=0;kk<nSurf;++kk){
 					iSurf=surfs.find(edges(iEdge)->surfind[kk]);
+					if (surfsIsDone[iSurf]){
+						#ifdef SAFE_ALGO
+						if(surfs.elems[iSurf].voluind[0]!=vertBlock[ii]){
+							cerr << endl <<"Surf voluind assignement performed twice during:" << endl;
+							cerr << __PRETTY_FUNCTION__ << endl;
+						}
+						#endif // SAFE_ALGO
+					}
 					volus.elems[volus.find(vertBlock[ii])].surfind.push_back(edges(iEdge)->surfind[kk]);
 					surfs.elems[iSurf].voluind.clear();
 					surfs.elems[iSurf].voluind.push_back(vertBlock[ii]);
 					surfs.elems[iSurf].voluind.push_back(0);
+					surfsIsDone[iSurf] = true;
 				}
 			}
 		}

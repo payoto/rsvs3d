@@ -775,6 +775,8 @@ void CleanupSnakeConnec(snake &snakein){
 		else { // Only executes at the end
 			
 			snakein.HashArrayNM();
+			snakein.CheckConnectivity();
+			snakein.OrderEdges();
 			snakein.ForceCloseContainers();
 			snakein.snakeconn.TightenConnectivity();
 			#ifdef SAFE_ALGO
@@ -782,8 +784,6 @@ void CleanupSnakeConnec(snake &snakein){
 				snakein.snakeconn.TestConnectivityBiDir();
 			}
 			#endif
-			snakein.CheckConnectivity();
-			snakein.OrderEdges();
 		}
 	}
 	snakein.PrepareForUse();
@@ -1340,18 +1340,19 @@ Edge can be removed if it is connected to one surface or one vertex.
 
 	}
 
-	ni = snakein.snakeconn.edges.size();
-	for (ii = 0; ii < ni; ++ii){
-		if (snakein.snakeconn.edges(ii)->surfind.size()>2){
-			// snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
-			// cerr << endl << "Edge is connected to too  many surfaces" << endl;
-			if(ne==0){cerr<< endl;}
-			cerr << "Edge error " << ne << " edge should connect to single surface (surfind:)";
-			DisplayVector(snakein.snakeconn.edges(ii)->surfind);
-			cerr << endl; 
-			ne++;
-		}
-	}
+	// I don't think this error makes sense its a side effect of the cleanup.
+	// ni = snakein.snakeconn.edges.size();
+	// for (ii = 0; ii < ni; ++ii){
+	// 	if (snakein.snakeconn.edges(ii)->surfind.size()>2){
+	// 		// snakein.snakeconn.edges(ii)->disptree(snakein.snakeconn,1);
+	// 		// cerr << endl << "Edge is connected to too  many surfaces" << endl;
+	// 		if(ne==0){cerr<< endl;}
+	// 		cerr << "Edge error " << ne << " edge should connect to single surface (surfind:)";
+	// 		DisplayVector(snakein.snakeconn.edges(ii)->surfind);
+	// 		cerr << endl; 
+	// 		ne++;
+	// 	}
+	// }
 	if(ne>0){
 		cerr << endl << "There were " << ne << " Edge deletion errors:" ;
 		cerr << endl << __PRETTY_FUNCTION__ << endl;
