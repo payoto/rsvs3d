@@ -76,7 +76,6 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 
 	snakeMesh.PrepareForUse();
 	snakeMesh.OrientSurfaceVolume();
-
 	///// Generate Coarser Volume Mesh
 	testSnake.snakemesh=&snakeMesh;
 	//testSnake.disp();
@@ -105,6 +104,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	TriangulateMesh(snakeMesh,triRSVS);
 
 	testSnake.PrepareForUse();
+
 }
 
 
@@ -364,7 +364,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<80;++ii){
+		for(ii=0;ii<200;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){

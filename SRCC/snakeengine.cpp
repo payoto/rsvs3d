@@ -136,6 +136,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 			}
 		}
 	}
+
 	newsnake.snakeconn.edges.ChangeIndices(1,0,0,0);
 	if(!newsnake.Check3D()){
 		for (ii=0;ii<nEdge;++ii){
@@ -387,18 +388,18 @@ void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit){
 	for(ii=0;ii<nSnaxEdge;++ii){
 		snaxSub1=snakein.snaxs.find(snakein.snakeconn.edges(ii)->vertind[0]);
 		snaxSub2=snakein.snaxs.find(snakein.snakeconn.edges(ii)->vertind[1]);
-		if(snaxSub1==-1 || snaxSub2==-1){
+		if(snaxSub1==-1 && snaxSub2==-1){
 			// tempConnec2.rmvind.clear();
 			// tempConnec2.keepind=snakein.snaxedges(ii)->index;
 			// tempConnec2.rmvind.push_back(snakein.snaxedges(ii)->index);
 			// connecEdit.push_back(tempConnec2);
-			cout << "SnaxEdgeConnecDetection invalid edge 2 snax inexistant";
+			cout << "SnaxEdgeConnecDetection invalid edge 2 snaxel inexistant:";
 			snakein.snakeconn.edges(ii)->disp();
 		} else if (snaxSub1==-1){
-			cout << "SnaxEdgeConnecDetection invalid edge 1(1) snax inexistant";
+			cout << "SnaxEdgeConnecDetection invalid edge 1(1) snaxel inexistant:";
 			snakein.snakeconn.edges(ii)->disp();
 		} else if (snaxSub2==-1){
-			cout << "SnaxEdgeConnecDetection invalid edge 1(2) snax inexistant";
+			cout << "SnaxEdgeConnecDetection invalid edge 1(2) snaxel inexistant:";
 			snakein.snakeconn.edges(ii)->disp();
 		} else if(snakein.snaxs(snaxSub1)->edgeind==snakein.snaxs(snaxSub2)->edgeind)
 		{
@@ -411,9 +412,12 @@ void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit){
 
 			connecEdit.push_back(tempConnec);
 			connecEdit.push_back(tempConnec2);
+			// edit vertices in place but not edges
+			// snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[0],
+			// 	tempConnec.keepind,tempConnec.scopeind);
+			// snakein.snakeconn.RemoveIndex(tempConnec2.typeobj,tempConnec2.rmvind[0]);
+			// snakein.snaxedges.DeHashParent(snakein.snaxedges.find(tempConnec2.rmvind[0]));
 
-			//snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[0],
-			//	tempConnec.keepind,tempConnec.scopeind);
 		}
 	}
 
@@ -485,6 +489,7 @@ void CleanupSnakeConnec(snake &snakein){
 
 	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
 		nEdgeSameSurfConn,nAboveN;
+	int count=0, nStartConn;
 	bool flag, iterFlag, contFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -517,48 +522,50 @@ void CleanupSnakeConnec(snake &snakein){
 		itSurf=indRmvSurf.begin();
 		itVolu=indRmvVolu.begin();
 		// Identify invalid vertex connections
-		SnaxNoConnecDetection(snakein.snakeconn, connecEdit);
 
-		nSnaxConn=int(connecEdit.size());
+		nVertConn=0;
+		do {
+			nStartConn=nVertConn;
+			SnaxNoConnecDetection(snakein.snakeconn, connecEdit);
+			nSnaxConn=int(connecEdit.size());
+			// cout << ++count << endl;
+			SnaxEdgeConnecDetection(snakein, connecEdit);
+			nVertConn=int(connecEdit.size());
+			// Identify Edge Connections
+			for(ii=nSnaxConn; ii < nVertConn;ii=ii+2){
+				// Skipping the edges which are marked here for removal.
+				snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
+					connecEdit[ii].keepind,connecEdit[ii].scopeind);
+				// edit the connectivity editing to reflect the removal of vertices
+				for(jj=ii+2;jj<nVertConn;jj=jj+2){
+					if(connecEdit[jj].keepind!=connecEdit[jj].rmvind[0]
+						&& (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0]
+							|| connecEdit[jj].keepind==connecEdit[ii].rmvind[0])){
+						connecEdit[jj].keepind=connecEdit[ii].keepind;
+						connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
+						// connecEdit[jj+1].keepind=-1; //connecEdit[ii+1].keepind;
+						connecEdit[jj+1].rmvind[0]=-1; //connecEdit[ii+1].rmvind[0];
+						
+						// connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
+					} else if(connecEdit[jj].keepind!=connecEdit[jj].rmvind[0]
+						&& connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
+						// connecEdit[jj].keepind=connecEdit[ii].keepind;
+					}
+				}
 
-		SnaxEdgeConnecDetection(snakein, connecEdit);
-		nVertConn=int(connecEdit.size());
-		// Identify Edge Connections
-		for(ii=nSnaxConn; ii < nVertConn;ii=ii+2){
-			// Skipping the edges which are marked here for removal.
-			snakein.snakeconn.SwitchIndex(connecEdit[ii].typeobj,connecEdit[ii].rmvind[0],
-				connecEdit[ii].keepind,connecEdit[ii].scopeind);
-			
-			// for(jj=ii+2;jj<nVertConn;jj=jj+2){
-			// 	if (connecEdit[jj].rmvind[0]==connecEdit[ii].keepind && 
-			// 		connecEdit[jj].keepind==connecEdit[ii].rmvind[0]){
-			// 		connecEdit[jj].keepind=connecEdit[ii].keepind;
-			// 		connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
-				
-			// 	} else if (connecEdit[jj].keepind==connecEdit[ii].rmvind[0] && 
-			// 		connecEdit[jj].keepind!=connecEdit[ii].keepind){
+			}
+			// cout << endl << nVertConn << endl;
+			// removes edges which are degenerate
 
-			// 		connecEdit[jj].keepind=connecEdit[ii].keepind;
-
-			// 	} else if (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0] && 
-			// 		connecEdit[jj].keepind!=connecEdit[ii].keepind){
-			// 		connecEdit[jj].rmvind[0]=connecEdit[ii].keepind;
-					
-			// 	} 
-			// }
-		}
-		// cout << endl << nVertConn << endl;
-		// removes edges which are degenerate
-
-		for (ii=nSnaxConn+1;ii<nVertConn;ii=ii+2){
-			// if (snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[0]==
-			// 	snakein.snakeconn.edges.isearch(connecEdit[ii].keepind)->vertind[1])
-			// {
-				snakein.snakeconn.RemoveIndex(2,connecEdit[ii].rmvind[0]);
-				snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[0]));
-
-			// }
-		}
+			for (ii=nSnaxConn+1;ii<nVertConn;ii=ii+2){
+				if(connecEdit[ii].rmvind[0]>0){
+					snakein.snakeconn.RemoveIndex(2,connecEdit[ii].rmvind[0]);
+					snakein.snaxedges.DeHashParent(snakein.snaxedges.find(connecEdit[ii].rmvind[0]));
+				} else {
+					connecEdit[ii].rmvind[0]=connecEdit[ii].keepind;
+				}
+			}
+		} while(nStartConn!=nVertConn);
 		// This block of code aims to fix the issue of edges in the same parent surface connected to the same surface
 		// It performs a merge for these surfaces but does not automatically delete the vertex
 		IdentifyMergEdgeSameSurfConnec(snakein, connecEdit);

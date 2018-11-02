@@ -480,8 +480,10 @@ void snake::CheckConnectivity() const {
 					}
 				}
 				if (isErr){
-					cerr << endl << " Test Snake Connectivity Error :" << errCount << " snaxel " << snakeconn.verts(ii)->index
-					<< " is connected to snaxel " << snaxs(testSub[jj])->index << " list: " << endl; 
+					cerr << endl << " Test Snake Connectivity Error :" 
+						<< errCount << " snaxel " << snakeconn.verts(ii)->index
+						<< " is connected to snaxel " << snaxs(testSub[jj])->index 
+						<< " list: " << endl; 
 					snakeconn.verts(ii)->disp();
 					snakeconn.verts(testSub[jj])->disp();
 					errCount++;
@@ -490,25 +492,31 @@ void snake::CheckConnectivity() const {
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity snax (same edge connectivity) Errors :" << errCount << endl;
+		cerr << "Test Connectivity snax (same edge connectivity) Errors :" 
+			<< errCount << endl;
 	}
 	errTot+=errCount;
 	errCount=0;
 	ni=int(snaxs.size());
+	/*Snaxel does not have the same number of edges as its parent edge
+	has surface connections*/
 	for (ii=0; ii<ni;++ii){
 		if (snakeconn.verts(ii)->edgeind.size()
 				!=snakemesh->edges.isearch(
 					snaxs(ii)->edgeind
 					)->surfind.size()){
-			cerr << endl << " Test snax number of edges error :" << errCount << " snaxel-vertex " << snakeconn.verts(ii)->index
-					<< " is connected to snaxel " << snaxs(ii)->edgeind << " list: " << endl; 
-					snakeconn.verts(ii)->disp();
-					snakemesh->edges.isearch(snaxs(ii)->edgeind)->disp();
-					errCount++;
+			cerr << endl << " Test snax number of edges error :" << errCount 
+				 << " snaxel-vertex " << snakeconn.verts(ii)->index
+				 << " is connected to snaxel " << snaxs(ii)->edgeind 
+				 << " list: " << endl; 
+			snakeconn.verts(ii)->disp();
+			snakemesh->edges.isearch(snaxs(ii)->edgeind)->disp();
+			errCount++;
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity snax (edges in surfs) Errors :" << errCount << endl;
+		cerr << "Test Connectivity snax (edges in surfs) Errors :"
+			<< errCount << endl;
 	}
 	errTot+=errCount;
 

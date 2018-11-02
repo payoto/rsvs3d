@@ -855,13 +855,17 @@ void mesh::TightenConnectivity(){
 
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd)
 {
+	/*Switch the indices of an element for another in all the appropriate
+	connectivity lists.
 
+	Args:
+		typeInd [1-8]: type of index */
 	int ii,jj,kk,newSub,oldSub;
 	vector<int> subList;
 	HashedVector<int,int> tempSub;
 	bool is3DMesh=volus.size()>0;
 
-	if(typeInd==1){
+	if(typeInd==1){ // Switch out a vertex
 		newSub=verts.find(newInd);
 		oldSub=verts.find(oldInd);
 		subList=edges.find_list(verts[oldSub].edgeind);
@@ -1002,85 +1006,85 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 		surfs.isSetMI=1;
    } else if (typeInd==5){ // Modify vertex index in scoped mode
 
-   	newSub=verts.find(newInd);
-   	oldSub=verts.find(oldInd);
+		newSub=verts.find(newInd);
+		oldSub=verts.find(oldInd);
 
-   	subList=edges.find_list(scopeInd);
-   	tempSub.vec=edges.find_list(verts(oldSub)->edgeind);
-   	tempSub.GenerateHash();
-   	for (ii=0;ii<int(subList.size());++ii){
-   		if(tempSub.find(subList[ii])!=-1){
-   			for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
-   				if(edges(subList[ii])->vertind[jj]==oldInd){
-   					edges[subList[ii]].vertind[jj]=newInd;
-   					verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
+		subList=edges.find_list(scopeInd);
+		tempSub.vec=edges.find_list(verts(oldSub)->edgeind);
+		tempSub.GenerateHash();
+		for (ii=0;ii<int(subList.size());++ii){
+			if(tempSub.find(subList[ii])!=-1){
+				for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
+					if(edges(subList[ii])->vertind[jj]==oldInd){
+						edges[subList[ii]].vertind[jj]=newInd;
+						verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
 
 				  //cout << " " << edges[subList[ii]].index <<  " ";
-   					for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
-   						if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
-   							verts[oldSub].edgeind.erase(
-   								verts[oldSub].edgeind.begin()+kk);
-   							kk--;
-   						}
-   					}
-   				}
-   			}
-   		}  
-   	}
-   	if(meshDepIsSet && meshDim==0){
-	  	// for (ii=0;ii<int(oldSub.size());++ii){
-	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
-	  	// }
-   		meshtree.elemind[oldSub]=newInd;
-   	}
-   	edges.isHash=1;
-   	verts.isHash=1;
-   	edges.isSetMI=1;
-   	verts.isSetMI=1;
-   } else if (typeInd==6){ // Modify surface index in scoped mode
+						for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
+							if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+								verts[oldSub].edgeind.erase(
+									verts[oldSub].edgeind.begin()+kk);
+								kk--;
+							}
+						}
+					}
+				}
+			}  
+		}
+		if(meshDepIsSet && meshDim==0){
+			// for (ii=0;ii<int(oldSub.size());++ii){
+			// 	meshtree.elemind[oldSub[ii]]=newInd;
+			// }
+			meshtree.elemind[oldSub]=newInd;
+		}
+		edges.isHash=1;
+		verts.isHash=1;
+		edges.isSetMI=1;
+		verts.isSetMI=1;
+	} else if (typeInd==6){ // Modify surface index in scoped mode
 
-   	newSub=surfs.find(newInd);
-   	oldSub=surfs.find(oldInd);
+		newSub=surfs.find(newInd);
+		oldSub=surfs.find(oldInd);
 
-   	subList=edges.find_list(scopeInd);
-   	for (ii=0;ii<int(subList.size());++ii){
-   		for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
-   			if(edges(subList[ii])->surfind[jj]==oldInd){
-   				edges[subList[ii]].surfind[jj]=newInd;
-   				surfs[newSub].edgeind.push_back(edges[subList[ii]].index); 
+		subList=edges.find_list(scopeInd);
+		for (ii=0;ii<int(subList.size());++ii){
+			for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
+				if(edges(subList[ii])->surfind[jj]==oldInd){
+					edges[subList[ii]].surfind[jj]=newInd;
+					surfs[newSub].edgeind.push_back(edges[subList[ii]].index); 
 
 			   //cout << " " << edges[subList[ii]].index <<  " ";
-   				for (kk=0;kk<int(surfs(oldSub)->edgeind.size());++kk){
-   					if(surfs(oldSub)->edgeind[kk]==edges[subList[ii]].index){
-   						surfs[oldSub].edgeind.erase(
-   							surfs[oldSub].edgeind.begin()+kk);
-   						kk--;
-   					}
-   				}
-   			}
-   		} 
-   	}
-   	for(ii=0;ii<int(surfs(newSub)->voluind.size());ii++){
-   		if(surfs(newSub)->voluind[ii]>0){
-   			volus.elems[volus.find(surfs(newSub)->voluind[ii])].surfind.push_back(newInd);
-   		}
-   	}
-   	if(meshDepIsSet && meshDim==3){
-	  	// for (ii=0;ii<int(oldSub.size());++ii){
-	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
-	  	// }
-   		meshtree.elemind[oldSub]=newInd;
-   	}
-   	edges.isHash=1;
-   	surfs.isHash=1;
-   	edges.isSetMI=1;
-   	surfs.isSetMI=1;
-   } else {
+					for (kk=0;kk<int(surfs(oldSub)->edgeind.size());++kk){
+						if(surfs(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+							surfs[oldSub].edgeind.erase(
+								surfs[oldSub].edgeind.begin()+kk);
+							kk--;
+						}
+					}
+				}
+			} 
+		}
+		for(ii=0;ii<int(surfs(newSub)->voluind.size());ii++){
+			if(surfs(newSub)->voluind[ii]>0){
+				volus.elems[volus.find(surfs(newSub)->voluind[ii])].surfind.push_back(newInd);
+			}
+		}
+		if(meshDepIsSet && meshDim==3){
+			// for (ii=0;ii<int(oldSub.size());++ii){
+			// 	meshtree.elemind[oldSub[ii]]=newInd;
+			// }
+			meshtree.elemind[oldSub]=newInd;
+		}
+		edges.isHash=1;
+		surfs.isHash=1;
+		edges.isSetMI=1;
+		surfs.isSetMI=1;
+   	} else {
 
-   	cerr << "Error unknown type " << typeInd << " of object for index switching" <<endl;
-   	cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   	throw invalid_argument (" Type is out of range");
-   }
+		cerr << "Error unknown type " << typeInd << " of object for index switching" <<endl;
+		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+		throw invalid_argument (" Type is out of range");
+	}
 
 }
 
