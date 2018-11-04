@@ -44,6 +44,9 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 			}
 		}
 		break;
+		default:
+		throw invalid_argument("Dimensionality too high.");
+		break;
 	}
 
 	if(flag){

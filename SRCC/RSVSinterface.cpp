@@ -534,7 +534,7 @@ void SQPcalc::ComputeSQPstep(){
 
 void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut){
 
-	int nR,nC;
+	int nR=0,nC=0;
 	arrayIn.size(nR,nC);
 	matOut.setZero(nR,nC);
 

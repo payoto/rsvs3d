@@ -445,7 +445,7 @@ void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, int volType) co
 	*/
 	
 	double volu::*mp;
-
+	mp=NULL;
 	switch(volType){
 		case 0:
 		mp=&volu::volume;
@@ -1091,7 +1091,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd
 void mesh::RemoveIndex(int typeInd, int oldInd)
 {
 
-	int ii,jj;
+	int ii,jj, sub;
 	vector<int> subList;
 
 	if(typeInd==1){
@@ -1101,8 +1101,8 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 	} else if (typeInd==2){
 
-
-		subList=verts.find_list(edges(edges.find(oldInd))->vertind);
+		sub = edges.find(oldInd);
+		subList=verts.find_list(edges(sub)->vertind);
 		for (ii=0;ii<int(subList.size());++ii){
 			for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
 				if(verts(subList[ii])->edgeind[jj]==oldInd){
@@ -1113,7 +1113,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 			}  
 		}
 
-		subList=surfs.find_list(edges(edges.find(oldInd))->surfind);
+		subList=surfs.find_list(edges(sub)->surfind);
 		for (ii=0;ii<int(subList.size());++ii){
 			if(subList[ii]!=-1){
 				for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
@@ -1126,6 +1126,8 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 				}
 			}  
 		}
+		edges[sub].vertind.clear();
+		edges[sub].surfind.clear();
 
 		edges.isHash=1;
 		verts.isHash=1;
@@ -1137,8 +1139,9 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 	} else if (typeInd==3){
 
+		sub = surfs.find(oldInd);
 
-		subList=edges.find_list(surfs(surfs.find(oldInd))->edgeind);
+		subList=edges.find_list(surfs(sub)->edgeind);
 		for (ii=0;ii<int(subList.size());++ii){
 			for (jj=0;jj<int(edges(subList[ii])->surfind.size());++jj){
 				if(edges(subList[ii])->surfind[jj]==oldInd){
@@ -1149,7 +1152,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 			}  
 		}
 
-		subList=volus.find_list(surfs(surfs.find(oldInd))->voluind);
+		subList=volus.find_list(surfs(sub)->voluind);
 		for (ii=0;ii<int(subList.size());++ii){
 			if(subList[ii]!=-1){
 				for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
@@ -1162,6 +1165,8 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 			}  
 		}
 
+		surfs[sub].edgeind.clear();
+		surfs[sub].voluind.clear();
 		surfs.isHash=1;
 		edges.isHash=1;
 		volus.isHash=1;

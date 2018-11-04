@@ -147,6 +147,8 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS ,
 		mp=&triangulation::dynatri;
 	} else if (typeMesh==3) {
 		mp=&triangulation::intertri; 
+	} else {
+		throw invalid_argument("Invalid type of mesh, typeMesh [1,2,3]");
 	}
 
 	maxIndVert=triangleRSVS.trivert.GetMaxIndex();
