@@ -42,7 +42,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
-
+#include "dbg.h"
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
@@ -129,6 +129,7 @@ public:
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
+			dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -142,6 +143,7 @@ public:
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
+			dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -156,6 +158,7 @@ public:
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
+			dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			throw range_error (" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -169,6 +172,7 @@ public:
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
+			dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			throw range_error ("Index is out of range");
 		}
 		#endif //SAFE_ACCESS
