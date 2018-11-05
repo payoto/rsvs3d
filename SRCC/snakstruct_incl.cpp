@@ -60,9 +60,11 @@ template<class T> bool SnakStruct<T>::memberIsHashParent(const int pos) const{
 	int key=elems[pos].KeyParent();
 	unordered_multimap<int,int>::const_iterator it = hashParent.find(key);
 	if(it != hashParent.end()){
-		while(it->second!=pos && it->first==key){++it;}
+		while(it != hashParent.end() 
+			&& it->second!=pos && it->first==key){++it;}
 
-		if (it->second==pos && it->first==key){
+		if (it != hashParent.end() 
+			&& it->second==pos && it->first==key){
 			return(true);
 		} else {
 
