@@ -72,14 +72,76 @@ void snaxsurf::PrepareForUse() {
 void snax::disptree(const mesh &meshin, int n) const{
    
    disp();
+   meshin.verts.isearch(index)->disptree(meshin, n);
 }
 void snaxedge::disptree(const mesh &meshin, int n) const{
    
    disp();
+   meshin.edges.isearch(index)->disptree(meshin, n);
 }
 void snaxsurf::disptree(const mesh &meshin, int n) const{
    
    disp();
+   meshin.surfs.isearch(index)->disptree(meshin, n);
+
+}
+void snax::disptree(const snake &snakein, int n) const{
+   
+   int i;
+	for(i=0;i<n;i++){cout<< "  ";}
+	disp();
+	for(i=0;i<n;i++){cout<< "  ";}
+	snakein.snakeconn.verts.isearch(index)->disp();
+	if(n>0){
+		for (i=0; unsigned_int(i)<
+			snakein.snakeconn.verts.isearch(index)->edgeind.size();i++){
+			snakein.snaxedges.isearch(
+				snakein.snakeconn.verts.isearch(index)->edgeind[i]
+				)->disptree(snakein,n-1);
+		}
+	}
+
+}
+void snaxedge::disptree(const snake &snakein, int n) const{
+   
+   int i;
+	for(i=0;i<n;i++){cout<< "  ";}
+	disp();
+	for(i=0;i<n;i++){cout<< "  ";}
+	snakein.snakeconn.edges.isearch(index)->disp();
+	if(n>0){
+		for (i=0; unsigned_int(i)<
+			snakein.snakeconn.edges.isearch(index)->vertind.size();i++){
+			snakein.snaxs.isearch(
+				snakein.snakeconn.edges.isearch(index)->vertind[i]
+				)->disptree(snakein,n-1);
+		}
+		for (i=0; unsigned_int(i)<
+			snakein.snakeconn.edges.isearch(index)->surfind.size();i++){
+			snakein.snaxsurfs.isearch(
+				snakein.snakeconn.edges.isearch(index)->surfind[i]
+				)->disptree(snakein,n-1);
+		}
+	}
+
+}
+void snaxsurf::disptree(const snake &snakein, int n) const{
+   
+	int i;
+	for(i=0;i<n;i++){cout<< "  ";}
+	disp();
+	for(i=0;i<n;i++){cout<< "  ";}
+	snakein.snakeconn.surfs.isearch(index)->disp();
+	if(n>0){
+		for (i=0; unsigned_int(i)<
+			snakein.snakeconn.surfs.isearch(index)->edgeind.size();i++){
+			snakein.snaxedges.isearch(
+				snakein.snakeconn.surfs.isearch(index)->edgeind[i]
+				)->disptree(snakein,n-1);
+		}
+	}
+
+
 }
 void snax::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 	index+=nVert;

@@ -494,7 +494,7 @@ void CleanupSnakeConnec(snake &snakein){
 	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
 		nEdgeSameSurfConn,nAboveN;
 	// int nStartConn;
-	// int count=0;
+	int count=0;
 	bool flag, iterFlag, contFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -528,7 +528,7 @@ void CleanupSnakeConnec(snake &snakein){
 		itVolu=indRmvVolu.begin();
 		// Identify invalid vertex connections
 		// count=0;
-		nVertConn=0;
+		// nVertConn=0;
 		SnaxNoConnecDetection(snakein.snakeconn, connecEdit);
 		// do {
 		nSnaxConn=int(connecEdit.size());
@@ -547,7 +547,10 @@ void CleanupSnakeConnec(snake &snakein){
 					if(connecEdit[jj].typeobj==1){
 						if(connecEdit[jj].keepind!=connecEdit[jj].rmvind[0]
 							&& (connecEdit[jj].rmvind[0]==connecEdit[ii].rmvind[0]
-								|| connecEdit[jj].keepind==connecEdit[ii].rmvind[0])){
+								|| connecEdit[jj].rmvind[0]==connecEdit[ii].keepind
+								|| connecEdit[jj].keepind==connecEdit[ii].rmvind[0]
+								|| connecEdit[jj].keepind==connecEdit[ii].keepind
+								)){
 							connecEdit[jj].keepind=connecEdit[ii].keepind;
 							connecEdit[jj].rmvind[0]=connecEdit[ii].rmvind[0];
 							// connecEdit[jj+1].keepind=-1; //connecEdit[ii+1].keepind;
@@ -561,6 +564,7 @@ void CleanupSnakeConnec(snake &snakein){
 					}
 				}
 			}
+			
 		}
 		// cout << endl << nVertConn << endl;
 		// removes edges which are degenerate
@@ -769,6 +773,7 @@ void CleanupSnakeConnec(snake &snakein){
 						==snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size()){
 						if(nAboveN==0){
 							cout << endl << "displaying vertices about to be removed by nAboveN cond:" << endl;
+							// dispconnrmv(connecEdit);
 						}
 						snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
 						indRmvVert.erase(indRmvVert.begin()+ii);
@@ -797,7 +802,7 @@ void CleanupSnakeConnec(snake &snakein){
 			if (snakein.Check3D()){
 				ii=snakein.snakeconn.TestConnectivityBiDir();
 				if(ii>0){
-					// dispconnrmv(connecEdit);
+					dispconnrmv(connecEdit);
 				}
 			}
 			#endif

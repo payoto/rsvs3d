@@ -588,6 +588,7 @@ void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact){
 	}
 	#endif
 	start_s=TimeStamp("Clean: ", start_s);
+	testSnake.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(testSnake,isImpact);
 
 

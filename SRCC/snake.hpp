@@ -148,6 +148,7 @@ public:
 	// interface functions
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	void disptree(const snake &snakein, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (edgeind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -175,6 +176,7 @@ public:
 	void PrepareForUse();
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	void disptree(const snake &snakein, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (surfind);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -198,6 +200,7 @@ public:
 	void PrepareForUse(); 
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	void disptree(const snake &snakein, int n) const;
 	int Key() const {return (index);};
 	int KeyParent() const {return (voluind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
