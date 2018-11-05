@@ -117,6 +117,7 @@ public:
 	void UpdateDistance(const vector<double> &dt);
 	void CalculateTimeStep(vector<double> &dt, double dtDefault);
 	void SnaxImpactDetection(vector<int> &isImpact);
+	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
 	// Snake connectivity operations

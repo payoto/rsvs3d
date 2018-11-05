@@ -941,11 +941,11 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 		if(!isSnaxDone[ii]){
 			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
 			if (nEdge==1){
-				if(IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<0.0)) {
+				if(IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<=0.0)) {
 					isImpact.push_back(snaxs(ii)->index);
 					isImpact.push_back(-1);
 
-				} else if (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>0.0)){
+				} else if (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>=0.0)){
 					isImpact.push_back(snaxs(ii)->index);
 					isImpact.push_back(-2);
 				}
@@ -960,6 +960,69 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 			}
 		}
 	}
+
+}
+void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
+
+	int i;
+	int nVerts, nSnax, vertInd;
+	vector<int> vertSnaxCloseCnt, vertSnaxMinInd;
+	vector<double> vertSnaxMinD;
+	double d;
+	bool flag;
+
+	nVerts = snakemesh->verts.size();
+	nSnax = snaxs.size();
+
+	// isImpact.clear();
+	// isImpact.reserve(nSnax*2);
+
+	vertSnaxCloseCnt.assign(nVerts,0);
+	vertSnaxMinInd.assign(nVerts,0);
+	vertSnaxMinD.assign(nVerts,1.0);
+
+	/*Find the closest snaxel to each vertex and the number of close
+	snaxels*/
+	for (i = 0; i < nSnax; ++i)
+	{
+		flag = false;
+		if((snaxs(i)->d<dDlim) && (snaxs(i)->v<=0.0) 
+			&& !IsAproxEqual(snaxs(i)->d,0.0)){
+			flag = true;
+			vertInd = snaxs(i)->fromvert;
+			d = snaxs(i)->d;
+		} else if (((1.0-snaxs(i)->d)<dDlim) && (snaxs(i)->v>=0.0) 
+			&& !IsAproxEqual(snaxs(i)->d,1.0)){
+			flag = true;
+			vertInd = snaxs(i)->tovert;
+			d = 1-snaxs(i)->d;
+		}
+		if(flag){
+			vertInd = snakemesh->verts.find(vertInd);
+			vertSnaxCloseCnt[vertInd]++;
+
+			if(vertSnaxMinD[vertInd]>=d){
+				vertSnaxMinD[vertInd]=d;
+				vertSnaxMinInd[vertInd]=i;
+			}
+		}
+	}
+
+	for (i = 0; i < nVerts; ++i){
+		if(vertSnaxCloseCnt[i]>=2){
+			isImpact.push_back(snaxs(vertSnaxMinInd[i])->index);
+			if(snaxs(vertSnaxMinInd[i])->d<dDlim){
+				// Collapse on the from vertex
+				snaxs[vertSnaxMinInd[i]].d=0.0;
+				isImpact.push_back(-1);
+			} else {
+				// Collapse on the to vertex
+				snaxs[vertSnaxMinInd[i]].d=1.0;
+				isImpact.push_back(-2);
+			}
+		}
+	}
+	snaxs.PrepareForUse();
 
 }
 

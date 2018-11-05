@@ -494,7 +494,7 @@ void CleanupSnakeConnec(snake &snakein){
 	int ii,jj,kk,nEdgeConn,nSurfConn,nEdgeSurfConn,nVertConn,nSnaxConn,
 		nEdgeSameSurfConn,nAboveN;
 	// int nStartConn;
-	int count=0;
+	// int count=0;
 	bool flag, iterFlag, contFlag;
 	HashedVector<int,int> indDelEdge;
 	iterFlag=true;
@@ -760,7 +760,7 @@ void CleanupSnakeConnec(snake &snakein){
 			// nAbove3=0;
 			nAboveN=0;
 			snakein.snakeconn.TightenConnectivity();
-			if(true){
+			if(false){
 				for(ii=0;ii<int(indRmvVert.size());ii++){
 					// nAbove3+=int(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2);
 					// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){

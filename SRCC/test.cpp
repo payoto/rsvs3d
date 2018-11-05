@@ -51,11 +51,12 @@ int main(){
 	gridTest.Run(Test_surfcentre,"test SurfCentroid"); 
 	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.Run(Test_snakeinit,"Snake rand velocity"); // Non working tests
 	#endif //TEST_ALL
  
-	gridTest.Run(Test_snakeinit,"Snake rand velocity"); // Non working tests
-	// gridTest.Run(Test_snakeinit_MC,"Merge 1 Clean ");
 	// gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
+	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
+	// gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 
 

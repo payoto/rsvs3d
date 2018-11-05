@@ -219,5 +219,7 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 
 int Test_snakeRSVS();
 int Test_surfcentre();
+int Test_snakeRSVS_singlevol();
+int Test_RSVSalgo_singlevol();
 #endif // SNAKEVEL_H_INCLUDED
 

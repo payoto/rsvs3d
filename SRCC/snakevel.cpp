@@ -65,7 +65,7 @@ void CalculateSnakeVelFast(snake &snakein){
 }
 void CalculateNoNanSnakeVel(snake &snakein){
 
-	int ii=0;
+	int ii=0, ll=0;
 
 	for (ii=0;ii<int(snakein.snaxs.size());++ii){
 		// if (snakein.snaxs(ii)->isfreeze==1){
@@ -75,7 +75,11 @@ void CalculateNoNanSnakeVel(snake &snakein){
 		//snakein.snaxs[ii].v=(double(rand()%1001)/1000.0+0.5)*snakein.snaxs[ii].v;
 		if(!isfinite(snakein.snaxs[ii].v)){
 			snakein.snaxs[ii].v=(0.5-snakein.snaxs[ii].d);
+			++ll;
 		}
+	}
+	if(ll>0){
+		cerr << endl << ll << " velocities were not finite." << endl;
 	}
 }
 

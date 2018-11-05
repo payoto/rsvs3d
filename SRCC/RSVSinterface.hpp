@@ -32,7 +32,7 @@ public :
 	RowVectorXd dObj;
 	VectorXd constr, lagMult, deltaDV, constrTarg;
 	double obj=0.0;
-	double limLag = 100000.0;
+	double limLag = INFINITY;
 
 	vector<bool> isConstrAct, isDvAct;
 	vector<int> subConstrAct, subDvAct;
