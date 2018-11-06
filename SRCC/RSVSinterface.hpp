@@ -45,7 +45,8 @@ public :
 	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildConstrMap(const mesh &meshin);
 	void BuildDVMap(const vector<int> &vecin);
-	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS);
+	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true);
 	void CalculateTriangulation(const triangulation &triRSVS);
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;

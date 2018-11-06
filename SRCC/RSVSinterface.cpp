@@ -48,7 +48,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	} 
 	ni=triRSVS.intertri.size();
 	for(ii = 0; ii< ni ; ii++){
-		CalcTriangle(*(triRSVS.intertri(ii)), triRSVS);
+		CalcTriangle(*(triRSVS.intertri(ii)), triRSVS, false);
 	} 
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
@@ -241,7 +241,8 @@ void SQPcalc::BuildDVMap(const vector<int> &vecin){
 	dvMap.GenerateHash();
 }
 
-void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
+void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
+	bool isObj, bool isConstr){
 
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
@@ -323,8 +324,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 		}
 	}
 	// Total
-	VolumeCalc.Calc();
-	AreaCalc.Calc();
 
 	HVal.setZero(9,9);
 	dVal.setZero(1,9);
@@ -333,57 +332,61 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	HConstrPart.setZero(nDvAct,nDvAct);
 	HObjPart.setZero(nDvAct,nDvAct);
 
+	if(isObj){
+		AreaCalc.Calc();
+		AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dObjPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
+		objPart=*retVal;
 
-	AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
-	ArrayVec2MatrixXd(*HValpnt, HVal);
-	ArrayVec2MatrixXd(*dValpnt, dVal);
-	Deriv1stChainScalar(dVal, dPos,dObjPart);
-	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
-	objPart=*retVal;
-
-	// Assign to main part of the object
-	// assign objective function
-	obj+=objPart; 
-	// Assign objective derivative
-	// cout << endl << "dObjPart " << nDvAct << " " ;
-	// PrintMatrix(dObjPart);
-	// cout <<  endl << "done" <<endl; 
-	for(ii=0; ii< nDvAct; ++ii){
-		dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-		isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
-		for(jj=0; jj< nDvAct; ++jj){
-			HObj(dvMap.find(dvListMap.vec[jj]),
-				 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+		// Assign to main part of the object
+		// assign objective function
+		obj+=objPart; 
+		// Assign objective derivative
+		// cout << endl << "dObjPart " << nDvAct << " " ;
+		// PrintMatrix(dObjPart);
+		// cout <<  endl << "done" <<endl; 
+		for(ii=0; ii< nDvAct; ++ii){
+			dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+			isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
+			for(jj=0; jj< nDvAct; ++jj){
+				HObj(dvMap.find(dvListMap.vec[jj]),
+					 dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+			}
 		}
 	}
-
-	VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
-	ArrayVec2MatrixXd(*HValpnt, HVal);
-	ArrayVec2MatrixXd(*dValpnt, dVal);
-	Deriv1stChainScalar(dVal, dPos,dConstrPart);
-	Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
-	constrPart=*retVal;
-	// Assign Constraint
-	// and constraint derivative
-	// and Hessian		
-	nCellTarg=triIn.connec.celltarg.size(); 
-	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
-		nj=subTempVec.size();
-		for(jj=0; jj< nj; ++jj){
-			if (subTempVec[jj]!=-1){
-				isConstrAct.at(subTempVec[jj]) = true;
-				constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
-				for(kk=0; kk< nDvAct; ++kk){
-					dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
-						triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
-					for(ll=0; ll< nDvAct; ++ll){
-						HObj(dvMap.find(dvListMap.vec[ll]),
-							 dvMap.find(dvListMap.vec[kk])) += HObjPart(ll,kk);
+	if(isConstr){
+		VolumeCalc.Calc();
+		VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dConstrPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+		constrPart=*retVal;
+		// Assign Constraint
+		// and constraint derivative
+		// and Hessian		
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
+					isConstrAct.at(subTempVec[jj]) = true;
+					constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+					for(kk=0; kk< nDvAct; ++kk){
+						dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
+							triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+						for(ll=0; ll< nDvAct; ++ll){
+							HObj(dvMap.find(dvListMap.vec[ll]),
+								 dvMap.find(dvListMap.vec[kk])) += HObjPart(ll,kk);
+						}
 					}
+				} else {
+					falseaccess++;
 				}
-			} else {
-				falseaccess++;
 			}
 		}
 	}

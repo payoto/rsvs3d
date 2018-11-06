@@ -596,7 +596,7 @@ void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	start_s=TimeStamp("Spawn: ", start_s);
 
 	testSnake.SnaxImpactDetection(isImpact);
-	testSnake.SnaxAlmostImpactDetection(isImpact, 0.00);
+	testSnake.SnaxAlmostImpactDetection(isImpact, 0.25);
 	testSnake.PrepareForUse();
 	#ifdef SAFE_ALGO
 	if (testSnake.Check3D()){
@@ -1040,7 +1040,7 @@ int Test_RSVSalgo_singlevol(){
 	
 
 	dims.assign(3,0);
-	dims[0]=1;dims[1]=1;dims[2]=1;
+	dims[0]=1;dims[1]=3;dims[2]=1;
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 
@@ -1048,7 +1048,9 @@ int Test_RSVSalgo_singlevol(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-		voluMesh.volus[0].target=0.0001;
+		voluMesh.volus[0].target=0.001;
+		voluMesh.volus[1].target=0.1;
+		voluMesh.volus[2].target=0.001;
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
@@ -1184,7 +1186,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// calcObj.Print2Screen(2);
 	// CalculateSnakeVel(testSnake);
 	CalculateNoNanSnakeVel(testSnake);
-	testSnake.CalculateTimeStep(dt,0.9);
+	testSnake.CalculateTimeStep(dt,0.5);
 	testSnake.UpdateDistance(dt);
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
