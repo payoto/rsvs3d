@@ -50,8 +50,14 @@ public :
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
-	void ComputeSQPstep();
-	void PrepareMatricesForSQP(
+	void CheckAndCompute();
+	void ComputeSQPstep(
+		MatrixXd &dConstrAct,
+		RowVectorXd &dObjAct,
+		VectorXd &constrAct,
+		VectorXd &lagMultAct
+		);
+	bool PrepareMatricesForSQP(
 		MatrixXd &dConstrAct,
 		MatrixXd &HConstrAct, 
 		MatrixXd &HObjAct,

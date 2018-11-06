@@ -233,8 +233,8 @@ int Test_snakeinit();
 int Test_snakeinit_MC();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
-void Test_stepalgo(snake &testSnake, vector<double> &dt, vector<int> &isImpact);
-void Test_stepalgo_mergeclean(snake &testSnake, vector<double> &dt, vector<int> &isImpact);
+void Test_stepalgo(snake &testSnake,  vector<int> &isImpact);
+void Test_stepalgo_mergeclean(snake &testSnake,  vector<int> &isImpact);
 // Functions needed at Compile time
 
 // set constructors (used to avoid a variable being unknowingly forgotten)

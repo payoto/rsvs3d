@@ -55,8 +55,8 @@ int main(){
 	#endif //TEST_ALL
  
 	// gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
-	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
-	// gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
+	// gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
+	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 
 

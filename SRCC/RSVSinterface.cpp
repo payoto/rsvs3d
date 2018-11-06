@@ -392,7 +392,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS){
 	// Assign Constraint Hessian
 }
 
-void SQPcalc::PrepareMatricesForSQP(
+bool SQPcalc::PrepareMatricesForSQP(
 	MatrixXd &dConstrAct,
 	MatrixXd &HConstrAct, 
 	MatrixXd &HObjAct,
@@ -448,26 +448,55 @@ void SQPcalc::PrepareMatricesForSQP(
 	}
 	constrAct.setZero(nConstrAct);
 	for(jj=0; jj<nConstrAct;++jj){
-		constrAct[jj]=constr[subDvAct[jj]] -constrTarg[subDvAct[jj]];
+		constrAct[jj]=constr[subConstrAct[jj]] -constrTarg[subConstrAct[jj]];
 	}
 	lagMultAct.setZero(nConstrAct);
 
 	// DisplayVector(isDvAct);
 	// DisplayVector(isConstrAct);
 	HLag = HObjAct;
+	return(nDvAct>0);
 }
 
-void SQPcalc::ComputeSQPstep(){
-
+void SQPcalc::CheckAndCompute(){
+	int ii;
+	bool computeFlag;
 	MatrixXd dConstrAct,HConstrAct, HObjAct;
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
+
+
+	computeFlag = PrepareMatricesForSQP(
+		dConstrAct,HConstrAct, HObjAct,dObjAct,
+		constrAct,lagMultAct
+		);
+
+	if (computeFlag){
+		ComputeSQPstep(
+			dConstrAct,dObjAct,
+			constrAct,lagMultAct
+			);
+	} else {
+		for (ii=0; ii<nDv; ++ii){
+			deltaDV[ii]=0.0;
+			
+		}
+	}
+
+}
+
+void SQPcalc::ComputeSQPstep(
+	MatrixXd &dConstrAct,
+	RowVectorXd &dObjAct,
+	VectorXd &constrAct,
+	VectorXd &lagMultAct
+	){
+
+	VectorXd  deltaDVAct;
 	MatrixXd temp1, temp2;
 	bool isNan, isLarge;
 	int ii, ni;
-	PrepareMatricesForSQP(dConstrAct,HConstrAct, HObjAct,dObjAct,
-		constrAct,lagMultAct
-		);
+
 	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
 	// HouseholderQR<MatrixXd> HLagSystem(HLag);
 	// LLT<MatrixXd> HLagSystem(HLag);
