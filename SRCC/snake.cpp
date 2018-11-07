@@ -681,22 +681,38 @@ void snake::OrderEdges(){
 }
 
 // Snake Movement
-void snake::UpdateDistance(double dt){
+void snake::UpdateDistance(double dt, double maxDstep){
 	int ii;
-
+	double dStep;
 	for (ii = 0; ii < int(snaxs.size()); ++ii)
 	{
-		snaxs[ii].d=snaxs[ii].d+snaxs[ii].v*dt;
+		if(snaxs[ii].v*dt>maxDstep){
+			dStep = maxDstep;
+		} else if (snaxs[ii].v*dt<-maxDstep){
+			dStep = -maxDstep;
+		} else{
+			dStep = snaxs[ii].v*dt; 
+		}
+		snaxs[ii].d=snaxs[ii].d+dStep;
 		snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
 		
 	}
 }
-void snake::UpdateDistance(const vector<double> &dt){
+void snake::UpdateDistance(const vector<double> &dt,  double maxDstep){
 	int ii;
+	double dStep;
+
 	if (int(dt.size())==snaxs.size()){
 		for (ii = 0; ii < int(snaxs.size()); ++ii)
 		{
-			snaxs[ii].d=snaxs[ii].d+snaxs[ii].v*dt[ii];
+			if(snaxs[ii].v*dt[ii]>maxDstep){
+			dStep = maxDstep;
+		} else if (snaxs[ii].v*dt[ii]<-maxDstep){
+			dStep = -maxDstep;
+		} else{
+			dStep = snaxs[ii].v*dt[ii]; 
+		}
+		snaxs[ii].d=snaxs[ii].d+dStep;
 			snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
 
 		}
@@ -1053,13 +1069,13 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 			
 		}
 		
-		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<0.0) 
+		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<=0.0) 
 			&& elems[snaxSubs[ii]].orderedge==1) {
 			isImpact.push_back(elems[snaxSubs[ii]].index);
 		isImpact.push_back(-1);
 
 
-	} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>0.0)
+	} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>=0.0)
 		&& elems[snaxSubs[ii]].orderedge==nSnax){
 		isImpact.push_back(elems[snaxSubs[ii]].index);
 		isImpact.push_back(-2);
@@ -1098,8 +1114,8 @@ void snake::OrientSurfaceVolume(){
 			if(jj==nj){ // if the orientation cannot be defined
 				dotProd=1.0;
 				kk=0;
-				cerr << "Warning: Cell orientations could not be computed " << endl;
-				cerr << "			in " << __PRETTY_FUNCTION__ << endl;
+				// cerr << "Warning: Cell orientations could not be computed " << endl;
+				// cerr << "			in " << __PRETTY_FUNCTION__ << endl;
 				break;
 			}
 			kk=snakeconn.surfs(jj)->voluind[0]==0;
