@@ -1042,7 +1042,8 @@ void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
 
 }
 
-void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd){
+void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone,
+								   int edgeInd){
 	int nSnax,ii,jj, dOrd;
 	vector<int> snaxSubs;
 	double impactTime;
@@ -1072,16 +1073,16 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<=0.0) 
 			&& elems[snaxSubs[ii]].orderedge==1) {
 			isImpact.push_back(elems[snaxSubs[ii]].index);
-		isImpact.push_back(-1);
+			isImpact.push_back(-1);
 
 
-	} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>=0.0)
-		&& elems[snaxSubs[ii]].orderedge==nSnax){
-		isImpact.push_back(elems[snaxSubs[ii]].index);
-		isImpact.push_back(-2);
+		} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>=0.0)
+			&& elems[snaxSubs[ii]].orderedge==nSnax){
+			isImpact.push_back(elems[snaxSubs[ii]].index);
+			isImpact.push_back(-2);
 
+		}
 	}
-}
 
 }
 

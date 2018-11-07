@@ -10,11 +10,11 @@
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
 
-	#ifdef SAFE_ALGO
 	if (snakein.Check3D()){
+		#ifdef SAFE_ALGO
 		ret = snakein.snakeconn.TestConnectivityBiDir();
+		#endif //SAFE_ALGO
 	}
-	#endif
 
 	return(ret);
 }
@@ -81,7 +81,7 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 
 	This function might be better in snakeengine.cpp
 	*/
-	double impactAlmostRange = 0.01;
+	double impactAlmostRange = 0.2;
 
 	int start_s, start_f;
 	start_f=clock();

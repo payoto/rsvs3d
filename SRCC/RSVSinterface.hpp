@@ -23,8 +23,8 @@ using namespace Eigen;
 
 class SQPcalc {
 protected:
-	int nDv;
-	int nConstr;
+	int nDv=0;
+	int nConstr=0;
 	int falseaccess=0;
 	bool returnDeriv=true;
 public :

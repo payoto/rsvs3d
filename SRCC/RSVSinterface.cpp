@@ -195,7 +195,9 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	HObj.setZero(nDv,nDv);  
 	dObj.setZero(nDv);
 	constr.setZero(nConstr);
-	lagMult.setZero(nConstr);
+	if(nConstr!=lagMult.size()){
+		lagMult.setZero(nConstr);
+	}
 	deltaDV.setZero(nDv);
 	// constrTarg.setZero(nConstr);
 }
@@ -217,6 +219,7 @@ void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
 		constrTarg[i] = voluVals[i];
 	}
 }
+
 void SQPcalc::BuildConstrMap(const mesh &meshin){
 	int ni, ii;
 	ni=meshin.volus.size();
@@ -347,7 +350,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		// Assign objective derivative
 		// cout << endl << "dObjPart " << nDvAct << " " ;
 		// PrintMatrix(dObjPart);
-		// cout <<  endl << "done" <<endl; 
+		// cout <<  endl << "done" <<endl;
 		for(ii=0; ii< nDvAct; ++ii){
 			dObj[dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
 			isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
@@ -367,7 +370,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		constrPart=*retVal;
 		// Assign Constraint
 		// and constraint derivative
-		// and Hessian		
+		// and Hessian
 		nCellTarg=triIn.connec.celltarg.size(); 
 		for(ii=0; ii< nCellTarg;++ii){
 			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
@@ -376,19 +379,26 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 				if (subTempVec[jj]!=-1){
 					isConstrAct.at(subTempVec[jj]) = true;
 					constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+
 					for(kk=0; kk< nDvAct; ++kk){
 						dConstr(subTempVec[jj],dvMap.find(dvListMap.vec[kk])) += 
 							triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
 						for(ll=0; ll< nDvAct; ++ll){
-							HObj(dvMap.find(dvListMap.vec[ll]),
-								 dvMap.find(dvListMap.vec[kk])) += HObjPart(ll,kk);
+							// TODO cross product with lagrangian
+							HConstr(dvMap.find(dvListMap.vec[ll]),
+								 dvMap.find(dvListMap.vec[kk])) += 
+								 triIn.connec.constrinfluence[ii]*
+								 HConstrPart(ll,kk)
+								 *lagMult[subTempVec[jj]];
 						}
 					}
+
 				} else {
 					falseaccess++;
 				}
 			}
 		}
+
 	}
 	// Assign Objective Hessian
 
@@ -503,6 +513,7 @@ void SQPcalc::ComputeSQPstep(
 	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
 	// HouseholderQR<MatrixXd> HLagSystem(HLag);
 	// LLT<MatrixXd> HLagSystem(HLag);
+	// PartialPivLU<MatrixXd> HLagSystem(HLag);
 
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
 	temp2 = HLagSystem.solve(dObjAct.transpose());
@@ -512,6 +523,7 @@ void SQPcalc::ComputeSQPstep(
 		).colPivHouseholderQr().solve(
 		// ).householderQr().solve(
 		// ).llt().solve(
+		// ).partialPivLu().solve()
 			constrAct - (dConstrAct*(temp2))
 		);
 
