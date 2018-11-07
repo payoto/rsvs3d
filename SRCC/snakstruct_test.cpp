@@ -11,18 +11,12 @@
 #include "RSVSmath.hpp"
 #include "RSVSinterface.hpp"
 #include "RSVSalgorithm.hpp"
+#include "RSVSintegration.hpp"
 
 using namespace std;
 
 // Implementation in snakstruct.cpp
 
-int TimeStamp(const char* str,int start_s){
-	int stop_s=clock();
-	cout << str << " " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms; ";
-
-	return(stop_s);
-
-}
 
 void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triangulation &testTriangle,
 	mesh &triMesh, triangulation &triRSVS, mesh &voluMesh, int nVoluZone, int ii){
@@ -596,7 +590,7 @@ void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	start_s=TimeStamp("Spawn: ", start_s);
 
 	testSnake.SnaxImpactDetection(isImpact);
-	testSnake.SnaxAlmostImpactDetection(isImpact, 0.25);
+	testSnake.SnaxAlmostImpactDetection(isImpact, 0.01);
 	testSnake.PrepareForUse();
 	#ifdef SAFE_ALGO
 	if (testSnake.Check3D()){
@@ -1048,9 +1042,9 @@ int Test_RSVSalgo_singlevol(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-		voluMesh.volus[0].target=0.001;
-		voluMesh.volus[1].target=0.1;
-		voluMesh.volus[2].target=0.001;
+		voluMesh.volus[0].target=0.0001;
+		voluMesh.volus[1].target=0.04;
+		voluMesh.volus[2].target=0.0001;
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
@@ -1071,7 +1065,7 @@ int Test_RSVSalgo_singlevol(){
 		double totT=0.0;
 		vector<double> dt;
 		vector<int> isImpact;
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<200;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1187,7 +1181,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// CalculateSnakeVel(testSnake);
 	CalculateNoNanSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.5);
-	testSnake.UpdateDistance(dt);
+	testSnake.UpdateDistance(dt,0.34);
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
 
@@ -1199,7 +1193,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// Need to develop that.
 	// Check if impact detect crossovers
 	start_s=TimeStamp(" triangulate:", start_s);
-	// calcObj.limLag=10000.0;
+	calcObj.limLag=10000.0;
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	calcObj.CheckAndCompute();

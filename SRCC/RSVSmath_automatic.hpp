@@ -6,6 +6,10 @@
 #include "vectorarray.hpp" 
 using namespace std; 
 
+static const double rsvsmath_automatic_eps_edge = 0.0000001;
+static const double rsvsmath_automatic_eps_surf = 0.0000001;
+static const double rsvsmath_automatic_eps_volu = 0.0000001;
+
 void Volume_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ); 
 void Volume_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
 void Volume_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
