@@ -561,63 +561,7 @@ int Test_snakeinitflat(){
 
 void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 
-	int start_s;
-
-	start_s=clock();
-
-	
-
-	start_s=TimeStamp("position: ", start_s);
-
-	testSnake.SnaxImpactDetection(isImpact);
-	MergeAllContactVertices(testSnake, isImpact);
-	testSnake.PrepareForUse();
-
-	start_s=TimeStamp("Merge: ", start_s);
-
-	CleanupSnakeConnec(testSnake);
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	start_s=TimeStamp("Clean: ", start_s);
-	testSnake.SnaxImpactDetection(isImpact);
-	SpawnArrivedSnaxels(testSnake,isImpact);
-
-
-	
-	start_s=TimeStamp("Spawn: ", start_s);
-
-	testSnake.SnaxImpactDetection(isImpact);
-	testSnake.SnaxAlmostImpactDetection(isImpact, 0.01);
-	testSnake.PrepareForUse();
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	MergeAllContactVertices(testSnake, isImpact);
-	testSnake.PrepareForUse();
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	
-	start_s=TimeStamp("Impact: ", start_s);
-
-	CleanupSnakeConnec(testSnake);
-
-	#ifdef SAFE_ALGO
-	if (testSnake.Check3D()){
-		testSnake.snakeconn.TestConnectivityBiDir();
-	}
-	#endif
-	testSnake.OrientSurfaceVolume();
-	start_s=TimeStamp("Clean: ", start_s);
-
-	
+	SnakeConnectivityUpdate(testSnake,  isImpact);
 
 }
 
@@ -912,6 +856,8 @@ int Test_RSVSalgo(){
 		double totT=0.0;
 		vector<double> dt;
 		vector<int> isImpact;
+		MaintainTriangulateSnake(triRSVS);
+
 		for(ii=0;ii<5;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -986,6 +932,7 @@ int Test_snakeRSVS(){
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
+		MaintainTriangulateSnake(triRSVS);
 		
 		for(ii=0;ii<100;++ii){
 			cout << ii << " ";
@@ -1065,6 +1012,8 @@ int Test_RSVSalgo_singlevol(){
 		double totT=0.0;
 		vector<double> dt;
 		vector<int> isImpact;
+		MaintainTriangulateSnake(triRSVS);
+
 		for(ii=0;ii<200;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
@@ -1121,7 +1070,7 @@ int Test_snakeRSVS_singlevol(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-		voluMesh.volus[0].target=0.9;
+		voluMesh.volus[0].target=0.01;
 		voluMesh.volus.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
@@ -1142,7 +1091,7 @@ int Test_snakeRSVS_singlevol(){
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
-		
+		MaintainTriangulateSnake(triRSVS);
 		for(ii=0;ii<25;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1174,21 +1123,12 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	vector<int> &isImpact){
 	int start_s;
 	SQPcalc calcObj;
-	
+	 
+	start_s=clock();
 
 	// calcObj.Print2Screen(1);
 	// calcObj.Print2Screen(2);
 	// CalculateSnakeVel(testSnake);
-	CalculateNoNanSnakeVel(testSnake);
-	testSnake.CalculateTimeStep(dt,0.5);
-	testSnake.UpdateDistance(dt,0.34);
-	testSnake.UpdateCoord();
-	testSnake.PrepareForUse();
-
-	Test_stepalgo(testSnake, isImpact);
-	start_s=clock();
-	
-	MaintainTriangulateSnake(RSVStri);
 	// Small step away from edge without crossover.
 	// Need to develop that.
 	// Check if impact detect crossovers
@@ -1202,5 +1142,14 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	
 	calcObj.Print2Screen();
 	// calcObj.Print2Screen(2);
+	CalculateNoNanSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,0.5);
+	testSnake.UpdateDistance(dt,0.34);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+
+	SnakeConnectivityUpdate_legacy(testSnake, isImpact);
+	MaintainTriangulateSnake(RSVStri);
+	
 
 }
