@@ -25,7 +25,7 @@ EXECUTABLE=main
 #make testnew/testall options
 TESTSOURCES=test.cpp mesh.cpp snake.cpp arraystructures.cpp snakstruct_test.cpp postprocessing.cpp
 TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp RSVSmath.cpp meshrefinement.cpp
-TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp
+TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp RSVSintegration.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 
