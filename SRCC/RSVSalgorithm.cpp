@@ -116,7 +116,7 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	// Remove one of the 'snakes'
 	RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
 	snakein.PrepareForUse();
-	snakein.OrientSurfaceVolume();
+	snakein.OrientFaces();
 	cout << "Initialisation DONE!" << endl;
 }
 

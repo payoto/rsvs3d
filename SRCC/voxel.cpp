@@ -79,6 +79,9 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	BuildBlockVert( dimGrid, blockGrid, nVert, edgeProp, nEdgeDim);
 	
 	blockGrid.PrepareForUse();
+	blockGrid.TightenConnectivity();
+	blockGrid.OrderEdges(); 
+	blockGrid.OrientFaces();
 	return(0);
 }
 
@@ -457,7 +460,7 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-	RowVector3i dimGrid1(2,3,4), dimGrid2(10,10,0), dimGrid3(20,30,10);
+	RowVector3i dimGrid1(6,6,12), dimGrid2(10,10,0), dimGrid3(20,30,10);
 	mesh blockGrid;
 	const char *fileToOpen;
 	
@@ -467,15 +470,16 @@ int Test_MeshOut(){
 	errTest=BuildBlockGrid(dimGrid1,blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="..\\TESTOUT\\tecout234.plt";
+	fileToOpen="..\\TESTOUT\\tecout6612.plt";
 	errTest=outmesh1.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
 	errTest=outmesh1.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
-	fileToOpen="..\\TESTOUT\\mesh234.dat";
+	fileToOpen="..\\TESTOUT\\tecout6612.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh1);
 
-	errTest=BuildBlockGrid(dimGrid2,blockGrid);
+	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
+	errFlag+= (errTest!=0);
 
 	fileToOpen="..\\TESTOUT\\tecout230.plt";
 	errTest=outmesh2.OpenFile(fileToOpen);
@@ -488,13 +492,14 @@ int Test_MeshOut(){
 	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
 	start_s=clock();
 	errTest=BuildBlockGrid(dimGrid3,blockGrid);
+	errFlag+= (errTest!=0);
 	// the code you wish to time goes here
 	stop_s=clock();
 	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 	fileToOpen="..\\TESTOUT\\tecout202020.plt";
 
 	errTest=outmesh3.OpenFile(fileToOpen);
-	errFlag+= (errTest!=0);
+	errFlag+= (errTest!=0); 
 
 	errTest=outmesh3.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
@@ -503,4 +508,4 @@ int Test_MeshOut(){
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh3);
 
 	return(errFlag);
-}
+}    

@@ -206,6 +206,7 @@ public:
 	void HashParent();
 	void DeHashParent(const int pos);
 	bool memberIsHashParent(const int pos) const;
+	inline void Init(int n);
 	// Functions that need modification
 	inline void push_back(T& newelem);
 	inline void clear();

@@ -461,6 +461,7 @@ template<class T> void ArrayStruct <T>::disp(const vector<int> &subs) const
 template<class T> inline void ArrayStruct <T>::Init(int n)
 {
 	T sT;
+	this->clear();
 	this->reserve(n);
 	this->assign(n,sT);
 }
@@ -633,7 +634,9 @@ template<class T> inline void ArrayStruct <T>::clear()
 {
 	elems.clear();
 	hashTable.clear();
-	//isHash=0;
+	isHash=0;
+	isSetMI=0;
+	readyforuse=false;
 }
 // Hashed Vector Template class implementations
 

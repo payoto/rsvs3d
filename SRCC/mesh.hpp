@@ -425,6 +425,10 @@ private:
 	bool meshDepIsSet=false;
 	int meshDim=0;
 	void SetLastIndex();
+	
+	void OrientSurfaceVolume();
+	void OrientEdgeSurface();
+	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	friend class snake;
 public:
 	vertarray verts;
@@ -488,9 +492,8 @@ public:
 	void ForceCloseContainers();
 	// Mesh Quality
 	vector<int> OrderEdges();
-	void OrientSurfaceVolume();
-	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
 	void SetBorders();
+	void OrientFaces();
 	// Mesh component comparison
 	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
 		int outerVolume=-1) const;

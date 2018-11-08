@@ -63,7 +63,7 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 	CleanupSnakeConnec(snakein);
 
 	SAFE_ALGO_TestConn(snakein);
-	snakein.OrientSurfaceVolume();
+	snakein.OrientFaces();
 
 	start_s=TimeStamp("Clean: ", start_s);
 
@@ -104,7 +104,7 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
-	snakein.OrientSurfaceVolume();
+	snakein.OrientFaces();
 	start_s=TimeStamp("Clean: ", start_s);
 
 
@@ -139,7 +139,7 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
-	snakein.OrientSurfaceVolume();
+	snakein.OrientFaces();
 	start_s=TimeStamp("Clean: ", start_s);
 
 	TimeStamp(" - Connec Update: ", start_f);
@@ -191,7 +191,7 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
-	snakein.OrientSurfaceVolume();
+	snakein.OrientFaces();
 	start_s=TimeStamp("Clean: ", start_s);
 
 	TimeStamp(" - Connec Update: ", start_f);

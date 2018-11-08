@@ -112,7 +112,7 @@ void snaxedge::disptree(const snake &snakein, int n) const{
 	if(n>0){
 		for (i=0; unsigned_int(i)<
 			snakein.snakeconn.edges.isearch(index)->vertind.size();i++){
-			snakein.snaxs.isearch(
+			snakein.snaxs.isearch( 
 				snakein.snakeconn.edges.isearch(index)->vertind[i]
 				)->disptree(snakein,n-1);
 		}
@@ -1084,6 +1084,21 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 		}
 	}
 
+}
+void snake::OrientFaces(){
+	/*
+	Orients either surfaces or edges depending. 
+	*/
+	if (this->Check3D()){
+		this->OrientSurfaceVolume();
+	} else {
+		this->OrientEdgeSurface();
+	}
+
+
+}
+void snake::OrientEdgeSurface(){
+	cerr << "Warning: not coded yet in " << __PRETTY_FUNCTION__ << endl;
 }
 
 

@@ -80,6 +80,8 @@ private:
 	bool is3D=true;
 	void SetLastIndex(); // Baaaad function do not use if you're not sure.
 	bool isFlipped=false;
+	void OrientSurfaceVolume();
+	void OrientEdgeSurface();
 public:
 	// Handling of data specific to snake
 	snaxarray snaxs; 			// properties associated with snakconn verts
@@ -123,7 +125,7 @@ public:
 	// Snake connectivity operations
 	void OrderEdges();
 	void SetSnaxSurfs() {}
-	void OrientSurfaceVolume();
+	void OrientFaces();
 	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
 	void AssignInternalVerts();
 	void CheckConnectivity() const; 

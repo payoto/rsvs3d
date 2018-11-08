@@ -113,6 +113,12 @@ template<class T> inline void SnakStruct <T>::clear()
 	hashParent.clear();
 	//isHashParent=0; 
 }
+template<class T> inline void SnakStruct <T>::Init(int n)
+{
+	this->clear();
+	ArrayStruct<T>::Init(n);
+ 
+}
 template<class T>
 int SnakStruct<T>::findparent(int key) const 
 {

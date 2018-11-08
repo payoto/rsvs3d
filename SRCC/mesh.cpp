@@ -1717,11 +1717,11 @@ void mesh::displight() const {
 	cout << "; surfs " << surfs.size();
 	cout << "; volus " << volus.size() << endl;
 }
-
+ 
 void mesh::Init(int nVe,int nE, int nS, int nVo)
 {
 	borderIsSet=false;
-
+	meshDim=0;
 	verts.Init(nVe);
 	edges.Init(nE);
 	surfs.Init(nS);
@@ -2523,6 +2523,24 @@ coordvec mesh::CalcPseudoNormalSurf(int ind) const{
 	return(ret);
 }
 
+void mesh::OrientFaces(){
+	/*
+	Orients either surfaces or edges depending. 
+	*/
+	if (this->WhatDim()==3){
+		this->OrientSurfaceVolume();
+	} else if(this->WhatDim()==2){
+		this->OrientEdgeSurface();
+	} else {
+
+	}
+
+
+}
+void mesh::OrientEdgeSurface(){
+	cerr << "Warning: not coded yet in " << __PRETTY_FUNCTION__ << endl;
+}
+
 void mesh::OrientSurfaceVolume(){
 	// Orders the surf.voluind [c0 c1] such that the surface normal vector points
 	// from c0 to c1
@@ -2595,7 +2613,7 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	currQueue.reserve(nSurfs/2); // list of positions
 	nextQueue.reserve(nSurfs/2);
 	orderVert.reserve(nSurfs);
-
+ 
 	// =======================================
 	// Collect surface vertex lists
 	emptVert.assign(6,0);
@@ -2628,6 +2646,13 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 				//cout << " | " << nSurfs << " | " ;
 				throw range_error (" Start point not found");
 			}
+			// ii=nSurfs-1;
+			// while(ii>=0 && surfStatus[ii])
+			// 	{ ii--; }
+			// if (ii==-1){
+			// 	//cout << " | " << nSurfs << " | " ;
+			// 	throw range_error (" Start point not found");
+			// }
 			currQueue.push_back(ii);
 			nBlocks++;
 			surfStatus[ii]=true;
