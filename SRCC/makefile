@@ -9,7 +9,7 @@ LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
 
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -O3 -DTIME_EXEC
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -O3 -DSAFE_ACCESS -g -ggdb
 #-g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CUSERFLAGS= 
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
@@ -25,7 +25,7 @@ EXECUTABLE=main
 #make testnew/testall options
 TESTSOURCES=test.cpp mesh.cpp snake.cpp arraystructures.cpp snakstruct_test.cpp postprocessing.cpp
 TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp RSVSmath.cpp meshrefinement.cpp
-TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp RSVSintegration.cpp
+TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp RSVSintegration.cpp voxel.cpp
 TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
 TESTEXECUTABLE=main_test
 

@@ -7,8 +7,9 @@
 #include "snake.hpp" 
 #include "snakevel.hpp"
 #include "RSVSmath.hpp"
+#include "RSVSinterface.hpp"
 
-using namespace std;	
+using namespace std;
 
 void CalculateSnakeVel(snake &snakein){
 
@@ -378,6 +379,84 @@ void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const
 	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
 
+mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
+
+	mesh meshout;
+	int ii, ni, jj, kk;
+	int nVe, nE, nSurf, nVolu;
+	std::vector<int> voluInds;
+	SQPcalc calcObj;
+
+	calcObj.PrepTriangulationCalc(triangul);
+	nSurf = triin.size();
+	nVe = nSurf*3; 
+	nE = nSurf*3;
+
+	ni = nSurf;
+	// Build list of unique voluIndices
+	for(ii = 0; ii<ni; ++ii){
+		voluInds.push_back(triin(ii)->connec.celltarg[0]);
+		voluInds.push_back(triin(ii)->connec.celltarg[1]);
+	}
+	sort(voluInds);
+	unique(voluInds);
+	nVolu = calcObj.numConstr();
+	// Prepare new mesh container
+	meshout.Init(nVe, nE, nSurf, nVolu);
+	meshout.PopulateIndices();
+	meshout.volus.HashArray();
+	meshout.PrepareForUse();
+	// cout << endl ; 
+	// for(ii=0; ii<nVolu; ++ii){
+	// 	cout << meshout.volus(ii)->index << " " ; 
+	// }
+	// cout << endl ; 
+	
+	for(ii=0; ii<nSurf; ++ii){
+		// cout << endl;
+		meshout.surfs[ii].edgeind = {ii*3+1, ii*3+2, ii*3+3};
+		meshout.surfs[ii].voluind.clear();
+		for(jj=0; jj<int(triin(ii)->connec.celltarg.size()); jj++){
+			for (auto x: calcObj.constrMap.
+				findall(triin(ii)->connec.celltarg[jj])){
+				meshout.surfs[ii].voluind.push_back(x+1);
+				// cout << x+1 << " " ;
+			} 
+			
+		}
+		// DisplayVector(meshout.surfs[ii].voluind);
+		for(jj=0; jj<int(meshout.surfs[ii].voluind.size()); jj++){
+			kk=meshout.volus.find(meshout.surfs[ii].voluind[jj], true);
+			if(kk>=0){
+				meshout.volus[kk].surfind.push_back(ii+1);
+			} else { cerr << " w " << kk << " " << meshout.surfs[ii].voluind[jj]
+				<< " " << triin(ii)->connec.celltarg[jj];
+				// meshout.volus[meshout.surfs[ii].voluind[jj]-1].surfind.push_back(ii+1);
+			}
+		}
+		
+		for(jj =0; jj<3; jj++){
+			meshout.edges[ii*3+jj].surfind = {ii};
+			meshout.edges[ii*3+jj].vertind = {ii*3+1+jj, ii*3+1+((jj+1)%3)};
+			if (triin(ii)->pointtype[jj]==1){
+				meshout.verts[ii*3+jj].coord=triangul.meshDep->
+					verts.isearch(triin(ii)->pointind[jj])->coord;
+			} else if (triin(ii)->pointtype[jj]==2){
+				meshout.verts[ii*3+jj].coord=triangul.snakeDep->snakeconn.
+					verts.isearch(triin(ii)->pointind[jj])->coord;
+			} else if (triin(ii)->pointtype[jj]==3){
+				meshout.verts[ii*3+jj].coord=triangul.
+					trivert.isearch(triin(ii)->pointind[jj])->coord.usedata();
+			}
+			meshout.verts[ii*3+jj].edgeind = {ii*3+1+jj, ii*3+1+((jj+3-1)%3)};
+		}
+
+	}
+	meshout.PrepareForUse();
+
+	return (meshout);
+
+}
 
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert){
 	// Adds a triarray and corresponding 
@@ -798,7 +877,7 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 				
 				newTrisSurf.voluind=triangleRSVS.meshDep->surfs(actSurfSub)->voluind;
 				isFlip=OrderMatchLists(pseudoEdgeInd, triangleRSVS.meshDep->surfs(actSurfSub)->edgeind, 
-							 pseudoEdgeInd[1],pseudoEdgeInd[2]);
+					pseudoEdgeInd[1],pseudoEdgeInd[2]);
 				if(isFlip==-1){
 					isFlip=newTrisSurf.voluind[0];
 					newTrisSurf.voluind[0]=newTrisSurf.voluind[1];

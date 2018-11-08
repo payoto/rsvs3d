@@ -12,22 +12,18 @@ using namespace std;
 using namespace Eigen; 
 
 
+void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
 
-void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
-
-	int ii,ni;
+	int ii;
 	int nDv, nConstr;
 	vector<int> vecin;
-
-	this->returnDeriv=true;
-
 	// prepare the SQP object
 	nConstr=triRSVS.meshDep->CountVoluParent(); 
 	if(triRSVS.snakeDep!=NULL){
 		nDv=triRSVS.snakeDep->snaxs.size();
 	} else {
 		nDv=0;
-	}
+	} 
 	BuildMathArrays(nDv, nConstr);
 
 	// TODO this needs to be supported by mapping each volume to the constraint position
@@ -40,6 +36,16 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 		vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
 	}
 	BuildDVMap(vecin);
+}
+
+void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
+
+	int ii,ni;
+
+	this->returnDeriv=true;
+
+	// prepare the SQP object
+	this->PrepTriangulationCalc(triRSVS);
 
 	// Calculate the SQP object
 	ni=triRSVS.dynatri.size();
@@ -52,7 +58,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	} 
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
-		CalcTriangle(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS);
+		CalcTriangle(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, false);
 	} 
 
 	// Output some data to check it makes sense
@@ -188,13 +194,19 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	
 	nDv=nDvIn;
 	nConstr=nConstrIn;
+
 	isConstrAct.assign(nConstr,false);
 	isDvAct.assign(nDv,false);
+
+
+	constr.setZero(nConstr);
 	dConstr.setZero(nConstr,nDv);
 	HConstr.setZero(nDv,nDv); 
-	HObj.setZero(nDv,nDv);  
+
+	obj=0.0;
 	dObj.setZero(nDv);
-	constr.setZero(nConstr);
+	HObj.setZero(nDv,nDv); 
+
 	if(nConstr!=lagMult.size()){
 		lagMult.setZero(nConstr);
 	}
@@ -334,7 +346,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 	dObjPart.setZero(1,nDvAct);
 	HConstrPart.setZero(nDvAct,nDvAct);
 	HObjPart.setZero(nDvAct,nDvAct);
-
+	
 	if(isObj){
 		AreaCalc.Calc();
 		AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
@@ -419,6 +431,7 @@ bool SQPcalc::PrepareMatricesForSQP(
 	int ii, jj, nDvAct, nConstrAct;
 
 	subDvAct.reserve(nDv);
+	subDvAct.clear();
 	nDvAct=0;
 	for(ii=0; ii<nDv; ++ii){
 		nDvAct += int(isDvAct.at(ii));
@@ -428,6 +441,7 @@ bool SQPcalc::PrepareMatricesForSQP(
 	}
 
 	subConstrAct.reserve(nConstr);
+	subConstrAct.clear();
 	nConstrAct=0;
 	for(ii=0; ii<nConstr; ++ii){
 		nConstrAct += int(isConstrAct.at(ii));
@@ -567,6 +581,7 @@ void SQPcalc::ComputeSQPstep(
 	}
 	
 	ni = subConstrAct.size();
+	lagMult.setZero(nConstr);
 	for (ii=0; ii<ni; ++ii){
 		lagMult[subConstrAct[ii]]=lagMultAct[ii];
 		isNan = isNan || isnan(lagMultAct[ii]);

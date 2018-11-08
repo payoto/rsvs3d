@@ -48,6 +48,7 @@ public :
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true);
 	void CalculateTriangulation(const triangulation &triRSVS);
+	void PrepTriangulationCalc(const triangulation &triRSVS);
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
@@ -67,7 +68,7 @@ public :
 		VectorXd &lagMultAct
 		);
 	void ReturnVelocities(triangulation &triRSVS);
-
+	int numConstr(){return(this->nConstr);}
 };
 
 
@@ -78,6 +79,7 @@ void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut);
 void PrintMatrix(const MatrixXd mat);
 void PrintMatrix(const RowVectorXd mat);
 void PrintMatrix(const VectorXd mat);
+
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 

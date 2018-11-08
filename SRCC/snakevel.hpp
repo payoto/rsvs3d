@@ -20,7 +20,7 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
-class SQPCalc;
+class SQPcalc;
 
 //=================================
 // included dependencies
@@ -28,6 +28,7 @@ class SQPCalc;
 #include "arraystructures.hpp"
 #include "snake.hpp" 
 #include "mesh.hpp" 
+
 
 
 //==================================
@@ -213,15 +214,17 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPCalc &calcObj);
+	vector<int> &isImpact, SQPcalc &calcObj);
 void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS);
 int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,int &returnType, int &nextEdge);
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
 bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);
+mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin);
 
 int Test_snakeRSVS();
 int Test_surfcentre();
 int Test_snakeRSVS_singlevol();
 int Test_RSVSalgo_singlevol();
+int Test_MeshOrient();
 #endif // SNAKEVEL_H_INCLUDED
 

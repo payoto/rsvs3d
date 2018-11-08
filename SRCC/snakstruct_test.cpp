@@ -69,7 +69,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	int ii;
 
 	snakeMesh.PrepareForUse();
-	snakeMesh.OrientSurfaceVolume();
+	snakeMesh.OrientFaces();
 	///// Generate Coarser Volume Mesh
 	testSnake.snakemesh=&snakeMesh;
 	//testSnake.disp();
@@ -87,7 +87,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 		voluMesh.volus[ii].target=(double(rand()%1001)/1000.0);
 	}
 	voluMesh.PrepareForUse();
-	voluMesh.OrientSurfaceVolume();
+	voluMesh.OrientFaces();
 
 	calcVolus.CalculateMesh(voluMesh);
 	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
@@ -342,7 +342,7 @@ int Test_snakeinit(){
 		testSnake.snakemesh=&snakeMesh;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		
-		snakeMesh.OrientSurfaceVolume();
+		snakeMesh.OrientFaces();
 		start_s=clock();
 		testSnake.PrepareForUse();
 		
@@ -431,7 +431,7 @@ int Test_snakeinit_MC(){
 		testSnake.snakemesh=&snakeMesh;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		
-		snakeMesh.OrientSurfaceVolume();
+		snakeMesh.OrientFaces();
 		start_s=clock();
 		testSnake.PrepareForUse();
 		
@@ -588,7 +588,7 @@ void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){
 	MergeCleanSnake(testSnake, isImpact);
 	testSnake.PrepareForUse();
 
-	testSnake.OrientSurfaceVolume();
+	testSnake.OrientFaces();
 	start_s=TimeStamp("Clean: ", start_s);
 
 	
@@ -649,7 +649,7 @@ int Test_MeshRefinement(){
 		outSnake.PrintMesh(snakeMesh);
 
 		snakeMesh.OrderEdges();
-		snakeMesh.OrientSurfaceVolume();
+		snakeMesh.OrientFaces();
 		outSnake.PrintMesh(snakeMesh);
 		//testSnake.disp();
 		for (ii=0;ii<snakeMesh.volus.size();++ii){
@@ -672,9 +672,9 @@ int Test_MeshRefinement(){
 		voluMesh.PrepareForUse();
 		voluMesh.TightenConnectivity();
 		voluMesh.OrderEdges();
-		snakeMesh.OrientSurfaceVolume();
-		voluMesh.OrientSurfaceVolume();
-		triMesh.OrientSurfaceVolume();
+		snakeMesh.OrientFaces();
+		voluMesh.OrientFaces();
+		triMesh.OrientFaces();
 
 		testTriangle.PrepareForUse();
 		TriangulateMesh(snakeMesh,testTriangle);
@@ -828,12 +828,11 @@ int Test_RSVSalgo(){
 	dims[0]=2;dims[1]=3;dims[2]=1;
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
-
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-
+		calcObj.BuildMathArrays(1,1);
 		voluMesh.volus[0].target=0.0;
 		voluMesh.volus[3].target=0.0;
 		voluMesh.volus[4].target=1.0;
@@ -968,7 +967,7 @@ int Test_RSVSalgo_singlevol(){
 	// int nVoluZone, ii;
 
 	snake testSnake;
-	mesh snakeMesh,  voluMesh, triMesh;
+	mesh snakeMesh,  voluMesh, triMesh, triMesh2;
 	// mesh triMesh;
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
@@ -989,12 +988,13 @@ int Test_RSVSalgo_singlevol(){
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh6612.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		voluMesh.volus[0].target=1;//0.05;//0.0001;
 		voluMesh.volus[1].target=1;//0.05;
 		voluMesh.volus[2].target=1;//0.05;//0.0001;
+		// voluMesh.volus[3].target=1;//0.05;//0.0001;
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
@@ -1017,7 +1017,7 @@ int Test_RSVSalgo_singlevol(){
 		vector<int> isImpact;
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<25;++ii){
+		for(ii=0;ii<5;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1040,6 +1040,11 @@ int Test_RSVSalgo_singlevol(){
 		// outSnake.PrintSnakeInternalPts(testSnake);
 
 
+	triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
+	FILE *fid;
+	fid = fopen("..\\TESTOUT\\triintertest.dat","w");
+	triMesh2.write(fid);//(triMesh,3,totT);
+	fclose(fid);
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -1123,8 +1128,57 @@ int Test_snakeRSVS_singlevol(){
 
 }
 
+int Test_MeshOrient(){
+
+	// int nVoluZone, ii;
+
+	snake testSnake;
+	mesh snakeMesh,  voluMesh;
+	// mesh triMesh;
+	triangulation testTriangle,triRSVS;
+	vector<int> dims;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	// double totT=0.0;
+	// vector<double> dt;
+	// vector<int> isImpact;
+
+	//bool errFlag;
+	int errTest=0;
+	SQPcalc calcObj;
+	FILE *fid;
+	
+
+	dims.assign(3,0);
+	dims[0]=1;dims[1]=3;dims[2]=1;
+	
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
+
+		outSnake.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh6612.dat");
+		
+		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+		voluMesh.volus[0].target=1;//0.05;//0.0001;
+		voluMesh.volus[1].target=1;//0.05;
+		voluMesh.volus[2].target=1;//0.05;//0.0001;
+		// voluMesh.volus[3].target=1;//0.05;//0.0001;
+		voluMesh.PrepareForUse();
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(voluMesh);
+
+		fileToOpen = "..\\TESTOUT\\volumesh6612.dat";
+		fid=fopen(fileToOpen,"w");
+		if(fid!=NULL){
+			voluMesh.PrepareForUse();
+			voluMesh.SetBorders();
+			voluMesh.OrientFaces();
+			voluMesh.write(fid);
+		}
+	return(errTest);
+}
+
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc calcObj){
+	vector<int> &isImpact, SQPcalc &calcObj){
 	int start_s;
 
 	 

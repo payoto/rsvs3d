@@ -354,9 +354,9 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 	return(maxIndex);
 }
 
-template<class T>  int ArrayStruct <T>::find(int key) const 
+template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const 
 {
-	if (isHash==0){
+	if (isHash==0 && !noWarn){
 		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
 		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
 		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
@@ -634,9 +634,9 @@ template<class T> inline void ArrayStruct <T>::clear()
 {
 	elems.clear();
 	hashTable.clear();
-	isHash=0;
-	isSetMI=0;
-	readyforuse=false;
+	// isHash=0;
+	maxIndex=0;
+	// readyforuse=false;
 }
 // Hashed Vector Template class implementations
 

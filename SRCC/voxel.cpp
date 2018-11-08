@@ -475,7 +475,7 @@ int Test_MeshOut(){
 	errFlag+= (errTest!=0);
 	errTest=outmesh1.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
-	fileToOpen="..\\TESTOUT\\tecout6612.dat";
+	fileToOpen="..\\TESTOUT\\mesh6612.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh1);
 
 	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
