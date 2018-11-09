@@ -345,6 +345,9 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 	for(ii=0; ii<n; ++ii){
 		veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
 	}
+	if(n==3){
+		veccoord.push_back(&(meshin.verts.isearch(vertind[0])->coord));
+	}
 
 	tempCalc.assign(veccoord);
 	tempCalc.Calc();
@@ -365,6 +368,14 @@ void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const
 
 	n=surfin.indvert.size();
 	for(ii=0; ii<n; ++ii){
+		if(surfin.typevert[ii]==1){
+			veccoord.push_back(&(meshin.verts.isearch(surfin.indvert[ii])->coord));
+		} else if (surfin.typevert[ii]==2){
+			veccoord.push_back(&(snakeconn.verts.isearch(surfin.indvert[ii])->coord));
+		}
+	}
+	if(n==3){
+		ii=0;
 		if(surfin.typevert[ii]==1){
 			veccoord.push_back(&(meshin.verts.isearch(surfin.indvert[ii])->coord));
 		} else if (surfin.typevert[ii]==2){

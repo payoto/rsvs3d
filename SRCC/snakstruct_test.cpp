@@ -1008,7 +1008,7 @@ int Test_RSVSalgo_singlevol(){
 	
 
 	dims.assign(3,0);
-	dims[0]=1;dims[1]=6;dims[2]=1;
+	dims[0]=1;dims[1]=3;dims[2]=1;
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 
@@ -1019,14 +1019,14 @@ int Test_RSVSalgo_singlevol(){
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-		for(ii=0;ii<dims[1];++ii){
-			voluMesh.volus[ii].target=0.3;
+		for(ii=0;ii<voluMesh.volus.size();++ii){
+			voluMesh.volus[ii].target=0.1;
 		}
-		voluMesh.volus[0].target=0.3;//0.05;//0.0001;
-		voluMesh.volus[1].target=0.3;//0.05;
-		voluMesh.volus[2].target=0.3;//0.05;//0.0001;
-		voluMesh.volus[3].target=0.3;//0.05;//0.0001;
-		voluMesh.volus[4].target=0.3;//0.05;//0.0001;
+		voluMesh.volus[0].target=0.05;//0.05;//0.0001;
+		voluMesh.volus[1].target=0.05;//0.05;
+		voluMesh.volus[2].target=0.05;//0.05;//0.0001;
+		// voluMesh.volus[3].target=0.3;//0.05;//0.0001;
+		// voluMesh.volus[4].target=0.3;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;
 		// voluMesh.volus[4].target=1;//0.05;
 		// voluMesh.volus[5].target=1;//0.05;//0.0001;
@@ -1049,7 +1049,7 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<200;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1241,7 +1241,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// Need to develop that.
 	// Check if impact detect crossovers
 	start_s=TimeStamp(" triangulate:", start_s);
-	calcObj.limLag=10000.0;
+	// calcObj.limLag=10000.0;
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
