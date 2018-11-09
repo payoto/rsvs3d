@@ -448,7 +448,8 @@ function []=PlotSurfNormals(grid, ax)
             if voluSurf(jj)>0
                 voluLines{voluSurf(jj)} = [ voluLines{voluSurf(jj)};
                     mCoord;mCoord+kk*normal;mCoord*nan;
-                    mCoord;voluMCoord(voluSurf(jj),:);mCoord*nan];
+                    mCoord;mCoord + (voluMCoord(voluSurf(jj),:)-mCoord)*1;mCoord*nan
+                    ];
             end
             kk=kk+2;
         end
@@ -501,12 +502,14 @@ function [normal, mCoord]=SurfNormal(surf, grid, edgeInd, vertInd)
     for ii=1:numel(currVertSub)
         normal = normal + TriPoint_Normal(mCoord,coords(ii,:),coords(ii+1,:));
     end
+    normal = 0.02 * normal / sqrt(sum(normal.^2));
     
 end
 
 function [norm]=TriPoint_Normal(p0,p1,p2)
     
     norm = cross((p1-p0),(p2-p0));
+    
     
 end
 

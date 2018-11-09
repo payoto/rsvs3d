@@ -521,57 +521,57 @@ void SQPcalc::ComputeSQPstep(
 
 	VectorXd  deltaDVAct;
 	MatrixXd temp1, temp2;
-	bool isNan, isLarge;
+	// bool isNan, isLarge;
 	int ii, ni;
 
-	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
-	// HouseholderQR<MatrixXd> HLagSystem(HLag);
-	// LLT<MatrixXd> HLagSystem(HLag);
-	// PartialPivLU<MatrixXd> HLagSystem(HLag);
+	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	// // HouseholderQR<MatrixXd> HLagSystem(HLag);
+	// // LLT<MatrixXd> HLagSystem(HLag);
+	// // PartialPivLU<MatrixXd> HLagSystem(HLag);
 
-	temp1 = HLagSystem.solve(dConstrAct.transpose());
-	temp2 = HLagSystem.solve(dObjAct.transpose());
+	// temp1 = HLagSystem.solve(dConstrAct.transpose());
+	// temp2 = HLagSystem.solve(dObjAct.transpose());
 
-	lagMultAct = (
-			dConstrAct*(temp1)
-		).colPivHouseholderQr().solve(
-		// ).householderQr().solve(
-		// ).llt().solve(
-		// ).partialPivLu().solve()
-			constrAct - (dConstrAct*(temp2))
-		);
+	// lagMultAct = (
+	// 		dConstrAct*(temp1)
+	// 	).colPivHouseholderQr().solve(
+	// 	// ).householderQr().solve(
+	// 	// ).llt().solve(
+	// 	// ).partialPivLu().solve()
+	// 		constrAct - (dConstrAct*(temp2))
+	// 	);
 
-	isNan = false;
-	isLarge = false;
-	ni = lagMultAct.size();
-	for (ii=0; ii<ni; ++ii){
-		if(lagMultAct[ii]<-limLag){
-			lagMultAct[ii]=-limLag;
-			isLarge=true;
-		}else if(lagMultAct[ii]>limLag){
-			lagMultAct[ii]=limLag;
-			isLarge=true;
-		} else if(isnan(lagMultAct[ii])){
-			//lagMultAct[ii]=0.0;
-			isNan=true;
-		}
-	}
+	// isNan = false;
+	// isLarge = false;
+	// ni = lagMultAct.size();
+	// for (ii=0; ii<ni; ++ii){
+	// 	if(lagMultAct[ii]<-limLag){
+	// 		lagMultAct[ii]=-limLag;
+	// 		isLarge=true;
+	// 	}else if(lagMultAct[ii]>limLag){
+	// 		lagMultAct[ii]=limLag;
+	// 		isLarge=true;
+	// 	} else if(isnan(lagMultAct[ii])){
+	// 		//lagMultAct[ii]=0.0;
+	// 		isNan=true;
+	// 	}
+	// }
 	// if (isNan){
-
+	// isLarge = false;
 	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
 	// }else 
-	if(isLarge){
+	// if(isLarge){
 
 		// deltaDVAct = -dConstrAct.transpose()*lagMultAct;
 	// }else if(true) {
 	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
 
-	} else {
+	// } else {
 
-		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
-						+ dConstrAct.transpose()*lagMultAct));
+	// 	deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+	// 					+ dConstrAct.transpose()*lagMultAct));
 
-	}
+	// }
 
 
 	ni = subDvAct.size();
@@ -583,8 +583,8 @@ void SQPcalc::ComputeSQPstep(
 	ni = subConstrAct.size();
 	lagMult.setZero(nConstr);
 	for (ii=0; ii<ni; ++ii){
-		lagMult[subConstrAct[ii]]=lagMultAct[ii];
-		isNan = isNan || isnan(lagMultAct[ii]);
+		// lagMult[subConstrAct[ii]]=lagMultAct[ii];
+		// isNan = isNan || isnan(lagMultAct[ii]);
 	}
 	if (false){
 		Print2Screen(3);

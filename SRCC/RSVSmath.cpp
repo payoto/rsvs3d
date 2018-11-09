@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "RSVSmath.hpp"
 #include "RSVSmath_automatic.hpp"
 #include "arraystructures.hpp" // for use of DisplayVector

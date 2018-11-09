@@ -424,6 +424,14 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 			} 
 			
 		}
+		if(meshout.surfs[ii].voluind.size()==1){
+			meshout.surfs[ii].voluind.push_back(0);
+		}
+		if(triin(ii)->connec.constrinfluence[0]==1.0){
+			kk=meshout.surfs[ii].voluind[0];
+			meshout.surfs[ii].voluind[0] = meshout.surfs[ii].voluind[1];
+			meshout.surfs[ii].voluind[1]=kk;
+		}
 		// DisplayVector(meshout.surfs[ii].voluind);
 		for(jj=0; jj<int(meshout.surfs[ii].voluind.size()); jj++){
 			kk=meshout.volus.find(meshout.surfs[ii].voluind[jj], true);
@@ -1054,9 +1062,9 @@ void triangulation::SetConnectivity(){
 
 	ni=intertri.size();
 	for (ii = 0; ii < ni; ++ii)	{
-		if(intertri(ii)->connec.celltarg.size()==0){
+		// if(intertri(ii)->connec.celltarg.size()==0){
 			this->SetConnectivityInter(ii);
-		}
+		// }
 	}
 	ni=dynatri.size();
 	for (ii = 0; ii < ni; ++ii)	{
@@ -1068,20 +1076,20 @@ void triangulation::SetConnectivity(){
 
 void triangulation::SetConnectivityInter(int ii){
 
-	int prevHash=intertri.isHash;
-	intertri[ii].connec.celltarg=
-		meshDep->surfs.isearch(dynatri(ii)->parentsurf)->voluind;
-	intertri[ii].connec.constrinfluence={-1.0,1.0};
-	intertri.isHash=prevHash;
+	int prevHash=this->intertri.isHash;
+	this->intertri[ii].connec.celltarg=
+		this->trisurf.isearch(this->intertri(ii)->parentsurf)->voluind;
+	this->intertri[ii].connec.constrinfluence={-1.0,1.0};
+	this->intertri.isHash=prevHash;
 
 }
 void triangulation::SetConnectivityStat(int ii){
 
-	int prevHash=intertri.isHash;
-	intertri[ii].connec.celltarg=
-		meshDep->surfs.isearch(dynatri(ii)->parentsurf)->voluind;
-	intertri[ii].connec.constrinfluence={-1.0,1.0};
-	intertri.isHash=prevHash;
+	int prevHash=stattri.isHash;
+	stattri[ii].connec.celltarg=
+		meshDep->surfs.isearch(stattri(ii)->parentsurf)->voluind;
+	stattri[ii].connec.constrinfluence={-1.0,1.0};
+	stattri.isHash=prevHash;
 
 }
 void triangulation::SetConnectivityDyna(int ii){
@@ -1093,7 +1101,7 @@ void triangulation::SetConnectivityDyna(int ii){
 
 	voluStore=snakeDep->snaxsurfs.isearch(dynatri(ii)->parentsurf)->voluind;
 	jj=0;
-	jj=snakeDep->snakeconn.surfs.isearch(dynatri(ii)->parentsurf)->voluind[jj]==0;
+	jj=(snakeDep->snakeconn.surfs.isearch(dynatri(ii)->parentsurf)->voluind[jj]==0);
 
 	prevHash=dynatri.isHash;
 	dynatri[ii].connec.celltarg.clear();

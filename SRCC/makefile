@@ -9,7 +9,7 @@ LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
 
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -O3 -DSAFE_ACCESS -g -ggdb
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -O3
 #-g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CUSERFLAGS= 
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 

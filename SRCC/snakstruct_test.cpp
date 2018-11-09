@@ -58,6 +58,8 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triang
 		}
 		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
+		outSnake.PrintSnake(testSnake, 10, totT);
+
 	}
 }
 
@@ -814,7 +816,7 @@ int Test_RSVSalgo(){
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
 	const char *fileToOpen;
-	tecplotfile outSnake;
+	tecplotfile outSnake, outSnake2;
 	// double totT=0.0;
 	// vector<double> dt;
 	// vector<int> isImpact;
@@ -829,6 +831,8 @@ int Test_RSVSalgo(){
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 		outSnake.OpenFile(fileToOpen);
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep_snake.plt";
+		outSnake2.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
@@ -863,7 +867,7 @@ int Test_RSVSalgo(){
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj);
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -894,7 +898,7 @@ int Test_snakeRSVS(){
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
 	const char *fileToOpen;
-	tecplotfile outSnake;
+	tecplotfile outSnake, outSnake2;
 	double totT=0.0;
 	vector<double> dt;
 	vector<int> isImpact;
@@ -908,10 +912,11 @@ int Test_snakeRSVS(){
 	dims[0]=2;dims[1]=3;dims[2]=1;
 	// try {
 		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
-
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		fileToOpen="..\\TESTOUT\\TestSnakeRSVS_snake.plt";
+		outSnake2.OpenFile(fileToOpen);
 		
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 
 		outSnake.PrintMesh(*(testSnake.snakemesh));
@@ -940,7 +945,7 @@ int Test_snakeRSVS(){
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj);
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -962,17 +967,33 @@ int Test_snakeRSVS(){
 
 }
 
+void repositionatquarteredge(snake &snakein){
+	/*Assumes there are only 2 snakes per edge*/
+
+	for(int ii=0; ii<int(snakein.snaxs.size()); ++ii){
+		if(snakein.snaxs(ii)->orderedge>1) {
+			snakein.snaxs[ii].d=0.75;
+		} else {
+			snakein.snaxs[ii].d=0.25;
+		}
+	}
+
+
+	snakein.UpdateCoord();
+	snakein.PrepareForUse();
+}
+
 int Test_RSVSalgo_singlevol(){
 
 	// int nVoluZone, ii;
 
 	snake testSnake;
-	mesh snakeMesh,  voluMesh, triMesh, triMesh2;
+	mesh snakeMesh,  voluMesh, triMesh, triMesh2, triMesh3, triMesh4;
 	// mesh triMesh;
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
 	const char *fileToOpen;
-	tecplotfile outSnake;
+	tecplotfile outSnake, outSnake2;
 	// double totT=0.0;
 	// vector<double> dt;
 	// vector<int> isImpact;
@@ -980,20 +1001,35 @@ int Test_RSVSalgo_singlevol(){
 	//bool errFlag;
 	int errTest=0;
 	SQPcalc calcObj;
+	int ii;
+	double totT=0.0;
+	vector<double> dt;
+	vector<int> isImpact;
 	
 
 	dims.assign(3,0);
-	dims[0]=1;dims[1]=3;dims[2]=1;
+	dims[0]=1;dims[1]=6;dims[2]=1;
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh6612.dat");
+
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep_snake.plt";
+		outSnake2.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
-		voluMesh.volus[0].target=1;//0.05;//0.0001;
-		voluMesh.volus[1].target=1;//0.05;
-		voluMesh.volus[2].target=1;//0.05;//0.0001;
+		for(ii=0;ii<dims[1];++ii){
+			voluMesh.volus[ii].target=0.3;
+		}
+		voluMesh.volus[0].target=0.3;//0.05;//0.0001;
+		voluMesh.volus[1].target=0.3;//0.05;
+		voluMesh.volus[2].target=0.3;//0.05;//0.0001;
+		voluMesh.volus[3].target=0.3;//0.05;//0.0001;
+		voluMesh.volus[4].target=0.3;//0.05;//0.0001;
+		// voluMesh.volus[3].target=1;//0.05;//0.0001;
+		// voluMesh.volus[4].target=1;//0.05;
+		// voluMesh.volus[5].target=1;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
@@ -1011,20 +1047,16 @@ int Test_RSVSalgo_singlevol(){
 		TriangulateSnake(testSnake,triRSVS);
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
-		int ii;
-		double totT=0.0;
-		vector<double> dt;
-		vector<int> isImpact;
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<5;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 					triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			// }
 			stop_s=clock();
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj);
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -1038,13 +1070,29 @@ int Test_RSVSalgo_singlevol(){
 		testSnake.displight();
 		// outSnake.PrintMesh(testSnake.snakeconn);
 		// outSnake.PrintSnakeInternalPts(testSnake);
+		
+		repositionatquarteredge(testSnake);
+		triRSVS.CalcTriVertPos();
+		triRSVS.PrepareForUse();
+		triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
+		FILE *fid;
+		fid = fopen("..\\TESTOUT\\triintertestbig.dat","w");
+		triMesh2.write(fid);//(triMesh,3,totT);
+		fclose(fid);
+		/*fid = fopen("..\\TESTOUT\\snakeconnouttri.dat","w");
+		triMesh3= TriarrayToMesh(triRSVS, triRSVS.dynatri);
+		// testSnake.snakeconn.write(fid);//(triMesh,3,totT);
+		triMesh3.write(fid);//(triMesh,3,totT);
+		fclose(fid);
 
+		fid = fopen("..\\TESTOUT\\snakeconnout.dat","w");		
+		testSnake.snakeconn.write(fid);//(triMesh,3,totT);
+		fclose(fid);
 
-	triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
-	FILE *fid;
-	fid = fopen("..\\TESTOUT\\triintertest.dat","w");
-	triMesh2.write(fid);//(triMesh,3,totT);
-	fclose(fid);
+		fid = fopen("..\\TESTOUT\\stattri.dat","w");
+		triMesh4= TriarrayToMesh(triRSVS, triRSVS.stattri);
+		triMesh4.write(fid);//(triMesh,3,totT);
+		fclose(fid);*/
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -1060,7 +1108,7 @@ int Test_snakeRSVS_singlevol(){
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
 	const char *fileToOpen;
-	tecplotfile outSnake;
+	tecplotfile outSnake, outSnake2;
 	double totT=0.0;
 	vector<double> dt;
 	vector<int> isImpact;
@@ -1074,8 +1122,10 @@ int Test_snakeRSVS_singlevol(){
 	dims[0]=1;dims[1]=1;dims[2]=1;
 	// try {
 		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
-
 		outSnake.OpenFile(fileToOpen);
+		fileToOpen="..\\TESTOUT\\TestSnakeRSVS_snake.plt";
+		outSnake2.OpenFile(fileToOpen);
+
 		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
@@ -1106,7 +1156,7 @@ int Test_snakeRSVS_singlevol(){
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj);
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -1178,7 +1228,7 @@ int Test_MeshOrient(){
 }
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc &calcObj){
+	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT){
 	int start_s;
 
 	 
@@ -1198,6 +1248,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.CheckAndCompute();
 	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" solve:", start_s);
+	outSnake2.PrintSnake(testSnake, 1, totT);
 	
 	calcObj.Print2Screen();
 	// calcObj.Print2Screen(2);
@@ -1207,7 +1258,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
 
-	SnakeConnectivityUpdate_legacy(testSnake, isImpact);
+	SnakeConnectivityUpdate(testSnake, isImpact);
 	MaintainTriangulateSnake(RSVStri);
 	
 

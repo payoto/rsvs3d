@@ -42,6 +42,7 @@ template <class T> class TriStruct;
 class triangle;
 class trianglepoint;
 class trianglesurf;
+class tecplotfile; 
 
 typedef TriStruct<triangle> triarray;
 typedef TriStruct<trianglepoint>  tripointarray;
@@ -214,7 +215,7 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn);
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc &calcObj);
+	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT);
 void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS);
 int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,int &returnType, int &nextEdge);
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
