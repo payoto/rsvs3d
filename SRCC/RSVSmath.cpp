@@ -273,6 +273,60 @@ the jacobian is arranged :
 		Volume_ddf(*p0,*p1,*p2,hes);
 	}
 }
+
+void Volume::CalcFD(){
+		/* This function calculates Volume Jacobian and Hessian using
+matlab automatically generated code
+
+the jacobian is arranged :
+	  x0 y0 z0  x1 y1 z1  x2 y2 z2
+ V [                               ] 
+
+ The Hessian is arranged:
+ 					V 	
+	   x0 y0 z0  x1 y1 z1  x2 y2 z2
+ x0 [                               ]  
+ y0 [                               ] 
+ z0 [                               ] 
+ x1 [                               ] 
+ y1 [                               ] 
+ z1 [                               ] 
+ x2 [                               ] 
+ y2 [                               ] 
+ z2 [                               ] 
+
+*/  
+	#ifdef SAFE_ALGO
+	PreCalc(); 
+	#endif
+	std::vector<double> v;
+	double fdStep=1e-6;
+	double tempVal;
+	
+	vector<vector<double>> vecs;
+
+	v.reserve(3);
+
+	if(!isCalc){
+		this->Calc();
+
+		vecs.clear();
+		vecs.reserve(3);
+		vecs.push_back(*p0);
+		vecs.push_back(*p1);
+		vecs.push_back(*p2);
+		for(int ii=0; ii<3; ++ii){
+			for(int jj=0; jj< 3; ++jj){
+				vecs[ii][jj] = vecs[ii][jj] + fdStep;
+				Volume_f(vecs[0],vecs[1],vecs[2],tempVal);
+				jac[0][ii*3+jj] = (tempVal-this->fun)/fdStep;
+				vecs[ii][jj] = vecs[ii][jj] - fdStep;
+			}
+
+		}
+
+	}
+}
  
 void Area::Calc(){
 		/* This function calculates Area Jacobian and Hessian using
@@ -550,5 +604,25 @@ void SurfCentroid::Disp(){
  	cout << "edgeLength" << edgeLength << endl << "centroid ";
  	DisplayVector(centroid); 
  	cout << endl;
+}
+
+
+void Volume2::Calc(){
+
+	#ifdef SAFE_ALGO
+	PreCalc(); 
+	#endif
+
+	if(!isCalc){
+		Volume2_f((*coords[0])[0],(*coords[0])[1],(*coords[0])[2],
+			*coords[1],*coords[2],*coords[3],*coords[4],*coords[5],*coords[6],
+			fun);
+		Volume2_df((*coords[0])[0],(*coords[0])[1],(*coords[0])[2],
+			*coords[1],*coords[2],*coords[3],*coords[4],*coords[5],*coords[6],
+			jac);
+		Volume2_ddf((*coords[0])[0],(*coords[0])[1],(*coords[0])[2],
+			*coords[1],*coords[2],*coords[3],*coords[4],*coords[5],*coords[6],
+			hes);
+	}
 }
 

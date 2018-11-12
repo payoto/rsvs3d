@@ -6,9 +6,10 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     % polygon
     % Areas are similarly calculated for triangular portions of a polygon
     if true
+        [ccodeGen(1)]=Code_Volume_d();
         [ccodeGen(1)]=Code_Volume();
-        [ccodeGen(2)]=Code_Area();
-        [ccodeGen(3)]=Code_LengthEdge();
+%         [ccodeGen(2)]=Code_Area();
+%         [ccodeGen(3)]=Code_LengthEdge();
 %         [ccodeGen(4)]=Code_SurfIntersect();
 %         [ccodeGen(5)]=Code_SurfCentroid4();
 %         [ccodeGen(6)]=Code_SurfCentroid5();
@@ -195,7 +196,52 @@ function [ccodeGen]=Code_Volume()
     [ccodeGen.inputs]=[ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
     ccodeGen.name='Volume';
     
-    vol=symfun(p0'*(cross((p2-p0),(p1-p0)))/6,[p0;p1;p2]);
+    vol=symfun(p0'*(cross((p2-p0),(p1-p0)))/6  ...
+        ,[p0;p1;p2]);
+%         + p1'*(cross((p0-p1),(p2-p1)))/6 + ...
+%         p2'*(cross((p1-p2),(p0-p2)))/6 ...
+    volJac=jacobian(vol);
+    volHes=hessian(vol);
+    
+    ccodeGen.f=custcccode(vol);
+    ccodeGen.df=custcccode(volJac);
+    ccodeGen.ddf=custcccode(volHes);
+    ccodeGen.symfun(1).fun=vol;
+    ccodeGen.symfun.jac=volJac;
+    ccodeGen.symfun.hes=volHes;
+end
+
+function [ccodeGen]=Code_Volume_d()
+
+    syms d0 d1 d2;
+    g0s=sym('g0s_%d__',[3,1]);
+    g1s=sym('g1s_%d__',[3,1]);
+    g2s=sym('g2s_%d__',[3,1]);
+    g0e=sym('g0e_%d__',[3,1]);
+    g1e=sym('g1e_%d__',[3,1]);
+    g2e=sym('g2e_%d__',[3,1]);
+    assume(d0,'real');
+    assume(d1,'real');
+    assume(d2,'real');
+    assume(g0e,'real');
+    assume(g1e,'real');
+    assume(g2e,'real');
+    assume(g0s,'real');
+    assume(g1s,'real');
+    assume(g2s,'real');
+    
+    p0=symfun(d0*(g0e-g0s)+g0s,[d0;g0s;g0e;d1;g1s;g1e;d2;g2s;g2e]);
+    p1=symfun(d1*(g1e-g1s)+g1s,[d0;g0s;g0e;d1;g1s;g1e;d2;g2s;g2e]);
+    p2=symfun(d2*(g2e-g2s)+g2s,[d0;g0s;g0e;d1;g1s;g1e;d2;g2s;g2e]);
+    ccodeGen=CCodeGenStruct('const vector<double>&','g0s','g1s','g2s','g0e','g1e','g2e');
+    [ccodeGen.inputs]=[CInputGenStruct('double ','d0', 'd1', 'd2'), ...
+        ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
+    ccodeGen.name='Volume';
+    
+    vol=symfun(p0'*(cross((p2-p0),(p1-p0)))/6  ...
+        ,[d0;d1;d2]);
+%         + p1'*(cross((p0-p1),(p2-p1)))/6 + ...
+%         p2'*(cross((p1-p2),(p0-p2)))/6 ...
     volJac=jacobian(vol);
     volHes=hessian(vol);
     

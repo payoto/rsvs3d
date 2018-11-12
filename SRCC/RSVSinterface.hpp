@@ -48,7 +48,9 @@ public :
 	void BuildDVMap(const vector<int> &vecin);
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalculateTriangulation(const triangulation &triRSVS);
+	void CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true, bool isDeriv=true);
+	void CalculateTriangulation(const triangulation &triRSVS, bool useFD=false);
 	void PrepTriangulationCalc(const triangulation &triRSVS);
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;

@@ -478,6 +478,7 @@ end
 
 function [normal, mCoord]=SurfNormal(surf, grid, edgeInd, vertInd)
     
+    
     % Get vertices in right order
     currVertSub=FindObjNum([],...
                 [grid.edge(...
@@ -502,10 +503,44 @@ function [normal, mCoord]=SurfNormal(surf, grid, edgeInd, vertInd)
     for ii=1:numel(currVertSub)
         normal = normal + TriPoint_Normal(mCoord,coords(ii,:),coords(ii+1,:));
     end
-    normal = 0.02 * normal / sqrt(sum(normal.^2));
+
+        normal = 0.02 * normal / sqrt(sum(normal.^2));
     
 end
 
+function [areaCalc, mCoord]=SurfAreaContrib(surf, grid, edgeInd, vertInd)
+    
+
+    % Get vertices in right order
+    currVertSub=FindObjNum([],...
+                [grid.edge(...
+                FindObjNum([],[surf.edgeind],edgeInd)...
+                ).vertind],vertInd);
+    [~,b,~]=unique(currVertSub);
+    b = sort(b);
+    if currVertSub(b(end))==currVertSub(end)
+        b(end+1) = numel(currVertSub)-1;
+    else
+        b(end+1) = numel(currVertSub);
+    end
+    currVertSub=currVertSub(b);
+    if currVertSub(end)~=currVertSub(1)
+        currVertSub(1:2)=currVertSub(2:-1:1);
+    end
+    currVertSub = currVertSub(1:end-1);
+    coords=vertcat(grid.vert(currVertSub).coord);
+    coords(end+1,:)=coords(1,:);
+    mCoord=mean(coords,1);
+    
+    areaCalc = [];
+    for ii=1:numel(currVertSub)
+        
+        areaCalc = [areaCalc,TriPoint_AreaContrib(mCoord,coords(ii,:),coords(ii+1,:))];
+        areaCalc = [areaCalc,TriPoint_AreaContrib(coords(ii+1,:),mCoord,coords(ii,:))];
+        areaCalc = [areaCalc,TriPoint_AreaContrib(coords(ii,:),coords(ii+1,:),mCoord)];
+    end
+    
+end
 function [norm]=TriPoint_Normal(p0,p1,p2)
     
     norm = cross((p1-p0),(p2-p0));
@@ -513,6 +548,37 @@ function [norm]=TriPoint_Normal(p0,p1,p2)
     
 end
 
+function [norm]=TriPoint_AreaContrib(p0,p1,p2)
+    
+    norm = dot(p0,cross((p2-p0),(p1-p0)))/6;
+    %kron((p2-p0),(p1-p0))==cross((p2-p0),(p1-p0))
+    
+end
+
+function [grid]=CalcVolume(grid)
+    
+
+    vertInd=[grid.vert(:).index];
+    edgeInd=[grid.edge(:).index];
+    surfInd=[grid.surf(:).index];
+    voluInd=[grid.volu(:).index];
+    
+    for ii=1:numel(grid.volu)
+        surfSub = FindObjNum([],grid.volu(ii).surfind, surfInd);
+        for jj=1:numel(surfSub)
+            [areaCalc, mCoord]=SurfAreaContrib(grid.surf(surfSub(jj)),...
+                grid, edgeInd, vertInd);
+            if grid.surf(surfSub(jj)).voluind(1)==grid.volu(ii).index
+                multiplier = 1;
+            else
+                multiplier = -1;
+            end
+            grid.surf(surfSub(jj)).volcontrib = areaCalc*multiplier;
+        end
+        
+        grid.volu(ii).volume = sum([grid.surf(surfSub).volcontrib]);
+    end
+end
 
 function [rgb]=NiceColors()
     hexCol= {

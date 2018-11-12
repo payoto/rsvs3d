@@ -208,6 +208,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	trianglepoint surfCentre;
 	triangle triangleEdge;
 	vector<int> orderVert;
+	int nextInd = triangul.GetMaxIndex();
 
 	// Loop around edges calculating centre and length of each edge
 	//surfLength=0;
@@ -228,7 +229,9 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 		triangleEdge.connec.constrinfluence={};
 	}
 
-	if (n>3){
+	if (n<3){
+		throw invalid_argument("cannot build triangle less than 3 points");
+	} else if (n>3){
 		for(ii=0; ii<n; ++ii){
 			//meshin.edges.isearch(surfin.edgeind[ii])->
 			//	GeometricProperties(&meshin,edgeCentre,edgeLength);
@@ -238,6 +241,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 
 			// triangleEdge.pointind[0]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[0];
 			// triangleEdge.pointind[1]=meshin.edges.isearch(surfin.edgeind[ii])->vertind[1];
+			triangleEdge.index=++nextInd;
 			triangleEdge.pointind[0]=orderVert[ii];
 			triangleEdge.pointind[1]=orderVert[(ii+1)%n];
 			triangul.push_back(triangleEdge);
@@ -254,7 +258,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	} else {
 
 		triangleEdge.SetPointType(typeMesh,typeMesh,typeMesh);
-
+		triangleEdge.index=++nextInd;
 		triangleEdge.pointind=orderVert;
 		triangleEdge.parentsurf=surfin.index;
 		triangul.push_back(triangleEdge);
@@ -270,6 +274,8 @@ void TriangulateTriSurface(const trianglesurf &surfin,
 	coordvec edgeCentre;
 	trianglepoint surfCentre;
 	triangle triangleEdge;
+	int nextInd = triangul.GetMaxIndex();
+
 
 	// Loop around edges calculating centre and length of each edge
 
@@ -284,10 +290,14 @@ void TriangulateTriSurface(const trianglesurf &surfin,
 	triangleEdge.connec.celltarg=surfin.voluind;
 	triangleEdge.connec.constrinfluence={-1.0, 1.0};
 	kk=0;
-	if (n>3){
+	if (n<3){
+		throw invalid_argument("cannot build triangle less than 3 points");
+	} else if (n>3){
 		for(ii=0; ii<n; ++ii){
 
 			triangleEdge.SetPointType(surfin.typevert[ii],surfin.typevert[(ii+1)%n],3);
+
+			triangleEdge.index=++nextInd;
 
 			triangleEdge.pointind[0]=surfin.indvert[ii];
 			triangleEdge.pointind[1]=surfin.indvert[(ii+1)%n];
@@ -306,6 +316,7 @@ void TriangulateTriSurface(const trianglesurf &surfin,
 
 		triangleEdge.SetPointType(surfin.typevert[0],surfin.typevert[1],surfin.typevert[2]);
 
+		triangleEdge.index=++nextInd;
 		triangleEdge.pointind=surfin.indvert;
 		triangleEdge.parentsurf=surfin.index;
 		triangul.push_back(triangleEdge);

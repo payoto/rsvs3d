@@ -982,7 +982,8 @@ void repositionatquarteredge(snake &snakein){
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
 }
-
+void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
+	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT);
 int Test_RSVSalgo_singlevol(){
 
 	// int nVoluZone, ii;
@@ -1020,11 +1021,11 @@ int Test_RSVSalgo_singlevol(){
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		for(ii=0;ii<voluMesh.volus.size();++ii){
-			voluMesh.volus[ii].target=0.1;
+			voluMesh.volus[ii].target=0.3;
 		}
-		voluMesh.volus[0].target=0.05;//0.05;//0.0001;
-		voluMesh.volus[1].target=0.05;//0.05;
-		voluMesh.volus[2].target=0.05;//0.05;//0.0001;
+		// voluMesh.volus[0].target=0.05;//0.05;//0.0001;
+		// voluMesh.volus[1].target=0.05;//0.05;
+		// voluMesh.volus[2].target=0.05;//0.05;//0.0001;
 		// voluMesh.volus[3].target=0.3;//0.05;//0.0001;
 		// voluMesh.volus[4].target=0.3;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;
@@ -1049,14 +1050,14 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<200;++ii){
+		for(ii=0;ii<1;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 					triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			// }
 			stop_s=clock();
-			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
+			Test_mathRSVS_FD(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -1242,7 +1243,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// Check if impact detect crossovers
 	start_s=TimeStamp(" triangulate:", start_s);
 	// calcObj.limLag=10000.0;
-	calcObj.CalculateTriangulation(RSVStri);
+	calcObj.CalculateTriangulation(RSVStri, false);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
 	calcObj.CheckAndCompute();
@@ -1263,3 +1264,62 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	
 
 }
+
+void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
+	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT){
+	int start_s;
+
+	SQPcalc calcObj2;
+	double fdStep=1e-3;
+	start_s=clock();
+
+	// calcObj.Print2Screen(1);
+	// calcObj.Print2Screen(2);
+	// CalculateSnakeVel(testSnake);
+	// Small step away from edge without crossover.
+	// Need to develop that.
+	// Check if impact detect crossovers
+	start_s=TimeStamp(" triangulate:", start_s);
+	// calcObj.limLag=10000.0;
+	// for(int ii=0; ii<testSnake.snakemesh->verts.size();++ii){
+	// 	for(int jj=0; jj<3;++jj){
+	// 		testSnake.snakemesh->verts[ii].coord[jj] +=1;
+	// 	}
+	// }
+	// testSnake.PrepareForUse();
+	// testSnake.UpdateCoord();
+	// testSnake.PrepareForUse();
+	calcObj.CalculateTriangulation(RSVStri, false);
+	testSnake.snaxs[137].d += fdStep;
+	testSnake.PrepareForUse();
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+	calcObj2.CalculateTriangulation(RSVStri, false);
+
+	cout << endl; 
+	for(int ii = 0; ii<calcObj.numConstr();++ii){
+		cout << calcObj2.constr[ii]- calcObj.constr[ii]  << " " << 
+			(calcObj2.constr[ii]- calcObj.constr[ii])/fdStep << endl;
+	}
+
+	calcObj.ReturnConstrToMesh(RSVStri);
+	start_s=TimeStamp(" deriv:", start_s);
+	calcObj.CheckAndCompute();
+	calcObj.ReturnVelocities(RSVStri);
+	start_s=TimeStamp(" solve:", start_s);
+	outSnake2.PrintSnake(testSnake, 1, totT);
+	
+	calcObj.Print2Screen();
+	// calcObj.Print2Screen(2);
+	CalculateNoNanSnakeVel(testSnake);
+	testSnake.CalculateTimeStep(dt,0.5);
+	testSnake.UpdateDistance(dt,0.34);
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+
+	SnakeConnectivityUpdate(testSnake, isImpact);
+	MaintainTriangulateSnake(RSVStri);
+	
+
+}
+

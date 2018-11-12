@@ -150,6 +150,7 @@ class Volume : public TriFunc {
 
 public:
 	void Calc() override;
+	void CalcFD();
 };
 
 class Area : public TriFunc {
@@ -178,6 +179,20 @@ class LengthEdge : public CoordFunc {
 public:
 	void Calc() override;
 	LengthEdge() : CoordFunc(3,2){}
+};
+
+
+class Volume2 : public CoordFunc {
+
+	using CoordFunc::PreCalc;
+	using CoordFunc::coords;
+	using CoordFunc::fun;
+	using CoordFunc::jac;
+	using CoordFunc::hes;
+
+public:
+	void Calc() override;
+	Volume2() : CoordFunc(3,7){}
 };
 
 class SurfCentroid : public CoordFunc {

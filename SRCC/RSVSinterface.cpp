@@ -12,6 +12,9 @@
 using namespace std; 
 using namespace Eigen; 
 
+//silent functions
+template <class T> void PrintMatrixFile(const vector<T> &mat, const char * name);
+
 
 void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
 
@@ -39,9 +42,10 @@ void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
 	BuildDVMap(vecin);
 }
 
-void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
+void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, bool useFD){
 
 	int ii,ni;
+
 
 	this->returnDeriv=true;
 
@@ -49,20 +53,25 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	this->PrepTriangulationCalc(triRSVS);
 
 	// Calculate the SQP object
+	
+	auto calcTriFunc=&SQPcalc::CalcTriangle;
+	if(useFD){
+		calcTriFunc = &SQPcalc::CalcTriangleFD;
+	}
 	ni=triRSVS.dynatri.size();
 	for(ii = 0; ii< ni ; ii++){
-		CalcTriangle(*(triRSVS.dynatri(ii)), triRSVS, true, true, true);
+		(this->*calcTriFunc)(*(triRSVS.dynatri(ii)), triRSVS, true, true, true);
 	} 
 	ni=triRSVS.intertri.size();
 	for(ii = 0; ii< ni ; ii++){
-		CalcTriangle(*(triRSVS.intertri(ii)), triRSVS, false, true, true);
+		(this->*calcTriFunc)(*(triRSVS.intertri(ii)), triRSVS, false, true, true);
 	} 
 	// PrintMatrixFile(this->dConstr, "matrix_dConstr.txt");
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
-		CalcTriangle(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, false, true, false);
+		(this->*calcTriFunc)(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, 
+			false, true, false);
 	} 
-
 	// Output some data to check it makes sense
 
 	// int n;
@@ -77,7 +86,8 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS){
 	// 		}
 	// 	}
 	// }
-	// PrintMatrixFile(this->dvCallConstr, "matrix_dvCallConstr.txt");
+	cout << endl << dvMap.find(1044) << endl;
+	PrintMatrixFile(this->dConstr.transpose(), "matrices\\matrix_dvConstr.txt");
 }
 
 void SQPcalc::ReturnVelocities(triangulation &triRSVS){
@@ -379,24 +389,415 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		// and constraint derivative
 		// and Hessian
 		nCellTarg=triIn.connec.celltarg.size(); 
+		if((dvListMap.find(1044)!=-1 )  && isDeriv){
+			std::vector<double> v={constrPart};
+			PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter2.txt");
+			PrintMatrixFile(triIn.connec.constrinfluence,"matrices\\matrix_dConstrPart_inter2.txt");
+			// PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
+			// PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
+			PrintMatrixFile(v,"matrices\\matrix_dConstrPart_inter2.txt");
+			PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter2.txt");
+			PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter2.txt");
+			// cout << endl;
+			// DisplayVector(*veccoord[0]);
+			// cout << endl;
+			// DisplayVector(*veccoord[1]);
+			// cout << endl;
+			// DisplayVector(*veccoord[2]);
+			// cout << endl;
+			// throw invalid_argument("");
+		}
 		for(ii=0; ii< nCellTarg;++ii){
 			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
 				if (subTempVec[jj]!=-1){
-					/*if(subTempVec[jj]==5 && nDvAct>0){
-						PrintMatrixFile(dConstrPart,"matrix_dConstrPart_inter2.txt");
-						PrintMatrixFile(dVal,"matrix_dVal_inter2.txt");
-						PrintMatrixFile(dPos,"matrix_dPos_inter2.txt");
-						cout << endl;
-						DisplayVector(*veccoord[0]);
-						cout << endl;
-						DisplayVector(*veccoord[1]);
-						cout << endl;
-						DisplayVector(*veccoord[2]);
-						cout << endl;
-						throw invalid_argument("");
-					}*/
+					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+					if(isDeriv){
+						for(kk=0; kk< nDvAct; ++kk){
+							this->dConstr(subTempVec[jj],this->dvMap.find(dvListMap.vec[kk])) += 
+								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
+							for(ll=0; ll< nDvAct; ++ll){
+								// TODO cross product with lagrangian
+								this->HConstr(this->dvMap.find(dvListMap.vec[ll]),
+									 this->dvMap.find(dvListMap.vec[kk])) += 
+									 triIn.connec.constrinfluence[ii]*
+									 HConstrPart(ll,kk)
+									 *this->lagMult[subTempVec[jj]];
+							}
+						}
+					}
+				} else {
+					this->falseaccess++;
+				}
+			}
+		}
+
+	}
+
+	HVal.setZero(9,9);
+	dVal.setZero(1,9);
+	dObjPart.setZero(1,nDvAct);	HObjPart.setZero(nDvAct,nDvAct);
+	
+	if(isObj){
+		AreaCalc.Calc();
+		AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dObjPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
+		objPart=*retVal;
+
+		// Assign to main part of the object
+		// assign objective function
+		this->obj+=objPart; 
+		// Assign objective derivative
+		// cout << endl << "dObjPart " << nDvAct << " " ;
+		// PrintMatrix(dObjPart);
+		// cout <<  endl << "done" <<endl;
+		if(isDeriv){
+			for(ii=0; ii< nDvAct; ++ii){
+				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+				for(jj=0; jj< nDvAct; ++jj){
+					this->HObj(dvMap.find(dvListMap.vec[jj]),
+						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				}
+			}
+		}
+	}
+	// Update active lists of design variables
+	for(ii=0; ii< nDvAct; ++ii){
+		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
+	}
+	nCellTarg=triIn.connec.celltarg.size(); 
+	for(ii=0; ii< nCellTarg;++ii){
+		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+		nj=subTempVec.size();
+		for(jj=0; jj< nj; ++jj){
+			if (subTempVec[jj]!=-1){
+				this->isConstrAct.at(subTempVec[jj]) = true;
+			}
+		}
+	}
+
+	// Assign Objective Hessian
+
+	// Assign Constraint Hessian
+}
+
+void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
+	bool isObj, bool isConstr, bool isDeriv){
+
+
+	int ii,ni,jj,nj,kk,ll,nCellTarg;
+	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	SurfCentroid centreCalc;
+	Volume VolumeCalc, VolumeCalcFD;
+	Area AreaCalc;
+	vector<int> dvList,subTempVec;
+	HashedVector<int,int> dvListMap;
+	vector<vector<double> const *> veccoord;
+	MatrixXd HPos, dPos;
+	MatrixXd HVal, dVal;
+	MatrixXd dConstrPart,HConstrPart, HObjPart;
+	MatrixXd dObjPart;
+	double constrPart, objPart;
+	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
+	double *retVal;
+
+
+	veccoord.reserve(3);
+
+	isCentre=0;
+	ni=3;
+	for(ii=0; ii<ni; ++ii){
+		if(triIn.pointtype[ii]==1){
+			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==2){
+			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==3){
+			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
+			isCentre++;
+		}
+	}
+
+	// Constr and objective
+	VolumeCalc.assign(veccoord[0],veccoord[1],veccoord[2]);
+	AreaCalc.assign(veccoord[0],veccoord[1],veccoord[2]);
+
+	// Active DV lists
+
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2){
+			dvList.push_back(triIn.pointind[ii]);
+		} else if (triIn.pointtype[ii]==3 && false){
+			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
+			nj=triRSVS.trisurf(subTemp)->indvert.size();
+			for(jj=0;jj<nj;++jj){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
+				}
+			}
+		}
+	}
+	dvListMap.vec=dvList;
+	sort(dvListMap.vec);
+	unique(dvListMap.vec);
+	dvListMap.GenerateHash();
+	nDvAct=dvListMap.vec.size();
+
+	// Positional Derivatives
+
+	// HERE -> function to calculate SurfCentroid (dc/dd)^T Hm (dc/dd)
+
+	HPos.setZero(nDvAct,nDvAct);
+	dPos.setZero(9,nDvAct);
+	kk=0;
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2){
+			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
+			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
+			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
+			subTemp3=dvListMap.find(triIn.pointind[ii]);
+			for(jj=0;jj<3;++jj){
+				dPos(kk*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
+			}
+			kk++;
+		} else if (triIn.pointtype[ii]==3 && false){
+
+		}
+	}
+	// Total
+
+	HVal.setZero(9,9);
+	dVal.setZero(1,9);
+	dConstrPart.setZero(1,nDvAct);
+	HConstrPart.setZero(nDvAct,nDvAct);
+
+	if(isConstr){
+		VolumeCalc.CalcFD();
+		VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dConstrPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+		// if (isDeriv){
+
+		// cout << dConstrPart.rows() << " " << dConstrPart.cols() << " ";
+		// }
+		constrPart=*retVal;
+		// Assign Constraint
+		// and constraint derivative
+		// and Hessian
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
+					// if((dvListMap.find(1038)!=-1 || dvListMap.find(1044))  && isDeriv){
+
+					// 	PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter3.txt");
+					// 	PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter3.txt");
+					// 	PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter3.txt");
+					// 	PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter3.txt");
+					// 	PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter3.txt");
+					// 	// cout << endl;
+					// 	// DisplayVector(*veccoord[0]);
+					// 	// cout << endl;
+					// 	// DisplayVector(*veccoord[1]);
+					// 	// cout << endl;
+					// 	// DisplayVector(*veccoord[2]);
+					// 	// cout << endl;
+					// 	// throw invalid_argument("");
+					// }
+					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+					if(isDeriv){
+						for(kk=0; kk< nDvAct; ++kk){
+							this->dConstr(subTempVec[jj],this->dvMap.find(dvListMap.vec[kk])) += 
+								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
+							for(ll=0; ll< nDvAct; ++ll){
+								// TODO cross product with lagrangian
+								this->HConstr(this->dvMap.find(dvListMap.vec[ll]),
+									 this->dvMap.find(dvListMap.vec[kk])) += 
+									 triIn.connec.constrinfluence[ii]*
+									 HConstrPart(ll,kk)
+									 *this->lagMult[subTempVec[jj]];
+							}
+						}
+					}
+				} else {
+					this->falseaccess++;
+				}
+			}
+		}
+
+	}
+
+	HVal.setZero(9,9);
+	dVal.setZero(1,9);
+	dObjPart.setZero(1,nDvAct);	HObjPart.setZero(nDvAct,nDvAct);
+	
+	if(isObj){
+		AreaCalc.Calc();
+		AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dObjPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
+		objPart=*retVal;
+
+		// Assign to main part of the object
+		// assign objective function
+		this->obj+=objPart; 
+		// Assign objective derivative
+		// cout << endl << "dObjPart " << nDvAct << " " ;
+		// PrintMatrix(dObjPart);
+		// cout <<  endl << "done" <<endl;
+		if(isDeriv){
+			for(ii=0; ii< nDvAct; ++ii){
+				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+				for(jj=0; jj< nDvAct; ++jj){
+					this->HObj(dvMap.find(dvListMap.vec[jj]),
+						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				}
+			}
+		}
+	}
+	// Update active lists of design variables
+	for(ii=0; ii< nDvAct; ++ii){
+		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
+	}
+	nCellTarg=triIn.connec.celltarg.size(); 
+	for(ii=0; ii< nCellTarg;++ii){
+		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+		nj=subTempVec.size();
+		for(jj=0; jj< nj; ++jj){
+			if (subTempVec[jj]!=-1){
+				this->isConstrAct.at(subTempVec[jj]) = true;
+			}
+		}
+	}
+
+	// Assign Objective Hessian
+
+	// Assign Constraint Hessian
+}
+
+
+void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation &triRSVS,
+	bool isObj, bool isConstr, bool isDeriv){
+
+
+	int ii,ni,jj,nj,kk,ll,nCellTarg;
+	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	SurfCentroid centreCalc;
+	Volume2 VolumeCalc;
+	Area AreaCalc;
+	vector<int> dvList,subTempVec;
+	HashedVector<int,int> dvListMap;
+	vector<vector<double> const *> veccoord;
+	MatrixXd HPos, dPos;
+	MatrixXd HVal, dVal;
+	MatrixXd dConstrPart,HConstrPart, HObjPart;
+	MatrixXd dObjPart;
+	double constrPart, objPart;
+	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
+	double * retVal;
+
+
+	veccoord.reserve(3);
+	isCentre=0;
+	ni=3;
+	for(ii=0; ii<ni; ++ii){
+		if(triIn.pointtype[ii]==1){
+			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==2){
+			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==3){
+			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
+			isCentre++;
+		}
+	}
+
+	// Constr and objective
+	VolumeCalc.assign(veccoord[0],veccoord[1],veccoord[2]); /// <-----Change assignement 
+	AreaCalc.assign(veccoord[0],veccoord[1],veccoord[2]);
+
+	// Active DV lists
+
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2){
+			dvList.push_back(triIn.pointind[ii]);
+		} else if (triIn.pointtype[ii]==3 && false){
+			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
+			nj=triRSVS.trisurf(subTemp)->indvert.size();
+			for(jj=0;jj<nj;++jj){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
+				}
+			}
+		}
+	}
+	dvListMap.vec=dvList;
+	sort(dvListMap.vec);
+	unique(dvListMap.vec);
+	dvListMap.GenerateHash();
+	nDvAct=dvListMap.vec.size();
+
+	// Positional Derivatives
+
+	// HERE -> function to calculate SurfCentroid (dc/dd)^T Hm (dc/dd)
+
+	HPos.setZero(nDvAct,nDvAct);
+	dPos.setZero(9,nDvAct);
+	kk=0;
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2){
+			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
+			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
+			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
+			subTemp3=dvListMap.find(triIn.pointind[ii]);
+			for(jj=0;jj<3;++jj){
+				dPos(kk*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
+			}
+			kk++;
+		} else if (triIn.pointtype[ii]==3 && false){
+
+		}
+	}
+	// Total
+
+	HVal.setZero(9,9);
+	dVal.setZero(1,9);
+	dConstrPart.setZero(1,nDvAct);
+	HConstrPart.setZero(nDvAct,nDvAct);
+
+	if(isConstr){
+		VolumeCalc.Calc();
+		VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dConstrPart);/// <-----Change NOT NEEDED
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);/// <-----Change NOT NEEDED
+		// if (isDeriv){
+
+		// cout << dConstrPart.rows() << " " << dConstrPart.cols() << " ";
+		// }
+		constrPart=*retVal;
+		// Assign Constraint
+		// and constraint derivative
+		// and Hessian
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< nDvAct; ++kk){
@@ -577,11 +978,13 @@ void SQPcalc::ComputeSQPstep(
 	bool isNan, isLarge;
 	int ii, ni;
 
-	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
 	// HouseholderQR<MatrixXd> HLagSystem(HLag);
-	// LLT<MatrixXd> HLagSystem(HLag);
+	LLT<MatrixXd> HLagSystem(HLag);
 	// PartialPivLU<MatrixXd> HLagSystem(HLag);
 
+	isLarge = true;
+	if (!isLarge){
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
 	temp2 = HLagSystem.solve(dObjAct.transpose());
 
@@ -594,8 +997,8 @@ void SQPcalc::ComputeSQPstep(
 			constrAct - (dConstrAct*(temp2))
 		);
 
-	isNan = false;
 	isLarge = false;
+	isNan = false;
 	ni = lagMultAct.size();
 	for (ii=0; ii<ni; ++ii){
 		if(lagMultAct[ii]<-limLag){
@@ -613,6 +1016,7 @@ void SQPcalc::ComputeSQPstep(
 	// isLarge = false;
 	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
 	// }else 
+	}
 	if(isLarge) {
 
 		// PrintMatrixFile(dConstrAct, "matrix_dConstrAct.txt");
@@ -625,18 +1029,25 @@ void SQPcalc::ComputeSQPstep(
 
 	}
 
-
 	ni = subDvAct.size();
 	for (ii=0; ii<ni; ++ii){
 		deltaDV[subDvAct[ii]]=deltaDVAct[ii];
+		// deltaDV[subDvAct[ii]]=dConstrAct.col(subDvAct[ii])[1];
 		
 	}
 	
 	ni = subConstrAct.size();
 	lagMult.setZero(nConstr);
-	for (ii=0; ii<ni; ++ii){
-		lagMult[subConstrAct[ii]]=lagMultAct[ii];
-		isNan = isNan || isnan(lagMultAct[ii]);
+	if(isLarge){
+		for (ii=0; ii<nConstr; ++ii){
+			lagMult[subConstrAct[ii]]=0;
+		}
+
+	} else {
+		for (ii=0; ii<ni; ++ii){
+			lagMult[subConstrAct[ii]]=lagMultAct[ii];
+			isNan = isNan || isnan(lagMultAct[ii]);
+		}
 	}
 	if (false){
 		Print2Screen(3);
@@ -739,7 +1150,7 @@ void PrintMatrixFile(const MatrixXd mat, const char * name){
 	ofstream myfile;
 	ni=mat.rows();
 	nj=mat.cols();
-	myfile.open(name);
+	myfile.open(name, ios::app);
 	for(ii=0;ii<ni;++ii){
 		for(jj=0;jj<nj;++jj){
 			myfile  << mat(ii,jj) << " ";
@@ -747,6 +1158,20 @@ void PrintMatrixFile(const MatrixXd mat, const char * name){
 		myfile  << endl;
 	}
 	myfile  << endl;
+	myfile.close();
+
+}
+template <class T> void PrintMatrixFile(const vector<T> &mat, const char * name){
+	int ii,ni;
+	ofstream myfile;
+	ni=mat.size();
+
+	myfile.open(name, ios::app);
+	myfile.precision(16);
+	myfile << std::scientific;
+	for(ii=0;ii<ni;++ii){
+		myfile  << mat[ii] << " ";
+	}
 	myfile  << endl;
 	myfile.close();
 

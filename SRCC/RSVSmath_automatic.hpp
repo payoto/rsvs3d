@@ -13,6 +13,12 @@ static const double rsvsmath_automatic_eps_volu = 0.0000001;
 void Volume_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ); 
 void Volume_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
 void Volume_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
+
+void Volume2_f(double  d0 , double  d1 , double  d2 , const vector<double>& g0s , const vector<double>& g1s , const vector<double>& g2s , const vector<double>& g0e , const vector<double>& g1e , const vector<double>& g2e , double &   t0 ) ;
+void Volume2_df(double  d0 , double  d1 , double  d2 , const vector<double>& g0s , const vector<double>& g1s , const vector<double>& g2s , const vector<double>& g0e , const vector<double>& g1e , const vector<double>& g2e , ArrayVec<double> &   A0 );
+void Volume2_ddf(double  d0 , double  d1 , double  d2 , const vector<double>& g0s , const vector<double>& g1s , const vector<double>& g2s , const vector<double>& g0e , const vector<double>& g1e , const vector<double>& g2e , ArrayVec<double> &   A0 ) ;
+
+
 void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ); 
 void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
 void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
