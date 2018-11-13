@@ -64,7 +64,7 @@ void CalculateSnakeVelFast(snake &snakein){
 		snakein.snaxs[ii].v=4;//(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
 	}
 }
-void CalculateNoNanSnakeVel(snake &snakein){
+void CalculateNoNanSnakeVel(snake &snakein, double deltaStep){
 
 	int ii=0, ll=0;
 
@@ -75,7 +75,7 @@ void CalculateNoNanSnakeVel(snake &snakein){
 		// }
 		//snakein.snaxs[ii].v=(double(rand()%1001)/1000.0+0.5)*snakein.snaxs[ii].v;
 		if(!isfinite(snakein.snaxs[ii].v)){
-			snakein.snaxs[ii].v=(0.5-snakein.snaxs[ii].d);
+			snakein.snaxs[ii].v=(0.5-snakein.snaxs[ii].d)*deltaStep;
 			++ll;
 		}
 	}

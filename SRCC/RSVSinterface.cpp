@@ -1024,8 +1024,8 @@ void SQPcalc::ComputeSQPstep(
 	bool isNan, isLarge;
 	int ii, ni;
 
-	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
-	// HouseholderQR<MatrixXd> HLagSystem(HLag);
+	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	HouseholderQR<MatrixXd> HLagSystem(HLag);
 	// LLT<MatrixXd> HLagSystem(HLag);
 	// PartialPivLU<MatrixXd> HLagSystem(HLag);
 
@@ -1035,10 +1035,10 @@ void SQPcalc::ComputeSQPstep(
 
 	lagMultAct = (
 			dConstrAct*(temp1)
-		).colPivHouseholderQr().solve(
-		// ).householderQr().solve(
+		// ).colPivHouseholderQr().solve(
+		).householderQr().solve(
 		// ).llt().solve(
-		// ).partialPivLu().solve()
+		// ).partialPivLu().solve(
 			constrAct - (dConstrAct*(temp2))
 		);
 

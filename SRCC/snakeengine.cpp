@@ -359,9 +359,10 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	for (ii=0;ii<kk;++ii){
 		if (vertNoSpawn.find(vertSpawn[ii])==-1){
 			SpawnAtVertex(partSnake,vertSpawn[ii]);
-		} else {
-			cout << endl << "vertex ignored for spawn " <<endl;
 		}
+		//  else {
+		// 	cout << endl << "vertex ignored for spawn " <<endl;
+		// }
 	}
 	vertNoSpawn.vec.insert(vertNoSpawn.vec.end(),vertSpawn.begin(),vertSpawn.end());
 	vertNoSpawn.GenerateHash();
