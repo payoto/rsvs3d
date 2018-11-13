@@ -1050,14 +1050,14 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<1;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 					triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			// }
 			stop_s=clock();
-			Test_mathRSVS_FD(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
@@ -1243,7 +1243,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// Check if impact detect crossovers
 	start_s=TimeStamp(" triangulate:", start_s);
 	// calcObj.limLag=10000.0;
-	calcObj.CalculateTriangulation(RSVStri, false);
+	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
 	calcObj.CheckAndCompute();

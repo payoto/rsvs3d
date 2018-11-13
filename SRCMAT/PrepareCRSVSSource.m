@@ -7,7 +7,7 @@ function []=PrepareCRSVSSource(targetPath,caseName)
     % Areas are similarly calculated for triangular portions of a polygon
     if true
         [ccodeGen(1)]=Code_Volume_d();
-        [ccodeGen(1)]=Code_Volume();
+        [ccodeGen(2)]=Code_Volume();
 %         [ccodeGen(2)]=Code_Area();
 %         [ccodeGen(3)]=Code_LengthEdge();
 %         [ccodeGen(4)]=Code_SurfIntersect();
@@ -236,7 +236,7 @@ function [ccodeGen]=Code_Volume_d()
     ccodeGen=CCodeGenStruct('const vector<double>&','g0s','g1s','g2s','g0e','g1e','g2e');
     [ccodeGen.inputs]=[CInputGenStruct('double ','d0', 'd1', 'd2'), ...
         ccodeGen.inputs,CInputGenStruct('double &','#MATCHOUT#')];
-    ccodeGen.name='Volume';
+    ccodeGen.name='Volume2';
     
     vol=symfun(p0'*(cross((p2-p0),(p1-p0)))/6  ...
         ,[d0;d1;d2]);

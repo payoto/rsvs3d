@@ -363,7 +363,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
 			subTemp3=dvListMap.find(triIn.pointind[ii]);
 			for(jj=0;jj<3;++jj){
-				dPos(kk*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
 			kk++;
@@ -398,8 +398,8 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 			std::vector<double> v={constrPart};
 			PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter2.txt");
 			PrintMatrixFile(triIn.connec.constrinfluence,"matrices\\matrix_dConstrPart_inter2.txt");
-			// PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
-			// PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
+			PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
+			PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
 			PrintMatrixFile(v,"matrices\\matrix_dConstrPart_inter2.txt");
 			PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter2.txt");
 			PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter2.txt");
@@ -558,7 +558,6 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
-	kk=0;
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
@@ -566,10 +565,9 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
 			subTemp3=dvListMap.find(triIn.pointind[ii]);
 			for(jj=0;jj<3;++jj){
-				dPos(kk*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-			kk++;
 		} else if (triIn.pointtype[ii]==3 && false){
 
 		}
@@ -749,8 +747,9 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 		} else if (triIn.pointtype[ii]==2){
 
 			subTemp = triRSVS.snakeDep->snakeconn.verts.find(triIn.pointind[ii]);
-			dvOrder[ii] = triRSVS.snakeDep->snaxs(subTemp)->index;
-			dvec[ii] = triIn.pointind[ii];
+			dvOrder[ii] = triIn.pointind[ii];
+
+			dvec[ii] = triRSVS.snakeDep->snaxs(subTemp)->d;
 			veccoordvol[1+ii] = &(triRSVS.meshDep->verts.isearch(
 				triRSVS.snakeDep->snaxs(subTemp)->fromvert)->coord);
 			veccoordvol[1+ii+3] = &(triRSVS.meshDep->verts.isearch(
@@ -796,7 +795,7 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
-	kk=0;
+
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
@@ -804,10 +803,9 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
 			subTemp3=dvListMap.find(triIn.pointind[ii]);
 			for(jj=0;jj<3;++jj){
-				dPos(kk*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-			kk++;
 		} else if (triIn.pointtype[ii]==3 && false){
 
 		}
@@ -840,9 +838,29 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 		
 		if(dvListMap.find(1044)!=-1 && isDeriv){
 			cout << endl;
+			DisplayVector(dvOrder);
+			cout << endl;
 			PrintMatrix(dConstrPart);
 			cout << endl;
 		}
+		// if((dvListMap.find(1044)!=-1 )  && isDeriv){
+		// 	std::vector<double> v={constrPart};
+		// 	PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(triIn.connec.constrinfluence,"matrices\\matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(v,"matrices\\matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter2.txt");
+		// 	PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter2.txt");
+		// 	// cout << endl;
+		// 	// DisplayVector(*veccoord[0]);
+		// 	// cout << endl;
+		// 	// DisplayVector(*veccoord[1]);
+		// 	// cout << endl;
+		// 	// DisplayVector(*veccoord[2]);
+		// 	// cout << endl;
+		// 	// throw invalid_argument("");
+		// }
 		// Assign Constraint
 		// and constraint derivative
 		// and Hessian
