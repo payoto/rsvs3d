@@ -17,22 +17,34 @@ CUSERFLAGS=
 #-DSAFE_ALGO
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
-INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen"
+INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen" -I"incl"
 OBJDIR=obj
 # make all options
 SOURCES=arraystructures.cpp
 EXECUTABLE=main
 #make testnew/testall options
-TESTSOURCES=test.cpp mesh.cpp snake.cpp arraystructures.cpp snakstruct_test.cpp postprocessing.cpp
-TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp RSVSmath.cpp meshrefinement.cpp
-TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp RSVSintegration.cpp voxel.cpp
-TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
+SRCTREE = src/
+
 TESTEXECUTABLE=main_test
 
 # Dependency handling
 DEPDIR := .d
+
+
+# Make does not offer a recursive wildcard function, so here's one:
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+TESTSOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
+SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
+
+# TESTSOURCES=test.cpp mesh.cpp snake.cpp arraystructures.cpp snakstruct_test.cpp postprocessing.cpp
+# TESTSOURCES+= snakeengine.cpp snakevel.cpp RSVSmath_automatic.cpp RSVSmath.cpp meshrefinement.cpp
+# TESTSOURCES+= RSVSinterface.cpp RSVSalgorithm.cpp RSVSintegration.cpp voxel.cpp
+# TESTALLSOURCES= voxel.cpp arraystructures_test.cpp
+
+# Dependency handling
 $(shell mkdir -p $(DEPDIR) >/dev/null)
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$(notdir $*).Td
 
 
 #------------------------------------------------------
@@ -50,6 +62,7 @@ CFLAGS += $(CUSERFLAGS)
 OBJECTS=$(addprefix $(OBJDIR),$(SOURCES:.cpp=.o))
 TESTOBJECTS=$(addprefix $(OBJDIR)/,$(TESTSOURCES:.cpp=.o))
 $(shell mkdir -p $(OBJDIR) >/dev/null)
+
 # Handling dependency include:
 ifeq ($(MAKECMDGOALS),testall)
 SRCS = $(TESTALLSOURCES) $(TESTSOURCES)
@@ -64,7 +77,7 @@ endif
 # Compilation command
 
 COMPILECPP=$(CC) $(DEPFLAGS) $(CFLAGS) $(INCLDIR)
-POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
+POSTCOMPILE = @mv -f $(DEPDIR)/$(notdir $*).Td $(DEPDIR)/$(notdir $*).d && touch $@
 #------------------------------------------------------
 #             RECIPES
 #------------------------------------------------------
@@ -84,11 +97,17 @@ main : $(OBJECTS)
 main_test : $(TESTOBJECTS) 
 	$(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
 
+.SECONDEXPANSION:
 
 $(OBJDIR)/%.o : %.cpp
-$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d
+$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f 
 	$(COMPILECPP) $< -o $@
 	$(POSTCOMPILE)
+
+
+%/.f:
+	mkdir -p $(dir $@)
+	touch $@
 
 #compileflagsalltest :
 #CFLAGS=$(CFLAGS) $(CFTESTFLAG)
@@ -104,6 +123,6 @@ clean :
 
 
 $(DEPDIR)/%.d: ;
-.PRECIOUS: $(DEPDIR)/%.d
+.PRECIOUS: $(DEPDIR)/%.d  %/.f
 
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS))))

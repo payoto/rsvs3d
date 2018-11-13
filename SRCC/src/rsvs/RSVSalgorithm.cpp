@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 #include "RSVSalgorithm.hpp"
 #include "snake.hpp"
