@@ -50,7 +50,9 @@ public :
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
 	void CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalculateTriangulation(const triangulation &triRSVS, bool useFD=false);
+	void CalcTriangleDirectArea(const triangle& triIn, const triangulation &triRSVS,
+	bool isObj=true, bool isConstr=true, bool isDeriv=true);
+	void CalculateTriangulation(const triangulation &triRSVS, int derivMethod=0);
 	void PrepTriangulationCalc(const triangulation &triRSVS);
 	void CalculateMesh(mesh &meshin);
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;

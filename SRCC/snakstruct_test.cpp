@@ -1289,12 +1289,12 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	// testSnake.PrepareForUse();
 	// testSnake.UpdateCoord();
 	// testSnake.PrepareForUse();
-	calcObj.CalculateTriangulation(RSVStri, false);
+	calcObj.CalculateTriangulation(RSVStri, 2);
 	testSnake.snaxs[137].d += fdStep;
 	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
-	calcObj2.CalculateTriangulation(RSVStri, false);
+	calcObj2.CalculateTriangulation(RSVStri);
 
 	cout << endl; 
 	for(int ii = 0; ii<calcObj.numConstr();++ii){

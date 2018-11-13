@@ -612,7 +612,6 @@ void Volume2::Calc(){
 	#ifdef SAFE_ALGO
 	PreCalc(); 
 	#endif
-
 	if(!isCalc){
 		Volume2_f((*coords[0])[0],(*coords[0])[1],(*coords[0])[2],
 			*coords[1],*coords[2],*coords[3],*coords[4],*coords[5],*coords[6],

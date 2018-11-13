@@ -42,7 +42,7 @@ void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
 	BuildDVMap(vecin);
 }
 
-void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, bool useFD){
+void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMethod){
 
 	int ii,ni;
 
@@ -55,8 +55,13 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, bool useFD){
 	// Calculate the SQP object
 	
 	auto calcTriFunc=&SQPcalc::CalcTriangle;
-	if(useFD){
+	switch(derivMethod){
+		case 1:
 		calcTriFunc = &SQPcalc::CalcTriangleFD;
+		break;
+		case 2:
+		calcTriFunc = &SQPcalc::CalcTriangleDirectArea;
+		break;
 	}
 	ni=triRSVS.dynatri.size();
 	for(ii = 0; ii< ni ; ii++){
@@ -695,21 +700,28 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
 	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
-	Volume2 VolumeCalc;
+	Volume2 VolumeCalc2;
+	Volume VolumeCalc;
 	Area AreaCalc;
-	vector<int> dvList,subTempVec;
+	vector<int> dvList,subTempVec, dvOrder;
 	HashedVector<int,int> dvListMap;
-	vector<vector<double> const *> veccoord;
+	vector<vector<double> const *> veccoord, veccoordvol;
+	vector<double> dvec;
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;
 	MatrixXd dObjPart;
 	double constrPart, objPart;
 	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
-	double * retVal;
+	ArrayVec<double>* HValpnt2=NULL, *dValpnt2=NULL;
+	double * retVal=NULL;
+	double * retVal2=NULL;
 
 
 	veccoord.reserve(3);
+	veccoordvol.assign(7,NULL);
+	dvec.reserve(3);
+	veccoordvol[0] = &dvec;
 	isCentre=0;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
@@ -723,12 +735,42 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 		}
 	}
 
+	// Volume calc assignement
+	dvOrder.assign(3,0);
+	ni = 3;
+	for(ii=0; ii<ni; ++ii){
+		if(triIn.pointtype[ii]==1){
+
+
+			dvec[ii] = 0;
+			veccoordvol[1+ii] = &(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord);
+			veccoordvol[1+3+ii] = &(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord);
+
+		} else if (triIn.pointtype[ii]==2){
+
+			subTemp = triRSVS.snakeDep->snakeconn.verts.find(triIn.pointind[ii]);
+			dvOrder[ii] = triRSVS.snakeDep->snaxs(subTemp)->index;
+			dvec[ii] = triIn.pointind[ii];
+			veccoordvol[1+ii] = &(triRSVS.meshDep->verts.isearch(
+				triRSVS.snakeDep->snaxs(subTemp)->fromvert)->coord);
+			veccoordvol[1+ii+3] = &(triRSVS.meshDep->verts.isearch(
+				triRSVS.snakeDep->snaxs(subTemp)->tovert)->coord);
+
+		} else if (triIn.pointtype[ii]==3){
+
+			dvec[ii] = 0;
+			veccoordvol[1+ii] = (triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr());
+			veccoordvol[1+ii+3] = (triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr());
+			isCentre++;
+		}
+	}
+
 	// Constr and objective
+	VolumeCalc2.assign(veccoordvol); /// <-----Change assignement 
 	VolumeCalc.assign(veccoord[0],veccoord[1],veccoord[2]); /// <-----Change assignement 
 	AreaCalc.assign(veccoord[0],veccoord[1],veccoord[2]);
 
 	// Active DV lists
-
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2){
 			dvList.push_back(triIn.pointind[ii]);
@@ -778,17 +820,29 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 	HConstrPart.setZero(nDvAct,nDvAct);
 
 	if(isConstr){
+		VolumeCalc2.Calc();
 		VolumeCalc.Calc();
 		VolumeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
-		ArrayVec2MatrixXd(*HValpnt, HVal);
-		ArrayVec2MatrixXd(*dValpnt, dVal);
-		Deriv1stChainScalar(dVal, dPos,dConstrPart);/// <-----Change NOT NEEDED
-		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);/// <-----Change NOT NEEDED
+		VolumeCalc2.ReturnDatPoint(&retVal2, &dValpnt2, &HValpnt2); 
+		ArrayVec2MatrixXd(*HValpnt2, HConstrPart);
+		ArrayVec2MatrixXd(*dValpnt2, dConstrPart);
+		// Deriv1stChainScalar(dVal, dPos,dConstrPart);/// <-----Change NOT NEEDED
+		// Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);/// <-----Change NOT NEEDED
 		// if (isDeriv){
 
 		// cout << dConstrPart.rows() << " " << dConstrPart.cols() << " ";
 		// }
-		constrPart=*retVal;
+		if(fabs(*retVal-*retVal2)>1e-10){
+			// cout << *retVal << " " << *retVal2 << endl;
+			this->falseaccess++;
+		}
+		constrPart=*retVal2;
+		
+		if(dvListMap.find(1044)!=-1 && isDeriv){
+			cout << endl;
+			PrintMatrix(dConstrPart);
+			cout << endl;
+		}
 		// Assign Constraint
 		// and constraint derivative
 		// and Hessian
@@ -800,17 +854,22 @@ void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation 
 				if (subTempVec[jj]!=-1){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
-						for(kk=0; kk< nDvAct; ++kk){
-							this->dConstr(subTempVec[jj],this->dvMap.find(dvListMap.vec[kk])) += 
-								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
-							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
-							for(ll=0; ll< nDvAct; ++ll){
-								// TODO cross product with lagrangian
-								this->HConstr(this->dvMap.find(dvListMap.vec[ll]),
-									 this->dvMap.find(dvListMap.vec[kk])) += 
-									 triIn.connec.constrinfluence[ii]*
-									 HConstrPart(ll,kk)
-									 *this->lagMult[subTempVec[jj]];
+						for(kk=0; kk< 3; ++kk){
+							if(dvOrder[kk]!=0){
+
+								this->dConstr(subTempVec[jj],this->dvMap.find(dvOrder[kk])) += 
+									triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+								dvCallConstr(this->dvMap.find(dvOrder[kk]),0)++;
+								for(ll=0; ll< 3; ++ll){
+									if(dvOrder[ll]!=0){
+									// TODO cross product with lagrangian
+										this->HConstr(this->dvMap.find(dvOrder[ll]),
+											 this->dvMap.find(dvOrder[kk])) += 
+											 triIn.connec.constrinfluence[ii]*
+											 HConstrPart(ll,kk)
+											 *this->lagMult[subTempVec[jj]];
+									}
+								}
 							}
 						}
 					}
