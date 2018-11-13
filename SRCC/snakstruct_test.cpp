@@ -1009,7 +1009,7 @@ int Test_RSVSalgo_singlevol(){
 	
 
 	dims.assign(3,0);
-	dims[0]=1;dims[1]=3;dims[2]=1;
+	dims[0]=1;dims[1]=1;dims[2]=3;
 	try {
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
 
@@ -1017,7 +1017,7 @@ int Test_RSVSalgo_singlevol(){
 
 		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh6612.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		for(ii=0;ii<voluMesh.volus.size();++ii){
@@ -1050,7 +1050,7 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<20;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1249,11 +1249,11 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.CheckAndCompute();
 	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" solve:", start_s);
-	outSnake2.PrintSnake(testSnake, 1, totT);
 	
 	calcObj.Print2Screen();
 	// calcObj.Print2Screen(2);
 	CalculateNoNanSnakeVel(testSnake);
+	outSnake2.PrintSnake(testSnake, 1, totT);
 	testSnake.CalculateTimeStep(dt,0.5);
 	testSnake.UpdateDistance(dt,0.34);
 	testSnake.UpdateCoord();

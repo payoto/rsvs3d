@@ -41,7 +41,6 @@ public :
 	vector<pair<int,int>> constrList; // keeps pairs with parentindex and voluindex
 	MatrixXd dvCallConstr;
 
-	void Print2Screen(int outType=0)const;
 	void BuildMathArrays(int nDv, int nConstr);
 	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildConstrMap(const mesh &meshin);
@@ -51,12 +50,18 @@ public :
 	void CalculateMesh(mesh &meshin);
 	void CalculateTriangulation(const triangulation &triRSVS, int derivMethod=0);
 	// Calculate derivatives
-	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
-		bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
-		bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
-	bool isObj=true, bool isConstr=true, bool isDeriv=true);
+	void CalcTriangle(
+		const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true, bool isDeriv=true
+		);
+	void CalcTriangleFD(
+		const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true, bool isDeriv=true
+		);
+	void CalcTriangleDirectVolume(
+		const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true, bool isDeriv=true
+		);
 
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
@@ -77,6 +82,9 @@ public :
 		);
 	void ReturnVelocities(triangulation &triRSVS);
 	int numConstr(){return(this->nConstr);}
+	// Output functions
+	void Print2Screen(int outType=0)const;
+	// void ConvergenceLog(std::string filename);
 };
 
 

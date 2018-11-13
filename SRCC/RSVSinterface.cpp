@@ -174,6 +174,24 @@ void SQPcalc::Print2Screen(int outType)const {
 		}
 		cout << endl;
 	}
+	if (outType==4){
+		const char* file="matrices\\dumpmatout.txt";
+		cout << "constr :" <<  endl ;	
+		PrintMatrixFile(constr,file);
+		cout << "dObj :" <<  endl ;	
+		PrintMatrixFile(dObj,file);
+		cout << "lagMult :" <<  endl ;	
+		PrintMatrixFile(lagMult,file);
+
+		cout << "dConstr :" <<  endl ;	
+		PrintMatrixFile(dConstr,file);
+		cout << "HConstr :" <<  endl ;	
+		PrintMatrixFile(HConstr,file);
+		cout << "HObj :" <<  endl ;	
+		PrintMatrixFile(HObj,file);
+		cout << "constrTarg :" <<  endl ;	
+		PrintMatrixFile(constrTarg,file);
+	}
 }
 
 void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
@@ -340,7 +358,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
-	kk=0;
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
@@ -351,7 +368,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-			kk++;
 		} else if (triIn.pointtype[ii]==3 && false){
 
 		}
@@ -396,7 +412,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 									 this->dvMap.find(dvListMap.vec[kk])) += 
 									 triIn.connec.constrinfluence[ii]*
 									 HConstrPart(ll,kk)
-									 *this->lagMult[subTempVec[jj]];
+									 *this->lagMult[subTempVec[jj]]*0;
 							}
 						}
 					}
@@ -1158,7 +1174,7 @@ void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,
 	const MatrixXd &HSc,const MatrixXd &Hcd,MatrixXd &HSd){
 	
 	VecBy3DimArray(dSdc, Hcd, HSd);
-	HSd+=(dcdd.transpose()*HSc*dcdd);
+	HSd = HSd + (dcdd.transpose()*HSc*dcdd);
 
 }
 
