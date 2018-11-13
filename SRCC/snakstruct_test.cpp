@@ -1021,11 +1021,11 @@ int Test_RSVSalgo_singlevol(){
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		for(ii=0;ii<voluMesh.volus.size();++ii){
-			voluMesh.volus[ii].target=0.3;
+			voluMesh.volus[ii].target=0.1;
 		}
-		// voluMesh.volus[0].target=0.05;//0.05;//0.0001;
+		// voluMesh.volus[0].target=0.001;//0.05;//0.0001;
 		// voluMesh.volus[1].target=0.05;//0.05;
-		// voluMesh.volus[2].target=0.05;//0.05;//0.0001;
+		// voluMesh.volus[2].target=0.001;//0.05;//0.0001;
 		// voluMesh.volus[3].target=0.3;//0.05;//0.0001;
 		// voluMesh.volus[4].target=0.3;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;

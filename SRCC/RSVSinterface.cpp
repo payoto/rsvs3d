@@ -60,7 +60,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMeth
 		calcTriFunc = &SQPcalc::CalcTriangleFD;
 		break;
 		case 2:
-		calcTriFunc = &SQPcalc::CalcTriangleDirectArea;
+		calcTriFunc = &SQPcalc::CalcTriangleDirectVolume;
 		break;
 	}
 	ni=triRSVS.dynatri.size();
@@ -78,21 +78,6 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMeth
 			false, true, false);
 	} 
 	// Output some data to check it makes sense
-
-	// int n;
-	// for(ii=0; ii<nDv; ++ii){
-	// 	n=0;
-	// 	for(int jj=0; jj<nConstr;++jj){
-	// 		n += int(fabs(this->dConstr(jj,ii))>0.00000000000001);
-	// 	}
-	// 	if(n>1){
-	// 		for(int jj=0; jj<nConstr;++jj){
-	// 			this->dConstr(jj,ii)=0.0;
-	// 		}
-	// 	}
-	// }
-	cout << endl << dvMap.find(1044) << endl;
-	PrintMatrixFile(this->dConstr.transpose(), "matrices\\matrix_dvConstr.txt");
 }
 
 void SQPcalc::ReturnVelocities(triangulation &triRSVS){
@@ -394,24 +379,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		// and constraint derivative
 		// and Hessian
 		nCellTarg=triIn.connec.celltarg.size(); 
-		if((dvListMap.find(1044)!=-1 )  && isDeriv){
-			std::vector<double> v={constrPart};
-			PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter2.txt");
-			PrintMatrixFile(triIn.connec.constrinfluence,"matrices\\matrix_dConstrPart_inter2.txt");
-			PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
-			PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
-			PrintMatrixFile(v,"matrices\\matrix_dConstrPart_inter2.txt");
-			PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter2.txt");
-			PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter2.txt");
-			// cout << endl;
-			// DisplayVector(*veccoord[0]);
-			// cout << endl;
-			// DisplayVector(*veccoord[1]);
-			// cout << endl;
-			// DisplayVector(*veccoord[2]);
-			// cout << endl;
-			// throw invalid_argument("");
-		}
 		for(ii=0; ii< nCellTarg;++ii){
 			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
@@ -458,9 +425,6 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		// assign objective function
 		this->obj+=objPart; 
 		// Assign objective derivative
-		// cout << endl << "dObjPart " << nDvAct << " " ;
-		// PrintMatrix(dObjPart);
-		// cout <<  endl << "done" <<endl;
 		if(isDeriv){
 			for(ii=0; ii< nDvAct; ++ii){
 				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
@@ -493,7 +457,11 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 
 void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
-
+	/*Same as calctriangle but the volume derivative is calculated using a 
+	Finite Difference.
+	
+	helps isolate errors in RSVSmath.
+	*/
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
 	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
@@ -586,10 +554,7 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 		ArrayVec2MatrixXd(*dValpnt, dVal);
 		Deriv1stChainScalar(dVal, dPos,dConstrPart);
 		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
-		// if (isDeriv){
 
-		// cout << dConstrPart.rows() << " " << dConstrPart.cols() << " ";
-		// }
 		constrPart=*retVal;
 		// Assign Constraint
 		// and constraint derivative
@@ -600,22 +565,6 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
 				if (subTempVec[jj]!=-1){
-					// if((dvListMap.find(1038)!=-1 || dvListMap.find(1044))  && isDeriv){
-
-					// 	PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter3.txt");
-					// 	PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter3.txt");
-					// 	PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter3.txt");
-					// 	PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter3.txt");
-					// 	PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter3.txt");
-					// 	// cout << endl;
-					// 	// DisplayVector(*veccoord[0]);
-					// 	// cout << endl;
-					// 	// DisplayVector(*veccoord[1]);
-					// 	// cout << endl;
-					// 	// DisplayVector(*veccoord[2]);
-					// 	// cout << endl;
-					// 	// throw invalid_argument("");
-					// }
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< nDvAct; ++kk){
@@ -691,9 +640,13 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 }
 
 
-void SQPcalc::CalcTriangleDirectArea(const triangle& triIn, const triangulation &triRSVS,
+void SQPcalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
-
+	/*Same as calctriangle but the volume derivative is calculated without intermediate
+	steps
+	
+	helps isolate errors on dPos.
+	*/
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
 	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
@@ -1055,13 +1008,12 @@ void SQPcalc::ComputeSQPstep(
 	bool isNan, isLarge;
 	int ii, ni;
 
-	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
 	// HouseholderQR<MatrixXd> HLagSystem(HLag);
-	LLT<MatrixXd> HLagSystem(HLag);
+	// LLT<MatrixXd> HLagSystem(HLag);
 	// PartialPivLU<MatrixXd> HLagSystem(HLag);
 
-	isLarge = true;
-	if (!isLarge){
+	
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
 	temp2 = HLagSystem.solve(dObjAct.transpose());
 
@@ -1093,7 +1045,7 @@ void SQPcalc::ComputeSQPstep(
 	// isLarge = false;
 	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
 	// }else 
-	}
+	
 	if(isLarge) {
 
 		// PrintMatrixFile(dConstrAct, "matrix_dConstrAct.txt");

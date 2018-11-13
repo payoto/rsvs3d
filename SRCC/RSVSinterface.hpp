@@ -46,15 +46,18 @@ public :
 	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildConstrMap(const mesh &meshin);
 	void BuildDVMap(const vector<int> &vecin);
+	void PrepTriangulationCalc(const triangulation &triRSVS);
+	// Calculate derivatives wrapper
+	void CalculateMesh(mesh &meshin);
+	void CalculateTriangulation(const triangulation &triRSVS, int derivMethod=0);
+	// Calculate derivatives
 	void CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
 	void CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalcTriangleDirectArea(const triangle& triIn, const triangulation &triRSVS,
+	void CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj=true, bool isConstr=true, bool isDeriv=true);
-	void CalculateTriangulation(const triangulation &triRSVS, int derivMethod=0);
-	void PrepTriangulationCalc(const triangulation &triRSVS);
-	void CalculateMesh(mesh &meshin);
+
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
 	void CheckAndCompute();

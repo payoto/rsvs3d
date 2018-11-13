@@ -154,7 +154,7 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
 
 	This function might be better in snakeengine.cpp
 	*/
-	double impactAlmostRange = 0.15;
+	double impactAlmostRange = 0.25;
 
 	int start_s, start_f;
 	start_f=clock();
