@@ -20,12 +20,94 @@ keep compilation time manageable.
 
 */
 
-void RSVScalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
+
+//==========================================
+// Core functions and SQPstep template
+//==========================================
+
+void ResizeLagrangianMultiplier(const RSVScalc &calcobj, 
+	VectorXd &lagMultAct, 
+	bool &isLarge, bool &isNan){
+	/*
+	Resizes the lagrangian multiplier LagMultAct based on whether any of its values
+	are nan or too large.
+
+	This uses the RSVScalc object to guide it.
+	*/
+	int ii, ni;
+
+	isLarge = false;
+	isNan = false;
+	ni = lagMultAct.size();
+	for (ii=0; ii<ni; ++ii){
+		if(lagMultAct[ii]<-calcobj.limLag){
+			lagMultAct[ii]=-calcobj.limLag;
+			isLarge=true;
+		}else if(lagMultAct[ii]>calcobj.limLag){
+			lagMultAct[ii]=calcobj.limLag;
+			isLarge=true;
+		} else if(isnan(lagMultAct[ii])){
+			lagMultAct[ii]=0.0;
+			isNan=true;
+		}
+	}
+}
+/*
+void SQPstep(const RSVScalc &calcobj,
+	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
+	const VectorXd &constrAct, VectorXd &lagMultAct,
+	VectorXd &deltaDVAct, bool &isNan, bool &isLarge){
+
+
+	MatrixXd temp1, temp2;
+
+	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
+	HouseholderQR<MatrixXd> HLagSystem(calcobj.HLag);
+	// LLT<MatrixXd> HLagSystem(HLag);
+	// PartialPivLU<MatrixXd> HLagSystem(HLag);
+
+
+	
+	temp1 = HLagSystem.solve(dConstrAct.transpose());
+	temp2 = HLagSystem.solve(dObjAct.transpose());
+
+	lagMultAct = (
+			dConstrAct*(temp1)
+		// ).colPivHouseholderQr().solve(
+		).householderQr().solve(
+		// ).llt().solve(
+		// ).partialPivLu().solve(
+			constrAct - (dConstrAct*(temp2))
+		);
+
+	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
+	
+	if(isLarge) {
+
+		// PrintMatrixFile(dConstrAct, "matrix_dConstrAct.txt");
+	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+
+	} else {
+
+		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+						+ dConstrAct.transpose()*lagMultAct));
+	}
+
+}*/
+
+
+
+//==========================================
+// Core class functions
+//==========================================
+
+void RSVScalc::CalcTriangle(const triangle& triIn,
+	const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
-	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
 	Area AreaCalc;
@@ -42,7 +124,6 @@ void RSVScalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 
 
 	veccoord.reserve(3);
-	isCentre=0;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
 		if(triIn.pointtype[ii]==1){
@@ -51,7 +132,6 @@ void RSVScalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
 		} else if (triIn.pointtype[ii]==3){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
-			isCentre++;
 		}
 	}
 
@@ -199,7 +279,8 @@ void RSVScalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 	// Assign Constraint Hessian
 }
 
-void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
+void RSVScalc::CalcTriangleFD(const triangle& triIn,
+	const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 	/*Same as calctriangle but the volume derivative is calculated using a 
 	Finite Difference.
@@ -208,7 +289,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSV
 	*/
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
-	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc, VolumeCalcFD;
 	Area AreaCalc;
@@ -226,7 +307,6 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSV
 
 	veccoord.reserve(3);
 
-	isCentre=0;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
 		if(triIn.pointtype[ii]==1){
@@ -235,7 +315,6 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSV
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
 		} else if (triIn.pointtype[ii]==3){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
-			isCentre++;
 		}
 	}
 
@@ -383,7 +462,8 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSV
 	// Assign Constraint Hessian
 }
 
-void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
+void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
+	const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 	/*Same as calctriangle but the volume derivative is calculated without intermediate
 	steps
@@ -392,7 +472,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulati
 	*/
 
 	int ii,ni,jj,nj,kk,ll,nCellTarg;
-	int isCentre,subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	Volume2 VolumeCalc2;
 	Volume VolumeCalc;
@@ -416,7 +496,6 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulati
 	veccoordvol.assign(7,NULL);
 	dvec.reserve(3);
 	veccoordvol[0] = &dvec;
-	isCentre=0;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
 		if(triIn.pointtype[ii]==1){
@@ -425,7 +504,6 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulati
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
 		} else if (triIn.pointtype[ii]==3){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
-			isCentre++;
 		}
 	}
 
@@ -453,10 +531,9 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulati
 
 		} else if (triIn.pointtype[ii]==3){
 
-			dvec[ii] = 0;
+			dvec[ii] = 0; // dvec used as a pointer
 			veccoordvol[1+ii] = (triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr());
 			veccoordvol[1+ii+3] = (triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr());
-			isCentre++;
 		}
 	}
 
@@ -713,7 +790,7 @@ bool RSVScalc::PrepareMatricesForSQP(
 	return(nDvAct>0);
 }
 
-void RSVScalc::CheckAndCompute(){
+void RSVScalc::CheckAndCompute(int calcMethod){
 	int ii;
 	bool computeFlag;
 	MatrixXd dConstrAct,HConstrAct, HObjAct;
@@ -724,9 +801,9 @@ void RSVScalc::CheckAndCompute(){
 		dConstrAct,HConstrAct, HObjAct,dObjAct,
 		constrAct,lagMultAct
 		);
-	computeFlag=true;
+	// computeFlag=true;
 	if (computeFlag){
-		ComputeSQPstep(
+		ComputeSQPstep(calcMethod,
 			dConstrAct,dObjAct,
 			constrAct,lagMultAct
 			);
@@ -739,6 +816,7 @@ void RSVScalc::CheckAndCompute(){
 }
 
 void RSVScalc::ComputeSQPstep(
+	int calcMethod,
 	MatrixXd &dConstrAct,
 	RowVectorXd &dObjAct,
 	VectorXd &constrAct,
@@ -746,58 +824,41 @@ void RSVScalc::ComputeSQPstep(
 	){
 
 	VectorXd  deltaDVAct;
-	MatrixXd temp1, temp2;
 	bool isNan, isLarge;
 	int ii, ni;
 
-	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
-	HouseholderQR<MatrixXd> HLagSystem(HLag);
-	// LLT<MatrixXd> HLagSystem(HLag);
-	// PartialPivLU<MatrixXd> HLagSystem(HLag);
+	switch(calcMethod){
+		case 0:
+			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
+				constrAct, lagMultAct,
+				deltaDVAct, isNan, isLarge);
+		break;
 
-	
-	temp1 = HLagSystem.solve(dConstrAct.transpose());
-	temp2 = HLagSystem.solve(dObjAct.transpose());
+		case 2:
+			SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
+				constrAct, lagMultAct,
+				deltaDVAct, isNan, isLarge);
+		break;
+ 
+		case 3: 
+			// Eigen::LLT is inconveniently a 2 parameter template so
+			// a full type is passed
+			SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, dObjAct,
+				constrAct, lagMultAct,
+				deltaDVAct, isNan, isLarge);
+		break;
 
-	lagMultAct = (
-			dConstrAct*(temp1)
-		// ).colPivHouseholderQr().solve(
-		).householderQr().solve(
-		// ).llt().solve(
-		// ).partialPivLu().solve(
-			constrAct - (dConstrAct*(temp2))
-		);
+		case 4:
+			SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, dObjAct,
+				constrAct, lagMultAct,
+				deltaDVAct, isNan, isLarge);
+		break;
 
-	isLarge = false;
-	isNan = false;
-	ni = lagMultAct.size();
-	for (ii=0; ii<ni; ++ii){
-		if(lagMultAct[ii]<-limLag){
-			lagMultAct[ii]=-limLag;
-			isLarge=true;
-		}else if(lagMultAct[ii]>limLag){
-			lagMultAct[ii]=limLag;
-			isLarge=true;
-		} else if(isnan(lagMultAct[ii])){
-			lagMultAct[ii]=0.0;
-			isNan=true;
-		}
-	}
-	// if (isNan){
-	// isLarge = false;
-	// 	deltaDVAct = -dConstrAct.transpose()*lagMultAct;
-	// }else 
-	
-	if(isLarge) {
-
-		// PrintMatrixFile(dConstrAct, "matrix_dConstrAct.txt");
-	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
-
-	} else {
-
-		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
-						+ dConstrAct.transpose()*lagMultAct));
-
+		default:
+			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
+				constrAct, lagMultAct,
+				deltaDVAct, isNan, isLarge);
+		break;
 	}
 
 	ni = subDvAct.size();
