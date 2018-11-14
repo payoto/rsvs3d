@@ -9,7 +9,7 @@
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp" 
 #include "RSVSmath.hpp"
-#include "RSVSinterface.hpp"
+#include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
 #include "RSVSintegration.hpp"
 
@@ -17,6 +17,8 @@ using namespace std;
 
 // Implementation in snakstruct.cpp
 
+void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
+	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT);
 
 void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triangulation &testTriangle,
 	mesh &triMesh, triangulation &triRSVS, mesh &voluMesh, int nVoluZone, int ii){
@@ -67,7 +69,7 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triang
 void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	vector<int> &dims, triangulation &triRSVS){
 	vector<int> elmMapping;
-	SQPcalc calcVolus;
+	RSVScalc calcVolus;
 	int ii;
 
 	snakeMesh.PrepareForUse();
@@ -100,7 +102,6 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	TriangulateMesh(snakeMesh,triRSVS);
 
 	testSnake.PrepareForUse();
-
 }
 
 
@@ -202,7 +203,6 @@ int Test_coordvec(){
 		return -1;
 	} 
 	return(0);
-
 }
 
 int Test_snax(){
@@ -239,7 +239,6 @@ int Test_snax(){
 		return -1;
 	} 
 	return(0);
-
 }
 
 int Test_snaxedge(){
@@ -261,7 +260,6 @@ int Test_snaxedge(){
 		return -1;	
 	} 
 	return(0);
-
 }
 
 int Test_snake(){
@@ -318,7 +316,6 @@ int Test_snake(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 int Test_snakeinit(){ 
@@ -406,7 +403,6 @@ int Test_snakeinit(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 
@@ -498,7 +494,6 @@ int Test_snakeinit_MC(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 int Test_snakeinitflat(){
@@ -558,13 +553,11 @@ int Test_snakeinitflat(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 
 	SnakeConnectivityUpdate(testSnake,  isImpact);
-
 }
 
 void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){
@@ -592,9 +585,6 @@ void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){
 
 	testSnake.OrientFaces();
 	start_s=TimeStamp("Clean: ", start_s);
-
-	
-
 }
 
 int Test_snakeOrderEdges(){
@@ -626,7 +616,6 @@ int Test_snakeOrderEdges(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 int Test_MeshRefinement(){
@@ -636,7 +625,7 @@ int Test_MeshRefinement(){
 	tecplotfile outSnake;
 	vector<int> elmMapping,dims;
 	triangulation testTriangle;
-	SQPcalc calcObj,calcObj2;
+	RSVScalc calcObj,calcObj2;
 	int ii;
 	
 	//bool errFlag;
@@ -709,7 +698,6 @@ int Test_MeshRefinement(){
 		return -1;
 	} 
 	return(errTest);
-
 }
 
 int Test_surfcentre(){ 
@@ -823,7 +811,7 @@ int Test_RSVSalgo(){
 	int start_s,stop_s;
 	//bool errFlag;
 	int errTest=0;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 	
 
 	dims.assign(3,0);
@@ -905,7 +893,7 @@ int Test_snakeRSVS(){
 	int start_s,stop_s,ii;
 	//bool errFlag;
 	int errTest=0;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 	
 
 	dims.assign(3,0);
@@ -982,10 +970,8 @@ void repositionatquarteredge(snake &snakein){
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
 }
-void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT);
-int Test_RSVSalgo_singlevol(){
 
+int Test_RSVSalgo_singlevol(){
 	// int nVoluZone, ii;
 
 	snake testSnake;
@@ -1001,7 +987,7 @@ int Test_RSVSalgo_singlevol(){
 	int start_s,stop_s;
 	//bool errFlag;
 	int errTest=0;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 	int ii;
 	double totT=0.0;
 	vector<double> dt;
@@ -1052,7 +1038,7 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<300;++ii){
+		for(ii=0;ii<10;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1103,7 +1089,7 @@ int Test_RSVSalgo_singlevol(){
 	} 
 	return(errTest);
 }
- 
+
 int Test_snakeRSVS_singlevol(){
 	int nVoluZone;
 	snake testSnake;
@@ -1118,7 +1104,7 @@ int Test_snakeRSVS_singlevol(){
 	int start_s,stop_s,ii;
 	//bool errFlag;
 	int errTest=0;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 	
 
 	dims.assign(3,0);
@@ -1178,7 +1164,6 @@ int Test_snakeRSVS_singlevol(){
 	// 	return -1;
 	// } 
 	return(errTest);
-
 }
 
 int Test_MeshOrient(){
@@ -1198,7 +1183,7 @@ int Test_MeshOrient(){
 
 	//bool errFlag;
 	int errTest=0;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 	FILE *fid;
 	
 
@@ -1231,7 +1216,7 @@ int Test_MeshOrient(){
 }
 
 void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT){
+	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT){
 	int start_s;
 
 	 
@@ -1263,15 +1248,13 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 
 	SnakeConnectivityUpdate(testSnake, isImpact);
 	MaintainTriangulateSnake(RSVStri);
-	
-
 }
 
 void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, SQPcalc &calcObj, tecplotfile &outSnake2, double totT){
+	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT){
 	int start_s;
 
-	SQPcalc calcObj2;
+	RSVScalc calcObj2;
 	double fdStep=1e-3;
 	start_s=clock();
 
@@ -1321,7 +1304,5 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 
 	SnakeConnectivityUpdate(testSnake, isImpact);
 	MaintainTriangulateSnake(RSVStri);
-	
-
 }
 

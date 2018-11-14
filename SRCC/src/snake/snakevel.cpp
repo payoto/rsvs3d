@@ -7,7 +7,7 @@
 #include "snake.hpp" 
 #include "snakevel.hpp"
 #include "RSVSmath.hpp"
-#include "RSVSinterface.hpp"
+#include "RSVScalc.hpp"
 
 using namespace std;
 
@@ -407,7 +407,7 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 	int ii, ni, jj, kk;
 	int nVe, nE, nSurf, nVolu;
 	std::vector<int> voluInds;
-	SQPcalc calcObj;
+	RSVScalc calcObj;
 
 	calcObj.PrepTriangulationCalc(triangul);
 	nSurf = triin.size();

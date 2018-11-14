@@ -22,7 +22,7 @@
 using namespace std; 
 using namespace Eigen; 
 
-class SQPcalc {
+class RSVScalc {
 protected:
 	int nDv=0;
 	int nConstr=0;

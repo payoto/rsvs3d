@@ -8,16 +8,16 @@
 #include "snake.hpp"
 #include "snakevel.hpp"
 #include "vectorarray.hpp"
-#include "RSVSinterface.hpp"
+#include "RSVScalc.hpp"
 #include "matrixtools.hpp"
 
 using namespace std; 
 using namespace Eigen; 
 
 //silent functions
+  
 
-
-void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
+void RSVScalc::PrepTriangulationCalc(const triangulation &triRSVS){
 
 	int ii;
 	int nDv, nConstr;
@@ -43,7 +43,7 @@ void SQPcalc::PrepTriangulationCalc(const triangulation &triRSVS){
 	BuildDVMap(vecin);
 }
 
-void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMethod){
+void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMethod){
 
 	int ii,ni;
 
@@ -55,13 +55,13 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMeth
 
 	// Calculate the SQP object
 	
-	auto calcTriFunc=&SQPcalc::CalcTriangle;
+	auto calcTriFunc=&RSVScalc::CalcTriangle;
 	switch(derivMethod){
 		case 1:
-		calcTriFunc = &SQPcalc::CalcTriangleFD;
+		calcTriFunc = &RSVScalc::CalcTriangleFD;
 		break;
 		case 2:
-		calcTriFunc = &SQPcalc::CalcTriangleDirectVolume;
+		calcTriFunc = &RSVScalc::CalcTriangleDirectVolume;
 		break;
 	}
 	ni=triRSVS.dynatri.size();
@@ -81,7 +81,7 @@ void SQPcalc::CalculateTriangulation(const triangulation &triRSVS, int derivMeth
 	// Output some data to check it makes sense
 }
 
-void SQPcalc::ReturnVelocities(triangulation &triRSVS){
+void RSVScalc::ReturnVelocities(triangulation &triRSVS){
 
 	int ii, ni;
 
@@ -91,11 +91,9 @@ void SQPcalc::ReturnVelocities(triangulation &triRSVS){
 			deltaDV[dvMap.find(triRSVS.snakeDep->snaxs(ii)->index)];
 	}
 	triRSVS.snakeDep->snaxs.PrepareForUse();
-
-
 }
 
-void SQPcalc::CalculateMesh(mesh &meshin){
+void RSVScalc::CalculateMesh(mesh &meshin){
 
 	int ii,ni, jj, nj;
 	int nDv, nConstr;
@@ -132,10 +130,9 @@ void SQPcalc::CalculateMesh(mesh &meshin){
 	}
 
 	// Output some data to check it makes sense
-	
 }
 
-void SQPcalc::Print2Screen(int outType)const {
+void RSVScalc::Print2Screen(int outType)const {
 	cout << "Math result: obj " << obj << " false access " << falseaccess << endl;
 	cout << "Constr " ;
 	for (int i = 0; i < nConstr; ++i)
@@ -195,7 +192,7 @@ void SQPcalc::Print2Screen(int outType)const {
 	}
 }
 
-void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
+void RSVScalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	
 	int ii, ni;
 	vector<double> temp;
@@ -207,10 +204,9 @@ void SQPcalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	}
 
 	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::fill);
-
-
 }
-void SQPcalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
+
+void RSVScalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
 	
 	int ii, ni;
 	vector<double> temp;
@@ -223,7 +219,7 @@ void SQPcalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
 	meshin.MapVolu2Self(temp, constrMap.vec, mp);
 }
 
-void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
+void RSVScalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	// Builds the target math arrays
 	
 	nDv=nDvIn;
@@ -251,8 +247,7 @@ void SQPcalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	dvCallConstr.setZero(nDv,1);
 }
 
-
-void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
+void RSVScalc::BuildConstrMap(const triangulation &triangleRSVS){
 
 	// explore parents of mesh adding 1 by 1 elemind
 	// for each parent
@@ -269,7 +264,7 @@ void SQPcalc::BuildConstrMap(const triangulation &triangleRSVS){
 	}
 }
 
-void SQPcalc::BuildConstrMap(const mesh &meshin){
+void RSVScalc::BuildConstrMap(const mesh &meshin){
 	int ni, ii;
 	ni=meshin.volus.size();
 	constrMap.vec.clear();
@@ -283,17 +278,16 @@ void SQPcalc::BuildConstrMap(const mesh &meshin){
 
 
 	constrMap.GenerateHash();
-
 }
 
-void SQPcalc::BuildDVMap(const vector<int> &vecin){
+void RSVScalc::BuildDVMap(const vector<int> &vecin){
 	dvMap.vec=vecin;
 	sort(dvMap.vec);
 	unique(dvMap.vec);
 	dvMap.GenerateHash();
 }
 
-void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
+void RSVScalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 
 
@@ -472,7 +466,7 @@ void SQPcalc::CalcTriangle(const triangle& triIn, const triangulation &triRSVS,
 	// Assign Constraint Hessian
 }
 
-void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
+void RSVScalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 	/*Same as calctriangle but the volume derivative is calculated using a 
 	Finite Difference.
@@ -656,8 +650,7 @@ void SQPcalc::CalcTriangleFD(const triangle& triIn, const triangulation &triRSVS
 	// Assign Constraint Hessian
 }
 
-
-void SQPcalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
+void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
 	/*Same as calctriangle but the volume derivative is calculated without intermediate
 	steps
@@ -919,7 +912,7 @@ void SQPcalc::CalcTriangleDirectVolume(const triangle& triIn, const triangulatio
 	// Assign Constraint Hessian
 }
 
-bool SQPcalc::PrepareMatricesForSQP(
+bool RSVScalc::PrepareMatricesForSQP(
 	MatrixXd &dConstrAct,
 	MatrixXd &HConstrAct, 
 	MatrixXd &HObjAct,
@@ -987,7 +980,7 @@ bool SQPcalc::PrepareMatricesForSQP(
 	return(nDvAct>0);
 }
 
-void SQPcalc::CheckAndCompute(){
+void RSVScalc::CheckAndCompute(){
 	int ii;
 	bool computeFlag;
 	MatrixXd dConstrAct,HConstrAct, HObjAct;
@@ -1010,10 +1003,9 @@ void SQPcalc::CheckAndCompute(){
 			
 		}
 	}
-
 }
 
-void SQPcalc::ComputeSQPstep(
+void RSVScalc::ComputeSQPstep(
 	MatrixXd &dConstrAct,
 	RowVectorXd &dObjAct,
 	VectorXd &constrAct,
@@ -1100,7 +1092,6 @@ void SQPcalc::ComputeSQPstep(
 		DisplayVector(isConstrAct);
 		DisplayVector(isDvAct);
 	}
-
 }
 
 /// INSPIRATION
