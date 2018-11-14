@@ -4,7 +4,9 @@
 		{
 			"file_regex": "^([^ ]*):(\\d+):(\\d+):\\s*(.*)$",
 			"name": "Custom Make",
+			"working_dir": "${folder:${project_path}}",
 			"shell_cmd": "make ",
+
 			"variants":
 			[
 				{
@@ -90,12 +92,11 @@
 			//     // this is needed to include the correct headers for clang
 			//     "-I/usr/lib/clang/$clang_version/include",
 			// ],
-         "easy_clang_complete_verbose": true,
+         // "easy_clang_complete_verbose": true,
          "SublimeLinter.linters.gcc.include_dirs": [
- //            "C:\\ap1949include\\Eigen_all\\Eigen\\"
- 			"${project_folder}\\SRCC\\incl\\",
-        ], 
-         
+                   "C:\\ap1949include\\Eigen_all\\Eigen\\",
+                   "C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
+               ],
          
      }
  }
