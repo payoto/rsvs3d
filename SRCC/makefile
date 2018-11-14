@@ -115,8 +115,9 @@ $(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f
 
 # Clean target
 #.PHONY : clean
+OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
-	rm *.o *.exe $(OBJDIR)/*.o $(DEPDIR)/*.d 
+	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d 
 
 #precompile.hpp : 
 #	$(CC) -c -H -DDEBUGLVL1 -ggdb $(INCLDIR) -x c++-header precompile.hpp
@@ -125,4 +126,6 @@ clean :
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d  %/.f
 
-include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS))))
+
+# $(info $(patsubst %,$(DEPDIR)/%.d,$(notdir $(basename $(SRCS)))))
+include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(notdir $(basename $(SRCS)))))

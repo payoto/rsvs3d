@@ -183,7 +183,7 @@ void SQPstep(const RSVScalc &calcobj,
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
 						+ dConstrAct.transpose()*lagMultAct));
 	}
-
+	// cout << __PRETTY_FUNCTION__<< endl;
 }
 
 #endif

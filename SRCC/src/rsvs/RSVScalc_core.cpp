@@ -826,38 +826,40 @@ void RSVScalc::ComputeSQPstep(
 	VectorXd  deltaDVAct;
 	bool isNan, isLarge;
 	int ii, ni;
-
+	cout << calcMethod << endl;
 	switch(calcMethod){
-		case 0:
+		case 1:
 			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge);
-		break;
+			// cout << "case 1:" << endl;
 
+		break;
 		case 2:
 			SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge);
+			// cout << "case 2:" << endl;
 		break;
- 
 		case 3: 
 			// Eigen::LLT is inconveniently a 2 parameter template so
 			// a full type is passed
 			SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge);
+			// cout << "case 3:" << endl;
 		break;
-
 		case 4:
 			SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge);
+			// cout << "case 4:" << endl;
 		break;
-
 		default:
 			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge);
+			// cout << "case default:" << endl;
 		break;
 	}
 

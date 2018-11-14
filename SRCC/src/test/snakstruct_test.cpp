@@ -1233,14 +1233,14 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
-	calcObj.CheckAndCompute(0);
+	calcObj.CheckAndCompute(3);
 	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" solve:", start_s);
 	
 	calcObj.Print2Screen();
 	// calcObj.Print2Screen(2);
 	CalculateNoNanSnakeVel(testSnake);
-	outSnake2.PrintSnake(testSnake, 1, totT);
+	outSnake2.PrintSnake(testSnake, 1, totT);  
 	testSnake.CalculateTimeStep(dt,0.9);
 	testSnake.UpdateDistance(dt,0.9);
 	testSnake.UpdateCoord();
@@ -1289,7 +1289,7 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
-	calcObj.CheckAndCompute(0);
+	calcObj.CheckAndCompute(3);
 	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" solve:", start_s);
 	outSnake2.PrintSnake(testSnake, 1, totT);
