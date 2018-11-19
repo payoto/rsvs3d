@@ -46,19 +46,19 @@ int main(){
 	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
 	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
-	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_surfcentre,"test SurfCentroid"); 
 	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
 	gridTest.Run(Test_snakeinit,"Snake rand velocity"); // Non working tests
 	gridTest.Run(Test_MeshOut,"Mesh output"); 
-	#endif //TEST_ALL
-	
 
 	// gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
 	// gridTest.Run(Test_MeshOrient,"Output mesh orientation");
 	// gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
+	#endif //TEST_ALL
+	
+	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 
 
