@@ -557,12 +557,12 @@ int Test_snakeinitflat(){
 
 void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	vector<double> dt;
-	CalculateSnakeVelRand(testSnake);
+	CalculateSnakeVelUnit(testSnake);
 	testSnake.CalculateTimeStep(dt,0.9);
 	testSnake.UpdateDistance(dt,0.9);
 	testSnake.UpdateCoord();
-	testSnake.PrepareForUse();
-	SnakeConnectivityUpdate_legacy(testSnake,  isImpact);
+	testSnake.PrepareForUse(); 
+	SnakeConnectivityUpdate_2D(testSnake,  isImpact);
 }
 
 void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){

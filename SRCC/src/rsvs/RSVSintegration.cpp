@@ -198,6 +198,58 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
 	
 }
 
+void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
+	/*
+	Performs the snake step except the movement of the snake.
+	This one performs it in a 'single' step:
+	 Impact Spawn Impact Merge Clean
+
+	This function might be better in snakeengine.cpp
+	*/
+	double impactAlmostRange = 0.2;
+
+	int start_s, start_f;
+	start_f=clock();
+
+
+	//===============================
+	// Spawn
+	// ======================
+	// Impact
+	SAFE_ALGO_TestConn(snakein);
+	snakein.SnaxImpactDetection(isImpact);
+	snakein.SnaxAlmostImpactDetection(isImpact, impactAlmostRange);
+	snakein.PrepareForUse();
+	start_s=TimeStamp("Impact: ", start_f);
+	// ======================
+	// Spawn
+	SAFE_ALGO_TestConn(snakein);
+	snakein.SnaxImpactDetection(isImpact);
+	SpawnArrivedSnaxels(snakein,isImpact);
+	start_s=TimeStamp("Spawn: ", start_s);
+	// ======================
+	// Impact
+	SAFE_ALGO_TestConn(snakein);
+	snakein.SnaxImpactDetection(isImpact);
+	snakein.PrepareForUse();
+	start_s=TimeStamp("Impact: ", start_s);
+	// ======================
+	// Merge
+	MergeAllContactVertices(snakein, isImpact);
+	snakein.PrepareForUse();
+	start_s=TimeStamp("Merge: ", start_s);
+	// ======================
+	// Clean
+	CleanupSnakeConnec(snakein);
+	snakein.PrepareForUse();
+	SAFE_ALGO_TestConn(snakein);
+	snakein.OrientFaces();
+	start_s=TimeStamp("Clean: ", start_s);
+
+	TimeStamp(" - Connec Update: ", start_f);
+	
+}
+
 
 int TimeStamp(const char* str,int start_s){
 	int stop_s=clock();

@@ -672,7 +672,8 @@ void CleanupSnakeConnec(snake &snakein){
 				ModifyMergVoluConnec(snakein, connecEdit, indRmvVert);
 
 			} else {
-				ModifyMergSurf2DConnec(snakein, connecEdit,indRmvVert);
+				// ModifyMergSurf2DConnec(snakein, connecEdit,indRmvVert);
+				ModifyMergSurf2DConnec(snakein, connecEdit);
 			}
 
 
@@ -1286,52 +1287,52 @@ void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const 
 }
 
 
-void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert){
 
+void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
+	/*
+	Relies on on surfaces only. If they are connected by an edge they need to be merged.
+	*/
 	
-	vector<int> tempSub,tempSub2;	//vector<int> objSub;
-	int  ii,jj,kk; //nSnax, nSnaxSurf,
+	int  ii,jj, ni, nj, nAbove0; //nSnax, nSnaxSurf,
 	ConnecRemv tempConnec;
 
-	for(ii=0; ii<int(indRmvVert.size()) ; ++ii){
-		// find edges connected to vertex
-		tempSub=snakein.snakeconn.edges.find_list(
-			snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind);
+	tempConnec.typeobj=3;
 
-		tempSub2=ConcatenateVectorField(snakein.snakeconn.edges, &edge::surfind, tempSub);
-		
-		sort(tempSub2);
-		unique(tempSub2);
-
-		if (int(tempSub2.size())>1){
-			tempConnec.typeobj=3;
-			kk=0;
-			if (tempSub2[kk]==0){
-				kk++;
+	ni = snakein.snakeconn.edges.size();
+	for(ii=0; ii<ni ; ++ii){
+		nj= snakein.snakeconn.edges(ii)->surfind.size();
+		if(nj>1){
+			nAbove0=0; 
+			for(jj=0; jj<nj; ++jj){
+				nAbove0 += (snakein.snakeconn.edges(ii)->surfind[jj]>0);
 			}
-			if (int(tempSub2.size())>(kk+1)){
-				tempConnec.keepind=tempSub2[kk];
+			if(nAbove0>1){
+				nAbove0=0;
+				tempConnec.keepind=-1;
 				tempConnec.rmvind.clear();
-				for(jj=kk+1; jj<int(tempSub2.size());++jj){
-					if(tempSub2[jj]>0){
-						tempConnec.rmvind.push_back(tempSub2[jj]);
-					}
-				}
-				if(int(tempConnec.rmvind.size())>0){
-					for (jj=0; jj<int(tempConnec.rmvind.size());jj++){
-						snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
-							tempConnec.keepind,tempConnec.scopeind);
-					}
-					connecEdit.push_back(tempConnec);
-				}
-			}
 
+				for(jj=0; jj<nj; ++jj){
+					if(nAbove0==0){
+						tempConnec.keepind=snakein.snakeconn.edges(ii)->surfind[jj];
+					} else if (snakein.snakeconn.edges(ii)->surfind[jj]!=0) {
+
+						tempConnec.rmvind.push_back(snakein.snakeconn.edges(ii)->surfind[jj]);
+					}
+					nAbove0 += (snakein.snakeconn.edges(ii)->surfind[jj]>0);
+				}
+
+				for (jj=0; jj<int(tempConnec.rmvind.size());jj++){
+					snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
+						tempConnec.keepind,tempConnec.scopeind);
+				}
+				connecEdit.push_back(tempConnec);
+
+			}
 		}
 
 	}
 
 }
-
 
 // Checks before removal by snake engine
 // Most of these checks have to be performed on the remaining objects

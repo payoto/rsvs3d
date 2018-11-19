@@ -79,7 +79,7 @@ void IdentifyMergeSurfRecursive(const snake &snakein,vector<bool> &isObjDone, ve
 void ModifyMergVoluConnec(snake &snakein, vector<ConnecRemv> &connecEdit, 
 	const vector<int> &indRmvVert);
 
-void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit, const vector<int> &indRmvVert);
+void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit);
 void SnaxEdgeConnecDetection(snake &snakein, vector<ConnecRemv> &connecEdit);
 void SnaxNoConnecDetection(const mesh &snakeconn, vector<ConnecRemv> &connecEdit);
 void dispconnrmv(vector<ConnecRemv> conn);
