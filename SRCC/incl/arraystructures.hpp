@@ -130,7 +130,7 @@ public:
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" : Index is out of range");
+			throw range_error (" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 	}
@@ -144,7 +144,7 @@ public:
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" : Index is out of range");
+			throw range_error (" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));
@@ -156,10 +156,11 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			cerr << "Attempt to access position " << a << 
+			cerr << "Attempt to access index " << b 
+				<< " at position " << a <<
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" : Index is out of range");
+			throw range_error (" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));

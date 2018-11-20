@@ -14,8 +14,8 @@
 
 #ifdef TEST_ALL
 #include "postprocessing.hpp"
-#include "voxel.hpp"
 #endif //TEST_ALL
+#include "voxel.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
 #include "snakeengine.hpp"
@@ -50,16 +50,19 @@ int main(){
 	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
 	gridTest.Run(Test_snakeinit,"Snake rand velocity"); // Non working tests
-	gridTest.Run(Test_MeshOut,"Mesh output"); 
 
 	// gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
 	// gridTest.Run(Test_MeshOrient,"Output mesh orientation");
 	// gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
+	gridTest.Run(Test_MeshOut,"Mesh output"); 
+	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 	#endif //TEST_ALL
 	
-	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
+	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D");
+
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
+	
 
 
 

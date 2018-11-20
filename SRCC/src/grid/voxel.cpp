@@ -460,7 +460,7 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-	RowVector3i dimGrid1(6,6,12), dimGrid2(10,10,0), dimGrid3(20,30,10);
+	RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
 	mesh blockGrid;
 	const char *fileToOpen;
 	
@@ -481,10 +481,10 @@ int Test_MeshOut(){
 	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="..\\TESTOUT\\tecout230.plt";
+	fileToOpen="..\\TESTOUT\\tecout100100.plt";
 	errTest=outmesh2.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
-	fileToOpen="..\\TESTOUT\\mesh230.dat";
+	fileToOpen="..\\TESTOUT\\tecout100100.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh2);
 
 	errTest=outmesh2.PrintMesh(blockGrid);

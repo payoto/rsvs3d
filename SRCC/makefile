@@ -9,7 +9,7 @@ LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
 
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -O3
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 #-g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CUSERFLAGS= 
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
@@ -104,6 +104,10 @@ $(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f
 	$(COMPILECPP) $< -o $@
 	$(POSTCOMPILE)
 
+$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp
+$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f 
+	$(COMPILECPP) -O3 $< -o $@
+	$(POSTCOMPILE)
 
 %/.f:
 	mkdir -p $(dir $@)

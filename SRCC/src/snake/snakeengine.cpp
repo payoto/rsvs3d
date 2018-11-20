@@ -113,33 +113,36 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,con
 
 	newsnake.snakeconn.edges.PopulateIndices();
 	newsnake.snaxedges.PopulateIndices();
-	for (ii=0;ii<nEdge;++ii){
-		newsnake.snaxedges[ii].surfind=surfInds[ii];
+	
+		for (ii=0;ii<nEdge;++ii){
+			newsnake.snaxedges[ii].surfind=surfInds[ii];
+			if(newsnake.Check3D()){
+				surfSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->voluind,
+					voluInds,hashVoluInds);
+				newsnake.snakeconn.edges[ii].surfind=surfSubsTemp;
+				for(jj=0;jj<int(surfSubsTemp.size());++jj){
 
-		surfSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->voluind,
-			voluInds,hashVoluInds);
-		newsnake.snakeconn.edges[ii].surfind=surfSubsTemp;
-		for(jj=0;jj<int(surfSubsTemp.size());++jj){
+					newsnake.snakeconn.edges[ii].surfind[jj]++;
 
-			newsnake.snakeconn.edges[ii].surfind[jj]++;
-
-		}
-		// Assign vertind (can be done WAY more efficiently the other way round)
-		// But liek this we can check the logic
-		vertSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->edgeind,
-			edgeInds,hashEdgeInds);
-		kk=0;
-		for(jj=0;jj<int(vertSubsTemp.size());++jj){
-			if (vertSubsTemp[jj]>=0){
-				newsnake.snakeconn.edges[ii].vertind[kk]=vertSubsTemp[jj];
-				kk++;
+				}
+			}
+			// Assign vertind (can be done WAY more efficiently the other way round)
+			// But liek this we can check the logic
+			vertSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->edgeind,
+				edgeInds,hashEdgeInds);
+			kk=0;
+			for(jj=0;jj<int(vertSubsTemp.size());++jj){
+				if (vertSubsTemp[jj]>=0){
+					newsnake.snakeconn.edges[ii].vertind[kk]=vertSubsTemp[jj];
+					kk++;
+				}
 			}
 		}
-	}
 
-	newsnake.snakeconn.edges.ChangeIndices(1,0,0,0);
+		newsnake.snakeconn.edges.ChangeIndices(1,0,0,0);
 	if(!newsnake.Check3D()){
 		for (ii=0;ii<nEdge;++ii){
+			newsnake.snakeconn.edges[ii].surfind.assign(2,0);
 			newsnake.snakeconn.edges[ii].surfind[0]=1;
 			newsnake.snakeconn.edges[ii].surfind[1]=0;
 		}
@@ -507,6 +510,7 @@ void CleanupSnakeConnec(snake &snakein){
 	auto itSurf=indRmvSurf.begin();
 	auto itVolu=indRmvVolu.begin();
 
+	snakein.snakeconn.TightenConnectivity();
 	snakein.HashParent();
 	#ifdef SAFE_ALGO
 	if (snakein.Check3D()){
@@ -1297,8 +1301,9 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 	ConnecRemv tempConnec;
 
 	tempConnec.typeobj=3;
-
+	// kk = 0;
 	ni = snakein.snakeconn.edges.size();
+	// cout << endl;
 	for(ii=0; ii<ni ; ++ii){
 		nj= snakein.snakeconn.edges(ii)->surfind.size();
 		if(nj>1){
@@ -1314,7 +1319,8 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 				for(jj=0; jj<nj; ++jj){
 					if(nAbove0==0){
 						tempConnec.keepind=snakein.snakeconn.edges(ii)->surfind[jj];
-					} else if (snakein.snakeconn.edges(ii)->surfind[jj]!=0) {
+					} else if (snakein.snakeconn.edges(ii)->surfind[jj]!=0
+						&& snakein.snakeconn.edges(ii)->surfind[jj]!=tempConnec.keepind) {
 
 						tempConnec.rmvind.push_back(snakein.snakeconn.edges(ii)->surfind[jj]);
 					}
@@ -1324,6 +1330,8 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 				for (jj=0; jj<int(tempConnec.rmvind.size());jj++){
 					snakein.snakeconn.SwitchIndex(tempConnec.typeobj,tempConnec.rmvind[jj],
 						tempConnec.keepind,tempConnec.scopeind);
+					// kk++;
+					// cout << tempConnec.keepind << " " << tempConnec.rmvind[jj] << "|";
 				}
 				connecEdit.push_back(tempConnec);
 
@@ -1331,7 +1339,7 @@ void ModifyMergSurf2DConnec(snake &snakein, vector<ConnecRemv> &connecEdit){
 		}
 
 	}
-
+	// cout << " " << ni <<  endl;
 }
 
 // Checks before removal by snake engine

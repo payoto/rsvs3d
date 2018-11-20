@@ -27,7 +27,7 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 		case 2: // surfs
 		n=int(newparent.surfs.size());
 		flag=false;
-		flag=n!=int(elmMapping.size());
+		flag=n!=int(elmMapping.size()); 
 		if(!flag){
 			for (ii=0;ii < n ; ii++){
 				if (newparent.surfs.find(elmMapping[ii])==-1){flag=true;break;}
@@ -81,10 +81,19 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 		}
 	}
 	if(nDim>=2){
-		for (ii=0; ii< newparent.edges.size();++ii){
-			if(newparent.edges(ii)->surfind.size()==0){
-				newparent.RemoveIndex(2,newparent.edges(ii)->index);
-				indRmvEdge.push_back(newparent.edges(ii)->index);
+		if(nDim==2){
+			for (ii=0; ii< newparent.edges.size();++ii){
+				if(newparent.edges(ii)->surfind.size()==1){
+					newparent.RemoveIndex(2,newparent.edges(ii)->index);
+					indRmvEdge.push_back(newparent.edges(ii)->index);
+				}
+			}
+		} else {
+			for (ii=0; ii< newparent.edges.size();++ii){
+				if(newparent.edges(ii)->surfind.size()==0){
+					newparent.RemoveIndex(2,newparent.edges(ii)->index);
+					indRmvEdge.push_back(newparent.edges(ii)->index);
+				}
 			}
 		}
 	}
@@ -162,48 +171,93 @@ void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &
 	nBox=1;
 	for(ii=0;ii<3;++ii){
 		dims[ii]=dims[ii]>0?dims[ii]:1;
+		deltaCoord[ii]=dims[ii]>0 ? deltaCoord[ii] : 2;
+		minCoord[ii]=dims[ii]>0 ? minCoord[ii] : minCoord[ii]-1;
+		maxCoord[ii]=dims[ii]>0 ? maxCoord[ii] : maxCoord[ii]+1;
 		nBox=nBox*dims[ii];
 	}
 	boxMap.assign(nBox,0);
 	elmMapping.clear();
-	elmMapping.assign(meshin.volus.size(),0);
-	// Go through volumes calculating their location find which box it fits in
-	n=meshin.volus.size();
-	for(ii=0;ii<n;ii++){
+	if(meshin.WhatDim()==3){
+		elmMapping.assign(meshin.volus.size(),0);
+		// Go through volumes calculating their location find which box it fits in
+		n=meshin.volus.size();
+		for(ii=0;ii<n;ii++){
 
-		edgeList=ConcatenateVectorField(meshin.surfs,&surf::edgeind,
-			meshin.surfs.find_list(meshin.volus(ii)->surfind));
-		vertList=ConcatenateVectorField(meshin.edges,&edge::vertind,
-			meshin.edges.find_list(edgeList));
-		vertList=meshin.verts.find_list(vertList);
-		sort(vertList);
-		unique(vertList);	
-		kk=int(vertList.size());
-		cellCoord.assign(0.0, 0.0 , 0.0);
-		for (jj=0;jj<kk;++jj){
-			cellCoord.add(meshin.verts(vertList[jj])->coord);
-		}
-		cellCoord.div(double(kk));
+			edgeList=ConcatenateVectorField(meshin.surfs,&surf::edgeind,
+				meshin.surfs.find_list(meshin.volus(ii)->surfind));
+			vertList=ConcatenateVectorField(meshin.edges,&edge::vertind,
+				meshin.edges.find_list(edgeList));
+			vertList=meshin.verts.find_list(vertList);
+			sort(vertList);
+			unique(vertList);	
+			kk=int(vertList.size());
+			cellCoord.assign(0.0, 0.0 , 0.0);
+			for (jj=0;jj<kk;++jj){
+				cellCoord.add(meshin.verts(vertList[jj])->coord);
+			}
+			cellCoord.div(double(kk));
 
-		cellCoord.substract(minCoord.usedata());
-		cellCoord.div(deltaCoord.usedata());
-		for (jj=0;jj<3;++jj){
-			cellCoord[jj]=cellCoord[jj]*double(dims[jj]);
-			cellCoord[jj]=floor(cellCoord[jj]);
-			cellCoord[jj]=(cellCoord[jj]>=double(dims[jj]))?double(dims[jj]-1):cellCoord[jj];
+			cellCoord.substract(minCoord.usedata());
+			cellCoord.div(deltaCoord.usedata());
+			for (jj=0;jj<3;++jj){
+				cellCoord[jj]=cellCoord[jj]*double(dims[jj]);
+				cellCoord[jj]=floor(cellCoord[jj]);
+				cellCoord[jj]=(cellCoord[jj]>=double(dims[jj]))?double(dims[jj]-1):cellCoord[jj];
+			}
+			sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
+				+(dims[0])*(dims[1])*int(cellCoord[2]);
+			if (sub>=nBox){
+				throw invalid_argument("sub was larger than available size");
+			}
+			if(boxMap[sub]==0){
+			// if the box as never been explored put the index in it
+				boxMap[sub]=meshin.volus(ii)->index;
+				elmMapping[ii]=boxMap[sub];
+			} else {
+			// put the number of the box in the elmMapping
+				elmMapping[ii]=boxMap[sub];
+			}
 		}
-		sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
-			+(dims[0])*(dims[1])*int(cellCoord[2]);
-		if (sub>=nBox){
-			throw invalid_argument("sub was larger than available size");
-		}
-		if(boxMap[sub]==0){
-		// if the box as never been explored put the index in it
-			boxMap[sub]=meshin.volus(ii)->index;
-			elmMapping[ii]=boxMap[sub];
-		} else {
-		// put the number of the box in the elmMapping
-			elmMapping[ii]=boxMap[sub];
+	} else if (meshin.WhatDim()==2){
+		elmMapping.assign(meshin.surfs.size(),0);
+		// Go through volumes calculating their location find which box it fits in
+		n=meshin.surfs.size();
+		for(ii=0;ii<n;ii++){
+
+
+			vertList=ConcatenateVectorField(meshin.edges,&edge::vertind,
+				meshin.edges.find_list(meshin.surfs(ii)->edgeind));
+			vertList=meshin.verts.find_list(vertList);
+			sort(vertList);
+			unique(vertList);	
+			kk=int(vertList.size());
+			cellCoord.assign(0.0, 0.0 , 0.0);
+			for (jj=0;jj<kk;++jj){
+				cellCoord.add(meshin.verts(vertList[jj])->coord);
+			}
+			cellCoord.div(double(kk));
+
+			cellCoord.substract(minCoord.usedata());
+			cellCoord.div(deltaCoord.usedata());
+			for (jj=0;jj<3;++jj){
+				cellCoord[jj]=cellCoord[jj]*double(dims[jj]);
+				cellCoord[jj]=floor(cellCoord[jj]);
+				cellCoord[jj]=(cellCoord[jj]>=double(dims[jj]))?double(dims[jj]-1):cellCoord[jj];
+			}
+			sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
+				+(dims[0])*(dims[1])*int(cellCoord[2]);
+			if (sub>=nBox){
+				throw invalid_argument("sub was larger than available size");
+			}
+			if(boxMap[sub]==0){
+			// if the box as never been explored put the index in it
+				boxMap[sub]=meshin.surfs(ii)->index;
+				elmMapping[ii]=boxMap[sub];
+			} else {
+			// put the number of the box in the elmMapping
+				elmMapping[ii]=boxMap[sub];
+			}
 		}
 	}
 

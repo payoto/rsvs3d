@@ -448,9 +448,15 @@ public:
 	int CountParents() const;
 	int SurfInParent(int surfind) const;
 	void SurfInParent(vector<int> &listInParent) const;
-	void SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	void ElmOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 		bool isBorderBound=true,
 		bool outerVolume=true) const;
+	void SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+		bool isBorderBound,
+		bool outerVolume) const;
+	void EdgeOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+		bool isBorderBound,
+		bool outerVolume) const;
 	int CountVoluParent() const ;
 	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 		vector<pair<int,int>> &parentcases, vector<double> &voluVals) const;
@@ -460,8 +466,10 @@ public:
 		const vector<int> &elms, double volu::*mp=&volu::fill);
 	void VoluValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
 	void VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const;
+	void SurfValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
+	void SurfValuesofParents(int elmInd, vector<double> &vals, double surf::*mp) const;
 	// Mesh property
-	int WhatDim(){return(meshDim);}
+	int WhatDim() const {return(meshDim);}
 	// basic operations grouped from each field
 	void HashArray();
 	void SetMaxIndex();
@@ -496,9 +504,13 @@ public:
 	void OrientFaces();
 	// Mesh component comparison
 	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
-		int outerVolume=-1) const;
-	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
 		int outerVolume=-1);
+	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
+		int outerVolume=-1) const;
+	void GetOffBorderVert3D(vector<int> &vertList, vector<int> &voluInd,
+		int outerVolume=-1) const;
+	void GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
+		int outerVolume=-1) const;
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;

@@ -23,8 +23,10 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	vector<int> &voluOutList, int outerBorder=1);
 void SpawnRSVS(snake &snakein, int outerBorder=1);
 void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder);
+void RemoveSnakeInSurf(snake &snakein, vector<int> &voluInd, int outerBorder);
 
 int Test_RSVSalgo_init();
 int Test_RSVSalgo();
+int Test_RSVSalgoflat();
 
 #endif

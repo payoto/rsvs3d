@@ -77,8 +77,16 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	///// Generate Coarser Volume Mesh
 	testSnake.snakemesh=&snakeMesh;
 	//testSnake.disp();
-	for (ii=0;ii<snakeMesh.volus.size();++ii){
-		elmMapping.push_back(1);
+	if(snakeMesh.WhatDim()==3){
+		for (ii=0;ii<snakeMesh.volus.size();++ii){
+			elmMapping.push_back(1);
+		}
+	} else if (snakeMesh.WhatDim()==2){
+		for (ii=0;ii<snakeMesh.surfs.size();++ii){
+			elmMapping.push_back(1);
+		}
+	} else { 
+		throw invalid_argument("Incorrect dimension");
 	}
 	CartesianMapping(snakeMesh,  elmMapping, dims);
 	CoarsenMesh(snakeMesh,voluMesh,elmMapping);
@@ -512,7 +520,7 @@ int Test_snakeinitflat(){
 		fileToOpen="..\\TESTOUT\\TestSnake2.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
+		errTest+=snakeMesh.read("..\\TESTOUT\\tecout100100.dat");
 		snakeMesh.PrepareForUse();
 		snakeMesh.SetBorders();
 		snakeMesh.PrepareForUse();
@@ -522,14 +530,14 @@ int Test_snakeinitflat(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		SpawnAtVertex(testSnake,13);
-		SpawnAtVertex(testSnake,16);
-		SpawnAtVertex(testSnake,32);
+		SpawnAtVertex(testSnake,103);
+		SpawnAtVertex(testSnake,4020);
+		SpawnAtVertex(testSnake,780);
 		testSnake.displight();
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<200;++ii){
+		for(ii=0;ii<100;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
@@ -557,12 +565,12 @@ int Test_snakeinitflat(){
 
 void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	vector<double> dt;
-	CalculateSnakeVelUnit(testSnake);
+	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.9);
 	testSnake.UpdateDistance(dt,0.9);
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse(); 
-	SnakeConnectivityUpdate_2D(testSnake,  isImpact);
+	SnakeConnectivityUpdate(testSnake,  isImpact);
 }
 
 void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){
@@ -861,6 +869,95 @@ int Test_RSVSalgo(){
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
+			stop_s=TimeStamp("Total: ", stop_s);
+			cout << endl;
+			totT=totT+1;
+		}
+
+		PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+				triMesh, triRSVS, voluMesh, nVoluZone, ii);
+
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		testSnake.displight();
+		outSnake.PrintMesh(testSnake.snakeconn);
+		outSnake.PrintSnakeInternalPts(testSnake);
+
+
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+}
+
+
+int Test_RSVSalgoflat(){
+	// int nVoluZone, ii;
+
+	snake testSnake;
+	mesh snakeMesh,  voluMesh, triMesh;
+	// mesh triMesh;
+	triangulation testTriangle,triRSVS;
+	vector<int> dims;
+	const char *fileToOpen;
+	tecplotfile outSnake, outSnake2;
+	// double totT=0.0;
+	// vector<double> dt;
+	// vector<int> isImpact;
+	int start_s,stop_s;
+	//bool errFlag;
+	int errTest=0;
+	RSVScalc calcObj;
+	
+
+	dims.assign(3,0);
+	dims[0]=2;dims[1]=2;dims[2]=0;
+	try {
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVS2Dstep.plt";
+		outSnake.OpenFile(fileToOpen);
+		fileToOpen="..\\TESTOUT\\TestAlgoRSVS2Dstep_snake.plt";
+		outSnake2.OpenFile(fileToOpen);
+		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
+		
+		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
+
+		voluMesh.surfs[0].target=1.0;
+		voluMesh.surfs[1].target=1.0;
+		voluMesh.surfs[3].target=1.0;
+		voluMesh.surfs[2].target=1.0;
+
+		calcObj.BuildMathArrays(1,1);
+		voluMesh.PrepareForUse();
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(voluMesh);
+		int nVoluZone;
+		nVoluZone=outSnake.ZoneNum();
+		 
+		start_s=clock();
+
+		SpawnRSVS(testSnake,1);
+		testSnake.PrepareForUse();
+
+		triRSVS.PrepareForUse();
+
+		TriangulateSnake(testSnake,triRSVS);
+		triRSVS.PrepareForUse();
+		triRSVS.CalcTriVertPos();
+		int ii;
+		double totT=0.0;
+		vector<double> dt;
+		vector<int> isImpact;
+		MaintainTriangulateSnake(triRSVS);
+
+		for(ii=0;ii<20;++ii){
+			cout << ii << " ";
+			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+				triMesh, triRSVS, voluMesh, nVoluZone, ii);
+			stop_s=clock();
+			// Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
+			Test_stepalgo(testSnake, isImpact);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;

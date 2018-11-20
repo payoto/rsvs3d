@@ -437,6 +437,48 @@ void mesh::SurfInParent(vector<int> &listInParent) const{
 	} 
 }
 
+void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, int volType) const{
+		/*
+	Extracts the surfaces in the parents corresponding to element elmInd
+	volType is a selector for which value to extract
+	*/
+	double surf::*mp;
+	mp=NULL;
+	switch(volType){
+		case 0:
+		mp=&surf::area;
+		break;
+		case 1:
+		mp=&surf::fill;
+		break;
+		case 2:
+		mp=&surf::target;
+		break;
+		case 3:
+		mp=&surf::error;
+		break;
+	}
+
+	this->SurfValuesofParents(elmInd, vals, mp);
+}
+
+void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, double surf::*mp) const{
+	/*
+	Extracts the volumes in the parents corresponding to element elmInd
+	volType is a selector for which value to extract
+	*/
+	int sub, ii;
+	vals.clear();
+
+
+	sub = surfs.find(elmInd);
+	for (ii=0; ii < meshtree.nParents; ++ii){
+		vals.push_back(meshtree.parentmesh[ii]->surfs.isearch
+			(meshtree.parentconn[ii][sub])->*mp);
+
+	}
+
+}
 
 void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, int volType) const{
 		/*
@@ -480,6 +522,21 @@ void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*m
 
 	}
 
+}
+
+void mesh::ElmOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	bool isBorderBound,
+	bool outerVolume) const{
+
+	if (this->WhatDim()==3){
+		this->SurfOnParentBound(listInParent, voluInd,
+			isBorderBound,
+			outerVolume);
+	} else if (this->WhatDim()==2) {
+		this->EdgeOnParentBound(listInParent, voluInd,
+			isBorderBound,
+			outerVolume);
+	}
 }
 
 void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
@@ -545,6 +602,75 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 		}
 		if (isOnBound){
 			listInParent.push_back(surfs(ii)->index);
+		}
+		
+	} 
+}
+
+
+void mesh::EdgeOnParentBound(vector<int> &listInParent, vector<int> &surfInd,
+	bool isBorderBound,
+	bool outerVolume) const{
+	/*
+	Returns a list of edges which are on the outer or inner boundaries.
+	*/
+	int ii, jj, boundVolume, nSurf = edges.size();
+	bool isOnBound;
+	vector<double> vals0, vals1;
+	listInParent.clear();
+
+	if(outerVolume){
+		boundVolume = 0.0;
+	} else {
+		boundVolume = 1.0;
+	}// Mesh component comparison
+
+	vals0.reserve(meshtree.nParents);
+	vals1.reserve(meshtree.nParents);
+	surfInd.clear();
+	surfInd.reserve(surfs.size());
+
+	for (ii=0; ii< nSurf; ++ii){
+		isOnBound=false;
+		if (edges(ii)->surfind[0]==0 || edges(ii)->surfind[1]==0){
+			isOnBound=isBorderBound;
+			if(isOnBound && (edges(ii)->surfind[0]!=0)){
+				surfInd.push_back(edges(ii)->surfind[0]);
+			}
+			if(isOnBound && (edges(ii)->surfind[1]!=0)){
+				surfInd.push_back(edges(ii)->surfind[1]);
+			}
+		} else if (SurfInParent(edges(ii)->index)>=0){
+			// Check parent surfme values
+			this->SurfValuesofParents(edges(ii)->surfind[0],vals0, &surf::target);
+			this->SurfValuesofParents(edges(ii)->surfind[1],vals1, &surf::target);
+			jj=0;
+			// DisplayVector(vals0);
+			// DisplayVector(vals1);
+			while(!isOnBound && jj< meshtree.nParents){
+
+				isOnBound = (vals0[jj]!=vals1[jj]) 
+				&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
+				++jj;
+			}
+			
+			if(isOnBound && (vals1[jj-1]==boundVolume)){
+				surfInd.push_back(edges(ii)->surfind[1]);
+				if(boundVolume==1.0 && surfs.isearch(surfInd.back())->isBorder){
+					surfInd.pop_back();
+				}
+			}
+			if(isOnBound && (vals0[jj-1]==boundVolume)){
+				surfInd.push_back(edges(ii)->surfind[0]);
+				if(boundVolume==1.0 && surfs.isearch(surfInd.back())->isBorder){
+					surfInd.pop_back();
+				}
+			}
+			
+			//cout << "? " << isOnBound << " || ";
+		}
+		if (isOnBound){
+			listInParent.push_back(edges(ii)->index);
 		}
 		
 	} 
@@ -1914,8 +2040,9 @@ int surf::OrderEdges(mesh *meshin)
 			// newSurf.OrderEdges(meshin);
 			meshin->surfs.push_back(newSurf);
 			// meshin->surfs(meshin->surfs.size()-1)->disp();
-			meshin->SwitchIndex(6,index,newSurf.index,newSurfedgeind);
 			prevHash = meshin->surfs.isHash;
+			meshin->surfs.isHash=1;
+			meshin->SwitchIndex(6,index,newSurf.index,newSurfedgeind);
 			meshin->surfs[meshin->surfs.size()-1].OrderEdges(meshin);
 			meshin->surfs.isHash=prevHash;
 			prevHash = meshin->volus.isHash;
@@ -2139,6 +2266,17 @@ void mesh::GetOffBorderVert(vector<int> &vertInd,  vector<int> &voluInd,
 }
 
 void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
+	int outerVolume) const {
+
+	if (this->WhatDim()==3){
+		this->GetOffBorderVert3D(vertInd, voluInd, outerVolume);
+	} else if (this->WhatDim()==2) {
+		this->GetOffBorderVert2D(vertInd, voluInd, outerVolume);
+	}
+
+}
+
+void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 	int outerVolume) const{
 	/*
 	Gets vertices that are in a vlume that is on the edge of the design
@@ -2222,6 +2360,89 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 
 }
 
+
+void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
+	int outerVolume) const{
+	/*
+	Gets vertices that are in a vlume that is on the edge of the design
+	space but off th eedge themselves
+
+	outerVolume indicates the additional condition of the volume needing 
+	to be full or empty in the parents.
+	-1 return all vertices
+	0 return vertices where the target volume is 1.0
+	1 return vertices where the target volume is >0.0
+	*/
+	int ii, ni, jj, nj,kk,nk, vertTemp, edgeSub,surfSub;
+	vector<double> vals;
+	bool surfCond;
+
+	ni=surfs.size();
+	nj=verts.size();
+	vertInd.clear();
+	vertInd.reserve(nj);
+	surfind.clear();
+	surfind.reserve(ni);
+
+	for (ii=0; ii<ni; ++ii){
+		surfCond=surfs(ii)->isBorder;
+		if(surfCond){
+			if(outerVolume==0){
+				this->SurfValuesofParents(surfs(ii)->index,vals, &surf::target);
+				surfCond=false;
+				jj=0;
+				while (!surfCond && jj<meshtree.nParents){
+					surfCond=vals[jj]==1.0;
+					++jj;
+				}
+			} else if(outerVolume==1){
+				this->SurfValuesofParents(surfs(ii)->index,vals, &surf::target);
+				surfCond=false;
+				jj=0;
+				while (!surfCond && jj<meshtree.nParents){
+					surfCond=vals[jj]>0.0;
+					++jj;
+				}
+			} else if(outerVolume!=-1){
+				throw invalid_argument("Unkownn value of outerVolume -1,0, or 1");
+			}
+		} 
+		// THIS IS DODGY HOW to pick the side to delete can fail
+		if(surfCond){
+			// Pick one of the surfaces to delete
+			if(outerVolume==0){
+				nj = surfs(ii)->edgeind.size();
+				for(jj=0;jj<nj;++jj){
+					surfSub = edges.find(surfs(ii)->edgeind[jj]);
+					for(kk=0;kk<2;++kk){
+						if(edges(surfSub)->surfind[kk]!=0){
+							if(!(surfs.isearch(edges(surfSub)->surfind[kk])->isBorder)){
+								surfind.push_back(edges(surfSub)->surfind[kk]);
+							}
+						}
+					}
+				}
+			} else {
+				surfind.push_back(surfs(ii)->index);
+			}
+			surfSub=ii;
+			nj=surfs(surfSub)->edgeind.size();
+			for(jj=0; jj<nj; ++jj){
+				edgeSub=edges.find(surfs(surfSub)->edgeind[jj]);
+				nk=edges(edgeSub)->vertind.size();
+				for (kk=0; kk<nk; ++kk){
+					vertTemp=edges(edgeSub)->vertind[kk];
+					if (!verts.isearch(vertTemp)->isBorder){
+						vertInd.push_back(vertTemp);
+					}
+				}
+			}
+
+		}
+	}
+
+}
+
 void mesh::SetBorders(){
 	int ii,jj,nT;
 	if (int(volus.size())>0){
@@ -2275,7 +2496,7 @@ void mesh::SetBorders(){
 
 		for(ii=0;ii<surfs.size();++ii){
 			jj=0;
-			nT=surfs(ii)->voluind.size();
+			nT=surfs(ii)->edgeind.size();
 			surfs[ii].isBorder=false;
 			while(jj<nT && !surfs(ii)->isBorder){
 				surfs[ii].isBorder=edges(edges.find(surfs[ii].edgeind[jj]))->isBorder;
