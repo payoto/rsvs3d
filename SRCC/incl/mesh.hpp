@@ -172,7 +172,8 @@ public:
 		surfind=oldVolu.surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
-		cout << "copyvolu #" << index << " Was created " << surfind.size() << endl;
+		cout << "copyvolu #" << index << " Was created " 
+			<< surfind.size() << endl;
 		#endif
 	}
 	~volu(){ // Destructor
