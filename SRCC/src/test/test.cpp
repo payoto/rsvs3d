@@ -22,6 +22,7 @@
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
 #include "RSVSalgorithm.hpp"
+#include "parameters.hpp"
 
 int main(){
 	customtest gridTest;
@@ -57,9 +58,10 @@ int main(){
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	gridTest.Run(Test_MeshOut,"Mesh output"); 
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
-	#endif //TEST_ALL
 	
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D");
+	#endif //TEST_ALL
+	gridTest.Run(param::test,"parameter implementation");
 
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 	

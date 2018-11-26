@@ -6,6 +6,8 @@
 #include "RSVSintegration.hpp"
 #include "snake.hpp"
 #include "snakeengine.hpp"
+#include "parameters.hpp"
+#include "voxel.hpp"
 
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
@@ -249,6 +251,8 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	TimeStamp(" - Connec Update: ", start_f);
 	
 }
+
+
 
 
 int TimeStamp(const char* str,int start_s){

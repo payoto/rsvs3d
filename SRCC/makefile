@@ -18,6 +18,7 @@ CUSERFLAGS=
 CFTESTFLAG= -DTEST_ALL
 LDFLAGS=-lstdc++
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen" -I"incl"
+INCLDIR += -I"C:\ap1949include\json\single_include\nlohmann"
 OBJDIR=obj
 # make all options
 SOURCES=arraystructures.cpp

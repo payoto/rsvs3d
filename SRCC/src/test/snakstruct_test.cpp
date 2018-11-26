@@ -1260,7 +1260,6 @@ int Test_snakeRSVS_singlevol(){
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
 
-
 	// } catch (exception const& ex) { 
 	// 	cerr << "Exception: " << ex.what() <<endl; 
 	// 	return -1;
