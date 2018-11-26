@@ -22,3 +22,28 @@ voxel::voxel(){
 
 voxel::~voxel(){
 }
+
+
+//===========================================
+// snaking class method definitions
+//===========================================
+
+snaking::snaking(){
+	this->arrivaltolerance = 1e-7;
+	this->multiarrivaltolerance = 1e-2; 
+	this->initboundary = 1;
+}
+
+snaking::~snaking(){
+}
+
+//===========================================
+// RSVS class method definitions
+//===========================================
+
+rsvs::rsvs(){
+	this->solveralgorithm = 0;
+}
+
+rsvs::~rsvs(){
+}

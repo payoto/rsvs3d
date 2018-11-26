@@ -17,8 +17,11 @@
 
 //==================================
 // Code
-// NOTE: function in a class definition are IMPLICITELY INLINED 
-//       ie replaced by their code at compile time
+// 
+// This file defines parameters to be used in other parts of the 
+// RSVS snaking framework. Default values are defined in "parameters.cpp"
+//
+// Substructure names are all 4-5 letters
 
 namespace param {
 
@@ -28,21 +31,44 @@ namespace param {
 		T ub;
 	};
 
-	class RSVS
+	/*
+	Parameters related to the Velocity calculation and VOS steps
+	*/
+	class rsvs
 	{
 	public:
-		RSVS();
-		~RSVS();
+		// Algorithm used by Eigen to solve the SQP system.
+		int solveralgorithm;
+
+		rsvs();
+		~rsvs();
 		
 	};
 
-	class snake
+	/*
+	Parameters controlling tuning parameters for the stepping of
+	the restricted surface.
+	*/
+	class snaking
 	{
 	public:
-		snake();
-		~snake();
+		// Distance along edge at which a vertex is considered
+		// arrived regardless of "d" and "v"
+		double arrivaltolerance;
+		// Distance along edge at which converging snaxels are
+		// considered arrived
+		double multiarrivaltolerance;
+		// Initialisation boundary (either 0 or 1)
+		int initboundary;
+
+		snaking();
+		~snaking();
 		
 	};
+
+	/*
+	Paramters controlling grid properties
+	*/
 	class voxel
 	{
 	public:
@@ -54,10 +80,21 @@ namespace param {
 		~voxel();
 		
 	};
+	class grid
+	{
+	public:
+		voxel voxel;
+		grid();
+		~grid();
+		
+	};
 
 	class parameters
 	{
 	public:
+		rsvs rsvs;
+		snaking snak;
+		grid grid;
 		parameters();
 		~parameters();
 		
