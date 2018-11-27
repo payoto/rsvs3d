@@ -22,6 +22,7 @@
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
 #include "RSVSalgorithm.hpp"
+#include "RSVSintegration.hpp"
 #include "parameters.hpp"
 
 int main(){
@@ -65,6 +66,7 @@ int main(){
 	gridTest.Run(param::test::io,"parameter read write");
 	gridTest.Run(param::test::ioflat,"parameter read write flat format");
 	gridTest.Run(param::test::ipartialread,"parameter read write flat format");
+	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
 
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 	

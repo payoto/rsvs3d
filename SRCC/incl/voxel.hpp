@@ -91,6 +91,7 @@ template <class T> T cumprod(T mat, int d) {
 // Derived Classes
 
 // functions
+int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid);
 int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid);
 int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert, 
 	Matrix3i edgeProp, RowVector3i nEdgeDim);

@@ -8,6 +8,9 @@
 #include "snakeengine.hpp"
 #include "parameters.hpp"
 #include "voxel.hpp"
+#include "meshrefinement.hpp"
+#include "RSVScalc.hpp"
+#include "RSVSalgorithm.hpp"
 
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
@@ -252,9 +255,6 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	
 }
 
-
-
-
 int TimeStamp(const char* str,int start_s){
 	int stop_s=clock();
 	#ifdef TIME_EXEC
@@ -262,4 +262,93 @@ int TimeStamp(const char* str,int start_s){
 	#endif
 	return(stop_s);
 
+}
+
+void integrate::prepare::Mesh(
+		const param::grid &gridconf,
+		mesh &snakeMesh,
+		mesh &voluMesh
+	){
+	/*prepares the snake and volume meshes gor the RSVS process*/
+	// Local declaration
+	int ii;
+	auto gridSize = gridconf.voxel.gridsizebackground;
+	vector<int> elmMapping, backgroundGrid;
+	RSVScalc calcVolus;
+
+	backgroundGrid.reserve(int(gridSize.size()));
+	for (int i = 0; i < int(gridSize.size()); ++i)
+	{
+		backgroundGrid.push_back(gridSize[i]);
+		gridSize[i] = gridSize[i] * gridconf.voxel.gridsizesnake[i];
+	}
+
+	// Initial build of the grid
+	BuildBlockGrid(gridSize, snakeMesh);
+	snakeMesh.Scale(gridconf.voxel.domain);
+	snakeMesh.PrepareForUse();
+	snakeMesh.OrientFaces();
+
+	// map elements to coarse grid
+	if(snakeMesh.WhatDim()==3){
+		for (ii=0;ii<snakeMesh.volus.size();++ii){
+			elmMapping.push_back(1);
+		}
+	} else if (snakeMesh.WhatDim()==2){
+		for (ii=0;ii<snakeMesh.surfs.size();++ii){
+			elmMapping.push_back(1);
+		}
+	} else { 
+		throw invalid_argument("Incorrect dimension");
+	}
+	CartesianMapping(snakeMesh,  elmMapping, backgroundGrid);
+	CoarsenMesh(snakeMesh,voluMesh,elmMapping);
+	snakeMesh.AddParent(&voluMesh,elmMapping);
+
+	voluMesh.PrepareForUse();
+	voluMesh.OrientFaces();
+	calcVolus.CalculateMesh(voluMesh);
+	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
+}
+
+void integrate::prepare::Snake(
+	const param::snaking &snakconf, 
+	mesh &snakeMesh, // non const as it is passed to the snake as a pointer
+	snake &rsvsSnake
+	){
+
+	rsvsSnake.snakemesh = &snakeMesh;
+	SpawnRSVS(rsvsSnake,snakconf.initboundary);
+	rsvsSnake.PrepareForUse();
+}
+
+void integrate::prepare::Triangulation(
+	mesh &snakeMesh,
+	snake &rsvsSnake,
+	triangulation &rsvsTri
+	){
+
+	TriangulateMesh(snakeMesh,rsvsTri);
+	rsvsTri.PrepareForUse();
+	TriangulateSnake(rsvsSnake,rsvsTri);
+	rsvsTri.PrepareForUse();
+	rsvsTri.CalcTriVertPos();
+	MaintainTriangulateSnake(rsvsTri);
+	rsvsTri.PrepareForUse();
+
+}
+
+
+
+
+// ===================
+int integrate::test::Prepare(){
+	param::grid gridconf;
+	mesh snakeMesh;
+	mesh voluMesh;
+	snake rsvsSnake;
+
+	integrate::prepare::Mesh(gridconf, snakeMesh, voluMesh);
+
+	return(0);
 }

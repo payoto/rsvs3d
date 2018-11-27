@@ -2931,6 +2931,70 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	return(nBlocks);
 }
 
+void mesh::Scale(){
+	std::array<std::array<double, 2>,3> domain;
+	for (int i = 0; i < 3; ++i)
+	{
+		domain[i]={0.0, 1.0};
+	}
+	this->Scale(domain);
+}
+
+void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
+	/*
+	Scale the mesh to be in the range domain where domain is a 2D array:
+	[
+	x [lb ub]
+	y [lb ub]
+	z [lb ub]
+	]
+	*/
+	std::array<std::array<double, 2>,3> currDomain;
+	std::array<std::array<double, 3>,3> transformation;
+	int nVerts, ii, jj;
+
+
+	nVerts = int(this->verts.size());
+
+	// Find the current range of values of the grid
+	for (int i = 0; i < 3; ++i)
+	{
+		currDomain[i]={std::numeric_limits<double>::infinity(), 
+			-std::numeric_limits<double>::infinity()};
+	}
+	for(ii=0; ii<nVerts; ++ii){
+		for(jj=0; jj<3; ++ii){
+			currDomain[jj][0]= currDomain[jj][0] <= this->verts(ii)->coord[jj] ?
+				currDomain[jj][0]:this->verts(ii)->coord[jj];
+			currDomain[jj][1]= currDomain[jj][0] >= this->verts(ii)->coord[jj] ?
+				currDomain[jj][1]:this->verts(ii)->coord[jj];
+		}
+	}
+
+	// Calculate modification parameters
+	for (int i = 0; i < 3; ++i)
+	{
+		transformation[i][0]=domain[i][0];
+		transformation[i][1]=currDomain[i][0];
+		transformation[i][2]=(domain[i][1]-domain[i][0])
+			/(currDomain[i][1]-currDomain[i][0]);
+		// Handle flat domains by ignoring the dimension
+		if(!isfinite(transformation[i][2])){
+			transformation[i][2]=1.0;
+		}
+	}
+
+	// Recalculate grid vertex positions
+	for(ii=0; ii<nVerts; ++ii){
+		for(jj=0; jj<3; ++ii){
+			this->verts.elems[ii].coord[jj]=transformation[jj][0]
+				+((this->verts(ii)->coord[jj]-transformation[jj][1])
+				*transformation[jj][2]);
+		}
+	}
+
+
+}
 
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2){
 	// compares the list vec1 and vec2 returning 

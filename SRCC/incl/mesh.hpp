@@ -465,10 +465,14 @@ public:
 		const vector<pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
 	void MapVolu2Self(const vector<double> &fillIn, 
 		const vector<int> &elms, double volu::*mp=&volu::fill);
-	void VoluValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
-	void VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const;
-	void SurfValuesofParents(int elmInd, vector<double> &vals, int volType=0) const;
-	void SurfValuesofParents(int elmInd, vector<double> &vals, double surf::*mp) const;
+	void VoluValuesofParents(int elmInd, vector<double> &vals,
+		int volType=0) const;
+	void VoluValuesofParents(int elmInd, vector<double> &vals,
+		double volu::*mp) const;
+	void SurfValuesofParents(int elmInd, vector<double> &vals,
+		int volType=0) const;
+	void SurfValuesofParents(int elmInd, vector<double> &vals,
+		double surf::*mp) const;
 	// Mesh property
 	int WhatDim() const {return(meshDim);}
 	// basic operations grouped from each field
@@ -515,6 +519,9 @@ public:
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;
+	// Mesh size and position
+	void Scale();
+	void Scale(const std::array<std::array<double, 2>,3> &domain);
 
 	~mesh(){
 		RemoveFromFamily();

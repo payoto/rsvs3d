@@ -20,6 +20,15 @@
 using namespace std;
 using namespace Eigen;
 
+int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid){
+
+	int out; 
+	Eigen::RowVector3i dimGridEig = Eigen::Map<Eigen::RowVector3i, 
+		Eigen::Unaligned>(dimGrid.data(), dimGrid.size());
+
+	out = BuildBlockGrid(dimGridEig,blockGrid);
+	return(out);
+}
 
 // Implementation of Cartesian Block grids
 int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
