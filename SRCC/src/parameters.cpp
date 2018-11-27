@@ -6,6 +6,7 @@
 
 #include "json.hpp"
 #include "parameters.hpp"
+#include "parameters2json.hpp"
 
 
 using nlohmann::json;
@@ -15,28 +16,27 @@ using nlohmann::json;
 // Bounds template class method definitions
 //===========================================
 
-template <class T>
-void param::to_json(json& j, const bounds<T>& p){
-	j = json{
-		{"lb", p.lb},
-		{"ub", p.ub},
-	};
-
-}
-template <class T>
-void param::from_json(const json& j, bounds<T>& p){
-	j.at("lb").get_to(p.lb);
-	j.at("ub").get_to(p.ub);
-}
+// template <class T>
+// void param::to_json(json& j, const bounds<T>& p){
+// 	j = json{
+// 		{"lb", p.lb},
+// 		{"ub", p.ub},
+// 	};
+// }
+// template <class T>
+// void param::from_json(const json& j, bounds<T>& p){
+// 	j.at("lb").get_to(p.lb);
+// 	j.at("ub").get_to(p.ub);
+// }
 
 //===========================================
-// Voxel class method definitions
+// voxel class method definitions
 //===========================================
 
 param::voxel::voxel(){
 	for(int i=0; i<3; ++i){
-		this->domain[i].lb=0.0;
-		this->domain[i].ub=1.0;
+		this->domain[i][0]=0.0;
+		this->domain[i][1]=1.0;
 	}
 
 	this->gridsizebackground = {1, 1, 1};

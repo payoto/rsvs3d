@@ -14,27 +14,18 @@
 #include <cstdlib>
 #include <array>
 #include <string>
-#include "json.hpp"
 
-//==================================
+//=================================
 // Code
 // 
 // This file defines parameters to be used in other parts of the 
 // RSVS snaking framework. Default values are defined in "parameters.cpp"
 //
 // Substructure names are all 4-5 letters
-using nlohmann::json;
-namespace param {
 
-	template <class T>
-	struct bounds{
-		T lb;
-		T ub;
-	};
-	template <class T>
-	void to_json(json& j, const bounds<T>& p);
-	template <class T>
-	void from_json(const json& j, bounds<T>& p); 
+
+namespace param {
+	typedef std::array<double,2> realbounds; 
 
 	/*
 	Parameters related to the Velocity calculation and VOS steps
@@ -47,10 +38,7 @@ namespace param {
 
 		rsvs();
 		~rsvs();
-		
 	};
-	void to_json(json& j, const rsvs& p);
-	void from_json(const json& j, rsvs& p); 
 
 	/*
 	Parameters controlling tuning parameters for the stepping of
@@ -74,8 +62,6 @@ namespace param {
 		~snaking();
 		
 	};
-	void to_json(json& j, const snaking& p);
-	void from_json(const json& j, snaking& p); 
 
 	/*
 	Paramters controlling grid properties
@@ -83,16 +69,13 @@ namespace param {
 	class voxel
 	{
 	public:
-		std::array<bounds<double>, 3>  domain;
+		std::array<realbounds, 3>  domain;
 		std::array<int, 3>  gridsizebackground;
 		std::array<int, 3> gridsizesnake;
 
 		voxel();
 		~voxel();
-		
 	};
-	void to_json(json& j, const voxel& p);
-	void from_json(const json& j, voxel& p); 
 
 	class grid
 	{
@@ -102,22 +85,14 @@ namespace param {
 		// ~grid();
 		
 	};
-	void to_json(json& j, const grid& p);
-	void from_json(const json& j, grid& p); 
 
 	class parameters
 	{
 	public:
 		rsvs rsvs;
 		snaking snak;
-		grid grid;
-		// parameters();
-		// ~parameters();
-		
+		grid grid;		
 	};
-	void to_json(json& j, const parameters& p);
-	void from_json(const json& j, parameters& p); 
-
 
 	namespace io {
 		void read(const std::string &fileName, parameters &p);
