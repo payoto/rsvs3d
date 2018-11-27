@@ -13,6 +13,7 @@
 
 #include <cstdlib>
 #include <array>
+#include <string>
 #include "json.hpp"
 
 //==================================
@@ -117,7 +118,22 @@ namespace param {
 	void to_json(json& j, const parameters& p);
 	void from_json(const json& j, parameters& p); 
 
-	int test();
+
+	namespace io {
+		void read(const std::string &fileName, parameters &p);
+		void readflat(const std::string &fileName, parameters &p);
+		void write(const std::string &fileName, const parameters &p);
+		void writeflat(const std::string &fileName, const parameters &p);
+
+		void defaultconf();
+	}
+	namespace test {
+
+		int base();
+		int io();
+		int ioflat();
+		int ipartialread();
+	}
 }
 
 #endif

@@ -61,7 +61,10 @@ int main(){
 	
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D");
 	#endif //TEST_ALL
-	gridTest.Run(param::test,"parameter implementation");
+	gridTest.Run(param::test::base,"parameter implementation");
+	gridTest.Run(param::test::io,"parameter read write");
+	gridTest.Run(param::test::ioflat,"parameter read write flat format");
+	gridTest.Run(param::test::ipartialread,"parameter read write flat format");
 
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 	

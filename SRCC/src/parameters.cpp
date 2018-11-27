@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <cassert>
+#include <fstream>
+#include <string>
 
 #include "json.hpp"
 #include "parameters.hpp"
@@ -134,9 +136,74 @@ void param::from_json(const json& j, parameters& p){
 	j.at("grid").get_to(p.grid);
 }
 
+//================================
+// io
+//================================
 
-int param::test(){
+void param::io::read(const std::string &fileName, parameters &p){
+	std::ifstream file;
+	json j, j_fin;
 
+	file.open(fileName);
+	j_fin = p; 
+	file >> j;
+	file.close();
+
+	// Insert values read into the parameter structure
+	j_fin.update(j);
+	p=j_fin;
+}
+
+void param::io::write(const std::string &fileName, const parameters &p){
+	std::ofstream file;
+	json j;
+
+	file.open(fileName);
+
+	j = p; 
+	file << j.dump(2);
+	file.close();
+}
+
+void param::io::readflat(const std::string &fileName, parameters &p){
+	std::ifstream file;
+	json j, j_fin;
+
+	file.open(fileName);
+	j_fin = p; 
+	file >> j;
+	file.close();
+	j = j.unflatten();
+	// Insert values read into the parameter structure
+	j_fin.update(j);
+	p=j_fin;
+}
+void param::io::writeflat(const std::string &fileName, const parameters &p){
+	std::ofstream file;
+	json j;
+
+	file.open(fileName);
+
+	j = p; 
+	file << j.flatten().dump(2);
+	file.close();
+}
+void param::io::defaultconf(){
+	param::parameters params;
+	std::string fileName="config\\defaultconf.json";
+	std::string fileNameFlat="config\\defaultconfflat.json";
+
+	param::io::write(fileName, params);
+	param::io::writeflat(fileNameFlat, params);
+
+}
+//================================
+// Tests
+//================================
+int param::test::base(){
+	/*
+	
+	*/
 	param::parameters params, params2;
 	json j, j2; 
 
@@ -157,5 +224,76 @@ int param::test(){
 		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
 		return (1);
 	};
-	return 0;
+	param::io::defaultconf();
+	return(0);
+}
+
+int param::test::io(){
+	param::parameters params, params2;
+	std::string fileName="..\\TESTOUT\\testioparam.json";
+	json j1, j2;
+
+	params.snak.arrivaltolerance = 1;
+	param::io::write(fileName, params);
+
+	param::io::read(fileName, params2);
+
+	j1 = params; 
+	j2 = params2;
+
+	if (j1!=j2){
+		std::cerr << "Error: Parameter read/write "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	};
+
+	return(0);
+}
+
+int param::test::ioflat(){
+	param::parameters params, params2;
+	std::string fileName="..\\TESTOUT\\testioflatparam.json";
+	json j1, j2;
+
+	params.snak.arrivaltolerance = 1;
+	param::io::writeflat(fileName, params);
+
+	param::io::readflat(fileName, params2);
+
+	j1 = params; 
+	j2 = params2;
+
+	if (j1!=j2){
+		std::cerr << "Error: Parameter read/write "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	};
+
+	return(0);
+}
+
+int param::test::ipartialread(){
+	param::parameters params, params2;
+	std::string fileName="config\\partialconfflat.json";
+	std::string fileName2="config\\partialconfflat_out.json";
+	json j1, j2;
+
+	param::io::readflat(fileName, params2);
+	param::io::writeflat(fileName2, params2);
+
+	j1 = params; 
+	j2 = params2;
+
+	if (j1==j2){
+		std::cerr << "Error: Parameter read/write "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	} else {
+		std::cout << "Partial read succesful, outputs are different" << std::endl;
+	}
+
+	return(0);
 }
