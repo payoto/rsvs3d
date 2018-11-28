@@ -68,7 +68,7 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 
 	sort(voluOutList);
 	unique(voluOutList);
-	DisplayVector(voluOutList);
+	// DisplayVector(voluOutList);
 
 
 

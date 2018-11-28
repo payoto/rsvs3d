@@ -65,18 +65,12 @@ int main(){
 	gridTest.Run(param::test::base,"parameter implementation");
 	gridTest.Run(param::test::io,"parameter read write");
 	gridTest.Run(param::test::ioflat,"parameter read write flat format");
-	gridTest.Run(param::test::ipartialread,"parameter read write flat format");
+	gridTest.Run(param::test::ipartialread,"parameter partial read write flat format");
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
 
 	// gridTest.Run(Test_snakeRSVS,"Snake RSVS");
 	
-
-
-
-
 	gridTest.PrintSummary();
-
-
 
 	return(0);
 }

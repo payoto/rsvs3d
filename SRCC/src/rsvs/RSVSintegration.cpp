@@ -2,6 +2,8 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+#include <boost/filesystem.hpp>
+
 
 #include "RSVSintegration.hpp"
 #include "snake.hpp"
@@ -11,6 +13,7 @@
 #include "meshrefinement.hpp"
 #include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
+#include "postprocessing.hpp"
 
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
@@ -71,9 +74,6 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 	snakein.OrientFaces();
 
 	start_s=TimeStamp("Clean: ", start_s);
-
-	
-
 }
 
 void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
@@ -148,7 +148,6 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	start_s=TimeStamp("Clean: ", start_s);
 
 	TimeStamp(" - Connec Update: ", start_f);
-	
 }
 
 void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
@@ -200,7 +199,6 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
 	start_s=TimeStamp("Clean: ", start_s);
 
 	TimeStamp(" - Connec Update: ", start_f);
-	
 }
 
 void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
@@ -252,7 +250,6 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	start_s=TimeStamp("Clean: ", start_s);
 
 	TimeStamp(" - Connec Update: ", start_f);
-	
 }
 
 int TimeStamp(const char* str,int start_s){
@@ -261,13 +258,12 @@ int TimeStamp(const char* str,int start_s){
 	cout << str << " " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms; ";
 	#endif
 	return(stop_s);
-
 }
 
 void integrate::prepare::Mesh(
-		const param::grid &gridconf,
-		mesh &snakeMesh,
-		mesh &voluMesh
+	const param::grid &gridconf,
+	mesh &snakeMesh,
+	mesh &voluMesh
 	){
 	/*prepares the snake and volume meshes gor the RSVS process*/
 	// Local declaration
@@ -328,27 +324,76 @@ void integrate::prepare::Triangulation(
 	triangulation &rsvsTri
 	){
 
+	rsvsTri.PrepareForUse();
 	TriangulateMesh(snakeMesh,rsvsTri);
 	rsvsTri.PrepareForUse();
 	TriangulateSnake(rsvsSnake,rsvsTri);
 	rsvsTri.PrepareForUse();
 	rsvsTri.CalcTriVertPos();
+	rsvsTri.PrepareForUse();
 	MaintainTriangulateSnake(rsvsTri);
 	rsvsTri.PrepareForUse();
-
 }
 
+void integrate::prepare::PostProcessing(){
+	tecplotfile outSnake;
+	param::files fileconf;
+	// Define 
+	fileconf.PrepareForUse();
+	if (fileconf.ioout.outdir.size()!=0){
+		boost::filesystem::create_directories(fileconf.ioout.outdir);
 
-
+	}
+}
 
 // ===================
+// Tests
+// ===================
+
 int integrate::test::Prepare(){
-	param::grid gridconf;
+	param::parameters paramconf;
 	mesh snakeMesh;
 	mesh voluMesh;
 	snake rsvsSnake;
+	triangulation rsvsTri;
 
-	integrate::prepare::Mesh(gridconf, snakeMesh, voluMesh);
+	try {
+		integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);
+	} catch (exception const& ex) { 
+		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);" << endl;
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	
+	try {
+
+		integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);
+	} catch (exception const& ex) { 
+		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);" << endl;
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+
+	try {
+
+		integrate::prepare::Triangulation(snakeMesh, rsvsSnake, rsvsTri);
+	} catch (exception const& ex) { 
+		cerr << "integrate::prepare::Triangulation" << endl;
+
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+
+	try {
+
+		integrate::prepare::PostProcessing();
+	} catch (exception const& ex) { 
+		cerr << "integrate::prepare::PostProcessing" << endl;
+
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+
 
 	return(0);
 }

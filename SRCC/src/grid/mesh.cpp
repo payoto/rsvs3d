@@ -2963,7 +2963,7 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 			-std::numeric_limits<double>::infinity()};
 	}
 	for(ii=0; ii<nVerts; ++ii){
-		for(jj=0; jj<3; ++ii){
+		for(jj=0; jj<3; ++jj){
 			currDomain[jj][0]= currDomain[jj][0] <= this->verts(ii)->coord[jj] ?
 				currDomain[jj][0]:this->verts(ii)->coord[jj];
 			currDomain[jj][1]= currDomain[jj][0] >= this->verts(ii)->coord[jj] ?
@@ -2986,7 +2986,7 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 
 	// Recalculate grid vertex positions
 	for(ii=0; ii<nVerts; ++ii){
-		for(jj=0; jj<3; ++ii){
+		for(jj=0; jj<3; ++jj){
 			this->verts.elems[ii].coord[jj]=transformation[jj][0]
 				+((this->verts(ii)->coord[jj]-transformation[jj][1])
 				*transformation[jj][2]);

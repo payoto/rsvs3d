@@ -9,16 +9,22 @@ LINK=g++
 # Compiler flags
 # Warnings all and Define DEBUGLVL2 to include all check code
 
-CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
+CFLAGS=-c -std=c++11 -Wall -Wextra -pedantic -DTIME_EXEC -O3 -g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
+# CFLAGS+= -DBOOST_STACKTRACE_USE_BACKTRACE
 #-g -ggdb -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CUSERFLAGS= 
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
 # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 #-DSAFE_ALGO
 CFTESTFLAG= -DTEST_ALL
-LDFLAGS=-lstdc++
+LDFLAGS=-lstdc++ 
+LDFLAGS += -L"C:\ap1949include\boost_1_67_0\stage\lib"
+LDFLAGS +=  -lboost_filesystem-mgw63-mt-sd-x64-1_67 -lboost_system-mgw63-mt-sd-x64-1_67
+# LDFLAGS += -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
 INCLDIR= -I"C:\ap1949include\Eigen_all\Eigen" -I"incl"
 INCLDIR += -I"C:\ap1949include\json\single_include\nlohmann"
+INCLDIR += -isystem"C:\ap1949include\boost_1_67_0"
+# INCLDIR += -I"C:\ap1949include\libbacktrace-build\lib"
 OBJDIR=obj
 # make all options
 SOURCES=arraystructures.cpp
@@ -93,10 +99,10 @@ testall : $(TESTSOURCES) $(TESTALLSOURCES) $(TESTEXECUTABLE)
  
 
 main : $(OBJECTS) 
-	$(LINK) $(LDFLAGS) $(OBJECTS) -o $@ 
+	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 main_test : $(TESTOBJECTS) 
-	$(LINK) $(LDFLAGS) $(TESTOBJECTS) -o $@ 
+	$(LINK)  $(TESTOBJECTS) -o $@ $(LDFLAGS)
 
 .SECONDEXPANSION:
 

@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <array>
 #include <string>
+#include <ctime>
 
 //=================================
 // Code
@@ -38,6 +39,7 @@ namespace param {
 
 		rsvs();
 		~rsvs();
+		void PrepareForUse();
 	};
 
 	/*
@@ -60,6 +62,7 @@ namespace param {
 
 		snaking();
 		~snaking();
+		void PrepareForUse();
 		
 	};
 
@@ -75,6 +78,7 @@ namespace param {
 
 		voxel();
 		~voxel();
+		void PrepareForUse();
 	};
 
 	class grid
@@ -84,6 +88,7 @@ namespace param {
 		// grid();
 		// ~grid();
 		
+		void PrepareForUse();
 	};
 
 	/*
@@ -95,26 +100,36 @@ namespace param {
 		std::string snakemeshname;
 		std::string volumeshname;
 		std::string targetfill;
+		std::string casename;
 
 		ioin();
+		void PrepareForUse();
 	};
 	/*
 	Class containing the output configuration these are files
 	to store and where to store them
 	*/
 	class ioout{
+	private:
+
 	public:
-		std::string basefolder;
-		std::string archivepattern;
+		std::string pathoutdir;
+		std::string pathpattern;
+		std::string basenamepattern;
+		std::string basenameoutdir;
+		std::string outdir;
 
 		ioout();
+		void PrepareForUse();
 	};
 	class files
 	{
 	public:
+		bool appcasename2outdir;
 		ioin ioin;
 		ioout ioout;
-		
+		files();
+		void PrepareForUse();
 	};
 
 	class parameters
@@ -124,6 +139,8 @@ namespace param {
 		snaking snak;
 		grid grid;
 		files files;
+
+		void PrepareForUse();
 	};
 
 
@@ -141,6 +158,7 @@ namespace param {
 		int io();
 		int ioflat();
 		int ipartialread();
+		int prepareforuse();
 	}
 }
 

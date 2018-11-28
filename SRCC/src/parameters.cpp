@@ -4,6 +4,11 @@
 #include <fstream>
 #include <string>
 
+
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+
 #include "json.hpp"
 #include "parameters.hpp"
 #include "parameters2json.hpp"
@@ -46,6 +51,8 @@ param::voxel::voxel(){
 
 param::voxel::~voxel(){
 }
+void param::voxel::PrepareForUse(){
+}
 void param::to_json(json& j, const voxel& p){
 	j = json{
 		{"domain", p.domain},
@@ -87,6 +94,8 @@ void param::from_json(const json& j, snaking& p){
 	j.at("initboundary").get_to(p.initboundary);
 	j.at("maxsteps").get_to(p.maxsteps);
 }
+void param::snaking::PrepareForUse(){
+}
 
 //===========================================
 // RSVS class method definitions
@@ -106,6 +115,8 @@ void param::to_json(json& j, const rsvs& p){
 void param::from_json(const json& j, rsvs& p){
 	j.at("solveralgorithm").get_to(p.solveralgorithm);
 }
+void param::rsvs::PrepareForUse(){
+}
 
 //===========================================
 // grid class method definitions
@@ -119,6 +130,10 @@ void param::to_json(json& j, const grid& p){
 void param::from_json(const json& j, grid& p){
 	j.at("voxel").get_to(p.voxel);
 }
+void param::grid::PrepareForUse(){
+	this->voxel.PrepareForUse();
+
+}
 
 //===========================================
 // File and io classes method definitions
@@ -129,6 +144,7 @@ param::ioin::ioin(){
 	this->snakemeshname = "";
 	this->volumeshname = "";
 	this->targetfill = "";
+	this->casename = "";
 }
 
 void param::to_json(json& j, const ioin& p){
@@ -136,44 +152,103 @@ void param::to_json(json& j, const ioin& p){
 		{"snakemeshname", p.snakemeshname},
 		{"volumeshname", p.volumeshname},
 		{"targetfill", p.targetfill},
+		{"casename", p.casename},
 	};
 }
 void param::from_json(const json& j, ioin& p){
 	j.at("snakemeshname").get_to(p.snakemeshname);
 	j.at("volumeshname").get_to(p.volumeshname);
 	j.at("targetfill").get_to(p.targetfill);
+	j.at("casename").get_to(p.casename);
+}
+void param::ioin::PrepareForUse(){
+
 }
 
 param::ioout::ioout(){
-	this->basefolder = "";
-	this->archivepattern = "";
-}
+	this->pathoutdir = "../out";
+	this->pathpattern = "Archive_%Y_%m/Day_%y-%m-%d";
+	this->basenamepattern = "%y%m%dT%H%M%S_";
+	this->basenameoutdir="rsvs3d_";
+	this->outdir="";
 
+}
+void param::ioout::PrepareForUse(){
+
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	std::ostringstream oss;
+	if (this->pathoutdir.size()==0){
+		this->pathoutdir += ".";
+	}
+	if (this->pathpattern.size()>0){
+		oss << std::put_time(&tm, this->pathpattern.c_str());
+		this->pathoutdir += "/";
+		this->pathoutdir += oss.str();
+		oss.str(std::string());
+	}
+	if (this->basenamepattern.size()>0){
+		oss.str(std::string());
+		oss << std::put_time(&tm, this->basenamepattern.c_str());
+		this->basenameoutdir += oss.str();
+	}
+	if(this->outdir.size()==0){
+		this->outdir = this->pathoutdir + "/" + this->basenameoutdir;
+	}
+}
 void param::to_json(json& j, const ioout& p){
 	j = json{
-		{"basefolder", p.basefolder},
-		{"archivepattern", p.archivepattern},
+		{"pathoutdir", p.pathoutdir},
+		{"pathpattern", p.pathpattern},
+		{"basenamepattern", p.basenamepattern},
+		{"basenameoutdir", p.basenameoutdir},
+		{"outdir", p.outdir},
 	};
 }
 void param::from_json(const json& j, ioout& p){
-	j.at("basefolder").get_to(p.basefolder);
-	j.at("archivepattern").get_to(p.archivepattern);
+	j.at("pathoutdir").get_to(p.pathoutdir);
+	j.at("pathpattern").get_to(p.pathpattern);
+	j.at("basenamepattern").get_to(p.basenamepattern);
+	j.at("basenameoutdir").get_to(p.basenameoutdir);
+	j.at("outdir").get_to(p.outdir);
 }
 
+param::files::files(){
+	this->appcasename2outdir=true;
+}
+void param::files::PrepareForUse(){
+	this->ioout.PrepareForUse();
+	this->ioin.PrepareForUse();
+
+	if(this->appcasename2outdir){
+		this->ioout.outdir += this->ioin.casename;
+		this->appcasename2outdir=false;
+	}
+}
 void param::to_json(json& j, const files& p){
 	j = json{
 		{"ioin", p.ioin},
 		{"ioout", p.ioout},
+		{"appcasename2outdir", p.appcasename2outdir},
 	};
 }
 void param::from_json(const json& j, files& p){
 	j.at("ioin").get_to(p.ioin);
 	j.at("ioout").get_to(p.ioout);
+	j.at("appcasename2outdir").get_to(p.appcasename2outdir);
 }
 
 //===========================================
 // parameters class method definitions
 //===========================================
+void param::parameters::PrepareForUse(){
+
+	this->rsvs.PrepareForUse();
+	this->snak.PrepareForUse();
+	this->grid.PrepareForUse();
+	this->files.PrepareForUse();
+
+}
 void param::to_json(json& j, const parameters& p){
 	j = json{
 		{"rsvs", p.rsvs},
@@ -356,6 +431,33 @@ int param::test::ipartialread(){
 	param::parameters params, params2;
 	std::string fileName="config\\partialconfflat.json";
 	std::string fileName2="config\\partialconfflat_out.json";
+	json j1, j2;
+	std::cout << "Start read" << std::endl;
+	param::io::readflat(fileName, params2);
+	std::cout << "succesful read" << std::endl;
+	param::io::writeflat(fileName2, params2);
+	std::cout << "succesful write" << std::endl;
+
+	j1 = params; 
+	j2 = params2;
+
+	if (j1==j2){
+		std::cerr << "Error: Parameter read/write "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	} else {
+		std::cout << "Partial read succesful, outputs are different" << std::endl;
+	}
+
+	return(0);
+}
+
+
+int param::test::prepareforuse(){
+	param::parameters params, params2;
+	std::string fileName="config\\confprepared.json";
+	std::string fileName2="config\\confprepared2.json";
 	json j1, j2;
 	std::cout << "Start read" << std::endl;
 	param::io::readflat(fileName, params2);

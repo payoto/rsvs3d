@@ -102,7 +102,7 @@ void RSVScalc::CalculateMesh(mesh &meshin){
 	//vector<int> vecin;
 	triangulation triRSVS(meshin);
 	// prepare the SQP object
-	
+	triRSVS.PrepareForUse();
 	this->returnDeriv=false;
 	nConstr=meshin.volus.size(); 
 	

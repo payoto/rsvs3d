@@ -24,6 +24,7 @@ namespace param {
 
 using namespace std; 
 
+
 void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_2D(snake &testSnake,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact);
@@ -48,6 +49,12 @@ namespace integrate {
 			snake &rsvsSnake,
 			triangulation &rsvsTri
 			);
+		void PostProcessing();
+	}
+
+	namespace execute{
+		void PostProcessing();
+		void RSVSiterate();
 	}
 
 	namespace test {
