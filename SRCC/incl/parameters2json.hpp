@@ -13,6 +13,9 @@ namespace param{
 	class voxel;
 	class grid;
 	class parameters;
+	class ioin;
+	class ioout;
+	class files;
 }
 
 //=================================
@@ -47,6 +50,17 @@ namespace param {
 	void to_json(json& j, const parameters& p);
 	void from_json(const json& j, parameters& p); 
 
+	void to_json(json& j, const ioin& p);
+	void from_json(const json& j, ioin& p); 
+
+	void to_json(json& j, const ioout& p);
+	void from_json(const json& j, ioout& p); 
+
+	void to_json(json& j, const files& p);
+	void from_json(const json& j, files& p); 
+
+	void flatupdate(json& jfin, json& jnew,
+		bool isFlatFin, bool isFlatNew);
 }
 
 #endif

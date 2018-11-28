@@ -86,13 +86,46 @@ namespace param {
 		
 	};
 
+	/*
+	Class containing the input configuration 
+	these are files to load etc
+	*/
+	class ioin{
+	public:
+		std::string snakemeshname;
+		std::string volumeshname;
+		std::string targetfill;
+
+		ioin();
+	};
+	/*
+	Class containing the output configuration these are files
+	to store and where to store them
+	*/
+	class ioout{
+	public:
+		std::string basefolder;
+		std::string archivepattern;
+
+		ioout();
+	};
+	class files
+	{
+	public:
+		ioin ioin;
+		ioout ioout;
+		
+	};
+
 	class parameters
 	{
 	public:
 		rsvs rsvs;
 		snaking snak;
-		grid grid;		
+		grid grid;
+		files files;
 	};
+
 
 	namespace io {
 		void read(const std::string &fileName, parameters &p);

@@ -121,6 +121,57 @@ void param::from_json(const json& j, grid& p){
 }
 
 //===========================================
+// File and io classes method definitions
+//===========================================
+
+
+param::ioin::ioin(){
+	this->snakemeshname = "";
+	this->volumeshname = "";
+	this->targetfill = "";
+}
+
+void param::to_json(json& j, const ioin& p){
+	j = json{
+		{"snakemeshname", p.snakemeshname},
+		{"volumeshname", p.volumeshname},
+		{"targetfill", p.targetfill},
+	};
+}
+void param::from_json(const json& j, ioin& p){
+	j.at("snakemeshname").get_to(p.snakemeshname);
+	j.at("volumeshname").get_to(p.volumeshname);
+	j.at("targetfill").get_to(p.targetfill);
+}
+
+param::ioout::ioout(){
+	this->basefolder = "";
+	this->archivepattern = "";
+}
+
+void param::to_json(json& j, const ioout& p){
+	j = json{
+		{"basefolder", p.basefolder},
+		{"archivepattern", p.archivepattern},
+	};
+}
+void param::from_json(const json& j, ioout& p){
+	j.at("basefolder").get_to(p.basefolder);
+	j.at("archivepattern").get_to(p.archivepattern);
+}
+
+void param::to_json(json& j, const files& p){
+	j = json{
+		{"ioin", p.ioin},
+		{"ioout", p.ioout},
+	};
+}
+void param::from_json(const json& j, files& p){
+	j.at("ioin").get_to(p.ioin);
+	j.at("ioout").get_to(p.ioout);
+}
+
+//===========================================
 // parameters class method definitions
 //===========================================
 void param::to_json(json& j, const parameters& p){
@@ -128,17 +179,43 @@ void param::to_json(json& j, const parameters& p){
 		{"rsvs", p.rsvs},
 		{"snak", p.snak},
 		{"grid", p.grid},
+		{"files", p.files}
 	};
 }
 void param::from_json(const json& j, parameters& p){
 	j.at("rsvs").get_to(p.rsvs);
 	j.at("snak").get_to(p.snak);
 	j.at("grid").get_to(p.grid);
+	j.at("files").get_to(p.files);
 }
 
 //================================
 // io
 //================================
+
+void param::flatupdate(json& jfin, json& jnew,
+	bool isFlatFin, bool isFlatNew){
+	/*
+	Allows recursing updae into sub fields
+	*/
+	// std::cout << "file read " << std::endl;
+	if(!isFlatNew){
+		jnew = jnew.flatten();
+	}
+	if(!isFlatFin){
+		jfin = jfin.flatten();
+	}
+		// std::cout << "j unflattened " << std::endl;
+		// std::cout << jnew.dump(1) << std::endl;
+		// std::cout << jfin.dump(1) << std::endl;
+	// Insert values read into the parameter structure
+	jfin.update(jnew);
+		// std::cout << "jfin updated " << std::endl;
+		// std::cout << jfin.dump(1) << std::endl;
+	jfin = jfin.unflatten();
+	jnew = jnew.unflatten();
+}
+
 
 void param::io::read(const std::string &fileName, parameters &p){
 	std::ifstream file;
@@ -150,7 +227,8 @@ void param::io::read(const std::string &fileName, parameters &p){
 	file.close();
 
 	// Insert values read into the parameter structure
-	j_fin.update(j);
+	param::flatupdate(j_fin,j,false, false);
+	
 	p=j_fin;
 }
 
@@ -167,16 +245,16 @@ void param::io::write(const std::string &fileName, const parameters &p){
 
 void param::io::readflat(const std::string &fileName, parameters &p){
 	std::ifstream file;
-	json j, j_fin;
+	json jnew, jfin;
 
 	file.open(fileName);
-	j_fin = p; 
-	file >> j;
+	jfin = p; 
+	// std::cout << "jfin assigned " << std::endl;
+	file >> jnew;
 	file.close();
-	j = j.unflatten();
-	// Insert values read into the parameter structure
-	j_fin.update(j);
-	p=j_fin;
+	param::flatupdate(jfin,jnew,false, true);
+	p=jfin;
+	// std::cout << "p assigned " << std::endl;
 }
 void param::io::writeflat(const std::string &fileName, const parameters &p){
 	std::ofstream file;
@@ -279,9 +357,11 @@ int param::test::ipartialread(){
 	std::string fileName="config\\partialconfflat.json";
 	std::string fileName2="config\\partialconfflat_out.json";
 	json j1, j2;
-
+	std::cout << "Start read" << std::endl;
 	param::io::readflat(fileName, params2);
+	std::cout << "succesful read" << std::endl;
 	param::io::writeflat(fileName2, params2);
+	std::cout << "succesful write" << std::endl;
 
 	j1 = params; 
 	j2 = params2;
