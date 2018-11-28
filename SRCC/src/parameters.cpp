@@ -171,6 +171,8 @@ param::ioout::ioout(){
 	this->basenamepattern = "%y%m%dT%H%M%S_";
 	this->basenameoutdir="rsvs3d_";
 	this->outdir="";
+	this->pattern="";
+
 
 }
 void param::ioout::PrepareForUse(){
@@ -191,6 +193,7 @@ void param::ioout::PrepareForUse(){
 		oss.str(std::string());
 		oss << std::put_time(&tm, this->basenamepattern.c_str());
 		this->basenameoutdir += oss.str();
+		this->pattern = oss.str();
 	}
 	if(this->outdir.size()==0){
 		this->outdir = this->pathoutdir + "/" + this->basenameoutdir;
@@ -203,6 +206,7 @@ void param::to_json(json& j, const ioout& p){
 		{"basenamepattern", p.basenamepattern},
 		{"basenameoutdir", p.basenameoutdir},
 		{"outdir", p.outdir},
+		{"pattern", p.pattern},
 	};
 }
 void param::from_json(const json& j, ioout& p){
@@ -211,6 +215,7 @@ void param::from_json(const json& j, ioout& p){
 	j.at("basenamepattern").get_to(p.basenamepattern);
 	j.at("basenameoutdir").get_to(p.basenameoutdir);
 	j.at("outdir").get_to(p.outdir);
+	j.at("pattern").get_to(p.pattern);
 }
 
 param::files::files(){
@@ -222,6 +227,7 @@ void param::files::PrepareForUse(){
 
 	if(this->appcasename2outdir){
 		this->ioout.outdir += this->ioin.casename;
+		this->ioout.pattern += this->ioin.casename;
 		this->appcasename2outdir=false;
 	}
 }

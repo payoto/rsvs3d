@@ -6,13 +6,17 @@
 // forward declared dependencies
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
-
+namespace integrate {
+	class RSVSclass;
+}
 class triangulation;
 class snake;
 class mesh;
+class tecplotfile;
 namespace param {
 	class grid;
 	class snaking;
+	class parameters;
 }
 
 //=================================
@@ -33,6 +37,7 @@ int TimeStamp(const char* str,int start_s);
 
 
 namespace integrate {
+	void Prepare(RSVSclass RSVSobj);
 	namespace prepare {
 		void Mesh(
 			const param::grid &gridconf,
@@ -49,7 +54,11 @@ namespace integrate {
 			snake &rsvsSnake,
 			triangulation &rsvsTri
 			);
-		void PostProcessing();
+		void PostProcessing(
+			const param::parameters &paramconf,
+			const param::parameters &origcong,
+			tecplotfile &outSnake
+			);
 	}
 
 	namespace execute{

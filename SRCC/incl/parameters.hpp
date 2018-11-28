@@ -118,6 +118,7 @@ namespace param {
 		std::string basenamepattern;
 		std::string basenameoutdir;
 		std::string outdir;
+		std::string pattern;
 
 		ioout();
 		void PrepareForUse();

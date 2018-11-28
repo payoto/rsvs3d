@@ -2,9 +2,10 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+#include <string>
 #include <boost/filesystem.hpp>
 
-
+#include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
 #include "snake.hpp"
 #include "snakeengine.hpp"
@@ -335,15 +336,46 @@ void integrate::prepare::Triangulation(
 	rsvsTri.PrepareForUse();
 }
 
-void integrate::prepare::PostProcessing(){
-	tecplotfile outSnake;
-	param::files fileconf;
-	// Define 
-	fileconf.PrepareForUse();
-	if (fileconf.ioout.outdir.size()!=0){
-		boost::filesystem::create_directories(fileconf.ioout.outdir);
-
+void integrate::prepare::PostProcessing(
+	const param::parameters &paramconf,
+	const param::parameters &origconf,
+	tecplotfile &outSnake
+	){
+	std::string outSnakeName;
+	
+	if (paramconf.files.ioout.outdir.size()!=0){
+		boost::filesystem::create_directories(paramconf.files.ioout.outdir);
 	}
+	outSnakeName = paramconf.files.ioout.outdir + "/";
+	outSnakeName += "rsvs3D_" + paramconf.files.ioout.pattern + ".plt";
+	outSnake.OpenFile(outSnakeName.c_str());
+
+	outSnakeName =  paramconf.files.ioout.outdir + "/";
+	outSnakeName += "config_call_" + paramconf.files.ioout.pattern + ".json";
+	param::io::writeflat(outSnakeName, origconf);
+	outSnakeName =  paramconf.files.ioout.outdir + "/";
+	outSnakeName += "config_active_" + paramconf.files.ioout.pattern + ".json";
+	param::io::writeflat(outSnakeName, paramconf);
+}
+
+void integrate::Prepare(integrate::RSVSclass RSVSobj){
+	// likely inputs (now in RSVSclass)
+	// param::parameters paramconf;
+	// mesh snakeMesh;
+	// mesh voluMesh;
+	// snake rsvsSnake;
+	// triangulation rsvsTri;
+	// tecplotfile outSnake;
+	// Locally defined
+	param::parameters origconf;
+
+	origconf = RSVSobj.paramconf;
+	RSVSobj.paramconf.PrepareForUse();
+
+	integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.snakeMesh, RSVSobj.voluMesh);
+	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.snakeMesh, RSVSobj.rsvsSnake);
+	integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
+	integrate::prepare::PostProcessing(RSVSobj.paramconf, origconf, RSVSobj.outSnake);
 }
 
 // ===================
@@ -351,12 +383,15 @@ void integrate::prepare::PostProcessing(){
 // ===================
 
 int integrate::test::Prepare(){
-	param::parameters paramconf;
+	param::parameters paramconf, origconf;
 	mesh snakeMesh;
 	mesh voluMesh;
 	snake rsvsSnake;
 	triangulation rsvsTri;
+	tecplotfile outSnake;
 
+	origconf = paramconf;
+	paramconf.PrepareForUse();
 	try {
 		integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);
 	} catch (exception const& ex) { 
@@ -366,7 +401,6 @@ int integrate::test::Prepare(){
 	} 
 	
 	try {
-
 		integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);" << endl;
@@ -375,21 +409,17 @@ int integrate::test::Prepare(){
 	} 
 
 	try {
-
 		integrate::prepare::Triangulation(snakeMesh, rsvsSnake, rsvsTri);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Triangulation" << endl;
-
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 
 
 	try {
-
-		integrate::prepare::PostProcessing();
+		integrate::prepare::PostProcessing(paramconf, origconf, outSnake);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::PostProcessing" << endl;
-
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 
