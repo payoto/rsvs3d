@@ -618,13 +618,13 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 		}
 		// if((dvListMap.find(1044)!=-1 )  && isDeriv){
 		// 	std::vector<double> v={constrPart};
-		// 	PrintMatrixFile(triIn.connec.celltarg,"matrices\\matrix_dConstrPart_inter2.txt");
-		// 	PrintMatrixFile(triIn.connec.constrinfluence,"matrices\\matrix_dConstrPart_inter2.txt");
-		// 	PrintMatrixFile(dvListMap.vec,"matrices\\matrix_dConstrPart_inter2.txt");
-		// 	PrintMatrixFile(dConstrPart,"matrices\\matrix_dConstrPart_inter2.txt");
-		// 	PrintMatrixFile(v,"matrices\\matrix_dConstrPart_inter2.txt");
-		// 	PrintMatrixFile(dVal,"matrices\\matrix_dVal_inter2.txt");
-		// 	PrintMatrixFile(dPos,"matrices\\matrix_dPos_inter2.txt");
+		// 	PrintMatrixFile(triIn.connec.celltarg,"matrices/matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(triIn.connec.constrinfluence,"matrices/matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dvListMap.vec,"matrices/matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dConstrPart,"matrices/matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(v,"matrices/matrix_dConstrPart_inter2.txt");
+		// 	PrintMatrixFile(dVal,"matrices/matrix_dVal_inter2.txt");
+		// 	PrintMatrixFile(dPos,"matrices/matrix_dPos_inter2.txt");
 		// 	// cout << endl;
 		// 	// DisplayVector(*veccoord[0]);
 		// 	// cout << endl;

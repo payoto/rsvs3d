@@ -1267,7 +1267,7 @@ int Test_tecplotfile(){
 	tecplotfile outmesh;
 	int errFlag;
 
-	fileToOpen="..\\TESTOUT\\tecout.plt";
+	fileToOpen="../TESTOUT/tecout.plt";
 
 	errFlag=outmesh.OpenFile(fileToOpen);
 	if (errFlag!=0){

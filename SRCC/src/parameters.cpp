@@ -343,8 +343,8 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 }
 void param::io::defaultconf(){
 	param::parameters params;
-	std::string fileName="config\\defaultconf.json";
-	std::string fileNameFlat="config\\defaultconfflat.json";
+	std::string fileName="config/defaultconf.json";
+	std::string fileNameFlat="config/defaultconfflat.json";
 
 	param::io::write(fileName, params);
 	param::io::writeflat(fileNameFlat, params);
@@ -383,7 +383,7 @@ int param::test::base(){
 
 int param::test::io(){
 	param::parameters params, params2;
-	std::string fileName="..\\TESTOUT\\testioparam.json";
+	std::string fileName="../TESTOUT/testioparam.json";
 	json j1, j2;
 
 	params.snak.arrivaltolerance = 1;
@@ -406,7 +406,7 @@ int param::test::io(){
 
 int param::test::ioflat(){
 	param::parameters params, params2;
-	std::string fileName="..\\TESTOUT\\testioflatparam.json";
+	std::string fileName="../TESTOUT/testioflatparam.json";
 	json j1, j2;
 
 	params.snak.arrivaltolerance = 1;
@@ -429,8 +429,8 @@ int param::test::ioflat(){
 
 int param::test::ipartialread(){
 	param::parameters params, params2;
-	std::string fileName="config\\partialconfflat.json";
-	std::string fileName2="config\\partialconfflat_out.json";
+	std::string fileName="config/partialconfflat.json";
+	std::string fileName2="config/partialconfflat_out.json";
 	json j1, j2;
 	std::cout << "Start read" << std::endl;
 	param::io::readflat(fileName, params2);
@@ -456,8 +456,8 @@ int param::test::ipartialread(){
 
 int param::test::prepareforuse(){
 	param::parameters params, params2;
-	std::string fileName="config\\confprepared.json";
-	std::string fileName2="config\\confprepared2.json";
+	std::string fileName="config/confprepared.json";
+	std::string fileName2="config/confprepared2.json";
 	json j1, j2;
 	std::cout << "Start read" << std::endl;
 	param::io::readflat(fileName, params2);

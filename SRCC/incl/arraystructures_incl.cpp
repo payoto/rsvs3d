@@ -265,12 +265,12 @@ template <class T> int TestTemplate_ArrayStruct()
 		errFlag+=TestReadyness(stackT," after PrepareForUse (4th Time)",true);
 
 		// Test Read write:
-		fidw=fopen("..\\TESTOUT\\testarray.dat","w");
+		fidw=fopen("../TESTOUT/testarray.dat","w");
 		if(fidw!=NULL){
 			stackT.write(fidw);
 			errFlag+=TestReadyness(stackT," Write out",true);
 			fclose(fidw);
-			fidr=fopen("..\\TESTOUT\\testarray.dat","r");
+			fidr=fopen("../TESTOUT/testarray.dat","r");
 			if(fidr!=NULL){
 				stackT3.read(fidr);
 				fclose(fidr);

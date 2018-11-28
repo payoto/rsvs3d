@@ -479,21 +479,21 @@ int Test_MeshOut(){
 	errTest=BuildBlockGrid(dimGrid1,blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="..\\TESTOUT\\tecout6612.plt";
+	fileToOpen="../TESTOUT/tecout6612.plt";
 	errTest=outmesh1.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
 	errTest=outmesh1.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
-	fileToOpen="..\\TESTOUT\\mesh6612.dat";
+	fileToOpen="../TESTOUT/mesh6612.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh1);
 
 	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="..\\TESTOUT\\tecout100100.plt";
+	fileToOpen="../TESTOUT/tecout100100.plt";
 	errTest=outmesh2.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
-	fileToOpen="..\\TESTOUT\\tecout100100.dat";
+	fileToOpen="../TESTOUT/tecout100100.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh2);
 
 	errTest=outmesh2.PrintMesh(blockGrid);
@@ -505,7 +505,7 @@ int Test_MeshOut(){
 	// the code you wish to time goes here
 	stop_s=clock();
 	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-	fileToOpen="..\\TESTOUT\\tecout202020.plt";
+	fileToOpen="../TESTOUT/tecout202020.plt";
 
 	errTest=outmesh3.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0); 
@@ -513,7 +513,7 @@ int Test_MeshOut(){
 	errTest=outmesh3.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="..\\TESTOUT\\mesh203010.dat";
+	fileToOpen="../TESTOUT/mesh203010.dat";
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh3);
 
 	return(errFlag);

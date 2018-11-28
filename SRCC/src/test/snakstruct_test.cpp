@@ -341,10 +341,10 @@ int Test_snakeinit(){
 	
 
 	try {
-		fileToOpen="..\\TESTOUT\\TestSnake.plt";
+		fileToOpen="../TESTOUT/TestSnake.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
@@ -365,7 +365,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<300;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -429,10 +429,10 @@ int Test_snakeinit_MC(){
 	
 
 	try {
-		fileToOpen="..\\TESTOUT\\TestSnake.plt";
+		fileToOpen="../TESTOUT/TestSnake.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
 		testSnake.snakemesh=&snakeMesh;
 		outSnake.PrintMesh(*(testSnake.snakemesh));
@@ -453,7 +453,7 @@ int Test_snakeinit_MC(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -517,10 +517,10 @@ int Test_snakeinitflat(){
 	int errTest=0;
 
 	try {
-		fileToOpen="..\\TESTOUT\\TestSnake2.plt";
+		fileToOpen="../TESTOUT/TestSnake2.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\tecout100100.dat");
+		errTest+=snakeMesh.read("../TESTOUT/tecout100100.dat");
 		snakeMesh.PrepareForUse();
 		snakeMesh.SetBorders();
 		snakeMesh.PrepareForUse();
@@ -537,7 +537,7 @@ int Test_snakeinitflat(){
 
 
 		testSnake.PrepareForUse();
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			if(testSnake.snaxs.size()>0){
 				outSnake.PrintMesh(testSnake.snakeconn,1,totT);
@@ -610,10 +610,10 @@ int Test_snakeOrderEdges(){
 	int errTest=0;
 
 	try {
-		fileToOpen="..\\TESTOUT\\TestOrderEdges.plt";
+		fileToOpen="../TESTOUT/TestOrderEdges.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh234.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh234.dat");
 		snakeMesh.HashArray();
 		snakeMesh.SetMaxIndex();
 		
@@ -645,10 +645,10 @@ int Test_MeshRefinement(){
 	int errTest=0;
 
 	try {
-		fileToOpen="..\\TESTOUT\\Test_Multimesh.plt";
+		fileToOpen="../TESTOUT/Test_Multimesh.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
 		outSnake.PrintMesh(snakeMesh);
 
@@ -772,10 +772,10 @@ int Test_RSVSalgo_init(){
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;
 	try {
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVS.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVS.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		PrepareMultiLvlSnake(snakeMesh,voluMesh2,testSnake2,dims,triRSVS2);
@@ -830,11 +830,11 @@ int Test_RSVSalgo(){
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;
 	try {
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVSstep.plt";
 		outSnake.OpenFile(fileToOpen);
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep_snake.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVSstep_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		calcObj.BuildMathArrays(1,1);
@@ -863,7 +863,7 @@ int Test_RSVSalgo(){
 		vector<int> isImpact;
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<5;++ii){
+		for(ii=0;ii<50;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -915,11 +915,11 @@ int Test_RSVSalgoflat(){
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=2;dims[2]=0;
 	try {
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVS2Dstep.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVS2Dstep.plt";
 		outSnake.OpenFile(fileToOpen);
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVS2Dstep_snake.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVS2Dstep_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh230.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh230.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 
@@ -1001,12 +1001,12 @@ int Test_snakeRSVS(){
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;
 	// try {
-		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
+		fileToOpen="../TESTOUT/TestSnakeRSVS.plt";
 		outSnake.OpenFile(fileToOpen);
-		fileToOpen="..\\TESTOUT\\TestSnakeRSVS_snake.plt";
+		fileToOpen="../TESTOUT/TestSnakeRSVS_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
 		
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 
 		outSnake.PrintMesh(*(testSnake.snakemesh));
@@ -1030,7 +1030,7 @@ int Test_snakeRSVS(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 		
-		for(ii=0;ii<100;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -1099,13 +1099,13 @@ int Test_RSVSalgo_singlevol(){
 	dims.assign(3,0);
 	dims[0]=1;dims[1]=1;dims[2]=3;
 	try {
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVSstep.plt";
 
 		outSnake.OpenFile(fileToOpen);
 
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep_snake.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVSstep_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		for(ii=0;ii<voluMesh.volus.size();++ii){
@@ -1140,7 +1140,7 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
 
-		for(ii=0;ii<10;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1167,20 +1167,20 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.PrepareForUse();
 		triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
 		FILE *fid;
-		fid = fopen("..\\TESTOUT\\triintertestbig.dat","w");
+		fid = fopen("../TESTOUT/triintertestbig.dat","w");
 		triMesh2.write(fid);//(triMesh,3,totT);
 		fclose(fid);
-		/*fid = fopen("..\\TESTOUT\\snakeconnouttri.dat","w");
+		/*fid = fopen("../TESTOUT/snakeconnouttri.dat","w");
 		triMesh3= TriarrayToMesh(triRSVS, triRSVS.dynatri);
 		// testSnake.snakeconn.write(fid);//(triMesh,3,totT);
 		triMesh3.write(fid);//(triMesh,3,totT);
 		fclose(fid);
 
-		fid = fopen("..\\TESTOUT\\snakeconnout.dat","w");		
+		fid = fopen("../TESTOUT/snakeconnout.dat","w");		
 		testSnake.snakeconn.write(fid);//(triMesh,3,totT);
 		fclose(fid);
 
-		fid = fopen("..\\TESTOUT\\stattri.dat","w");
+		fid = fopen("../TESTOUT/stattri.dat","w");
 		triMesh4= TriarrayToMesh(triRSVS, triRSVS.stattri);
 		triMesh4.write(fid);//(triMesh,3,totT);
 		fclose(fid);*/
@@ -1212,12 +1212,12 @@ int Test_snakeRSVS_singlevol(){
 	dims.assign(3,0);
 	dims[0]=1;dims[1]=1;dims[2]=1;
 	// try {
-		fileToOpen="..\\TESTOUT\\TestSnakeRSVS.plt";
+		fileToOpen="../TESTOUT/TestSnakeRSVS.plt";
 		outSnake.OpenFile(fileToOpen);
-		fileToOpen="..\\TESTOUT\\TestSnakeRSVS_snake.plt";
+		fileToOpen="../TESTOUT/TestSnakeRSVS_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
 
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh203010.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		voluMesh.volus[0].target=0.01;
@@ -1242,7 +1242,7 @@ int Test_snakeRSVS_singlevol(){
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
-		for(ii=0;ii<25;++ii){
+		for(ii=0;ii<20;++ii){
 			cout << ii << " ";
 			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
@@ -1291,10 +1291,10 @@ int Test_MeshOrient(){
 	dims.assign(3,0);
 	dims[0]=1;dims[1]=3;dims[2]=1;
 	
-		fileToOpen="..\\TESTOUT\\TestAlgoRSVSstep.plt";
+		fileToOpen="../TESTOUT/TestAlgoRSVSstep.plt";
 
 		outSnake.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("..\\TESTOUT\\mesh6612.dat");
+		errTest+=snakeMesh.read("../TESTOUT/mesh6612.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		voluMesh.volus[0].target=1;//0.05;//0.0001;
@@ -1305,7 +1305,7 @@ int Test_MeshOrient(){
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
 
-		fileToOpen = "..\\TESTOUT\\volumesh6612.dat";
+		fileToOpen = "../TESTOUT/volumesh6612.dat";
 		fid=fopen(fileToOpen,"w");
 		if(fid!=NULL){
 			voluMesh.PrepareForUse();

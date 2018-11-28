@@ -175,7 +175,7 @@ void RSVScalc::Print2Screen(int outType)const {
 		cout << endl;
 	}
 	if (outType==4){
-		const char* file="matrices\\dumpmatout.txt";
+		const char* file="matrices/dumpmatout.txt";
 		cout << "constr :" <<  endl ;	
 		PrintMatrixFile(constr,file);
 		cout << "dObj :" <<  endl ;	
