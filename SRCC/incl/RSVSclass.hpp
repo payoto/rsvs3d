@@ -11,12 +11,15 @@
 
 //=================================
 // included dependencies
+#include <iostream>
+#include <fstream>
 
 #include "mesh.hpp"
 #include "snake.hpp"
 #include "postprocessing.hpp"
 #include "parameters.hpp"
 #include "snakevel.hpp"
+#include "RSVScalc.hpp"
 
 //==================================
 // Code
@@ -32,6 +35,8 @@ namespace integrate {
 		mesh snakeMesh;
 		mesh voluMesh;
 		triangulation rsvsTri;
+		RSVScalc calcObj;
+		std::ofstream logFile;
 	};
 }
 

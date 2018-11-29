@@ -817,7 +817,7 @@ int Test_RSVSalgo(){
 	triangulation testTriangle,triRSVS;
 	vector<int> dims;
 	const char *fileToOpen;
-	tecplotfile outSnake, outSnake2;
+	tecplotfile outSnake, outSnake2; 
 	// double totT=0.0;
 	// vector<double> dt;
 	// vector<int> isImpact;
@@ -825,7 +825,7 @@ int Test_RSVSalgo(){
 	//bool errFlag;
 	int errTest=0;
 	RSVScalc calcObj;
-	
+
 
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;

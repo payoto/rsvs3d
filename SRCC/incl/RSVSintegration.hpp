@@ -22,6 +22,7 @@ namespace param {
 //=================================
 // included dependencies
 #include <vector>
+#include <fstream>
 
 // ================================
 // declarations
@@ -54,16 +55,36 @@ namespace integrate {
 			snake &rsvsSnake,
 			triangulation &rsvsTri
 			);
-		void PostProcessing(
+		void Output(
 			const param::parameters &paramconf,
 			const param::parameters &origcong,
-			tecplotfile &outSnake
+			tecplotfile &outSnake,
+			std::ofstream &logFile
 			);
 	}
 
 	namespace execute{
-		void PostProcessing();
 		void RSVSiterate();
+		void Logging();
+		void PostProcessing();
+
+		namespace logging{
+			// Log only convergence data
+			void Log();
+			// Store the Snake in a file
+			void Snake();
+			// Store All the available information
+			void FullTecplot();
+		}
+
+		namespace postprocess{
+			// Log only convergence data
+			void Log();
+			// Log 
+			void Snake();
+			void FullTecplot();
+			// Final
+		}
 	}
 
 	namespace test {
