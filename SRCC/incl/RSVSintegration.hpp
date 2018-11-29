@@ -59,7 +59,9 @@ namespace integrate {
 			const param::parameters &paramconf,
 			const param::parameters &origcong,
 			tecplotfile &outSnake,
-			std::ofstream &logFile
+			std::ofstream &logFile,
+			std::ofstream &coutFile,
+			std::ofstream &cerrFile
 			);
 	}
 

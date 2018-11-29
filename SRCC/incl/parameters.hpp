@@ -120,6 +120,9 @@ namespace param {
 		std::string outdir;
 		std::string pattern;
 
+		bool redirectcout;
+		bool redirectcerr;
+
 		ioout();
 		void PrepareForUse();
 	};

@@ -173,6 +173,8 @@ param::ioout::ioout(){
 	this->outdir="";
 	this->pattern="";
 
+	this->redirectcout=false;
+	this->redirectcerr=false;
 
 }
 void param::ioout::PrepareForUse(){
@@ -207,6 +209,8 @@ void param::to_json(json& j, const ioout& p){
 		{"basenameoutdir", p.basenameoutdir},
 		{"outdir", p.outdir},
 		{"pattern", p.pattern},
+		{"redirectcout", p.redirectcout},
+		{"pattern", p.pattern},
 	};
 }
 void param::from_json(const json& j, ioout& p){
@@ -216,6 +220,8 @@ void param::from_json(const json& j, ioout& p){
 	j.at("basenameoutdir").get_to(p.basenameoutdir);
 	j.at("outdir").get_to(p.outdir);
 	j.at("pattern").get_to(p.pattern);
+	j.at("redirectcout").get_to(p.redirectcout);
+	j.at("redirectcerr").get_to(p.redirectcerr);
 }
 
 param::files::files(){

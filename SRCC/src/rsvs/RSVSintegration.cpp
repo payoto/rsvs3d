@@ -284,7 +284,8 @@ void integrate::Prepare(integrate::RSVSclass RSVSobj){
 	integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.snakeMesh, RSVSobj.voluMesh);
 	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.snakeMesh, RSVSobj.rsvsSnake);
 	integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
-	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.logFile);
+	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.logFile,
+		RSVSobj.coutFile, RSVSobj.cerrFile);
 }
 
 void integrate::prepare::Mesh(
@@ -366,7 +367,9 @@ void integrate::prepare::Output(
 	const param::parameters &paramconf,
 	const param::parameters &origconf,
 	tecplotfile &outSnake,
-	std::ofstream &logFile
+	std::ofstream &logFile,
+	std::ofstream &coutFile,
+	std::ofstream &cerrFile
 	){
 	std::string outSnakeName;
 	
@@ -387,7 +390,22 @@ void integrate::prepare::Output(
 	outSnakeName =  paramconf.files.ioout.outdir + "/";
 	outSnakeName += "convergence_" + paramconf.files.ioout.pattern + ".log";
 	logFile.open(outSnakeName);
-	// option for a cout and cerr file by using a redirection option?
+
+	if (paramconf.files.ioout.redirectcout){
+		// auto ;
+		outSnakeName =  paramconf.files.ioout.outdir + "/";
+		outSnakeName += "cout_" + paramconf.files.ioout.pattern + ".txt";
+		coutFile.open(outSnakeName);
+		std::cout.rdbuf(coutFile.rdbuf());
+	}
+	if (paramconf.files.ioout.redirectcerr){
+		// auto ;
+		outSnakeName =  paramconf.files.ioout.outdir + "/";
+		outSnakeName += "cerr_" + paramconf.files.ioout.pattern + ".txt";
+		cerrFile.open(outSnakeName);
+		std::cerr.rdbuf(cerrFile.rdbuf());
+	}
+
 }
 
 
@@ -422,6 +440,8 @@ int integrate::test::Prepare(){
 	triangulation rsvsTri;
 	tecplotfile outSnake;
 	std::ofstream logFile;
+	std::ofstream coutFile;
+	std::ofstream cerrFile;
 
 	origconf = paramconf;
 	paramconf.PrepareForUse();
@@ -450,7 +470,8 @@ int integrate::test::Prepare(){
 	} 
 
 	try {
-		integrate::prepare::Output(paramconf, origconf, outSnake,logFile);
+		integrate::prepare::Output(paramconf, origconf, outSnake,logFile,
+			coutFile, cerrFile);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Output" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 

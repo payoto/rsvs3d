@@ -37,6 +37,8 @@ namespace integrate {
 		triangulation rsvsTri;
 		RSVScalc calcObj;
 		std::ofstream logFile;
+		std::ofstream coutFile;
+		std::ofstream cerrFile;
 	};
 }
 
