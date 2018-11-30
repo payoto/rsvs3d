@@ -11,8 +11,9 @@ LINK=g++
 #                 DIRECTORIES and INCLUDES
 #------------------------------------------------------
 # Executable name
-EXECUTABLE=main
-TESTEXECUTABLE=main_test
+MAINEXECUTABLE=RSVS3D
+TESTEXECUTABLE=test_RSVS3D
+TESTALLEXECUTABLE=testall_RSVS3D
 
 # source, object and dependency directories
 OBJDIR = obj
@@ -20,6 +21,10 @@ SRCTREE = src/
 DEPDIR := .d
 BINDIR =
 INCLDIR= "incl"
+
+# Sources which contain the main function for all and test
+MAINALLSRC = src/main.cpp
+MAINTESTSRC = src/test/test.cpp
 
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
@@ -33,7 +38,7 @@ DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 # -isystem$(DIRMKL)
 INCL= 
 
-INCLDIR+= $(DIREIGEN) $(DIRJSON) 
+INCLDIR+= $(DIREIGEN) $(DIRJSON) $(DIRCXXOPTS)
 INCLDIRSYS = $(DIRBOOST)
 
 #------------------------------------------------------
@@ -104,6 +109,8 @@ POSTCOMPILE = @mv -f $(DEPDIR)/$(notdir $*).Td $(DEPDIR)/$(notdir $*).d && touch
 #------------------------------------------------------
 #            PARSE FILES and FOLDERS BEFORE RECIPES
 #------------------------------------------------------
+# Each target requires to choose between main and test.cpp
+# and therefore needs its own build statement
 # Define a recursive wildcard function, to find sources:
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
@@ -111,40 +118,42 @@ rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 $(shell mkdir -p $(OBJDIR) >/dev/null)
 # Object definitions
-TESTSOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
 SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
-# testall handling
-ifeq ($(MAKECMDGOALS),testall)
-TESTSOURCES+= $(TESTALLSOURCES)
-endif
-OBJECTS=$(addprefix $(OBJDIR),$(SOURCES:.cpp=.o))
-TESTOBJECTS=$(addprefix $(OBJDIR)/,$(TESTSOURCES:.cpp=.o))
 
-# Handling dependency include:
-ifeq ($(MAKECMDGOALS),testall)
-SRCS = $(TESTALLSOURCES) $(TESTSOURCES)
+# Handling target differences
+ifeq ($(MAKECMDGOALS), )
+SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
+EXECUTABLE = $(MAINEXECUTABLE)
 endif
-ifeq ($(MAKECMDGOALS),testnew)
-SRCS =  $(TESTSOURCES)
-endif
-ifeq ($(MAKECMDGOALS),testall)
-SRCS = $(SOURCES)
+ifeq ($(MAKECMDGOALS), all)
+SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
+EXECUTABLE = $(MAINEXECUTABLE)
 endif
 
+ifeq ($(MAKECMDGOALS), testnew)
+SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
+EXECUTABLE = $(TESTEXECUTABLE)
+endif
+
+ifeq ($(MAKECMDGOALS), testall)
+SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
+EXECUTABLE = $(TESTALLEXECUTABLE)
+endif
+
+# Define objects from sources
+OBJECTS=$(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
 #------------------------------------------------------
 #             RECIPES
 #------------------------------------------------------
 
 # TARGETS
-all : $(SOURCES) $(EXECUTABLE)  
-testnew : $(TESTSOURCES) $(TESTEXECUTABLE) 
-testall : $(TESTSOURCES) $(TESTALLSOURCES) $(TESTEXECUTABLE) 
+all : $(SRCS) $(EXECUTABLE)  
+testnew : $(SRCS) $(EXECUTABLE) 
+testall : $(SRCS) $(EXECUTABLE) 
   
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(OBJECTS) 
 	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
-$(TESTEXECUTABLE) : $(TESTOBJECTS) 
-	$(LINK)  $(TESTOBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
 # into OBJDIR
