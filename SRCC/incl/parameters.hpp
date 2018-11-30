@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <array>
 #include <string>
+#include <vector>
 #include <ctime>
 
 //=================================
@@ -160,9 +161,12 @@ namespace param {
 		void readflat(const std::string &fileName, parameters &p);
 		void write(const std::string &fileName, const parameters &p);
 		void writeflat(const std::string &fileName, const parameters &p);
+		int updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
+			parameters &p, const std::string&& sep=std::string(":"));
 
 		void defaultconf();
 	}
+
 	namespace test {
 
 		int base();
@@ -170,6 +174,7 @@ namespace param {
 		int ioflat();
 		int ipartialread();
 		int prepareforuse();
+		int autoflat();
 	}
 }
 

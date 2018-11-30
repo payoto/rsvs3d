@@ -322,9 +322,25 @@ void param::io::read(const std::string &fileName, parameters &p){
 	json j, j_fin;
 
 	file.open(fileName);
+	if (!file.is_open()){
+		std::string errstr;
+		errstr = "Parameter file failed to open ";
+		errstr += "in " ;
+		errstr +=__PRETTY_FUNCTION__  ;
+		errstr += " \n:  " + fileName;
+		throw std::invalid_argument(errstr.c_str());
+	}
+
 	j_fin = p; 
 	file >> j;
 	file.close();
+
+	try{
+		j = j.unflatten();
+	} catch (std::exception const& ex) {
+		// if j is already not flat catch the exception and move on
+		// TODO check the correct exception is being thrown (one day)
+	}
 
 	// Insert values read into the parameter structure
 	param::flatupdate(j_fin,j,false, false);
@@ -337,6 +353,15 @@ void param::io::write(const std::string &fileName, const parameters &p){
 	json j;
 
 	file.open(fileName);
+	file.open(fileName);
+	if (!file.is_open()){
+		std::string errstr;
+		errstr = "Parameter file failed to open ";
+		errstr += "in " ;
+		errstr +=__PRETTY_FUNCTION__  ;
+		errstr += " \n:  " + fileName;
+		throw std::invalid_argument(errstr.c_str());
+	}
 
 	j = p; 
 	file << j.dump(2);
@@ -348,6 +373,16 @@ void param::io::readflat(const std::string &fileName, parameters &p){
 	json jnew, jfin;
 
 	file.open(fileName);
+	file.open(fileName);
+	if (!file.is_open()){
+		std::string errstr;
+		errstr = "Parameter file failed to open ";
+		errstr += "in " ;
+		errstr +=__PRETTY_FUNCTION__  ;
+		errstr += " \n:  " + fileName;
+		throw std::invalid_argument(errstr.c_str());
+	}
+
 	jfin = p; 
 	// std::cout << "jfin assigned " << std::endl;
 	file >> jnew;
@@ -361,6 +396,15 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 	json j;
 
 	file.open(fileName);
+	file.open(fileName);
+	if (!file.is_open()){
+		std::string errstr;
+		errstr = "Parameter file failed to open ";
+		errstr += "in " ;
+		errstr +=__PRETTY_FUNCTION__  ;
+		errstr += " \n:  " + fileName;
+		throw std::invalid_argument(errstr.c_str());
+	}
 
 	j = p; 
 	file << j.flatten().dump(2);
@@ -368,13 +412,68 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 }
 void param::io::defaultconf(){
 	param::parameters params;
-	std::string fileName="config/defaultconf.json";
-	std::string fileNameFlat="config/defaultconfflat.json";
+	std::string fileName("config/defaultconf.json");
+	std::string fileNameFlat("config/defaultconfflat.json");
 
 	param::io::write(fileName, params);
 	param::io::writeflat(fileNameFlat, params);
 
 }
+
+int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
+	parameters &p, const std::string&& sep){
+	/*Parses json key value pairs returning the number of failures.*/
+	int numFail=0;
+	json j = p;
+	std::size_t pos;
+	std::string key, val;
+	j=j.flatten();
+
+	for (auto keyVal : flatjsonKeyVal){
+		pos = keyVal.find(sep);
+		if(pos==std::string::npos){ // if separator was found
+			std::cerr << "Warning in: " << std::endl << "  "
+				 << __PRETTY_FUNCTION__ << std::endl;
+			std::cerr << "  Separator " << sep << " Was not found in JSON key/val: " 
+				<< keyVal << std::endl << std::endl;
+			++numFail;
+			continue;
+		}
+		// split the string and parse it
+		key = keyVal.substr(0, pos);
+		val = keyVal.substr(pos+1);
+		if(j[key]==nullptr){
+			std::cerr << "Warning in: " << std::endl << "  "
+				 << __PRETTY_FUNCTION__ << std::endl;
+			std::cerr << "  key " << key << " Was not found in JSON object " 
+				<< std::endl << "  The following keyval will not be used: "
+				<<  keyVal << std::endl << std::endl;
+			++numFail;
+			continue;
+		}
+
+		if (!j[key].is_number() && !j[key].is_string()){
+			std::cerr << "Warning in: " << std::endl << "  "
+				 << __PRETTY_FUNCTION__ << std::endl;
+			std::cerr << "  Value of j[" << key << "] is neither a string or number, " 
+				<< " parsing not supported." << std::endl << std::endl;
+			++numFail;
+			continue;
+		}
+
+		if(j[key].is_string()){
+			j[key]=val;
+		} else if (j[key].is_number_integer()){
+			j[key]=std::stoi(val);
+		} else if (j[key].is_number_float()){
+			j[key]=std::stod(val);
+		}
+	}
+	j=j.unflatten();
+	p = j;
+	return(numFail);
+}
+
 //================================
 // Tests
 //================================
@@ -501,6 +600,34 @@ int param::test::prepareforuse(){
 	} else {
 		std::cout << "Partial read succesful, outputs are different" << std::endl;
 	}
+
+	return(0);
+}
+
+
+int param::test::autoflat(){
+	param::parameters params, params2;
+
+	json j1, j2;
+	
+	j1 = params;
+	j2 = params2;
+
+	j1 = j1.flatten();
+	std::cout << "Dump j1 flattened" << std::endl << j1.dump(1);
+	j1 = j1.flatten();
+	std::cout << "Dump j1 flattened twice" << std::endl << j1.dump(1);
+
+	try{
+		j2 = j2.unflatten();
+		std::cout << "Dump j2 unflattened" << std::endl << j2.dump(1);
+	} catch (std::exception const& ex) {
+		std::cout << "Cannot be unflattened and throws exception" << std::endl;
+		std::cout << ex.what() << std::endl;
+
+		std::cout << "Dump j2 unflattened" << std::endl << j2.dump(1);
+	}
+
 
 	return(0);
 }
