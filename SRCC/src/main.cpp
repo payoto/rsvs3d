@@ -5,6 +5,7 @@
 #include "cxxopts.hpp"
 #include "parameters.hpp"
 #include "RSVSclass.hpp"
+#include "RSVSintegration.hpp"
 
 int main(int argc, char* argv[]){
 	int execFlow=0;
@@ -13,17 +14,31 @@ int main(int argc, char* argv[]){
 	execFlow = parse::CommandLineParser(argc, argv, paramconf);
 	if (execFlow>0){
 		integrate::RSVSclass RSVSobj;
+		RSVSobj.paramconf = paramconf;
+
+		integrate::execute::All(RSVSobj);
+
 	} else {
 		// Output parameter file to the directory (NO OVERWRITE?)
-
-		if (execFlow==-2){
-			cerr << "Error while parsing the arguments. Check generated"
-				"  'conf.json' file";
-				exit(-2);
-		}
+		NoExecution(execFlow, paramconf);
 	}
 }
 
+void NoExecution(int execFlow, param::parameters &paramconf){
+	std::string nameConfOut("noexec_rsvsconfig.json");
+
+	if (execFlow==-2){
+		nameConfOut="failexec_rsvsconfig.json";
+	}
+
+	param::io::writeflat(nameConfOut, paramconf);
+
+	if (execFlow==-2){
+		cerr << "Error while parsing the arguments. Check generated"
+			"  'conf.json' file";
+			exit(-2);
+	}
+}
 
 int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramconf){
 	/*
@@ -136,21 +151,18 @@ int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramcon
 	return(execFlow);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void parse::config::useconfig(const std::string &confCase,
 	param::parameters &paramconf){
 
 	std::cerr << "No predefined cases yet." << std::endl;
 
 }
+#pragma GCC diagnostic pop
 void parse::config::loadconfig(const std::string &confCase,
 	param::parameters &paramconf){
 
 	param::io::read(confCase, paramconf);
-
-}
-void parse::config::param(const std::string &confCase,
-	param::parameters &paramconf){
-
-	std::cerr << "No predefined cases yet." << std::endl;
 
 }

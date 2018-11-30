@@ -353,7 +353,7 @@ void param::io::write(const std::string &fileName, const parameters &p){
 	json j;
 
 	file.open(fileName);
-	file.open(fileName);
+
 	if (!file.is_open()){
 		std::string errstr;
 		errstr = "Parameter file failed to open ";
@@ -365,6 +365,7 @@ void param::io::write(const std::string &fileName, const parameters &p){
 
 	j = p; 
 	file << j.dump(2);
+	file.flush();
 	file.close();
 }
 
@@ -373,7 +374,7 @@ void param::io::readflat(const std::string &fileName, parameters &p){
 	json jnew, jfin;
 
 	file.open(fileName);
-	file.open(fileName);
+
 	if (!file.is_open()){
 		std::string errstr;
 		errstr = "Parameter file failed to open ";
@@ -396,7 +397,7 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 	json j;
 
 	file.open(fileName);
-	file.open(fileName);
+
 	if (!file.is_open()){
 		std::string errstr;
 		errstr = "Parameter file failed to open ";
@@ -408,6 +409,7 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 
 	j = p; 
 	file << j.flatten().dump(2);
+	file.flush();
 	file.close();
 }
 void param::io::defaultconf(){

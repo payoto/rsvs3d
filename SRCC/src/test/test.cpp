@@ -21,14 +21,12 @@
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
 #include "RSVSalgorithm.hpp"
-#include "RSVSintegration.hpp"
 #endif //TEST_ALL
+#include "RSVSintegration.hpp"
 #include "parameters.hpp"
 
 int main(){
 	customtest gridTest;
-
-
 
 	#ifdef TEST_ALL
 	// BASE templatess
@@ -65,12 +63,12 @@ int main(){
 	gridTest.Run(param::test::io,"parameter read write");
 	gridTest.Run(param::test::ioflat,"parameter read write flat format");
 	gridTest.Run(param::test::ipartialread,"parameter partial read write flat format");
+	gridTest.Run(param::test::autoflat,"Algorithm for automatic determination of flat json");
 	// RSVS and integration tests
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
-	gridTest.Run(integrate::test::All,"Test full integration");
 	#endif //TEST_ALL
+	gridTest.Run(integrate::test::All,"Test full integration");
 	
-	gridTest.Run(param::test::autoflat,"Algorithm for automatic determination of flat json");
 	
 	gridTest.PrintSummary();
 

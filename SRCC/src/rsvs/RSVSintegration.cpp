@@ -414,6 +414,23 @@ void integrate::prepare::Output(
 // 		execute
 // ====================
 
+void integrate::execute::All(integrate::RSVSclass &RSVSobj){
+
+
+	auto coutbuff=std::cout.rdbuf();
+	auto cerrbuff=std::cout.rdbuf();
+
+	integrate::Prepare(RSVSobj);
+	auto iterateInfo=integrate::execute::RSVSiterate(RSVSobj);
+
+	integrate::execute::PostProcessing(RSVSobj,
+		iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
+	std::cout.rdbuf(coutbuff);
+	std::cerr.rdbuf(cerrbuff);
+	// std::cout << std::endl <<  " cout Buffer restored" << std::endl;
+	// std::cerr << " cerr Buffer restored" << std::endl;
+}
+
 integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &RSVSobj){
 
 	vector<double> dt;

@@ -54,11 +54,12 @@ CCPSTD=c++11
 # gdb (debug) flags: # -g -ggdb 
 # boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
+# -funroll-all-loops -ffast-math -ffinite-math-only 
 # cxxopts #
-CCFLAGDBG= -g -ggdb 
-CCFLAGPROJ= -DTIME_EXEC -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
+CCFLAGDBG= 
+CCFLAGPROJ= -DTIME_EXEC
 CCFLAGBOOST=
-CCFLAGEIG= 
+CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG)
 # Flags to add when the target is "testall"
@@ -87,6 +88,7 @@ LDFILE += $(LDFILEBOOSTWITHVERSION)
 #            PARSE FLAGS BEFORE RECIPES
 #------------------------------------------------------
 
+LDFLAGS = 
 
 # Compile list of flags
 CFLAGS=-c -std=$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) $(CCFLAGCUSTOM)
@@ -99,7 +101,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$(notdir $*).Td
 INCL+=$(addprefix -I,$(INCLDIR))
 INCL+=$(addprefix -isystem,$(INCLDIRSYS))
 # Parse libraries
-LDFLAGS=$(addprefix -L,$(LDDIR))
+LDFLAGS+=$(addprefix -L,$(LDDIR))
 LDFLAGS+=$(addprefix -l,$(LDFILE))
 # Compilation command
 COMPILECPP=$(CC) $(DEPFLAGS) $(CFLAGS) $(INCL)

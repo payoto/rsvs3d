@@ -34,8 +34,6 @@ bool RSVScalc::PrepareMatricesForSQP(
 	VectorXd &lagMultAct
 	){
 
-	
-
 	int ii, jj, nDvAct, nConstrAct;
 
 	subDvAct.reserve(nDv);
@@ -129,7 +127,7 @@ void RSVScalc::ComputeSQPstep(
 	VectorXd  deltaDVAct;
 	bool isNan, isLarge;
 	int ii, ni;
-	cout << calcMethod << endl;
+
 	switch(calcMethod){
 		case 1:
 			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
