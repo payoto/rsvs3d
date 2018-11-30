@@ -28,6 +28,7 @@ DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
 DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
 DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
+DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 
 # -isystem$(DIRMKL)
 INCL= 
@@ -48,6 +49,7 @@ CCPSTD=c++11
 # gdb (debug) flags: # -g -ggdb 
 # boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
+# cxxopts #
 CCFLAGDBG= -g -ggdb 
 CCFLAGPROJ= -DTIME_EXEC -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CCFLAGBOOST=

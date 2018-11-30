@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <boost/filesystem.hpp>
+#include<tuple>
 
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
@@ -266,7 +267,7 @@ int TimeStamp(const char* str,int start_s){
 // 		prepare
 // ====================
 
-void integrate::Prepare(integrate::RSVSclass RSVSobj){
+void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	// likely inputs (now in RSVSclass)
 	// param::parameters paramconf;
 	// mesh snakeMesh;
@@ -413,12 +414,13 @@ void integrate::prepare::Output(
 // 		execute
 // ====================
 
-void integrate::execute::RSVSiterate(RSVSclass &RSVSobj){
+integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &RSVSobj){
 
 	vector<double> dt;
 	vector<int> isImpact;
 	int stepNum, maxStep, nVoluZone;
 	double totT=0;
+
 	auto start_s=clock();
 	// for n Steps
 
@@ -458,10 +460,11 @@ void integrate::execute::RSVSiterate(RSVSclass &RSVSobj){
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" triangulate:", start_s);
 	}
-
+	integrate::iteratereturns retStruct(nVoluZone,stepNum, totT);
+	return(retStruct);
 }
 
-void integrate::execute::Logging(RSVSclass &RSVSobj,
+void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 	// Simple function which directs to the correct output
 
@@ -490,7 +493,7 @@ void integrate::execute::Logging(RSVSclass &RSVSobj,
 	}
 }
 
-void integrate::execute::PostProcessing(RSVSclass &RSVSobj,
+void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 
 	if (0 < RSVSobj.paramconf.files.ioout.outputlvl){
@@ -622,7 +625,7 @@ void integrate::execute::postprocess::Snake(
 	rsvsSnake.snakeconn.write(fileToOpen.c_str());
 
 	fileToOpen=paramconf.files.ioout.outdir + "/";
-	fileToOpen += "Snake_" + paramconf.files.ioout.pattern + ".snk";
+	fileToOpen += "Snake_" + paramconf.files.ioout.pattern + ".3snk";
 	rsvsSnake.write(fileToOpen.c_str());
 
 }
@@ -689,4 +692,22 @@ int integrate::test::Prepare(){
 
 
 	return(0);
+}
+
+int integrate::test::All(){
+
+	integrate::RSVSclass RSVSobj;
+	auto coutbuff=std::cout.rdbuf();
+	auto cerrbuff=std::cout.rdbuf();
+
+	integrate::Prepare(RSVSobj);
+	auto iterateInfo=integrate::execute::RSVSiterate(RSVSobj);
+
+	integrate::execute::PostProcessing(RSVSobj,
+		iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
+	std::cout.rdbuf(coutbuff);
+	std::cerr.rdbuf(cerrbuff);
+	std::cout << std::endl <<  " cout Buffer restored" << std::endl;
+	std::cerr << " cerr Buffer restored" << std::endl;
+	return 0;
 }

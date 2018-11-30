@@ -266,7 +266,7 @@ int snake::read(const char *str) {
 }
 int snake::write(const char *str) const {
 	FILE *fid;
-	fopen_s(&fid, str, "r");
+	fopen_s(&fid, str, "w");
 	if (fid!=NULL){
 		this->write(fid);
 		fclose(fid);

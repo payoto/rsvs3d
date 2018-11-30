@@ -24,6 +24,7 @@ namespace param {
 // included dependencies
 #include <vector>
 #include <fstream>
+#include <tuple>
 
 // ================================
 // declarations
@@ -40,7 +41,21 @@ int TimeStamp(const char* str,int start_s);
 
 
 namespace integrate {
-	void Prepare(RSVSclass RSVSobj);
+	class iteratereturns {
+	public:
+		int nVoluZone=0;
+		int stepNum=0;
+		double timeT=0.0;
+
+		iteratereturns(int n, int s, double t){
+			this->nVoluZone=n;
+			this->stepNum=s;
+			this->timeT=t;
+		}
+
+	};
+
+	void Prepare(RSVSclass &RSVSobj);
 	namespace prepare {
 		void Mesh(
 			const param::grid &gridconf,
@@ -68,7 +83,9 @@ namespace integrate {
 	}
 
 	namespace execute{
-		void RSVSiterate(RSVSclass &RSVSobj);
+
+
+		iteratereturns RSVSiterate(RSVSclass &RSVSobj);
 		void Logging(RSVSclass &RSVSobj,
 			double totT, int nVoluZone, int stepNum);
 		void PostProcessing(RSVSclass &RSVSobj,
@@ -115,6 +132,7 @@ namespace integrate {
 
 	namespace test {
 		int Prepare();
+		int All();
 	}
 }
 

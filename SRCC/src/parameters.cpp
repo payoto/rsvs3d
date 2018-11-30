@@ -219,7 +219,7 @@ void param::to_json(json& j, const ioout& p){
 		{"outdir", p.outdir},
 		{"pattern", p.pattern},
 		{"redirectcout", p.redirectcout},
-		{"pattern", p.pattern},
+		{"redirectcerr", p.redirectcerr},
 		{"logginglvl", p.logginglvl},
 		{"outputlvl", p.outputlvl},
 	};
