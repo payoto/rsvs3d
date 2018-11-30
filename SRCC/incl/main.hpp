@@ -8,6 +8,10 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
+namespace param {
+	class parameters;
+}
+
 //=================================
 // included dependencies
 
@@ -20,6 +24,6 @@
 //
 // Substructure names are all 4-5 letters
 
-void CommandLineParser(int argc, char* argv[]);
+int CommandLineParser(int argc, char* argv[], param::parameters &paramconf);
 
 #endif
