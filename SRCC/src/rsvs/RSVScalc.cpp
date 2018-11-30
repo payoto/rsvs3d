@@ -289,4 +289,47 @@ void RSVScalc::BuildDVMap(const vector<int> &vecin){
 	dvMap.GenerateHash();
 }
 
+void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
+	/*
+	takes in a stream and a log lvl (which defaults to the highest available)
+	*/
+	// format stream  (in preparation)
+	
+	// residual and delta are summary with:
+	// mean median max min std
+	if (loglvl>0){
+		out << "> constraint residual :, ";
+		StreamStatistics(abs(this->constr.array()-this->constrTarg.array()),
+			out, string(", "));
+		out << "> constraint delta :, ";
+		StreamStatistics((this->constr.array()-this->constrTarg.array()),
+			out, string(", "));
+		out << "> objective residual :, ";
+		StreamStatistics(abs(this->deltaDV.array()),
+			out, string(", "));
+		out << "> objective delta :, ";
+		StreamStatistics(this->deltaDV.array(),
+			out, string(", "));
+	}
+	// Same as res but with all the constraint values
+	if (loglvl>1){
+		out << "> constraint residuals :, ";
+		StreamOutVector(abs(this->constr.array()-this->constrTarg.array()),
+			out, string(", "));
 
+		out << "> volume values :, ";
+		StreamOutVector(this->constr.array(),
+			out, string(", "));
+	
+		out << "> constraint deltas :, ";
+		StreamOutVector((this->constr.array()-this->constrTarg.array()),
+			out, string(", "));
+	}
+	if (loglvl>2){
+		out << "> snaxel velocity :, ";
+		StreamOutVector(move(deltaDV),
+			out, string(", "));
+	}
+
+
+}

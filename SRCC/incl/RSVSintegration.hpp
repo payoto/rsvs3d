@@ -13,6 +13,7 @@ class triangulation;
 class snake;
 class mesh;
 class tecplotfile;
+class RSVScalc;
 namespace param {
 	class grid;
 	class snaking;
@@ -30,7 +31,8 @@ namespace param {
 using namespace std; 
 
 
-void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact);
+void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact,
+	double impactAlmostRange=0.2);
 void SnakeConnectivityUpdate_2D(snake &testSnake,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact);
@@ -66,26 +68,48 @@ namespace integrate {
 	}
 
 	namespace execute{
-		void RSVSiterate();
-		void Logging();
-		void PostProcessing();
+		void RSVSiterate(RSVSclass &RSVSobj);
+		void Logging(RSVSclass &RSVSobj,
+			double totT, int nVoluZone, int stepNum);
+		void PostProcessing(RSVSclass &RSVSobj,
+			double totT, int nVoluZone, int stepNum);
 
 		namespace logging{
 			// Log only convergence data
-			void Log();
+			void Log(
+				std::ofstream &logFile,
+				RSVScalc &calcObj,
+				int loglvl);
 			// Store the Snake in a file
-			void Snake();
+			void Snake(
+				tecplotfile &outSnake,
+				snake &rsvsSnake,
+				mesh &voluMesh,
+				double totT, int nVoluZone);
 			// Store All the available information
-			void FullTecplot();
+			void FullTecplot(
+				tecplotfile &outSnake, snake &rsvsSnake,
+				triangulation &rsvsTri, mesh &voluMesh,
+				double totT, int nVoluZone, int stepNum);
 		}
 
 		namespace postprocess{
 			// Log only convergence data
-			void Log();
-			// Log 
-			void Snake();
-			void FullTecplot();
-			// Final
+			// Log only convergence data
+			void Log(
+				std::ofstream &logFile,
+				RSVScalc &calcObj,
+				int loglvl);
+			// Store the Snake in a file
+			void Snake(
+				tecplotfile &outSnake, snake &rsvsSnake,
+				mesh &voluMesh, double totT, int nVoluZone,
+				param::parameters &paramconf);
+			// Store All the available information
+			void FullTecplot(
+				tecplotfile &outSnake, snake &rsvsSnake,
+				triangulation &rsvsTri, mesh &voluMesh,
+				double totT, int nVoluZone, int stepNum);
 		}
 	}
 

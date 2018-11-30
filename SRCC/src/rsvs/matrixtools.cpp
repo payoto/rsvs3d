@@ -3,6 +3,7 @@
 #include <fstream>
 #include <Eigen>
 #include "vectorarray.hpp"
+// #include "matrixtools.hpp"
 
 using namespace std;
 using namespace Eigen; 
@@ -80,7 +81,7 @@ void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,
 
 }
 
-void PrintMatrix(const MatrixXd mat){
+void PrintMatrix(const MatrixXd &mat){
 	int ii,jj, ni, nj;
 
 	ni=mat.rows();
@@ -92,7 +93,7 @@ void PrintMatrix(const MatrixXd mat){
 		cout << endl;
 	}
 }
-void PrintMatrixFile(const MatrixXd mat, const char * name){
+void PrintMatrixFile(const MatrixXd &mat, const char * name){
 	int ii,jj, ni, nj;
 	ofstream myfile;
 	ni=mat.rows();
@@ -109,7 +110,7 @@ void PrintMatrixFile(const MatrixXd mat, const char * name){
 
 }
 
-void PrintMatrix(const VectorXd mat){
+void PrintMatrix(const VectorXd &mat){
 	int ii, ni;
 
 	ni=mat.size();
@@ -118,7 +119,7 @@ void PrintMatrix(const VectorXd mat){
 		cout << endl;
 	}
 }
-void PrintMatrix(const RowVectorXd mat){
+void PrintMatrix(const RowVectorXd &mat){
 	int ii, ni;
 
 	ni=mat.size();
@@ -128,3 +129,31 @@ void PrintMatrix(const RowVectorXd mat){
 	}
 	cout << endl;
 }
+
+void StreamStatistics(const VectorXd &&vec, ofstream &out, const string &&sep){
+	/*
+	Uses a rvalue reference to allow operations to be passed 
+	directly in the statistics
+	*/
+	out << vec.norm() << sep;
+	out << vec.mean() << sep;
+	out << sqrt((vec.array() - vec.mean()).square().sum()/(vec.size()-1))<< sep;
+	out << vec.maxCoeff() << sep;
+	out << vec.minCoeff() << sep;
+	out << endl;
+}
+
+
+void StreamOutVector(const VectorXd &&vec, ofstream &out, const string &&sep){
+	/*
+	Uses a rvalue reference to allow operations to be passed 
+	directly in the statistics
+	*/
+	int i, n;
+	n = vec.size();
+	for(i = 0; i<n; ++i){
+		out << vec[i] << sep;
+	}
+	out << endl;
+}
+

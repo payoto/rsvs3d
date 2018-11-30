@@ -55,6 +55,10 @@ namespace param {
 		// Distance along edge at which converging snaxels are
 		// considered arrived
 		double multiarrivaltolerance;
+		// maximum snake time step length
+		double snaxtimestep;
+		// maximum snaxel distance movement
+		double snaxdiststep;
 		// Initialisation boundary (either 0 or 1)
 		int initboundary;
 		// maximum number of steps
@@ -122,6 +126,9 @@ namespace param {
 
 		bool redirectcout;
 		bool redirectcerr;
+
+		int logginglvl;
+		int outputlvl;
 
 		ioout();
 		void PrepareForUse();

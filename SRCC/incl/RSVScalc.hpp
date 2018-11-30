@@ -11,6 +11,7 @@
 //=================================
 // included dependencies
 #include <iostream>
+#include <fstream>
 #include <vector> 
 #include "vectorarray.hpp" 
 #include "RSVSmath.hpp"
@@ -85,7 +86,7 @@ public :
 	int numConstr(){return(this->nConstr);}
 	// Output functions
 	void Print2Screen(int outType=0)const;
-	void ConvergenceLog(ostream out);
+	void ConvergenceLog(ofstream &out, int loglvl=3) const;
 };
 
 //==================================

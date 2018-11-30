@@ -133,6 +133,11 @@ public:
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
 	bool ReturnFlip()const{return(isFlipped);}
+	// io of snake
+	void read(FILE *fid);
+	void write(FILE *fid) const;
+	int read(const char *str);
+	int write(const char *str) const;
 
 };
 

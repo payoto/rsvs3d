@@ -67,6 +67,7 @@ void snaxsurf::PrepareForUse() {
 	normvector.PrepareForUse();
 }
 
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void snax::disptree(const mesh &meshin, int n) const{
@@ -232,6 +233,48 @@ void snake::displight() const{
 
 	cout << "Snaking Mesh with  ";
 	snakemesh->displight();
+}
+
+void snake::read(FILE *fid){
+	snaxs.read(fid);
+	snaxedges.read(fid);
+	snaxsurfs.read(fid);
+
+	snakeconn.read(fid);
+	
+}
+void snake::write(FILE *fid) const {
+   //fprintf(fid,"%i \n",int(borderIsSet));
+	snaxs.write(fid);
+	snaxedges.write(fid);
+	snaxsurfs.write(fid);
+
+	snakeconn.write(fid);
+}
+int snake::read(const char *str) {
+   // Convenience read function taking a single char argument
+	FILE *fid;
+	fopen_s(&fid, str, "r");
+	if (fid!=NULL){
+		this->read(fid);
+		fclose(fid);
+	} else {
+		cout << "File " << str << "Could not be opened to read" << endl;
+		return(1);
+	}
+	return(0);
+}
+int snake::write(const char *str) const {
+	FILE *fid;
+	fopen_s(&fid, str, "r");
+	if (fid!=NULL){
+		this->write(fid);
+		fclose(fid);
+	} else {
+		cout << "File " << str << "Could not be opened to write" << endl;
+		return(1);
+	}
+	return(0);
 }
 
 bool snake::isready() const{
@@ -940,7 +983,7 @@ double SnaxImpactDt(const snax &snax1,const snax &snax2){
 
 
 void snake::SnaxImpactDetection(vector<int> &isImpact){
-
+	// TODO make an approximate arrival 
 	int nSnax,ii,nEdge;
 	vector<bool> isSnaxDone;
 
@@ -1023,7 +1066,8 @@ void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
 			}
 		}
 	}
-
+	// TODO: Need to add a check for the order of the snaxel on the edge.
+	// if it is not 1 or the largest this action will cause crossovers. 
 	for (i = 0; i < nVerts; ++i){
 		if(vertSnaxCloseCnt[i]>=2){
 			isImpact.push_back(snaxs(vertSnaxMinInd[i])->index);

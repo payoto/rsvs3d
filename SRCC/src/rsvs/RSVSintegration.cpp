@@ -152,7 +152,8 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	TimeStamp(" - Connec Update: ", start_f);
 }
 
-void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
+void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
+	double impactAlmostRange){
 	/*
 	Performs the snake step except the movement of the snake.
 	This one performs it in a 'single' step:
@@ -160,11 +161,9 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact){
 
 	This function might be better in snakeengine.cpp
 	*/
-	double impactAlmostRange = 0.2;
 
 	int start_s, start_f;
 	start_f=clock();
-
 
 	//===============================
 	// Spawn
@@ -414,19 +413,229 @@ void integrate::prepare::Output(
 // 		execute
 // ====================
 
+void integrate::execute::RSVSiterate(RSVSclass &RSVSobj){
 
+	vector<double> dt;
+	vector<int> isImpact;
+	int stepNum, maxStep, nVoluZone;
+	double totT=0;
+	auto start_s=clock();
+	// for n Steps
+
+	RSVSobj.voluMesh.PrepareForUse();
+	RSVSobj.outSnake.PrintMesh(RSVSobj.snakeMesh);
+	RSVSobj.outSnake.PrintMesh(RSVSobj.voluMesh);
+	nVoluZone=RSVSobj.outSnake.ZoneNum();
+
+	maxStep = RSVSobj.paramconf.snak.maxsteps;
+	for(stepNum=0; stepNum<maxStep; ++stepNum){
+		start_s=clock(); 
+		// calcObj.limLag=10000.0;
+		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
+		RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
+		start_s=TimeStamp(" deriv:", start_s);
+		RSVSobj.calcObj.CheckAndCompute(
+			RSVSobj.paramconf.rsvs.solveralgorithm);
+		RSVSobj.calcObj.ReturnVelocities(RSVSobj.rsvsTri);
+		start_s=TimeStamp(" solve:", start_s);
+		
+		CalculateNoNanSnakeVel(RSVSobj.rsvsSnake);
+
+		integrate::execute::Logging(RSVSobj,
+			totT, nVoluZone, stepNum);
+
+		RSVSobj.rsvsSnake.CalculateTimeStep(dt,
+			RSVSobj.paramconf.snak.snaxtimestep);
+		RSVSobj.rsvsSnake.UpdateDistance(dt,
+			RSVSobj.paramconf.snak.snaxdiststep);
+		totT += *max_element(dt.begin(), dt.end());
+		RSVSobj.rsvsSnake.UpdateCoord();
+		RSVSobj.rsvsSnake.PrepareForUse();
+
+		SnakeConnectivityUpdate(RSVSobj.rsvsSnake, isImpact,
+			RSVSobj.paramconf.snak.multiarrivaltolerance);
+		start_s=clock();
+		MaintainTriangulateSnake(RSVSobj.rsvsTri);
+		start_s=TimeStamp(" triangulate:", start_s);
+	}
+
+}
+
+void integrate::execute::Logging(RSVSclass &RSVSobj,
+	double totT, int nVoluZone, int stepNum){
+	// Simple function which directs to the correct output
+
+	if (0 < RSVSobj.paramconf.files.ioout.logginglvl){
+		// calcObj logging outputs different amounts of data
+		// depending.
+		RSVSobj.logFile << "> step" << stepNum << " :," ;
+		RSVSobj.logFile << totT << endl;
+		integrate::execute::logging::Log(
+			RSVSobj.logFile, RSVSobj.calcObj,
+			RSVSobj.paramconf.files.ioout.logginglvl
+			);
+	}
+
+	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::logging::Snake(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.voluMesh, totT, nVoluZone);
+	}
+
+	if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::logging::FullTecplot(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.rsvsTri, RSVSobj.voluMesh,
+			totT, nVoluZone, stepNum);
+	}
+}
+
+void integrate::execute::PostProcessing(RSVSclass &RSVSobj,
+	double totT, int nVoluZone, int stepNum){
+
+	if (0 < RSVSobj.paramconf.files.ioout.outputlvl){
+		RSVSobj.logFile << "> final step" << stepNum << " :," ;
+			RSVSobj.logFile << totT << endl;
+		integrate::execute::postprocess::Log(
+			RSVSobj.logFile, RSVSobj.calcObj,
+			RSVSobj.paramconf.files.ioout.logginglvl
+			);
+	}
+
+	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::postprocess::Snake(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.voluMesh, totT, nVoluZone,
+			RSVSobj.paramconf);
+	}
+
+	if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::postprocess::FullTecplot(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.rsvsTri, RSVSobj.voluMesh,
+			totT, nVoluZone, stepNum);
+	}
+}
 // ====================
 // integrate
 // 		execute
 // 			logging
 // ====================
 
+void integrate::execute::logging::Log(
+	std::ofstream &logFile,
+	RSVScalc &calcObj,
+	int loglvl
+	){
+
+	// Make a logging function for 
+	// volume convergence and velocity convergence
+	calcObj.ConvergenceLog(logFile, loglvl);
+}
+
+void integrate::execute::logging::Snake(
+	tecplotfile &outSnake, snake &rsvsSnake,
+	mesh &voluMesh, double totT, int nVoluZone
+	){
+
+	outSnake.PrintVolumeDat(voluMesh,nVoluZone,1,totT);
+	outSnake.PrintSnake(rsvsSnake, 2, totT);
+}
+
+void integrate::execute::logging::FullTecplot(
+	tecplotfile &outSnake, snake &rsvsSnake,
+	triangulation &rsvsTri, mesh &voluMesh,
+	double totT, int nVoluZone, int stepNum){
+	vector<int> vertList;
+	int jj;
+	if(rsvsSnake.snaxs.size()>0){
+		//rsvsSnake.snakeconn.TightenConnectivity();
+		outSnake.PrintMesh(rsvsSnake.snakeconn,1,totT);
+
+		rsvsSnake.snakeconn.PrepareForUse();
+		
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT);
+		if (stepNum==0){
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,3);
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,3);
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,5,totT,3);
+		}
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,3);
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,3);
+		if (int(rsvsTri.acttri.size())>0){
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::stattri,5,totT,3,rsvsTri.acttri);
+		}
+		
+		vertList.clear();
+		for(jj=0;jj<int(rsvsSnake.isMeshVertIn.size()); ++jj){
+			if(rsvsSnake.isMeshVertIn[jj]){
+				vertList.push_back(rsvsSnake.snakemesh->verts(jj)->index);
+			}
+		}
+		if(int(rsvsSnake.isMeshVertIn.size())==0){
+			vertList.push_back(rsvsSnake.snakemesh->verts(0)->index);
+		}
+		outSnake.PrintMesh(*(rsvsSnake.snakemesh),6,totT,4,vertList);
+		outSnake.PrintVolumeDat(voluMesh,nVoluZone,7,totT);
+		outSnake.PrintSnake(rsvsSnake, 8, totT);
+
+	}
+}
 
 // ====================
 // integrate
 // 		execute
 // 			postprocess
 // ====================
+void integrate::execute::postprocess::Log(
+	std::ofstream &logFile,
+	RSVScalc &calcObj,
+	int loglvl
+	){
+
+	integrate::execute::logging::Log(
+			logFile, calcObj, loglvl+2);
+}
+
+void integrate::execute::postprocess::Snake(
+	tecplotfile &outSnake, snake &rsvsSnake,
+	mesh &voluMesh, double totT, int nVoluZone,
+	param::parameters &paramconf
+	){
+
+	string fileToOpen;
+
+	integrate::execute::logging::Snake(
+		outSnake, rsvsSnake,
+		voluMesh, totT, nVoluZone);
+
+	fileToOpen=paramconf.files.ioout.outdir + "/";
+	fileToOpen += "VoluMesh_" + paramconf.files.ioout.pattern + ".msh";
+	voluMesh.write(fileToOpen.c_str());
+
+	fileToOpen=paramconf.files.ioout.outdir + "/";
+	fileToOpen += "SnakeMesh_" + paramconf.files.ioout.pattern + ".msh";
+	rsvsSnake.snakemesh->write(fileToOpen.c_str());
+
+	fileToOpen=paramconf.files.ioout.outdir + "/";
+	fileToOpen += "SnakeConn_" + paramconf.files.ioout.pattern + ".msh";
+	rsvsSnake.snakeconn.write(fileToOpen.c_str());
+
+	fileToOpen=paramconf.files.ioout.outdir + "/";
+	fileToOpen += "Snake_" + paramconf.files.ioout.pattern + ".snk";
+	rsvsSnake.write(fileToOpen.c_str());
+
+}
+
+void integrate::execute::postprocess::FullTecplot(
+	tecplotfile &outSnake, snake &rsvsSnake,
+	triangulation &rsvsTri, mesh &voluMesh,
+	double totT, int nVoluZone, int stepNum){
+
+	integrate::execute::logging::FullTecplot(
+		outSnake, rsvsSnake, rsvsTri, voluMesh,
+		totT, nVoluZone, stepNum);
+}
 
 // ===================
 // Tests

@@ -74,6 +74,8 @@ void param::from_json(const json& j, voxel& p){
 param::snaking::snaking(){
 	this->arrivaltolerance = 1e-7;
 	this->multiarrivaltolerance = 1e-2; 
+	this->snaxtimestep=0.9;
+	this->snaxdiststep=0.9;
 	this->initboundary = 1;
 	this->maxsteps = 50;
 }
@@ -84,6 +86,8 @@ void param::to_json(json& j, const snaking& p){
 	j = json{
 		{"arrivaltolerance", p.arrivaltolerance},
 		{"multiarrivaltolerance", p.multiarrivaltolerance},
+		{"snaxtimestep", p.snaxtimestep},
+		{"snaxdiststep", p.snaxdiststep},
 		{"initboundary", p.initboundary},
 		{"maxsteps", p.maxsteps},
 	};
@@ -91,6 +95,8 @@ void param::to_json(json& j, const snaking& p){
 void param::from_json(const json& j, snaking& p){
 	j.at("arrivaltolerance").get_to(p.arrivaltolerance);
 	j.at("multiarrivaltolerance").get_to(p.multiarrivaltolerance);
+	j.at("snaxtimestep").get_to(p.snaxtimestep);
+	j.at("snaxdiststep").get_to(p.snaxdiststep);
 	j.at("initboundary").get_to(p.initboundary);
 	j.at("maxsteps").get_to(p.maxsteps);
 }
@@ -176,7 +182,10 @@ param::ioout::ioout(){
 	this->redirectcout=false;
 	this->redirectcerr=false;
 
+	this->logginglvl=2;
+	this->outputlvl=2;
 }
+
 void param::ioout::PrepareForUse(){
 
 	auto t = std::time(nullptr);
@@ -211,6 +220,8 @@ void param::to_json(json& j, const ioout& p){
 		{"pattern", p.pattern},
 		{"redirectcout", p.redirectcout},
 		{"pattern", p.pattern},
+		{"logginglvl", p.logginglvl},
+		{"outputlvl", p.outputlvl},
 	};
 }
 void param::from_json(const json& j, ioout& p){
@@ -222,6 +233,8 @@ void param::from_json(const json& j, ioout& p){
 	j.at("pattern").get_to(p.pattern);
 	j.at("redirectcout").get_to(p.redirectcout);
 	j.at("redirectcerr").get_to(p.redirectcerr);
+	j.at("logginglvl").get_to(p.logginglvl);
+	j.at("outputlvl").get_to(p.outputlvl);
 }
 
 param::files::files(){

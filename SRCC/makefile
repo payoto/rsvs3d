@@ -24,11 +24,15 @@ INCLDIR= "incl"
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
 DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
+# DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
 DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
 DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
 
-INCLDIR+= $(DIREIGEN) $(DIRJSON)
+# -isystem$(DIRMKL)
+INCL= 
+
+INCLDIR+= $(DIREIGEN) $(DIRJSON) 
 INCLDIRSYS = $(DIRBOOST)
 
 #------------------------------------------------------
@@ -43,11 +47,11 @@ CCPSTD=c++11
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC
 # gdb (debug) flags: # -g -ggdb 
 # boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE
-# eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
+# eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
 CCFLAGDBG= -g -ggdb 
 CCFLAGPROJ= -DTIME_EXEC -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO
 CCFLAGBOOST=
-CCFLAGEIGF=
+CCFLAGEIG= 
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG)
 # Flags to add when the target is "testall"
@@ -85,7 +89,7 @@ endif
 CFLAGS += $(CCFLAGUSER)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$(notdir $*).Td
 # Parse includes
-INCL=$(addprefix -I,$(INCLDIR))
+INCL+=$(addprefix -I,$(INCLDIR))
 INCL+=$(addprefix -isystem,$(INCLDIRSYS))
 # Parse libraries
 LDFLAGS=$(addprefix -L,$(LDDIR))

@@ -20,8 +20,9 @@ using namespace std;
 void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
 	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT);
 
-void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triangulation &testTriangle,
-	mesh &triMesh, triangulation &triRSVS, mesh &voluMesh, int nVoluZone, int ii){
+void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
+	triangulation &testTriangle, mesh &triMesh, triangulation &triRSVS,
+	mesh &voluMesh, int nVoluZone, int ii){
 	vector<int> vertList;
 	int jj;
 	if(testSnake.snaxs.size()>0){
@@ -46,7 +47,8 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT, triang
 		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
 		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
 		if (int(triRSVS.acttri.size())>0){
-			outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,totT,3,triRSVS.acttri);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,
+				totT,3,triRSVS.acttri);
 		}
 		
 		vertList.clear();
@@ -824,6 +826,7 @@ int Test_RSVSalgo(){
 	int start_s,stop_s;
 	//bool errFlag;
 	int errTest=0;
+	int nVoluZone;
 	RSVScalc calcObj;
 
 
@@ -844,7 +847,6 @@ int Test_RSVSalgo(){
 		voluMesh.PrepareForUse();
 		outSnake.PrintMesh(*(testSnake.snakemesh));
 		outSnake.PrintMesh(voluMesh);
-		int nVoluZone;
 		nVoluZone=outSnake.ZoneNum();
 		
 		start_s=clock();
