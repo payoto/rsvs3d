@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	int execFlow;
 	param::parameters paramconf;
 
-	CommandLineParser(argc, argv, paramconf);
+	execFlow = CommandLineParser(argc, argv, paramconf);
 	if (execFlow>0){
 		integrate::RSVSclass RSVSobj;
 	}
@@ -81,15 +81,18 @@ int CommandLineParser(int argc, char* argv[], param::parameters &paramconf)
 	// "Execution control"
 	if(result.count("noexec")>0 && result.count("exec")>0){
 		std::cerr << std::endl << " Invalid specification of -e (exec) and -n (noexec)";
-		std::cerr << " on the command line" << std::cerr;
+		std::cerr << " on the command line." << std::endl;
+		std::cerr << " see --help for more info" << std::endl;
 		exit(-1);
 	}
 	if (result.count("exec")){
-
 		execFlow = 1;
 	}
 	if (result.count("noexec")){
 		execFlow = -1;
 	}
+
+	// Parameter configuration
+
 	return(execFlow);
 }
