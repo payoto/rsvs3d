@@ -15,6 +15,7 @@ namespace param {
 //=================================
 // included dependencies
 
+#include <string>
 
 //=================================
 // Code
@@ -23,7 +24,13 @@ namespace param {
 // RSVS snaking framework. Default values are defined in "parameters.cpp"
 //
 // Substructure names are all 4-5 letters
+namespace parse {
+	int CommandLineParser(int argc, char* argv[], param::parameters &paramconf);
 
-int CommandLineParser(int argc, char* argv[], param::parameters &paramconf);
-
+	namespace config{
+		void useconfig(const std::string &confCase, param::parameters &paramconf);
+		void loadconfig(const std::string &confCase, param::parameters &paramconf);
+		void param(const std::string &confCase, param::parameters &paramconf);
+	}
+}
 #endif
