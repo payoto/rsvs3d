@@ -2,10 +2,12 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <fstream>
 #include <functional>
 #include <cmath>
 
 #include "mesh.hpp"
+#include "warning.hpp"
 
 
 // Class function definitions
@@ -2995,6 +2997,45 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 
 
 }
+
+void mesh::LoadTargetFill(const std::string &fileName){
+	
+	vector<double> fillVals;
+	double ft;
+	int nElms, count;
+	ifstream file;
+	
+	file.open(fileName);
+	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
+
+	if (this->WhatDim()==3){
+		nElms = this->volus.size();
+	} else if(this->WhatDim()==2){
+		nElms = this->surfs.size();
+	}
+
+	fillVals.reserve(nElms);
+	count=0;
+	while(!file.eof() && count<nElms) {
+		file >> ft;
+		fillVals.push_back(ft);
+		++count;
+	}
+	cout << "fill loaded : " ;
+	DisplayVector(fillVals);
+	cout << endl; 
+	if (this->WhatDim()==3){
+		for (int i = 0; i < nElms; ++i) {
+			this->volus[i].target = fillVals[i%count];
+		}
+	} else if(this->WhatDim()==2){
+		for (int i = 0; i < nElms; ++i) {
+			this->surfs[i].target = fillVals[i%count];
+		}
+	}
+	this->PrepareForUse();
+}
+
 
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2){
 	// compares the list vec1 and vec2 returning 

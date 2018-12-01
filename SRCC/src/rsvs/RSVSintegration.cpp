@@ -282,7 +282,8 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	RSVSobj.paramconf.PrepareForUse();
 
 	integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.snakeMesh, RSVSobj.voluMesh);
-	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.snakeMesh, RSVSobj.rsvsSnake);
+	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.paramconf.rsvs,
+		RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
 	integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
 	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.logFile,
 		RSVSobj.coutFile, RSVSobj.cerrFile);
@@ -337,9 +338,39 @@ void integrate::prepare::Mesh(
 
 void integrate::prepare::Snake(
 	const param::snaking &snakconf, 
+	const param::rsvs &rsvsconf, 
 	mesh &snakeMesh, // non const as it is passed to the snake as a pointer
+	mesh &voluMesh,
 	snake &rsvsSnake
 	){
+
+	// go through the rsvs conf figuring out which fill option to use.
+	int nElms;
+	if(voluMesh.WhatDim()==3){
+		nElms = voluMesh.volus.size();
+		if(rsvsconf.filefill.active){
+			voluMesh.LoadTargetFill(rsvsconf.filefill.fill);
+		} else if(rsvsconf.makefill.active){
+			// TODO add a fill builder
+		} else if(rsvsconf.cstfill.active){
+			for(int i=0; i< nElms; ++i){
+				voluMesh.volus[i].target=rsvsconf.cstfill.fill;
+			}
+		}
+	} else if(voluMesh.WhatDim()==2){
+		nElms = voluMesh.surfs.size();
+		if(rsvsconf.filefill.active){
+			voluMesh.LoadTargetFill(rsvsconf.filefill.fill);
+		} else if(rsvsconf.makefill.active){
+			// TODO add a fill builder
+		} else if(rsvsconf.cstfill.active){
+			for(int i=0; i< nElms; ++i){
+				voluMesh.surfs[i].target=rsvsconf.cstfill.fill;
+			}
+		}
+	}
+	voluMesh.PrepareForUse();
+
 
 	rsvsSnake.snakemesh = &snakeMesh;
 	SpawnRSVS(rsvsSnake,snakconf.initboundary);
@@ -450,6 +481,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
 	for(stepNum=0; stepNum<maxStep; ++stepNum){
 		start_s=clock(); 
 		// calcObj.limLag=10000.0;
+		std::cout << std::endl << "Step " << stepNum << " ";
 		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
 		RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" deriv:", start_s);
@@ -477,6 +509,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" triangulate:", start_s);
 	}
+	std::cout << std::endl << "RSVS iteration finished" << std::endl;
 	integrate::iteratereturns retStruct(nVoluZone,stepNum, totT);
 	return(retStruct);
 }
@@ -683,7 +716,7 @@ int integrate::test::Prepare(){
 	} 
 	
 	try {
-		integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);
+		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs, snakeMesh,voluMesh,  rsvsSnake);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 

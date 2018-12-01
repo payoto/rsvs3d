@@ -28,7 +28,11 @@
 
 namespace param {
 	typedef std::array<double,2> realbounds; 
-
+	template <class T>
+	struct filltype {
+		bool active=false;
+		T fill;
+	};
 	/*
 	Parameters related to the Velocity calculation and VOS steps
 	*/
@@ -38,6 +42,9 @@ namespace param {
 		// Algorithm used by Eigen to solve the SQP system.
 		int solveralgorithm;
 
+		filltype<double> cstfill;
+		filltype<std::string> filefill;
+		filltype<std::string> makefill;
 		rsvs();
 		~rsvs();
 		void PrepareForUse();

@@ -18,6 +18,7 @@ namespace param {
 	class grid;
 	class snaking;
 	class parameters;
+	class rsvs;
 }
 
 //=================================
@@ -64,7 +65,9 @@ namespace integrate {
 		);
 		void Snake(
 			const param::snaking &snakconf, 
+			const param::rsvs &rsvsconf, 
 			mesh &snakeMesh,
+			mesh &voluMesh,
 			snake &rsvsSnake
 		);
 		void Triangulation(

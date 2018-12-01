@@ -8,6 +8,7 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 namespace param{
+	template <class T> struct filltype;
 	class rsvs;
 	class snaking;
 	class voxel;
@@ -34,7 +35,11 @@ namespace param{
 
 using nlohmann::json;
 namespace param {
-	
+	template<class T>
+	void to_json(json& j, const filltype<T>& p);
+	template<class T>
+	void from_json(const json& j, filltype<T>& p); 
+
 	void to_json(json& j, const rsvs& p);
 	void from_json(const json& j, rsvs& p); 	
 

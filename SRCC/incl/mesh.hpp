@@ -522,6 +522,7 @@ public:
 	// Mesh size and position
 	void Scale();
 	void Scale(const std::array<std::array<double, 2>,3> &domain);
+	void LoadTargetFill(const std::string &fileName);
 
 	~mesh(){
 		RemoveFromFamily();

@@ -12,6 +12,7 @@
 #include "json.hpp"
 #include "parameters.hpp"
 #include "parameters2json.hpp"
+#include "warning.hpp"
 
 
 using nlohmann::json;
@@ -21,18 +22,19 @@ using nlohmann::json;
 // Bounds template class method definitions
 //===========================================
 
-// template <class T>
-// void param::to_json(json& j, const bounds<T>& p){
-// 	j = json{
-// 		{"lb", p.lb},
-// 		{"ub", p.ub},
-// 	};
-// }
-// template <class T>
-// void param::from_json(const json& j, bounds<T>& p){
-// 	j.at("lb").get_to(p.lb);
-// 	j.at("ub").get_to(p.ub);
-// }
+template<class T>
+void param::to_json(json& j, const filltype<T>& p){
+	j = json{
+		{"active", p.active},
+		{"fill", p.fill},
+	};
+}
+template<class T>
+void param::from_json(const json& j, filltype<T>& p){
+	j.at("active").get_to(p.active);
+	j.at("fill").get_to(p.fill);
+
+}
 
 //===========================================
 // voxel class method definitions
@@ -109,6 +111,15 @@ void param::snaking::PrepareForUse(){
 
 param::rsvs::rsvs(){
 	this->solveralgorithm = 0;
+
+	this->cstfill.active=false;
+	this->cstfill.fill=0.5;
+
+	this->filefill.active=false;
+	this->filefill.fill="";
+	
+	this->makefill.active=false;
+	this->makefill.active="";
 }
 
 param::rsvs::~rsvs(){
@@ -116,10 +127,16 @@ param::rsvs::~rsvs(){
 void param::to_json(json& j, const rsvs& p){
 	j = json{
 		{"solveralgorithm", p.solveralgorithm},
+		{"cstfill", p.cstfill},
+		{"filefill", p.filefill},
+		{"makefill", p.makefill},
 	};
 }
 void param::from_json(const json& j, rsvs& p){
 	j.at("solveralgorithm").get_to(p.solveralgorithm);
+	j.at("cstfill").get_to(p.cstfill);
+	j.at("filefill").get_to(p.filefill);
+	j.at("makefill").get_to(p.makefill);
 }
 void param::rsvs::PrepareForUse(){
 }
@@ -322,14 +339,7 @@ void param::io::read(const std::string &fileName, parameters &p){
 	json j, j_fin;
 
 	file.open(fileName);
-	if (!file.is_open()){
-		std::string errstr;
-		errstr = "Parameter file failed to open ";
-		errstr += "in " ;
-		errstr +=__PRETTY_FUNCTION__  ;
-		errstr += " \n:  " + fileName;
-		throw std::invalid_argument(errstr.c_str());
-	}
+	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 
 	j_fin = p; 
 	file >> j;
@@ -354,15 +364,15 @@ void param::io::write(const std::string &fileName, const parameters &p){
 
 	file.open(fileName);
 
-	if (!file.is_open()){
-		std::string errstr;
-		errstr = "Parameter file failed to open ";
-		errstr += "in " ;
-		errstr +=__PRETTY_FUNCTION__  ;
-		errstr += " \n:  " + fileName;
-		throw std::invalid_argument(errstr.c_str());
-	}
-
+	// if (!file.is_open()){
+	// 	std::string errstr;
+	// 	errstr = "Parameter file failed to open ";
+	// 	errstr += "in " ;
+	// 	errstr +=__PRETTY_FUNCTION__  ;
+	// 	errstr += " \n:  " + fileName;
+	// 	throw std::invalid_argument(errstr.c_str());
+	// }
+	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 	j = p; 
 	file << j.dump(2);
 	file.flush();
@@ -374,15 +384,7 @@ void param::io::readflat(const std::string &fileName, parameters &p){
 	json jnew, jfin;
 
 	file.open(fileName);
-
-	if (!file.is_open()){
-		std::string errstr;
-		errstr = "Parameter file failed to open ";
-		errstr += "in " ;
-		errstr +=__PRETTY_FUNCTION__  ;
-		errstr += " \n:  " + fileName;
-		throw std::invalid_argument(errstr.c_str());
-	}
+	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 
 	jfin = p; 
 	// std::cout << "jfin assigned " << std::endl;
@@ -397,15 +399,7 @@ void param::io::writeflat(const std::string &fileName, const parameters &p){
 	json j;
 
 	file.open(fileName);
-
-	if (!file.is_open()){
-		std::string errstr;
-		errstr = "Parameter file failed to open ";
-		errstr += "in " ;
-		errstr +=__PRETTY_FUNCTION__  ;
-		errstr += " \n:  " + fileName;
-		throw std::invalid_argument(errstr.c_str());
-	}
+	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 
 	j = p; 
 	file << j.flatten().dump(2);
@@ -454,7 +448,7 @@ int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
 			continue;
 		}
 
-		if (!j[key].is_number() && !j[key].is_string()){
+		if (!j[key].is_number() && !j[key].is_string() && !j[key].is_boolean()){
 			std::cerr << "Warning in: " << std::endl << "  "
 				 << __PRETTY_FUNCTION__ << std::endl;
 			std::cerr << "  Value of j[" << key << "] is neither a string or number, " 
@@ -469,6 +463,9 @@ int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
 			j[key]=std::stoi(val);
 		} else if (j[key].is_number_float()){
 			j[key]=std::stod(val);
+		} else if (j[key].is_boolean()){
+			std::istringstream is(val);
+			is >> std::boolalpha >> j[key];
 		}
 	}
 	j=j.unflatten();

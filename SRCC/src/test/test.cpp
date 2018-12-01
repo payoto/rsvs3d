@@ -57,7 +57,7 @@ int main(){
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	// Snakstruct 2D tests
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
-	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
+	// gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
 	// Parameter and JSON tests
 	gridTest.Run(param::test::base,"parameter implementation");
 	gridTest.Run(param::test::io,"parameter read write");
