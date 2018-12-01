@@ -483,10 +483,10 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
 		// calcObj.limLag=10000.0;
 		std::cout << std::endl << "Step " << stepNum << " ";
 		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
-		RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" deriv:", start_s);
 		RSVSobj.calcObj.CheckAndCompute(
 			RSVSobj.paramconf.rsvs.solveralgorithm);
+		RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
 		RSVSobj.calcObj.ReturnVelocities(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" solve:", start_s);
 		

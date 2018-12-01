@@ -204,8 +204,12 @@ void RSVScalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	for(ii=0; ii<ni; ii++){
 		temp.push_back(constr[ii]);
 	}
-
 	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::fill);
+	temp.clear();
+	for(ii=0; ii<ni; ii++){
+		temp.push_back(log10(fabs(constrTarg[ii]-constr[ii])));
+	}
+	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::error);
 }
 
 void RSVScalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
