@@ -16,10 +16,10 @@ TESTEXECUTABLE=test_RSVS3D
 TESTALLEXECUTABLE=testall_RSVS3D
 
 # source, object and dependency directories
-OBJDIR = obj
+OBJDIR = objmkl
 SRCTREE = src/
 DEPDIR := .d
-BINDIR =
+BINDIR = binmkl
 INCLDIR= "incl"
 
 # Sources which contain the main function for all and test
@@ -119,6 +119,7 @@ rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 # Make output folders
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 $(shell mkdir -p $(OBJDIR) >/dev/null)
+$(shell mkdir -p $(BINDIR) >/dev/null)
 # Object definitions
 SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
 
@@ -155,7 +156,7 @@ testall : $(SRCS) $(EXECUTABLE)
   
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(OBJECTS) 
-	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
+	$(LINK)  $(OBJECTS) -o $(BINDIR)/$@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
 # into OBJDIR

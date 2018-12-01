@@ -176,9 +176,10 @@ void SQPstep(const RSVScalc &calcobj,
 		);
 
 	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
-	
+	isLarge=false;
 	if(isLarge || isNan) {
 		// Use a least squared solver if only using the constraint
+		std::cout << "using constr only " << endl;
 	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
 	} else {
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 

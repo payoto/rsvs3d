@@ -199,6 +199,7 @@ void RSVScalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	int ii, ni;
 	vector<double> temp;
 	ni=constr.size();
+	double tempVal;
 	temp.reserve(ni);
 
 	for(ii=0; ii<ni; ii++){
@@ -207,7 +208,12 @@ void RSVScalc::ReturnConstrToMesh(triangulation &triRSVS) const {
 	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::fill);
 	temp.clear();
 	for(ii=0; ii<ni; ii++){
-		temp.push_back(log10(fabs(constrTarg[ii]-constr[ii])));
+		tempVal = fabs(constrTarg[ii]-constr[ii]);
+		if (tempVal>1e-16){
+			temp.push_back(log10(tempVal));
+		} else {
+			temp.push_back(-16);
+		}
 	}
 	triRSVS.meshDep->MapVolu2Parent(temp, this->constrList, &volu::error);
 }
