@@ -47,6 +47,7 @@ public :
 	void BuildConstrMap(const triangulation &triangleRSVS);
 	void BuildConstrMap(const mesh &meshin);
 	void BuildDVMap(const vector<int> &vecin);
+	bool SnakDVcond(const triangulation &triRSVS, int ii);
 	void PrepTriangulationCalc(const triangulation &triRSVS);
 	// Calculate derivatives wrapper
 	void CalculateMesh(mesh &meshin);
@@ -64,6 +65,9 @@ public :
 		const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true
 		);
+	void CalcTriangleEdgeLength(
+		const triangle& triIn, const triangulation &triRSVS,
+		bool isObj=true, bool isConstr=true, bool isDeriv=true);
 
 	void ReturnConstrToMesh(triangulation &triRSVS) const ;
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;

@@ -40,9 +40,33 @@ void RSVScalc::PrepTriangulationCalc(const triangulation &triRSVS){
 	vecin.clear();
 	vecin.reserve(nDv);
 	for(ii=0; ii<nDv; ++ii){
-		vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
+		if(!triRSVS.snakeDep->snaxs(ii)->isfreeze){
+			vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
+		} else if (this->SnakDVcond(triRSVS, ii)){
+			vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
+		}
 	}
 	BuildDVMap(vecin);
+}
+
+bool RSVScalc::SnakDVcond(const triangulation &triRSVS, int ii){
+	bool allNeighFroze=true;
+	int nEdges, kk;
+	const edge *tempEdge;
+
+	nEdges = triRSVS.snakeDep->snakeconn.verts(ii)->edgeind.size();
+
+	kk=0;
+	// Check if all neighbours of the snaxel are 
+	while(kk<nEdges && allNeighFroze){
+		tempEdge=triRSVS.snakeDep->snakeconn.edges.isearch(triRSVS.snakeDep->snakeconn.verts(ii)->edgeind[kk]);
+		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(tempEdge->vertind[0])->isfreeze;
+		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(tempEdge->vertind[1])->isfreeze;
+
+		++kk;
+	} 
+
+	return(!allNeighFroze);
 }
 
 void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMethod){
@@ -82,6 +106,7 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 	} 
 	// Output some data to check it makes sense
 }
+
 
 void RSVScalc::ReturnVelocities(triangulation &triRSVS){
 
@@ -307,9 +332,10 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 	
 	// residual and delta are summary with:
 	// mean median max min std
+	double normConstr, normVel; 
 	if (loglvl>0){
 		out << "> constraint residual :, ";
-		StreamStatistics(abs(this->constr.array()-this->constrTarg.array()),
+		normConstr= StreamStatistics(abs(this->constr.array()-this->constrTarg.array()),
 			out, string(", "));
 		out << "> constraint delta :, ";
 		StreamStatistics((this->constr.array()-this->constrTarg.array()),
@@ -318,8 +344,9 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		StreamStatistics(abs(this->deltaDV.array()),
 			out, string(", "));
 		out << "> objective delta :, ";
-		StreamStatistics(this->deltaDV.array(),
+		normVel= StreamStatistics(this->deltaDV.array(),
 			out, string(", "));
+		std::cout << " conv: (vol) " << normConstr << " (vel) " << normVel << "; ";
 	}
 	// Same as res but with all the constraint values
 	if (loglvl>1){

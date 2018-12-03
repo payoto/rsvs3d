@@ -97,7 +97,7 @@ public:
 	void PreCalc();
 	// Build a valid object
 	void assign(vector<vector<double> const*> &coords);
-	void assign(int pRepI,vector<double> &pRep);
+	void assign(int pRepI, const vector<double> &pRep);
 	void ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c);

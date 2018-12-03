@@ -30,7 +30,7 @@ void PrintMatrix(const MatrixXd &mat);
 void PrintMatrixFile(const MatrixXd &mat, const char * name);
 void PrintMatrix(const RowVectorXd &mat);
 void PrintMatrix(const VectorXd &mat);
-void StreamStatistics(const VectorXd &&vec, ofstream &out, 
+double StreamStatistics(const VectorXd &&vec, ofstream &out, 
 	const string &&sep=string(", "));
 void StreamOutVector(const VectorXd &&vec, ofstream &out, 
 	const string &&sep=string(", "));

@@ -130,17 +130,19 @@ void PrintMatrix(const RowVectorXd &mat){
 	cout << endl;
 }
 
-void StreamStatistics(const VectorXd &&vec, ofstream &out, const string &&sep){
+double StreamStatistics(const VectorXd &&vec, ofstream &out, const string &&sep){
 	/*
 	Uses a rvalue reference to allow operations to be passed 
 	directly in the statistics
 	*/
-	out << vec.norm() << sep;
+	double norm=vec.norm();
+	out << norm << sep;
 	out << vec.mean() << sep;
 	out << sqrt((vec.array() - vec.mean()).square().sum()/(vec.size()-1))<< sep;
 	out << vec.maxCoeff() << sep;
 	out << vec.minCoeff() << sep;
 	out << endl;
+	return(norm);
 }
 
 

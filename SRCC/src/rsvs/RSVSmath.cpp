@@ -171,7 +171,7 @@ void CoordFunc::assign(vector<vector<double> const*> &pRep){
 	isReady=false;
 }
 
-void CoordFunc::assign(int pRepI,vector<double> &pRep){
+void CoordFunc::assign(int pRepI, const vector<double> &pRep){
 	 
 	if ((pRepI<nCoord) & (pRepI>=0)){
 		coords[pRepI]=&pRep;

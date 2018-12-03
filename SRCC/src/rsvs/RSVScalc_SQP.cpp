@@ -60,7 +60,9 @@ bool RSVScalc::PrepareMatricesForSQP(
 	dConstrAct.setZero(nConstrAct,nDvAct);
 	for(ii=0; ii<nConstrAct;++ii){
 		for(jj=0; jj<nDvAct;++jj){
-			dConstrAct(ii,jj)=dConstr(subConstrAct[ii],subDvAct[jj]);
+			dConstrAct(ii,jj)=dConstr(subConstrAct[ii],subDvAct[jj])
+				// /constrTarg[subConstrAct[ii]]
+				;
 		}
 	}
 	HConstrAct.setZero(nDvAct,nDvAct); 
@@ -81,7 +83,9 @@ bool RSVScalc::PrepareMatricesForSQP(
 	}
 	constrAct.setZero(nConstrAct);
 	for(jj=0; jj<nConstrAct;++jj){
-		constrAct[jj]=constr[subConstrAct[jj]] -constrTarg[subConstrAct[jj]];
+		constrAct[jj]=(constr[subConstrAct[jj]] -constrTarg[subConstrAct[jj]])
+			// /constrTarg[subConstrAct[jj]]
+			;
 	}
 	lagMultAct.setZero(nConstrAct);
 

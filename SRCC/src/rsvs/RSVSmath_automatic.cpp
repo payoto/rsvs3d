@@ -413,7 +413,7 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
 
 void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ) { 
 double   t3,   t4,   t6,   t9,   t2,   t7,   t8,   t5,   t10;
-double eps = rsvsmath_automatic_eps_surf;
+double eps = 0;
   t3 = p0[1-1]-p1[1-1];
   t4 = p0[1-1]-p2[1-1];
   t6 = p0[2-1]-p1[2-1];

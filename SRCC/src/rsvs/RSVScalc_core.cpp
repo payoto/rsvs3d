@@ -142,7 +142,8 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	// Active DV lists
 
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==2 
+			&& this->dvMap.find(triIn.pointind[ii])!=-1){
 			dvList.push_back(triIn.pointind[ii]);
 		} else if (triIn.pointtype[ii]==3 && false){
 			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
@@ -167,7 +168,8 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==2
+			&& this->dvMap.find(triIn.pointind[ii])!=-1){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
 			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
@@ -220,7 +222,9 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 									 this->dvMap.find(dvListMap.vec[kk])) += 
 									 triIn.connec.constrinfluence[ii]*
 									 HConstrPart(ll,kk)
-									 *this->lagMult[subTempVec[jj]]*0;
+									 *this->lagMult[subTempVec[jj]]
+									 // /this->constrTarg[subTempVec[jj]]
+									 ;
 							}
 						}
 					}
@@ -258,6 +262,12 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 				}
 			}
 		}
+
+		// if(objPart==0 && isDeriv && isConstr){
+		// 	CalcTriangleEdgeLength(triIn, triRSVS,
+		// 		isObj, false, isDeriv);
+		// 	cout << "%" ;
+		// }
 	}
 	// Update active lists of design variables
 	for(ii=0; ii< nDvAct; ++ii){
@@ -722,6 +732,173 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	// Assign Constraint Hessian
 }
 
+// =====================================
+//
+//
+
+
+void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
+	const triangulation &triRSVS,
+	bool isObj, bool isConstr, bool isDeriv){
+
+
+	int ii,ni,jj,nj,kk,ll,nCellTarg;
+	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
+	SurfCentroid centreCalc;
+	LengthEdge EdgeCalc;
+	Area AreaCalc;
+	vector<int> dvList,subTempVec;
+	HashedVector<int,int> dvListMap;
+	vector<vector<double> const *> veccoord;
+	MatrixXd HPos, dPos;
+	MatrixXd HVal, dVal, HVal2, dVal2;
+	MatrixXd dConstrPart,HConstrPart, HObjPart;
+	MatrixXd dObjPart;
+	double constrPart, objPart;
+	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
+	double * retVal;
+
+
+	veccoord.reserve(3);
+	ni=3;
+	for(ii=0; ii<ni; ++ii){
+		if(triIn.pointtype[ii]==1){
+			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==2){
+			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
+		} else if (triIn.pointtype[ii]==3){
+			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
+		}
+	}
+
+	// Constr and objective
+	// CoordFunc.assign(int pRepI,vector<double> &pRep);
+	AreaCalc.assign(veccoord[0],veccoord[1],veccoord[2]);
+
+	// Active DV lists
+
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2 
+			&& this->dvMap.find(triIn.pointind[ii])!=-1){
+			dvList.push_back(triIn.pointind[ii]);
+		} else if (triIn.pointtype[ii]==3 && false){
+			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
+			nj=triRSVS.trisurf(subTemp)->indvert.size();
+			for(jj=0;jj<nj;++jj){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
+				}
+			}
+		}
+	}
+	dvListMap.vec=dvList;
+	sort(dvListMap.vec);
+	unique(dvListMap.vec);
+	dvListMap.GenerateHash();
+	nDvAct=dvListMap.vec.size();
+
+	// Positional Derivatives
+
+	// HERE -> function to calculate SurfCentroid (dc/dd)^T Hm (dc/dd)
+
+	HPos.setZero(nDvAct,nDvAct);
+	dPos.setZero(9,nDvAct);
+	for(ii=0; ii<ni; ++ii){
+		if (triIn.pointtype[ii]==2
+			&& this->dvMap.find(triIn.pointind[ii])!=-1){
+			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
+			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
+			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
+			subTemp3=dvListMap.find(triIn.pointind[ii]);
+			for(jj=0;jj<3;++jj){
+				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
+					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
+			}
+		} else if (triIn.pointtype[ii]==3 && false){
+
+		}
+	}
+	// Total
+
+
+	if(false){
+		throw invalid_argument("2D Area constraint not implemented yet");
+		HVal.setZero(9,9);
+		dVal.setZero(1,9);
+		dConstrPart.setZero(1,nDvAct);
+		HConstrPart.setZero(nDvAct,nDvAct);
+		AreaCalc.Calc();
+		AreaCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt); 
+		ArrayVec2MatrixXd(*HValpnt, HVal);
+		ArrayVec2MatrixXd(*dValpnt, dVal);
+		Deriv1stChainScalar(dVal, dPos,dConstrPart);
+		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+	}
+
+	if (isObj){
+		HVal.setZero(9,9);
+		dVal.setZero(1,9);
+		objPart=0;
+		for (int ed = 0; ed < 3; ++ed){
+			if(triIn.pointtype[ed]==2 && triIn.pointtype[(ed+1)%3]==2){
+
+				HVal2.setZero(6,6);
+				dVal2.setZero(1,6);
+				EdgeCalc.assign(0, (triRSVS.snakeDep->snakeconn.verts
+						.isearch(triIn.pointind[ed])->coord));
+				EdgeCalc.assign(1, (triRSVS.snakeDep->snakeconn.verts
+						.isearch(triIn.pointind[(ed+1)%3])->coord));
+				EdgeCalc.Calc();
+				EdgeCalc.ReturnDatPoint(&retVal, &dValpnt, &HValpnt);
+				objPart+= *retVal;
+				ArrayVec2MatrixXd(*HValpnt, HVal2);
+				ArrayVec2MatrixXd(*dValpnt, dVal2);
+				for (ii=0; ii<6; ++ii){
+					dVal(0,(ed*3+ii)%9) += dVal2(0,ii);
+					for (jj=0; jj<6; ++jj){
+						HVal((ed*3+jj)%9,(ed*3+ii)%9) += HVal2(0,jj);
+					}
+				}
+			}
+		}
+
+		Deriv1stChainScalar(dVal, dPos,dObjPart);
+		Deriv2ndChainScalar(dVal, dPos,HVal,HPos,HObjPart);
+		// Assign to main part of the object
+		// assign objective function
+		this->obj+=objPart; 
+		// Assign objective derivative
+		if(isDeriv){
+			for(ii=0; ii< nDvAct; ++ii){
+				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
+				for(jj=0; jj< nDvAct; ++jj){
+					this->HObj(dvMap.find(dvListMap.vec[jj]),
+						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				}
+			}
+		}
+
+	}
+
+	// Update active lists of design variables
+	for(ii=0; ii< nDvAct; ++ii){
+		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
+	}
+	nCellTarg=triIn.connec.celltarg.size(); 
+	for(ii=0; ii< nCellTarg;++ii){
+		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+		nj=subTempVec.size();
+		for(jj=0; jj< nj; ++jj){
+			if (subTempVec[jj]!=-1){
+				this->isConstrAct.at(subTempVec[jj]) = true;
+			}
+		}
+	}
+
+	// Assign Objective Hessian
+
+	// Assign Constraint Hessian
+}
 
 
 /// INSPIRATION
