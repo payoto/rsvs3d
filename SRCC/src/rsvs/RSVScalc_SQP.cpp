@@ -129,43 +129,60 @@ void RSVScalc::ComputeSQPstep(
 	){
 
 	VectorXd  deltaDVAct;
-	bool isNan, isLarge;
+	bool isNan, isLarge, rerunDefault=true, attemptConstrOnly;
 	int ii, ni;
 
-	switch(calcMethod){
-		case 1:
-			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
-				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
-			// cout << "case 1:" << endl;
+	/*
+	This while loop while expensive allows to use the most stable algorithm
+	*/
+	attemptConstrOnly=false;
+	if((calcMethod%10)!=calcMethod){
+		calcMethod=calcMethod%10;
+		attemptConstrOnly =true;
+	}
+	while(rerunDefault){
+		switch(calcMethod){
+			case 1:
+				rerunDefault=SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
+					constrAct, lagMultAct,
+					deltaDVAct, isNan, isLarge,attemptConstrOnly);
+				// cout << "case 1:" << endl;
 
-		break;
-		case 2:
-			SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
-				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
-			// cout << "case 2:" << endl;
-		break;
-		case 3: 
-			// Eigen::LLT is inconveniently a 2 parameter template so
-			// a full type is passed
-			SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, dObjAct,
-				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
-			// cout << "case 3:" << endl;
-		break;
-		case 4:
-			SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, dObjAct,
-				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
-			// cout << "case 4:" << endl;
-		break;
-		default:
-			SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
-				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
-			// cout << "case default:" << endl;
-		break;
+			break;
+			case 2:
+				rerunDefault=SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
+					constrAct, lagMultAct,
+					deltaDVAct, isNan, isLarge,attemptConstrOnly);
+				// cout << "case 2:" << endl;
+			break;
+			case 3: 
+				// Eigen::LLT is inconveniently a 2 parameter template so
+				// a full type is passed
+				rerunDefault=SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, dObjAct,
+					constrAct, lagMultAct,
+					deltaDVAct, isNan, isLarge,attemptConstrOnly);
+				// cout << "case 3:" << endl;
+			break;
+			case 4:
+				rerunDefault=SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, dObjAct,
+					constrAct, lagMultAct,
+					deltaDVAct, isNan, isLarge,attemptConstrOnly);
+				// cout << "case 4:" << endl;
+			break;
+			default:
+				SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
+					constrAct, lagMultAct,
+					deltaDVAct, isNan, isLarge,true);
+				rerunDefault=false;
+				// cout << "case default:" << endl;
+			break;
+		}
+		if(attemptConstrOnly){
+			rerunDefault=false;
+		}
+		if(rerunDefault){
+			calcMethod=0;
+		}
 	}
 
 	ni = subDvAct.size();

@@ -103,25 +103,25 @@ void ResizeLagrangianMultiplier(const RSVScalc &calcobj,
 	VectorXd &lagMultAct, 
 	bool &isLarge, bool &isNan);
 template<class T>
-void SQPstep(const RSVScalc &calcobj,
+bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge);
+	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
 template<template<typename> class T>
-void SQPstep(const RSVScalc &calcobj,
+bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge);
+	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
 
 
 // Code needs to be included as it is a templated functions
 
  
 template<template<typename> class T>
-void SQPstep(const RSVScalc &calcobj,
+bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge){
+	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
 	/*
 	This template cannot be deduced and needs the developer to
 	pass the required solver template class when it is called.
@@ -141,17 +141,17 @@ void SQPstep(const RSVScalc &calcobj,
 	*see : template<class T> void SQPstep
 	*/
 
-	SQPstep<T<MatrixXd>>(calcobj, dConstrAct, dObjAct,
+	return(SQPstep<T<MatrixXd>>(calcobj, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
-				deltaDVAct, isNan, isLarge);
+				deltaDVAct, isNan, isLarge,attemptConstrOnly));
 
 }
 
 template<class T>
-void SQPstep(const RSVScalc &calcobj,
+bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge){
+	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
 	/*
 	This template cannot be deduced and needs the developer to
 	pass the required solver class when it is called.
@@ -181,15 +181,19 @@ void SQPstep(const RSVScalc &calcobj,
 
 	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
 	isLarge=false;
+	if(!attemptConstrOnly && (isLarge || isNan)){
+		return(isLarge || isNan);
+	}
 	if(isLarge || isNan) {
 		// Use a least squared solver if only using the constraint
-		std::cout << "using constr only " << endl;
+		std::cout << "(constrmov) " ;
 	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
 	} else {
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
 						+ dConstrAct.transpose()*lagMultAct));
 	}
 	// cout << __PRETTY_FUNCTION__<< endl;
+	return(isLarge || isNan);
 }
 
 #endif
