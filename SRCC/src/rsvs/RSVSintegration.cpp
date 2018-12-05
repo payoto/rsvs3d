@@ -421,6 +421,8 @@ void integrate::prepare::Output(
 	outSnakeName =  paramconf.files.ioout.outdir + "/";
 	outSnakeName += "convergence_" + paramconf.files.ioout.pattern + ".log";
 	logFile.open(outSnakeName);
+	logFile.precision(16);
+	logFile << std::scientific;
 
 	if (paramconf.files.ioout.redirectcout){
 		// auto ;

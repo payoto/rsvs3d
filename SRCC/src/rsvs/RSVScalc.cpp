@@ -346,6 +346,7 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		out << "> objective delta :, ";
 		normVel= StreamStatistics(this->deltaDV.array(),
 			out, string(", "));
+		out << "> objective value:," << this->obj << std::endl;
 		std::cout << " conv: (vol) " << normConstr << " (vel) " << normVel << "; ";
 	}
 	// Same as res but with all the constraint values
