@@ -3,6 +3,7 @@
 
 *NOGIT*
 *TESTOUT*
+out/*
 .gitattributes
 
 !*.lay
@@ -29,4 +30,5 @@ SRCC/gch/*
 # Profilers
 *test-cppcheck-build-dir*
 *.cppcheck
+
 

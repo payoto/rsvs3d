@@ -1,0 +1,74 @@
+{
+  "files": {
+    "appcasename2outdir": true,
+    "ioin": {
+      "casename": "",
+      "snakemeshname": "",
+      "targetfill": "",
+      "volumeshname": ""
+    },
+    "ioout": {
+      "basenameoutdir": "rsvs3d_",
+      "basenamepattern": "%y%m%dT%H%M%S_",
+      "logginglvl": 2,
+      "outdir": "",
+      "outputlvl": 2,
+      "pathoutdir": "../out",
+      "pathpattern": "Archive_%Y_%m/Day_%y-%m-%d",
+      "pattern": "",
+      "redirectcerr": false,
+      "redirectcout": false
+    }
+  },
+  "grid": {
+    "voxel": {
+      "domain": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "gridsizebackground": [
+        1,
+        1,
+        1
+      ],
+      "gridsizesnake": [
+        6,
+        6,
+        6
+      ]
+    }
+  },
+  "rsvs": {
+    "cstfill": {
+      "active": true,
+      "fill": 0.5
+    },
+    "filefill": {
+      "active": false,
+      "fill": ""
+    },
+    "makefill": {
+      "active": true,
+      "fill": ""
+    },
+    "solveralgorithm": 0
+  },
+  "snak": {
+    "arrivaltolerance": 1e-07,
+    "initboundary": 1,
+    "maxsteps": 50,
+    "multiarrivaltolerance": 0.01,
+    "snaxdiststep": 0.9,
+    "snaxtimestep": 0.9
+  }
+}

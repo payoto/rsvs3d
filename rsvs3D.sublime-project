@@ -39,6 +39,9 @@
 	"folders":
 	[
 		{
+			"path": "."
+		},
+		{
 			"path": "SRCC"
 		},
 		{
