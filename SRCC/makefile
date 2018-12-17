@@ -16,10 +16,10 @@ TESTEXECUTABLE=test_RSVS3D
 TESTALLEXECUTABLE=testall_RSVS3D
 
 # source, object and dependency directories
-OBJDIR = objmkl
+OBJDIR = obj
 SRCTREE = src/
 DEPDIR := .d
-BINDIR = binmkl
+BINDIR = bin
 INCLDIR= "incl"
 
 # Sources which contain the main function for all and test
@@ -29,7 +29,7 @@ MAINTESTSRC = src/test/test.cpp
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
 DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
-# DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
+DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
 DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
 DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
@@ -46,7 +46,7 @@ INCLDIRSYS = $(DIRBOOST)
 #------------------------------------------------------
 # Standard GCC warning, optimisation and c++ standard flags
 WARNFLAGS= -Wall -Wextra -pedantic
-OPTIMLVL=3
+OPTIMLVL=0
 CCPSTD=c++11
 
 # Other compiler flags
@@ -56,10 +56,10 @@ CCPSTD=c++11
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # cxxopts #
-CCFLAGDBG= 
-CCFLAGPROJ= -DTIME_EXEC
+CCFLAGDBG= -g -ggdb
+CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
 CCFLAGBOOST=
-CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
+CCFLAGEIG= 
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG)
 # Flags to add when the target is "testall"
@@ -71,15 +71,15 @@ CFTESTFLAG= -DTEST_ALL
 #------------------------------------------------------
 # LDFILE are the library names, LDDIR are the library 
 # directories
-LDFILE = stdc++
+LDFILE = stdc++ 
 
 LDDIRBOOST = $(DIRBOOST)/stage/lib
-LDFILEBOOST = boost_filesystem boost_system
+LDFILEBOOST = boost_filesystem boost_system 
 BOOSTVERSION = -mgw63-mt-sd-x64-1_67
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 
 LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
-LDDIR = $(LDDIRBOOST)
+LDDIR = $(LDDIRBOOST) 
 LDFILE += $(LDFILEBOOSTWITHVERSION)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
 
@@ -157,6 +157,7 @@ testall : $(SRCS) $(EXECUTABLE)
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(OBJECTS) 
 	$(LINK)  $(OBJECTS) -o $(BINDIR)/$@ $(LDFLAGS)
+	cp $(BINDIR)/$@ ./
 
 # Needed to mirror the dirrectory tree of SRCTREE
 # into OBJDIR

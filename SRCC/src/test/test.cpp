@@ -11,7 +11,6 @@
 
 #include "test.hpp"
 
-#ifdef TEST_ALL
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
 #include "voxel.hpp"
@@ -21,6 +20,7 @@
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
 #include "RSVSalgorithm.hpp"
+#ifdef TEST_ALL
 #endif //TEST_ALL
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
@@ -57,7 +57,6 @@ int main(){
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	// Snakstruct 2D tests
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
-	// gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
 	// Parameter and JSON tests
 	gridTest.Run(param::test::base,"parameter implementation");
 	gridTest.Run(param::test::io,"parameter read write");
@@ -66,8 +65,9 @@ int main(){
 	gridTest.Run(param::test::autoflat,"Algorithm for automatic determination of flat json");
 	// RSVS and integration tests
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
-	#endif //TEST_ALL
 	gridTest.Run(integrate::test::All,"Test full integration");
+	#endif //TEST_ALL
+	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
 	
 	
 	gridTest.PrintSummary();

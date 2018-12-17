@@ -831,7 +831,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
 		nCellDat=3;
 
 		if (forceOutType==0){
-			if(nVolu>0){
+			if(nVolu>0 && triout.snakeDep->Check3D()){
 				forceOutType=1; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
 				forceOutType=2;// output as Surface data (FEPOLYGON)
@@ -1120,7 +1120,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray tr
 		nCellDat=3;
 
 		if (forceOutType==0){
-			if(nVolu>0){
+			if(nVolu>0 && triout.snakeDep->Check3D()){
 				forceOutType=1; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
 				forceOutType=2;// output as Surface data (FEPOLYGON)

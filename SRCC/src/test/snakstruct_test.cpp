@@ -20,6 +20,54 @@ using namespace std;
 void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
 	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT);
 
+void PrintRSVSSnake2D(tecplotfile &outSnake, snake &testSnake, double totT,
+	triangulation &testTriangle, mesh &triMesh, triangulation &triRSVS,
+	mesh &voluMesh, int nVoluZone, int ii){
+	vector<int> vertList;
+	int jj;
+	if(testSnake.snaxs.size()>0){
+		//testSnake.snakeconn.TightenConnectivity();
+		outSnake.PrintMesh(testSnake.snakeconn,1,totT);
+
+		testSnake.snakeconn.PrepareForUse();
+		testTriangle.stattri.clear();
+		testTriangle.trivert.clear();
+		testTriangle.PrepareForUse();
+		triRSVS.PrepareForUse();
+		TriangulateMesh(testSnake.snakeconn,testTriangle);
+		MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
+		outSnake.PrintMesh(triMesh,2,totT);
+		MeshTriangulation(triMesh,testSnake.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+		outSnake.PrintMesh(triMesh,3,totT);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
+		if (ii==0){
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,3);
+		}
+		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+		if (int(triRSVS.acttri.size())>0){
+			outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,
+				totT,3,triRSVS.acttri);
+		}
+		
+		vertList.clear();
+		for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
+			if(testSnake.isMeshVertIn[jj]){
+				vertList.push_back(testSnake.snakemesh->verts(jj)->index);
+			}
+		}
+		if(int(testSnake.isMeshVertIn.size())==0){
+			vertList.push_back(testSnake.snakemesh->verts(0)->index);
+		}
+		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
+		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
+		outSnake.PrintSnake(testSnake, 10, totT);
+
+	}
+}
+
 void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
 	triangulation &testTriangle, mesh &triMesh, triangulation &triRSVS,
 	mesh &voluMesh, int nVoluZone, int ii){
@@ -952,20 +1000,23 @@ int Test_RSVSalgoflat(){
 		vector<double> dt;
 		vector<int> isImpact;
 		MaintainTriangulateSnake(triRSVS);
-
 		for(ii=0;ii<20;++ii){
+			// testSnake.displight();
 			cout << ii << " ";
-			PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+			PrintRSVSSnake2D(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
-			// Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
-			Test_stepalgo(testSnake, isImpact);
+
+
+			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
+			// Test_stepalgo(testSnake, isImpact);
+			// MaintainTriangulateSnake(triRSVS);
 			stop_s=TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
 
-		PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
+		PrintRSVSSnake2D(outSnake, testSnake, totT, testTriangle,
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 
 		stop_s=clock();
@@ -1336,7 +1387,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
 	start_s=TimeStamp(" deriv:", start_s);
-	calcObj.CheckAndCompute(3);
+	calcObj.CheckAndCompute(2);
 	calcObj.ReturnVelocities(RSVStri);
 	start_s=TimeStamp(" solve:", start_s);
 	
