@@ -4,9 +4,9 @@
 #include <ctime>
 #include <vector>
 #include <string>
-#include <boost/filesystem.hpp>
-#include<tuple>
 
+
+#include<tuple>
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
 #include "snake.hpp"
@@ -17,6 +17,8 @@
 #include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
 #include "postprocessing.hpp"
+
+#include "filesystem.hpp"
 
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
@@ -405,7 +407,14 @@ void integrate::prepare::Output(
 	std::string outSnakeName;
 	
 	if (paramconf.files.ioout.outdir.size()!=0){
+		#ifdef USE_CSTD_FILESYSTEM
+		// use c++17 std library filesystem
+		const std::filesystem::path pathout=paramconf.files.ioout.outdir;
+		std::filesystem::create_directories(pathout);
+		#else
+		// else use boost
 		boost::filesystem::create_directories(paramconf.files.ioout.outdir);
+		#endif
 	}
 	outSnakeName = paramconf.files.ioout.outdir + "/";
 	outSnakeName += "rsvs3D_" + paramconf.files.ioout.pattern + ".plt";
@@ -763,3 +772,4 @@ int integrate::test::All(){
 	std::cerr << " cerr Buffer restored" << std::endl;
 	return 0;
 }
+

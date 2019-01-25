@@ -90,7 +90,7 @@
  {
  	"sublimegdb_workingdir": "${folder:${project_path:main_test.exe}}",
          // NOTE: You MUST provide --interpreter=mi for the plugin to work
-         "sublimegdb_commandline": "gdb --interpreter=mi ./main_test.exe",
+         "sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
 
    //       "ecc_common_flags": ["-ISRCC",
 			//     // some example includes

@@ -237,14 +237,16 @@ int Test_coordvec(){
 		unitCoord.disp();
 
 		cout << "unit access: ";
-		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)<< ","<< 
-		testCoord.Unit(2) << "] norm 1" << endl;
+		cout << "coord vec [" << testCoord.Unit(0) << ","<< testCoord.Unit(1)
+			<< ","<< testCoord.Unit(2) << "] norm 1" << endl;
 
 		cout << "base oper(): ";
-		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1)<< ","<< testCoord(2) << "] " << endl;
+		cout << "coord vec [" << testCoord(0) << ","<< testCoord(1) 
+			<< ","<< testCoord(2) << "] " << endl;
 		cout << "base oper(): ";testCoord.disp();
 		cout << "base oper[]: ";
-		cout << "coord vec [" << testCoord[0] << ","<< testCoord[1]<< ","<< testCoord[2] << "] " << endl;
+		cout << "coord vec [" << testCoord[0] << ","<< testCoord[1] 
+			<< ","<< testCoord[2] << "] " << endl;
 		cout << "base oper[]: ";testCoord.disp();
 
 		cout << "base ope()=: {compile error}";

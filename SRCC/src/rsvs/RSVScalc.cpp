@@ -32,7 +32,7 @@ void RSVScalc::PrepTriangulationCalc(const triangulation &triRSVS){
 		nDv=0;
 	} 
 	BuildMathArrays(nDv, nConstr);
-
+	
 	// TODO this needs to be supported by mapping each volume to the constraint position
 	// There can be more than one constraint for each cell.
 	BuildConstrMap(triRSVS);

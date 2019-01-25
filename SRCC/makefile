@@ -29,17 +29,37 @@ MAINTESTSRC = src/test/test.cpp
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
 DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
-DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
 DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
-DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
-DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
+DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
 
+#------------------------------------------------------
+#                 USE OF OPTIONAL LIBRARIES
+#------------------------------------------------------
+# Some libraries are optional in certain conditions
+# Specify by "true" or "false" whether they should be used
+
+# Boost is needed for the <boost/filesystem> header 
+# except under std=c++17 which added a standard filesystem header
+# (Broken on GCC v8.1 + MinGW, must still use boost)
+USE_BOOST = true
+DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
+# BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
+# boost compiled library file location (for linker)
+LDDIRBOOST = $(DIRBOOST)/stage/lib
+# boost libraries to load: boost_<library>
+LDFILEBOOST = boost_filesystem boost_system
+# boost version appropriate to the system 
+BOOSTVERSION = -mgw63-mt-sd-x64-1_67
+
+# intel MKL libraries for faster Eigen maths 
+# Not compatible with GCC on windows
+DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
 # -isystem$(DIRMKL)
 INCL= 
 
-INCLDIR+= $(DIREIGEN) $(DIRJSON) $(DIRCXXOPTS)
-INCLDIRSYS = $(DIRBOOST)
+INCLDIR+=  $(DIRJSON) $(DIRCXXOPTS)
+INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 #------------------------------------------------------
 #                 COMPILER FLAGS
@@ -47,7 +67,7 @@ INCLDIRSYS = $(DIRBOOST)
 # Standard GCC warning, optimisation and c++ standard flags
 WARNFLAGS= -Wall -Wextra -pedantic
 OPTIMLVL=0
-CCPSTD=c++11
+CCPSTD=17
 
 # Other compiler flags
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC
@@ -65,6 +85,27 @@ CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG)
 # Flags to add when the target is "testall"
 CFTESTFLAG= -DTEST_ALL
 
+#------------------------------------------------------
+#    PARSE correct flags to get FILESYSTEM to work
+#------------------------------------------------------
+
+ifneq (,$(filter $(CC),gcc g++))
+ifneq ($(USE_BOOST),true)
+GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
+GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
+
+$(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
+
+ifneq "$(GCCVERSIONMAJOR)" "7"
+$(warning Attempting to use GCC != v7 without Boost is not supported on windows)
+# space to define the flag specifying the correct file system
+CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM_EXPERIMENTAL
+else
+# space to define the flag specifying the correct file system
+# CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM
+endif
+endif
+endif
 
 #------------------------------------------------------
 #                 LINKER FLAGS
@@ -72,16 +113,21 @@ CFTESTFLAG= -DTEST_ALL
 # LDFILE are the library names, LDDIR are the library 
 # directories
 LDFILE = stdc++ 
-
-LDDIRBOOST = $(DIRBOOST)/stage/lib
-LDFILEBOOST = boost_filesystem boost_system 
-BOOSTVERSION = -mgw63-mt-sd-x64-1_67
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
+# optional boost paths (not needed if using c++17)
 
+ifeq ($(USE_BOOST),true)
 LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
-LDDIR = $(LDDIRBOOST) 
 LDFILE += $(LDFILEBOOSTWITHVERSION)
+CCFLAGCUSTOM += -DUSE_BOOST
+else
+# Leave empty
+LDDIRBOOST = 
+endif
+
+LDDIR = $(LDDIRBOOST) 
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
+
 
 
 #------------------------------------------------------
@@ -91,7 +137,7 @@ LDFILE += $(LDFILEBOOSTWITHVERSION)
 LDFLAGS = 
 
 # Compile list of flags
-CFLAGS=-c -std=$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) $(CCFLAGCUSTOM)
+CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) $(CCFLAGCUSTOM)
 ifeq ($(MAKECMDGOALS),testall)
 CFLAGS+= $(CFTESTFLAG)
 endif

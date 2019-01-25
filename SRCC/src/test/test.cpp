@@ -69,7 +69,7 @@ int main(){
 	#endif //TEST_ALL
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
 	
-	
+
 	gridTest.PrintSummary();
 
 	return(0);

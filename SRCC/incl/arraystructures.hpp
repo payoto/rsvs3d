@@ -42,7 +42,9 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
-#include <boost/stacktrace.hpp>
+#ifdef USE_BOOST 
+	#include <boost/stacktrace.hpp>
+#endif
 
 //==================================
 // Code
@@ -128,7 +130,9 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			#ifdef USE_BOOST 
 			cerr << boost::stacktrace::stacktrace() << endl;
+			#endif
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
@@ -143,7 +147,9 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			#ifdef USE_BOOST 
 			cerr << boost::stacktrace::stacktrace() << endl;
+			#endif
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
@@ -159,7 +165,9 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			#ifdef USE_BOOST 
 			cerr << boost::stacktrace::stacktrace() << endl;
+			#endif
 			cerr << "Attempt to access index " << b 
 				<< " at position " << a <<
 				" in array of size " << elems.size() << endl;
@@ -175,7 +183,9 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			#ifdef USE_BOOST 
 			cerr << boost::stacktrace::stacktrace() << endl;
+			#endif
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
