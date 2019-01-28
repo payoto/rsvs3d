@@ -24,6 +24,7 @@
 #endif //TEST_ALL
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
+#include "tetgen_rsvs_api.hpp"
 
 int main(){
 	customtest gridTest;
@@ -66,8 +67,9 @@ int main(){
 	// RSVS and integration tests
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
 	gridTest.Run(integrate::test::All,"Test full integration");
-	#endif //TEST_ALL
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
+	#endif //TEST_ALL
+	gridTest.Run(test_tetgenapi,"tegen API testing"); // Non working test
 	
 
 	gridTest.PrintSummary();

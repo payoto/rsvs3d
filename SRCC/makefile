@@ -17,10 +17,11 @@ TESTALLEXECUTABLE=testall_RSVS3D
 
 # source, object and dependency directories
 OBJDIR = obj
-SRCTREE = src/
+SRCTREE = src
 DEPDIR := .d
 BINDIR = bin
-INCLDIR= "incl"
+INCLDIR= incl
+#modules/tetgen/
 
 # Sources which contain the main function for all and test
 MAINALLSRC = src/main.cpp
@@ -32,6 +33,7 @@ DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
 DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
+DIRTETGEN= modules/tetgen
 
 #------------------------------------------------------
 #                 USE OF OPTIONAL LIBRARIES
@@ -58,7 +60,8 @@ DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144
 # -isystem$(DIRMKL)
 INCL= 
 
-INCLDIR+=  $(DIRJSON) $(DIRCXXOPTS)
+SRCTREE+= $(DIRTETGEN)
+INCLDIR+=  $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
 INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 #------------------------------------------------------
@@ -75,13 +78,15 @@ CCPSTD=17
 # boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
 # -funroll-all-loops -ffast-math -ffinite-math-only 
+# Tetgen flag to use as library: -DTETLIBRARY
 # cxxopts #
 CCFLAGDBG= -g -ggdb
 CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
 CCFLAGBOOST=
 CCFLAGEIG= 
+CCFLAGETETGEN= -DTETLIBRARY -DNDEBUG
 CCFLAGUSER= 
-CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG)
+CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
 # Flags to add when the target is "testall"
 CFTESTFLAG= -DTEST_ALL
 
@@ -94,7 +99,7 @@ ifneq ($(USE_BOOST),true)
 GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
 GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
 
-$(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
+# $(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
 
 ifneq "$(GCCVERSIONMAJOR)" "7"
 $(warning Attempting to use GCC != v7 without Boost is not supported on windows)
@@ -167,8 +172,10 @@ $(shell mkdir -p $(DEPDIR) >/dev/null)
 $(shell mkdir -p $(OBJDIR) >/dev/null)
 $(shell mkdir -p $(BINDIR) >/dev/null)
 # Object definitions
-SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
-
+SOURCES = $(foreach d,$(wildcard $(SRCTREE)*),$(call rwildcard,$d/,*.cpp))
+# SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
+$(info $(SOURCES))
+$(info sources printed)
 # Handling target differences
 ifeq ($(MAKECMDGOALS), )
 SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
