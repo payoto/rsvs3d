@@ -1,0 +1,3 @@
+[submodule "SRCC/modules/tetgen"]
+	path = SRCC/modules/tetgen
+	url = git@github.com:payoto/tetgen.git
