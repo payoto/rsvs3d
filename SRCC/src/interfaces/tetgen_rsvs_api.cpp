@@ -7,6 +7,7 @@
 #include "snake.hpp"
 #include "snakevel.hpp"
 #include "voxel.hpp"
+#include "arraystructures.hpp"
 // void tetrahedralize(char *switches, tetgenio *in, tetgenio *out, 
 //                     tetgenio *addin, tetgenio *bgmin)
 
@@ -208,15 +209,126 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 }
 
+void RemoveSingularMeshElements(snake &snakein, mesh &meshin){
+
+	double tol = 1e-7;
+	std::vector<bool> isSnaxDone;
+	HashedVector<int, int> closeVert;
+	std::vector<int> sameSnaxs, rmvInds;
+	int nSnax, count, countJ, countRep;
+
+	nSnax = snakein.snaxs.size();
+	isSnaxDone.assign(nSnax,false);
+	closeVert.vec.assign(nSnax,-1);
+
+	count = nSnax;
+	// This piece of code is going to be incomplete as it won't test
+	// for multiple snaxels very close on the same edge
+	// 
+	// closeVert is a list of vertices close
+	for (int i = 0; i < count; ++i)	{
+		if((snakein.snaxs(i)->d<tol)){ 
+			closeVert.vec[i] = snakein.snaxs(i)->fromvert;
+		} else if (((1-snakein.snaxs(i)->d)<tol)){
+			closeVert.vec[i] = snakein.snaxs(i)->tovert;
+		} 
+	}
+
+	countRep = 0;
+	closeVert.GenerateHash();
+	rmvInds.reserve(count);
+	// Find matching elements and perform the replacement process
+	for (int i = 0; i < count; ++i)
+	{
+		if(!isSnaxDone[i] && closeVert.vec[i]!=-1)
+		{
+			sameSnaxs=closeVert.findall(closeVert.vec[i]);
+			countJ = sameSnaxs.size();
+			for (int j = 1; j < countJ; ++j)
+			{
+				meshin.SwitchIndex(1, meshin.verts(sameSnaxs[j])->index, 
+					meshin.verts(sameSnaxs[0])->index);
+				countRep++;
+				rmvInds.push_back(meshin.verts(sameSnaxs[j])->index);
+			}
+
+		} else {
+			isSnaxDone[i]=true;
+		}
+	}
+	sort(rmvInds);
+	unique(rmvInds);
+	meshin.verts.remove(rmvInds);
+	meshin.verts.PrepareForUse();
+	rmvInds.clear();
+	std::cout << "Number of removed vertices " << countRep << std::endl;
+	
+	// Remove Edges
+	count  = meshin.edges.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(meshin.edges(i)->vertind[0]==meshin.edges(i)->vertind[1]){
+			meshin.RemoveIndex(2, meshin.edges(i)->index);
+			rmvInds.push_back(meshin.edges(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed edges " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	meshin.edges.remove(rmvInds);
+	meshin.edges.PrepareForUse();
+	rmvInds.clear();
+
+	// Remove Surfs
+	count  = meshin.surfs.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(meshin.surfs(i)->edgeind.size()<3){
+			meshin.RemoveIndex(3, meshin.surfs(i)->index);
+			rmvInds.push_back(meshin.surfs(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed surfs " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	meshin.surfs.remove(rmvInds);
+	meshin.surfs.PrepareForUse();
+	rmvInds.clear();
+
+	// Remove Volus
+	count  = meshin.volus.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(meshin.volus(i)->surfind.size()<4){
+			meshin.RemoveIndex(3, meshin.volus(i)->index);
+			rmvInds.push_back(meshin.volus(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed volus " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	meshin.volus.remove(rmvInds);
+	meshin.volus.PrepareForUse();
+	rmvInds.clear();
+
+
+}
 
 void tetgen_RSVS(snake &snakein){
 
 	mesh meshdomain, meshgeom;
-	tetgenio_safe tetin;
+	tetgenio_safe tetin, tetout;
 	triangulation triRSVS;
-	int nHoles;
+	int nHoles, count;
 
 	// Triangulation preparation
+	snakein.AssignInternalVerts();
 	triRSVS.stattri.clear();
 	triRSVS.trivert.clear();
 	triRSVS.PrepareForUse();
@@ -225,17 +337,51 @@ void tetgen_RSVS(snake &snakein){
 	triRSVS.PrepareForUse();
 	triRSVS.CalcTriVertPos();
 	MaintainTriangulateSnake(triRSVS);
-	MeshTriangulation(meshgeom,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+	MeshTriangulation(meshgeom,snakein.snakeconn,triRSVS.dynatri,
+		triRSVS.trivert);
 	meshgeom.PrepareForUse();
 	meshgeom.displight();
+	meshgeom.TightenConnectivity();
 	meshgeom.OrderEdges();
 
+	RemoveSingularMeshElements(snakein,meshgeom);
+
 	// Find number of holes
-	
+	nHoles = 0;
+	count = snakein.isMeshVertIn.size();
+	for (int i = 0; i < count; ++i) {
+		nHoles+=int(snakein.isMeshVertIn[i]);
+	}
 
 	meshdomain = BuildDomain({-2, -2, -2}, {5, 5, 5});
 	meshdomain.PrepareForUse();
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
+
+	std::cout<< std::endl << nHoles << std::endl;
+
+	// Assign the holes
+	for (int i = 0; i < nHoles; ++i)
+	{
+		if(snakein.isMeshVertIn[i]){
+			for(int j=0; j<3; ++j){
+				tetin.holelist[i*3+j]=snakein.snakemesh->verts(i)->coord[j];
+			}
+		}
+	}
+
+
+	tetin.save_nodes("rsvs_3cell_2body");
+	tetin.save_poly("rsvs_3cell_2body");
+
+	// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+	//   do quality mesh generation (q) with a specified quality bound
+	//   (1.414), and apply a maximum volume constraint (a0.1).
+
+	tetrahedralize("pq1.414a0.1", &tetin, &tetout);
+
+	tetout.save_nodes("rsvsout_3cell_2body");
+	tetout.save_elements("rsvsout_3cell_2body");
+	tetout.save_faces("rsvsout_3cell_2body");
 }
 
 int tetcall()
