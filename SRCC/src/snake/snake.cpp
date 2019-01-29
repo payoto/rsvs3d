@@ -304,7 +304,13 @@ void snake::PrepareForUse(bool needOrder) {
 	snaxedges.PrepareForUse();
 	snaxsurfs.PrepareForUse();
 	snakeconn.PrepareForUse(needOrder);
-	snakemesh->PrepareForUse();
+	if(this->snakemesh!=NULL){
+		snakemesh->PrepareForUse();
+	} else {
+		cerr << endl << "Warning: Mesh containing snake unset in snake"
+			" object.\n Set attribute `snakemesh` to a mesh pointer" << endl;
+	}
+
 	is3D=int(snakemesh->volus.size())>0;
 
 	if (int(isMeshVertIn.size()) != int(snakemesh->verts.size())){

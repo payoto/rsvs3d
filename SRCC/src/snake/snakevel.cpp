@@ -103,7 +103,7 @@ void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS){
 
-	TriangulateContainer(snakein.snakeconn, triangleRSVS , 2);
+	TriangulateContainer(snakein.snakeconn, triangleRSVS, 2);
 	triangleRSVS.snakeDep=&snakein;
 }
 
@@ -118,12 +118,14 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 		triangleRSVS.CleanDynaTri();
 		triangleRSVS.trivert.SetMaxIndex();
 		if(surfReTriangulate.size()>0){
-			TriangulateContainer(triangleRSVS.snakeDep->snakeconn, triangleRSVS , 2,surfReTriangulate);
+			TriangulateContainer(triangleRSVS.snakeDep->snakeconn,
+				triangleRSVS, 2, surfReTriangulate);
 		}
 
 		BuildTriSurfGridSnakeIntersect(triangleRSVS);
 		surfReTriangulate.clear();
-		TriangulateContainer(triangleRSVS.snakeDep->snakeconn, triangleRSVS , 3,surfReTriangulate);
+		TriangulateContainer(triangleRSVS.snakeDep->snakeconn,
+			triangleRSVS, 3,surfReTriangulate);
 
 		n=triangleRSVS.trivert.size();
 		// Still need to recompute coordinates

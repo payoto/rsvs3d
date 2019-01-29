@@ -75,7 +75,13 @@ public:
 	using tetgenio::vfacetlist;
 	using tetgenio::vcelllist;
 
+	// using tetgenio::~tetgenio;
+
 	void allocate();
+	void allocatefacet(int fIndex);
+	void allocatefacet(int fIndex, int numPoly);
+	void allocatefacetpolygon(int fIndex, int pIndex);
+	void allocatefacetpolygon(int fIndex, int pIndex, int numVerts);
 };
 
 

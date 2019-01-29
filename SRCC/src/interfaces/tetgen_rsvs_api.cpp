@@ -1,8 +1,12 @@
 #include <iostream>
+#include <vector>
 
 #include "tetgen_rsvs_api.hpp"
 #include "tetgen.h"
-
+#include "mesh.hpp"
+#include "snake.hpp"
+#include "snakevel.hpp"
+#include "voxel.hpp"
 // void tetrahedralize(char *switches, tetgenio *in, tetgenio *out, 
 //                     tetgenio *addin, tetgenio *bgmin)
 
@@ -57,7 +61,182 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "tetgen.h" // Defined tetgenio, tetrahedralize().
+
+
+void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
+	/*
+	Loads data for tetgen testing
+	*/
+
+	triangulation triRSVS;
+
+	snakeMesh.read("../TESTOUT/testtetgen/SnakeMesh_181205T193158_sphere2.msh");
+	voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
+	snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
+	// snakein.snakeconn.read("../TESTOUT/testtetgen/SnakeConn_181205T193158_sphere2.msh");
+	snakein.snakemesh = &snakeMesh;
+	
+	snakeMesh.PrepareForUse();
+	snakeMesh.displight();
+	
+	voluMesh.PrepareForUse();
+	voluMesh.displight();
+
+	snakein.PrepareForUse();
+	snakein.displight();
+
+	snakeMesh.AddParent(&voluMesh);
+
+	triRSVS.stattri.clear();
+	triRSVS.trivert.clear();
+	triRSVS.PrepareForUse();
+	TriangulateMesh(snakeMesh,triRSVS);
+	TriangulateSnake(snakein,triRSVS);
+	triRSVS.PrepareForUse();
+	triRSVS.CalcTriVertPos();
+	MaintainTriangulateSnake(triRSVS);
+
+	MeshTriangulation(triMesh,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+	triMesh.displight();
+	triMesh.PrepareForUse();
+	triMesh.OrderEdges();
+	triMesh.TestConnectivityBiDir();
+
+	// triMesh is the triangulation in mesh format
+	// it is not cleaned up for tiny surfaces
+}
+
+mesh BuildDomain(const std::vector<double> &lowerB, const std::vector<double> &upperB){
+	/*
+	Builds a parralelipipede domain stretching from lowerB to upperB
+
+	`lowerB` and `upperB` must be vectors of size 3.
+	*/	
+	mesh cube;
+	int count; 
+
+	if(lowerB.size()!=3 || upperB.size()!=3){
+		std::cerr << "Error in " << __PRETTY_FUNCTION__ << " vectors must be"
+			" of size 3" << std::endl;
+		throw invalid_argument("Input vectors must be of size 3");
+	}
+
+	std::array<int, 3> dimGrid={1, 1, 1};
+	BuildBlockGrid(dimGrid, cube);
+
+	count = cube.verts.size();
+	for (int i = 0; i < count; ++i) {
+		for (int j = 0; j < 3; ++j)	{
+			cube.verts[i].coord[j] = (cube.verts[i].coord[j]*(upperB[j]-lowerB[j])) + lowerB[j];
+		}
+	}
+
+	return cube;
+}
+
+
+void MeshData2Tetgenio(const mesh &meshgeom, tetgenio_safe &tetin,
+	int facetOffset, int pointOffset, int pointMarker, const std::vector<double> &pointMtrList){
+	/*
+	Writes meshdata into the tetgenio format for a single mesh
+	*/
+	vector<int> orderVert;
+	int countI, countJ, countK;
+
+	// Set point properties to the appropriate lists
+	countI = meshgeom.verts.size();
+	countJ = min(int(pointMtrList.size()), tetin.numberofpointmtrs);
+	for (int i = 0; i < countI; ++i) {
+		// set point coordinates
+		for (int j = 0; j < 3; ++j) {
+			tetin.pointlist[(i+pointOffset)*3+j] = meshgeom.verts(i)->coord[j];
+		}
+		// set point metrics
+		for (int j = 0; j < countJ; ++j) {
+			tetin.pointlist[(i+pointOffset)*countJ+j] =pointMtrList[j];
+		}
+		// set point markers
+		tetin.pointmarkerlist[i] = pointMarker;
+	}
+
+	// Set connectivity through facet and polygon
+	countI = meshgeom.volus.size();
+	for (int i = 0; i < countI; ++i){
+		countJ= meshgeom.volus(i)->surfind.size();
+		tetin.allocatefacet(i+facetOffset,countJ);
+		for (int j = 0; j < countJ; ++j){
+			meshgeom.surfs.isearch(meshgeom.volus(i)->surfind[j])
+				->OrderedVerts(&meshgeom,orderVert);
+			tetin.allocatefacetpolygon(i+facetOffset,j,orderVert.size());
+			countK = orderVert.size();
+			for (int k = 0; k < countK; ++k){
+				tetin.facetlist[i+facetOffset].polygonlist[j].vertexlist[k] 
+					= meshgeom.verts.find(orderVert[k])+pointOffset;
+			}
+		}
+
+	}
+}
+
+void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
+	tetgenio_safe &tetin, int numHoles){
+	/*
+	Converts a mesh into the safe allocation tetgenio format.
+	
+	Rules of conversion are: 
+		- volu becomes a facet
+		- surf becomes a polygon in the facet
+		- edges are not logged
+		- points come as a list
+	*/
+	
+
+	tetin.firstnumber=0;
+
+	tetin.numberoffacets = meshgeom.volus.size() + meshdomain.volus.size();
+	tetin.numberofholes = meshgeom.volus.size();
+	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
+
+	tetin.numberofpointmtrs = 0;
+
+
+	tetin.allocate();
+
+	// MeshData2Tetgenio(meshgeom, tetin, facetOffset, pointOffset, pointMarker, pointMtrList);
+	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {});
+	MeshData2Tetgenio(meshdomain, tetin, meshgeom.volus.size(), meshgeom.verts.size(), 2, {});
+
+}
+
+
+void tetgen_RSVS(snake &snakein){
+
+	mesh meshdomain, meshgeom;
+	tetgenio_safe tetin;
+	triangulation triRSVS;
+	int nHoles;
+
+	// Triangulation preparation
+	triRSVS.stattri.clear();
+	triRSVS.trivert.clear();
+	triRSVS.PrepareForUse();
+	TriangulateMesh(*snakein.snakemesh,triRSVS);
+	TriangulateSnake(snakein,triRSVS);
+	triRSVS.PrepareForUse();
+	triRSVS.CalcTriVertPos();
+	MaintainTriangulateSnake(triRSVS);
+	MeshTriangulation(meshgeom,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+	meshgeom.PrepareForUse();
+	meshgeom.displight();
+	meshgeom.OrderEdges();
+
+	// Find number of holes
+	
+
+	meshdomain = BuildDomain({-2, -2, -2}, {5, 5, 5});
+	meshdomain.PrepareForUse();
+	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
+}
 
 int tetcall()
 {
@@ -66,11 +245,17 @@ int tetcall()
 	tetgenio::facet *f;
 	tetgenio::polygon *p;
 	int i;
+	mesh snakeMesh, voluMesh, triMesh;
+	snake snakein;
 
+	load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
+	tetgen_RSVS(snakein);
 	// All indices start from 1.
 	in.firstnumber = 1;
 	in.numberofpoints = 8;
 	in.numberoffacets = 6;
+	in.numberofholes = 0;
+
 	in.allocate();
 	// in.pointlist = new REAL[in.numberofpoints * 3];
 	// in.facetlist = new tetgenio::facet[in.numberoffacets];
@@ -98,8 +283,8 @@ int tetcall()
 
 	// Facet 1. The leftmost facet.
 	f = &in.facetlist[0];
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
 	f->numberofpolygons = 1;
+	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
 	f->numberofholes = 0;
 	f->holelist = NULL;
 	p = &f->polygonlist[0];
@@ -188,7 +373,8 @@ int tetcall()
 	in.facetmarkerlist[3] = 0;
 	in.facetmarkerlist[4] = 0;
 	in.facetmarkerlist[5] = 0;
-
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wwrite-strings"
 	// Output the PLC to files 'barin.node' and 'barin.poly'.
 	in.save_nodes("barin");
 	in.save_poly("barin");
@@ -203,6 +389,7 @@ int tetcall()
 	out.save_nodes("barout");
 	out.save_elements("barout");
 	out.save_faces("barout");
+	#pragma GCC diagnostic pop
 
 	return 0;
 }
@@ -229,6 +416,10 @@ void tetgenio_safe::allocate(){
 	if(this->numberoffacets>0){
 		this->facetlist = new tetgenio::facet[this->numberoffacets];
 		this->facetmarkerlist = new int[this->numberoffacets];
+		for (int i = 0; i < this->numberoffacets; ++i){
+			this->facetlist[i].numberofpolygons=0;
+			this->facetlist[i].numberofholes=0;
+		}
 	}
 
 	// Allocation of holes (a set of points)
@@ -272,6 +463,64 @@ void tetgenio_safe::allocate(){
 	}
 }
 
+void tetgenio_safe::allocatefacet(int fIndex){
+	if (fIndex<this->numberoffacets){
+		if(this->facetlist[fIndex].numberofpolygons>0){
+			this->facetlist[fIndex].polygonlist 
+				= new tetgenio::polygon[this->facetlist[fIndex].numberofpolygons];
+		}
+		if(this->facetlist[fIndex].numberofholes>0){
+			this->facetlist[fIndex].holelist 
+				= new REAL[this->facetlist[fIndex].numberofholes];
+		}
+
+	} else {
+		std::cerr << "Error: Index passed to facet allocation out "
+			"of range" << std::endl;
+	}
+}
+void tetgenio_safe::allocatefacetpolygon(int fIndex, int pIndex){
+	if (fIndex<this->numberoffacets){
+		if (pIndex<this->facetlist[fIndex].numberofpolygons){
+			if(this->facetlist[fIndex].polygonlist[pIndex].numberofvertices>0){
+				this->facetlist[fIndex].polygonlist[pIndex].vertexlist 
+					= new int[this->facetlist[fIndex].polygonlist[pIndex].numberofvertices];
+			}
+
+		} else {
+			std::cerr << "Error: Index passed to polygon allocation out "
+				"of range" << std::endl;
+		}
+	} else {
+		std::cerr << "Error: Index passed to facet allocation out "
+			"of range" << std::endl;
+	}
+}
+void tetgenio_safe::allocatefacet(int fIndex, int numPoly){
+	if (fIndex<this->numberoffacets){
+		this->facetlist[fIndex].numberofpolygons=numPoly;
+		this->allocatefacet(fIndex);
+
+	} else {
+		std::cerr << "Error: Index passed to facet allocation out "
+			"of range" << std::endl;
+	}
+}
+
+void tetgenio_safe::allocatefacetpolygon(int fIndex, int pIndex, int numVerts){
+	if (fIndex<this->numberoffacets){
+		if (pIndex<this->facetlist[fIndex].numberofpolygons){
+			this->facetlist[fIndex].polygonlist[pIndex].numberofvertices = numVerts;
+			this->allocatefacetpolygon(fIndex,pIndex);
+		} else {
+			std::cerr << "Error: Index passed to polygon allocation out "
+				"of range" << std::endl;
+		}
+	} else {
+		std::cerr << "Error: Index passed to facet allocation out "
+			"of range" << std::endl;
+	}
+}
 
 // Test code
 int test_tetgenapi(){
