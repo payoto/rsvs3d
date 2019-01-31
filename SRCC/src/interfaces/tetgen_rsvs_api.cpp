@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <array>
 
 #include "tetgen_rsvs_api.hpp"
 #include "tetgen.h"
@@ -11,58 +12,6 @@
 #include "postprocessing.hpp"
 // void tetrahedralize(char *switches, tetgenio *in, tetgenio *out, 
 //                     tetgenio *addin, tetgenio *bgmin)
-
-///////////////////////////////////////////////////////////////////////////////
-//                                                                           //
-// tetcall.cxx                                                               //
-//                                                                           //
-// An example of how to call TetGen from another program by using the data   //
-// type "tetgenio" and function "tetrahedralize()" of TetGen libaray.        //
-//                                                                           //
-// In order to run this example, you need the library of TetGen, you can get //
-// the source code as well as the user's manul of TetGen from:               //
-//                                                                           //
-//            http://tetgen.berlios.de/index.html                            //
-//                                                                           //
-// Section 2 of the user's manual contains the information of how to compile //
-// TetGen into a libaray.                                                    //
-//                                                                           //
-// The geometry used in this example (illustrated in Section 3.3 .1, Figure  //
-// 12 of the user's manual) is a rectangluar bar consists of 8 points and 6  //
-// facets (which are all rectangles). In additional, there are two boundary  //
-// markers defined on its facets.                                            //
-//                                                                           //
-// This code illustrates the following basic steps:                          //
-//   - at first create an input object "in", and set data of the geometry    //
-//     into it.                                                              //
-//   - then call function "tetrahedralize()" to create a quality mesh of the //
-//     geometry with output in another object "out".                         //
-// In addition, It outputs the geometry in the object "in" into two files    //
-// (barin.node and barin.poly), and outputs the mesh in the object "out"     //
-// into three files (barout.node, barout.ele, and barout.face).  These files //
-// can be visualized by TetView.                                             //
-//                                                                           //
-// To compile this code into an executable program, do the following steps:  //
-//   - compile TetGen into a library named "libtet.a" (see Section 2.1 of    //
-//     the user's manula for compiling);                                     //
-//   - Save this file into the same directory in which you have the files    //
-//     "tetgen.h" and "libtet.a";                                            //
-//   - compile it using the following command:                               //
-//                                                                           //
-//     g++ -o test tetcall.cxx -L./ -ltet                                    //
-//                                                                           //
-//     which will result an executable program named "test".                 //
-//                                                                           //
-// Please send your quesions, comments to Hang Si <si@wias-berlin.de>        //
-//                                                                           //
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-//                                                                           //
-// main()  Create and refine a mesh using TetGen library.                    //
-//                                                                           //
-///////////////////////////////////////////////////////////////////////////////
-
 
 
 void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
@@ -86,6 +35,7 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 
 	snakein.PrepareForUse();
 	snakein.displight();
+	snakein.AssignInternalVerts();
 
 	snakeMesh.AddParent(&voluMesh);
 
@@ -108,7 +58,7 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 	// it is not cleaned up for tiny surfaces
 }
 
-mesh BuildDomain(const std::vector<double> &lowerB, const std::vector<double> &upperB){
+mesh BuildDomain(const std::array<double,3> &lowerB, const std::array<double,3> &upperB){
 	/*
 	Builds a parralelipipede domain stretching from lowerB to upperB
 
@@ -137,7 +87,7 @@ mesh BuildDomain(const std::vector<double> &lowerB, const std::vector<double> &u
 }
 
 
-void MeshData2Tetgenio(const mesh &meshgeom, tetgenio_safe &tetin,
+void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 	int facetOffset, int pointOffset, int pointMarker, const std::vector<double> &pointMtrList){
 	/*
 	Writes meshdata into the tetgenio format for a single mesh
@@ -180,7 +130,7 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgenio_safe &tetin,
 
 
 void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
-	tetgenio_safe &tetin, int numHoles){
+	tetgen::io_safe &tetin, int numHoles){
 	/*
 	Converts a mesh into the safe allocation tetgenio format.
 	
@@ -203,148 +153,72 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 	tetin.allocate();
 
-	// MeshData2Tetgenio(meshgeom, tetin, facetOffset, pointOffset, pointMarker, pointMtrList);
+	// MeshData2Tetgenio(meshgeom, tetin, facetOffset, pointOffset, 
+	// pointMarker, pointMtrList);
 	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {});
-	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), meshgeom.verts.size(), 2, {});
+	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
+		meshgeom.verts.size(), 2, {});
 
 }
 
-void RemoveSingularMeshElements(snake &snakein, mesh &meshin){
-
-	double tol = 1e-3;
+HashedVector<int, int> GroupCloseSnaxels(const snake &snakein, double distTol){
+	/*
+	Merges snaxel which are `distTol` to the end of their carrying edge.
+	*/
 	std::vector<bool> isSnaxDone;
 	HashedVector<int, int> closeVert;
 	std::vector<int> sameSnaxs, rmvInds;
-	int nSnax, count, countJ, countRep;
+	int nSnax;
 
 	nSnax = snakein.snaxs.size();
-	isSnaxDone.assign(nSnax,false);
 	closeVert.vec.assign(nSnax,-1);
 
-	count = nSnax;
 	// This piece of code is going to be incomplete as it won't test
 	// for multiple snaxels very close on the same edge
 	// 
 	// closeVert is a list of vertices close
 	for (int i = 0; i < nSnax; ++i)	{
-		if((snakein.snaxs(i)->d<tol)){ 
+		if((snakein.snaxs(i)->d<distTol)){ 
 			closeVert.vec[i] = snakein.snaxs(i)->fromvert;
-		} else if (((1-snakein.snaxs(i)->d)<tol)){
+		} else if (((1-snakein.snaxs(i)->d)<distTol)){
 			closeVert.vec[i] = snakein.snaxs(i)->tovert;
 		} 
 	}
 
-	countRep = 0;
 	closeVert.GenerateHash();
-	rmvInds.reserve(nSnax);
-	// Find matching elements and perform the replacement process
-	for (int i = 0; i < nSnax; ++i)
-	{
-		if(!isSnaxDone[i] && closeVert.vec[i]!=-1)
-		{
-			sameSnaxs=closeVert.findall(closeVert.vec[i]);
-			countJ = sameSnaxs.size();
-			for (int j = 1; j < countJ; ++j)
-			{
-				meshin.SwitchIndex(1, meshin.verts(sameSnaxs[j])->index, 
-					meshin.verts(sameSnaxs[0])->index);
-				countRep++;
-				rmvInds.push_back(meshin.verts(sameSnaxs[j])->index);
-				isSnaxDone[sameSnaxs[j]]=true;
-			}
-			isSnaxDone[sameSnaxs[0]]=true;
-
-		} else {
-			isSnaxDone[i]=true;
-		}
-	}
-	sort(rmvInds);
-	unique(rmvInds);
-	FILE *fid;
-	fid = fopen("delvert.txt","w");
-	for (int i = 0; i < countRep; ++i)
-	{	
-		for (int j = 0; j < 3; ++j)
-		{
-			fprintf(fid, "%f ", meshin.verts.isearch(rmvInds[i])->coord[j]);
-		}
-		fprintf(fid, "\n");
-	}
-	meshin.verts.remove(rmvInds);
-	meshin.verts.PrepareForUse();
-	std::cout << "Number of removed vertices " << countRep <<
-		 " " << rmvInds.size() << std::endl;
-	rmvInds.clear();
-	
-	// Remove Edges
-	count  = meshin.edges.size();
-	countRep= 0;
-	for (int i = 0; i < count; ++i)
-	{
-		if(meshin.edges(i)->vertind[0]==meshin.edges(i)->vertind[1]){
-			meshin.RemoveIndex(2, meshin.edges(i)->index);
-			rmvInds.push_back(meshin.edges(i)->index);
-			countRep++;
-		}
-	}
-	std::cout << "Number of removed edges " << countRep << std::endl;
-	sort(rmvInds);
-	unique(rmvInds);
-	meshin.edges.remove(rmvInds);
-	meshin.edges.PrepareForUse();
-	rmvInds.clear();
-
-	// Remove Surfs
-	count  = meshin.surfs.size();
-	countRep= 0;
-	for (int i = 0; i < count; ++i)
-	{
-		if(meshin.surfs(i)->edgeind.size()<3){
-			meshin.RemoveIndex(3, meshin.surfs(i)->index);
-			rmvInds.push_back(meshin.surfs(i)->index);
-			countRep++;
-		}
-	}
-	std::cout << "Number of removed surfs " << countRep << std::endl;
-	sort(rmvInds);
-	unique(rmvInds);
-	meshin.surfs.remove(rmvInds);
-	meshin.surfs.PrepareForUse();
-	rmvInds.clear();
-
-	// Remove Volus
-	count  = meshin.volus.size();
-	countRep= 0;
-	for (int i = 0; i < count; ++i)
-	{
-		if(meshin.volus(i)->surfind.size()<4){
-			meshin.RemoveIndex(3, meshin.volus(i)->index);
-			rmvInds.push_back(meshin.volus(i)->index);
-			countRep++;
-		}
-	}
-	std::cout << "Number of removed volus " << countRep << std::endl;
-	sort(rmvInds);
-	unique(rmvInds);
-	meshin.volus.remove(rmvInds);
-	meshin.volus.PrepareForUse();
-	rmvInds.clear();
-
+	return closeVert;
 }
 
-void tetgen_RSVS(snake &snakein){
+
+
+
+void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
+	const tetgen::apiparam &tetgenParam){
+	/*
+	Processes a snake object into a tetgen input object.
+
+	This function processes snake objects into the safe tetgenio object.
+	This can then used to generate a tetrahedral mesh or to save it as the
+	input file.
+	*/
 
 	mesh meshdomain, meshgeom, meshtemp;
-	tetgenio_safe tetin, tetout;
 	triangulation triRSVS;
 	int nHoles, nPtsHole, kk, count;
+	std::vector<int> lowerB, upperB;
+
 	tecplotfile tecout;
 
+	// Cleanup the mesh
 	tecout.OpenFile("../TESTOUT/rsvs_tetgen_mesh.plt");
 	meshtemp=snakein.snakeconn;
 	tecout.PrintMesh(meshtemp);
 	meshtemp.displight();
-	RemoveSingularMeshElements(snakein,meshtemp);
+
+	auto groupedVertices = GroupCloseSnaxels(snakein, tetgenParam.distanceTol);
+	meshtemp.MergeGroupedVertices(groupedVertices);
+	meshtemp.RemoveSingularConnectors();
+
 	meshtemp.PrepareForUse();
 	meshtemp.TestConnectivityBiDir();
 	meshtemp.TightenConnectivity();
@@ -353,12 +227,11 @@ void tetgen_RSVS(snake &snakein){
 	meshtemp.displight();
 
 	// Triangulation preparation
-	snakein.AssignInternalVerts();
 	triRSVS.stattri.clear();
 	triRSVS.trivert.clear();
 	triRSVS.PrepareForUse();
 	TriangulateMesh(meshtemp,triRSVS);
-	TriangulateSnake(snakein,triRSVS);
+
 	triRSVS.PrepareForUse();
 	triRSVS.CalcTriVertPos();
 	MeshTriangulation(meshgeom,meshtemp,triRSVS.stattri,
@@ -378,7 +251,7 @@ void tetgen_RSVS(snake &snakein){
 	// 	nHoles+=int(snakein.isMeshVertIn[i]);
 	// }
 
-	meshdomain = BuildDomain({-2, -2, -2}, {5, 5, 5});
+	meshdomain = BuildDomain(tetgenParam.lowerB, tetgenParam.upperB);
 	meshdomain.PrepareForUse();
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
@@ -402,179 +275,39 @@ void tetgen_RSVS(snake &snakein){
 
 
 	tecout.PrintMesh(meshdomain);
-	tetin.
-	tetin.save_nodes("rsvs_3cell_2body");
-	tetin.save_poly("rsvs_3cell_2body");
 
-	// // Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
-	// //   do quality mesh generation (q) with a specified quality bound
-	// //   (1.414), and apply a maximum volume constraint (a0.1).
-
-	// tetrahedralize("pkq1.414a0.1", &tetin, &tetout);
-
-	// tetout.save_nodes("rsvsout_3cell_2body");
-	// tetout.save_elements("rsvsout_3cell_2body");
-	// tetout.save_faces("rsvsout_3cell_2body");
+	
 }
 
 int tetcall()
 {
-	tetgenio_safe in;
-	tetgenio out;
-	tetgenio::facet *f;
-	tetgenio::polygon *p;
-	int i;
+	tetgen::io_safe tetin, tetout;
+	tetgen::apiparam inparam;
 	mesh snakeMesh, voluMesh, triMesh;
 	snake snakein;
 
 	load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
-	tetgen_RSVS(snakein);
-	// All indices start from 1.
-	in.firstnumber = 1;
-	in.numberofpoints = 8;
-	in.numberoffacets = 6;
-	in.numberofholes = 0;
-
-	in.allocate();
-	// in.pointlist = new REAL[in.numberofpoints * 3];
-	// in.facetlist = new tetgenio::facet[in.numberoffacets];
-	// in.facetmarkerlist = new int[in.numberoffacets];
-
-	in.pointlist[0]  = 0;  // node 1.
-	in.pointlist[1]  = 0;
-	in.pointlist[2]  = 0;
-	in.pointlist[3]  = 2;  // node 2.
-	in.pointlist[4]  = 0;
-	in.pointlist[5]  = 0;
-	in.pointlist[6]  = 2;  // node 3.
-	in.pointlist[7]  = 2;
-	in.pointlist[8]  = 0;
-	in.pointlist[9]  = 0;  // node 4.
-	in.pointlist[10] = 2;
-	in.pointlist[11] = 0;
-	// Set node 5, 6, 7, 8.
-	for (i = 4; i < 8; i++) {
-		in.pointlist[i * 3]     = in.pointlist[(i - 4) * 3];
-		in.pointlist[i * 3 + 1] = in.pointlist[(i - 4) * 3 + 1];
-		in.pointlist[i * 3 + 2] = 12;
-	}
+	TetgenInput_RSVS(snakein, tetin, inparam);
 
 
-	// Facet 1. The leftmost facet.
-	f = &in.facetlist[0];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 1;
-	p->vertexlist[1] = 2;
-	p->vertexlist[2] = 3;
-	p->vertexlist[3] = 4;
-
-	// Facet 2. The rightmost facet.
-	f = &in.facetlist[1];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 5;
-	p->vertexlist[1] = 6;
-	p->vertexlist[2] = 7;
-	p->vertexlist[3] = 8;
-
-	// Facet 3. The bottom facet.
-	f = &in.facetlist[2];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 1;
-	p->vertexlist[1] = 5;
-	p->vertexlist[2] = 6;
-	p->vertexlist[3] = 2;
-
-	// Facet 4. The back facet.
-	f = &in.facetlist[3];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 2;
-	p->vertexlist[1] = 6;
-	p->vertexlist[2] = 7;
-	p->vertexlist[3] = 3;
-
-	// Facet 5. The top facet.
-	f = &in.facetlist[4];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 3;
-	p->vertexlist[1] = 7;
-	p->vertexlist[2] = 8;
-	p->vertexlist[3] = 4;
-
-	// Facet 6. The front facet.
-	f = &in.facetlist[5];
-	f->numberofpolygons = 1;
-	f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
-	f->numberofholes = 0;
-	f->holelist = NULL;
-	p = &f->polygonlist[0];
-	p->numberofvertices = 4;
-	p->vertexlist = new int[p->numberofvertices];
-	p->vertexlist[0] = 4;
-	p->vertexlist[1] = 8;
-	p->vertexlist[2] = 5;
-	p->vertexlist[3] = 1;
-
-	// Set 'in.facetmarkerlist'
-
-	in.facetmarkerlist[0] = -1;
-	in.facetmarkerlist[1] = -2;
-	in.facetmarkerlist[2] = 0;
-	in.facetmarkerlist[3] = 0;
-	in.facetmarkerlist[4] = 0;
-	in.facetmarkerlist[5] = 0;
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wwrite-strings"
-	// Output the PLC to files 'barin.node' and 'barin.poly'.
-	in.save_nodes("barin");
-	in.save_poly("barin");
+	tetin.save_nodes("rsvs_3cell_2body");
+	tetin.save_poly("rsvs_3cell_2body");
 
 	// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 	//   do quality mesh generation (q) with a specified quality bound
 	//   (1.414), and apply a maximum volume constraint (a0.1).
+	inparam.command = "pkq1.414a0.1"; 
+	tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
-	tetrahedralize("pq1.414a0.1", &in, &out);
-
-	// Output mesh to files 'barout.node', 'barout.ele' and 'barout.face'.
-	out.save_nodes("barout");
-	out.save_elements("barout");
-	out.save_faces("barout");
-	#pragma GCC diagnostic pop
+	// tetout.save_nodes("rsvsout_3cell_2body");
+	// tetout.save_elements("rsvsout_3cell_2body");
+	// tetout.save_faces("rsvsout_3cell_2body");
 
 	return 0;
 }
 
 
-void tetgenio_safe::allocate(){
+void tetgen::io_safe::allocate(){
 
 	// Allocation of points and associated attributes
 	if (this->numberofpoints>0){
@@ -623,7 +356,7 @@ void tetgenio_safe::allocate(){
 		this->trifacelist = new int[this->numberoftrifaces*3];
 		this->trifacemarkerlist = new int[this->numberoftrifaces];
 		this->o2facelist = new int[this->numberoftrifaces*3];
-		this->adjtetlist = new int[this->numberoftrifaces*2];
+		this->face2tetlist = new int[this->numberoftrifaces*2];
 	}
 
 	// Allocate edges
@@ -631,18 +364,19 @@ void tetgenio_safe::allocate(){
 		this->edgelist = new int[this->numberofedges*2];
 		this->edgemarkerlist = new int[this->numberofedges];
 		this->o2edgelist = new int[this->numberofedges];
-		this->edgeadjtetlist = new int[this->numberofedges];
+		this->edge2tetlist = new int[this->numberofedges];
+		this->face2edgelist = new int[this->numberofedges*3];
 	}
 
 	// Voronoi implementation
 	if(this->numberofvedges || this->numberofvpoints 
 		|| this->numberofvcells || this->numberofvfacets){
-		std::cerr << "Warning : tetgenio_safe::allocate() does not support "
+		std::cerr << "Warning : tetgen::io_safe::allocate() does not support "
 			"Voronoi variables" << std::endl; 
 	}
 }
 
-void tetgenio_safe::allocatefacet(int fIndex){
+void tetgen::io_safe::allocatefacet(int fIndex){
 	if (fIndex<this->numberoffacets){
 		if(this->facetlist[fIndex].numberofpolygons>0){
 			this->facetlist[fIndex].polygonlist 
@@ -658,7 +392,7 @@ void tetgenio_safe::allocatefacet(int fIndex){
 			"of range" << std::endl;
 	}
 }
-void tetgenio_safe::allocatefacetpolygon(int fIndex, int pIndex){
+void tetgen::io_safe::allocatefacetpolygon(int fIndex, int pIndex){
 	if (fIndex<this->numberoffacets){
 		if (pIndex<this->facetlist[fIndex].numberofpolygons){
 			if(this->facetlist[fIndex].polygonlist[pIndex].numberofvertices>0){
@@ -675,7 +409,10 @@ void tetgenio_safe::allocatefacetpolygon(int fIndex, int pIndex){
 			"for  facet out of range" << std::endl;
 	}
 }
-void tetgenio_safe::allocatefacet(int fIndex, int numPoly){
+void tetgen::io_safe::allocatefacet(int fIndex, int numPoly){
+	/*
+	Allocates facets specifying the number of polygons in the facet.
+	*/
 	if (fIndex<this->numberoffacets){
 		this->facetlist[fIndex].numberofpolygons=numPoly;
 		this->allocatefacet(fIndex);
@@ -685,8 +422,7 @@ void tetgenio_safe::allocatefacet(int fIndex, int numPoly){
 			"of range" << std::endl;
 	}
 }
-
-void tetgenio_safe::allocatefacetpolygon(int fIndex, int pIndex, int numVerts){
+void tetgen::io_safe::allocatefacetpolygon(int fIndex, int pIndex, int numVerts){
 	if (fIndex<this->numberoffacets){
 		if (pIndex<this->facetlist[fIndex].numberofpolygons){
 			this->facetlist[fIndex].polygonlist[pIndex].numberofvertices = numVerts;

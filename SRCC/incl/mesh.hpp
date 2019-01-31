@@ -503,6 +503,9 @@ public:
 	void RemoveIndex(int typeInd, int oldInd);
 	int ConnectedVertex(vector<int> &vertBlock) const;
 	void ForceCloseContainers();
+	void RemoveSingularConnectors(const std::vector<int> &rmvVertInds={});
+	std::vector<int> MergeGroupedVertices(HashedVector<int, int> &closeVert,
+		bool delVerts=true);
 	// Mesh Quality
 	vector<int> OrderEdges();
 	void SetBorders();

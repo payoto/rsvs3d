@@ -2598,6 +2598,135 @@ void mesh::ForceCloseContainers(){
 	volus.ForceArrayReady();
 }
 
+std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert, bool delVerts){
+	/*
+	Uses a hashed vector to merge points grouped together.
+
+	Deletes points which have been merged out.
+	*/
+	std::vector<bool> isSnaxDone;
+	std::vector<int> sameSnaxs, rmvInds;
+	int nSnax, countJ, countRep;
+
+	nSnax = closeVert.vec.size();
+	if (!closeVert.isHash){
+		closeVert.GenerateHash();
+	}
+	rmvInds.reserve(nSnax);
+	isSnaxDone.reserve(nSnax);
+	// Find matching elements and perform the replacement process
+	for (int i = 0; i < nSnax; ++i)
+	{
+		if(!isSnaxDone[i] && closeVert.vec[i]!=-1)
+		{
+			sameSnaxs=closeVert.findall(closeVert.vec[i]);
+			countJ = sameSnaxs.size();
+			for (int j = 1; j < countJ; ++j)
+			{
+				this->SwitchIndex(1, this->verts(sameSnaxs[j])->index, 
+					this->verts(sameSnaxs[0])->index);
+				countRep++;
+				rmvInds.push_back(this->verts(sameSnaxs[j])->index);
+				isSnaxDone[sameSnaxs[j]]=true;
+			}
+			isSnaxDone[sameSnaxs[0]]=true;
+
+		} else {
+			isSnaxDone[i]=true;
+		}
+	}
+	if(rmvInds.size()>0 && delVerts){
+		sort(rmvInds);
+		unique(rmvInds);
+		this->verts.remove(rmvInds);
+		this->verts.PrepareForUse();
+	}
+	return(rmvInds);
+}
+
+void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
+	/*
+	Removes degenerate connectors.
+
+	This removes edges, surfaces and volumes which do not have enough
+	children (ie connector elements of lower dimensionality) to be a closed container.
+	Edges < 2 vertices
+	Surfaces < 3 edges
+	Volumes < 4 Surfaces
+
+	Offers the option to delete vertices as well.
+	*/
+
+	std::vector<int> rmvInds;
+	int count, countRep;
+
+	if(rmvVertInds.size()>0){
+		rmvInds=rmvVertInds;
+
+		sort(rmvInds);
+		unique(rmvInds);
+		this->verts.remove(rmvInds);
+		this->verts.PrepareForUse();
+		std::cout << "Number of removed vertices " << rmvInds.size() << std::endl;
+		rmvInds.clear();
+	}
+	
+	// Remove Edges
+	count  = this->edges.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(this->edges(i)->vertind[0]==this->edges(i)->vertind[1]){
+			this->RemoveIndex(2, this->edges(i)->index);
+			rmvInds.push_back(this->edges(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed edges " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	this->edges.remove(rmvInds);
+	this->edges.PrepareForUse();
+	rmvInds.clear();
+
+	// Remove Surfs
+	count  = this->surfs.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(this->surfs(i)->edgeind.size()<3){
+			this->RemoveIndex(3, this->surfs(i)->index);
+			rmvInds.push_back(this->surfs(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed surfs " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	this->surfs.remove(rmvInds);
+	this->surfs.PrepareForUse();
+	rmvInds.clear();
+
+	// Remove Volus
+	count  = this->volus.size();
+	countRep= 0;
+	for (int i = 0; i < count; ++i)
+	{
+		if(this->volus(i)->surfind.size()<4){
+			this->RemoveIndex(3, this->volus(i)->index);
+			rmvInds.push_back(this->volus(i)->index);
+			countRep++;
+		}
+	}
+	std::cout << "Number of removed volus " << countRep << std::endl;
+	sort(rmvInds);
+	unique(rmvInds);
+	this->volus.remove(rmvInds);
+	this->volus.PrepareForUse();
+	rmvInds.clear();
+
+}
+
 int mesh::ConnectedVertex(vector<int> &vertBlock) const{
    // Fills a vector with a number for each vertex corresponding to a
    // group of connected edges it is part of , can be used close surfaces in 2D or volumes
