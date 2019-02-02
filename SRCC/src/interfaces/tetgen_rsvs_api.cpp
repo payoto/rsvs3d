@@ -210,7 +210,114 @@ HashedVector<int, int> GroupCloseSnaxels(const snake &snakein, double distTol){
 	return closeVert;
 }
 
+int FindVertexHole(int vertInd, const mesh &meshin, const std::vector<bool> &vertIn,
+	const HashedVector<int, int> &uncertainVert, std::vector<bool> &vertExplored){
+	/*
+	Starting from vertInd look for a vertex which is definitely a hole.
 
+	From this vertex check if it is in? 
+	Check if it is in closeVert 
+	-> yes and no, we're done
+	-> yes and yes, explore this vertices neighbours
+	-> no, nothing to see here go to next from vertex
+	*/
+
+	std::vector<int> currVertList, nextEdgeList;
+	int returnInd=-1;
+	int ii, cntII, jj, cntJJ, vertPos, vertFound;
+
+	currVertList.reserve(20);
+	nextEdgeList.reserve(20);
+	currVertList.push_back(vertInd);
+
+	while(currVertList.size()>0){
+		nextEdgeList.clear();
+		cntII=currVertList.size();
+		for(ii=0; ii<cntII; ++ii){
+			vertPos = meshin.verts.find(currVertList[ii]);
+			if(!vertExplored[vertPos] && vertIn[vertPos]){
+				vertExplored[vertPos]=true;
+				vertFound = uncertainVert.find(currVertList[ii]);
+				if(vertFound==-1){
+					// Found our point!
+					returnInd = currVertList[ii];
+					// These operations return out of the function
+					currVertList.clear();
+					break;
+				} else {
+					// Add the edges to a list
+					cntJJ = meshin.verts(vertPos)->edgeind.size();
+					for (jj=0; jj< cntJJ; ++jj){
+						nextEdgeList.push_back(
+							meshin.verts(vertPos)->edgeind[jj]);
+					}
+				}
+			}
+		}
+		if (returnInd==-1){
+			// Assign currVertList
+			currVertList.clear();
+			if (nextEdgeList.size()>0){
+				currVertList = ConcatenateVectorField(meshin.edges,
+					&edge::vertind, nextEdgeList);
+			}
+		}
+	}
+
+	return (returnInd);
+}
+
+std::vector<int> FindHolesInSnake(const snake &snakein,
+	const HashedVector<int, int> &uncertainVert){
+	/*
+	Resolves the problem of finding points from which to initiate voids
+	in a snake.
+
+	Takes in a snake and a vector of indices to which snaxels were considered
+	close. These have to be treated separately as there is some uncertainty
+	about wether they are inside or outside. uncertain Vert is a list of
+	indices where the algorithm is known to be invalid
+	*/
+
+	int ii, cntII, jj, cntJJ, kk, cntKK, ll;
+	auto& vols = snakein.snakeconn.volus;
+	std::vector<bool> vertExplored;
+	std::vector<int> holeInds;
+	int vertAct, holeInd=-1;
+	// const vector<int>  &surfEdgeind=currVertList;
+	vertExplored.assign(snakein.isMeshVertIn.size(),false);
+	// Go through the volume objects vertices,
+		// looking for a 'from vertex'
+			// From this vertex check if it is in? 
+			// Check if it is in closeVert 
+			// -> yes and no, we're done
+			// -> yes and yes, explore this vertices neighbours
+			// -> no, nothing to see here go to next from vertex
+	cntII = snakein.snakeconn.volus.size();
+	holeInds.reserve(cntII);
+	for (ii = 0; ii< cntII; ++ii){
+		cntJJ = vols(ii)->surfind.size();
+		for (jj = 0; jj< cntJJ; ++jj){
+			auto surfEdgeind = snakein.snakeconn.surfs.isearch(
+				vols(ii)->surfind[jj])->edgeind;
+			cntKK = surfEdgeind.size();
+			for (kk = 0; kk<cntKK; ++kk){
+				for (ll = 0; ll<2; ++ll){
+					vertAct = snakein.snaxs.isearch( 
+						snakein.snakeconn.edges(surfEdgeind[kk])->vertind[ll]
+						)->fromvert;
+					holeInd = FindVertexHole(vertAct, *(snakein.snakemesh), 
+						snakein.isMeshVertIn, uncertainVert, vertExplored);
+					if(holeInd!=-1){break;}
+				}
+				if(holeInd!=-1){break;}
+			}
+			if(holeInd!=-1){break;}
+		}
+		if(holeInd!=-1){holeInds.push_back(holeInd);}
+	}
+	return (holeInds);
+}
 
 
 void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
@@ -227,7 +334,7 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	triangulation triRSVS;
 	int nHoles;
 	// int nPtsHole, kk, count;
-	std::vector<int> lowerB, upperB;
+	std::vector<int>  holeIndices;
 
 	tecplotfile tecout;
 
@@ -267,7 +374,8 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 
 	// Find number of holes
-	nHoles = 2;
+	holeIndices=FindHolesInSnake(snakein, groupedVertices);
+	nHoles = holeIndices.size();
 	// count = snakein.isMeshVertIn.size();
 	// for (int i = 0; i < count; ++i) {
 	// 	nHoles+=int(snakein.isMeshVertIn[i]);
@@ -279,28 +387,14 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
-	int jjj=0;
-	tetin.holelist[jjj++]=1.0;
-	tetin.holelist[jjj++]=0.5;
-	tetin.holelist[jjj++]=0.5;
-	tetin.holelist[jjj++]=2.0;
-	tetin.holelist[jjj++]=0.5;
-	tetin.holelist[jjj++]=0.5;
 	// Assign the holes
-	// kk = 0;
-	// nPtsHole = snakein.snakemesh->verts.size();
-	// for (int i = 0; i < nPtsHole; ++i)
-	// {
-	// 	if(snakein.isMeshVertIn[i]){
-	// 		for(int j=0; j<3; ++j){
-	// 			tetin.holelist[kk*3+j]=snakein.snakemesh->verts(i)->coord[j];
-	// 		}
-	// 		kk++;
-	// 	}
-	// 	if (kk==nHoles){
-	// 		break;
-	// 	}
-	// }
+	
+	for (int i = 0; i < nHoles; ++i){
+		for (int j =0; j<3; ++j){
+			tetin.holelist[i*3+j] = snakein.snakemesh->verts.isearch(
+				holeIndices[i])->coord[j];
+		}
+	}
 
 
 	tecout.PrintMesh(meshdomain);
