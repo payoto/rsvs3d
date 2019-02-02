@@ -88,7 +88,9 @@ mesh BuildDomain(const std::array<double,3> &lowerB, const std::array<double,3> 
 
 
 void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
-	int facetOffset, int pointOffset, int pointMarker, const std::vector<double> &pointMtrList, const std::vector<double> &facetConstr, int facetConstrOffset){
+	int facetOffset, int pointOffset, int pointMarker, 
+	const std::vector<double> &pointMtrList, const std::vector<double> &facetConstr,
+	int facetConstrOffset){
 	/*
 	Writes meshdata into the tetgenio format for a single mesh
 	*/
@@ -165,8 +167,8 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 	tetin.numberofholes = numHoles;
 	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
 
-	tetin.numberofpointmtrs = 0;
-	tetin.numberoffacetconstraints = 2;
+	tetin.numberofpointmtrs = 1;
+	tetin.numberoffacetconstraints = 0;
 
 
 	tetin.allocate();
@@ -176,9 +178,9 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 	// MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {},{0.05*0.05},0);
 	// MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
 	// 	meshgeom.verts.size(), 2, {},{0.01},1);
-	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {},{0.003},0);
+	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.05},{},0);
 	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
-		meshgeom.verts.size(), 2, {},{0.1},1);
+		meshgeom.verts.size(), 2, {0.3},{},0);
 
 }
 
@@ -330,10 +332,11 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	input file.
 	*/
 
-	mesh meshdomain, meshgeom, meshtemp;
+	mesh meshdomain ,meshdomain2, meshgeom, meshtemp;
 	triangulation triRSVS;
 	int nHoles;
 	// int nPtsHole, kk, count;
+
 	std::vector<int>  holeIndices;
 
 	tecplotfile tecout;
@@ -383,6 +386,11 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 	meshdomain = BuildDomain(tetgenParam.lowerB, tetgenParam.upperB);
 	meshdomain.PrepareForUse();
+	meshdomain2 = BuildDomain({-1.0,-1.0,-1.0}, {4.0,2.0,2.0});
+	meshdomain2.PrepareForUse();
+	meshdomain.MakeCompatible_inplace(meshdomain2);
+	meshdomain.Concatenate(meshdomain2);
+	meshdomain.PrepareForUse();
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
@@ -411,8 +419,8 @@ int tetcall()
 
 	try {
 
-		inparam.lowerB= {-2.0, -2.0,-2.0};
-		inparam.upperB= {5.0, 5.0, 5.0};
+		inparam.lowerB= {-15.0, -15.0,-15.0};
+		inparam.upperB= {15.0, 15.0, 15.0};
 		inparam.distanceTol = 1e-3;
 		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
 		TetgenInput_RSVS(snakein, tetin, inparam);
