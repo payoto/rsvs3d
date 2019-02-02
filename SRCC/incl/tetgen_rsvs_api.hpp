@@ -38,6 +38,7 @@ namespace tetgen {
 		using tetgenio::pointattributelist;
 		using tetgenio::pointmtrlist;
 		using tetgenio::pointmarkerlist;
+		using tetgenio::numberofpointmtrs;
 
 		// int  *tetrahedronlist;
 		// REAL *tetrahedronattributelist;
@@ -52,7 +53,10 @@ namespace tetgen {
 		// int *facetmarkerlist;
 		using tetgenio::facetlist;
 		using tetgenio::facetmarkerlist;
-
+		// REAL *facetconstraintlist;
+	    // int numberoffacetconstraints;
+	    using tetgenio::facetconstraintlist;
+	    using tetgenio::numberoffacetconstraints;
 		// 	REAL *holelist;
 		// 	REAL *regionlist;
 		using tetgenio::holelist;

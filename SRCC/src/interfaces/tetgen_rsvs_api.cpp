@@ -88,12 +88,12 @@ mesh BuildDomain(const std::array<double,3> &lowerB, const std::array<double,3> 
 
 
 void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
-	int facetOffset, int pointOffset, int pointMarker, const std::vector<double> &pointMtrList){
+	int facetOffset, int pointOffset, int pointMarker, const std::vector<double> &pointMtrList, const std::vector<double> &facetConstr, int facetConstrOffset){
 	/*
 	Writes meshdata into the tetgenio format for a single mesh
 	*/
 	vector<int> orderVert;
-	int countI, countJ, countK;
+	int countI, countJ, countK, nFacetConstr;
 
 	// Set point properties to the appropriate lists
 	countI = meshgeom.verts.size();
@@ -105,14 +105,29 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 		}
 		// set point metrics
 		for (int j = 0; j < countJ; ++j) {
-			tetin.pointlist[(i+pointOffset)*countJ+j] =pointMtrList[j];
+			tetin.pointmtrlist[(i+pointOffset)*countJ+j] =pointMtrList[j];
 		}
 		// set point markers
 		tetin.pointmarkerlist[i] = pointMarker;
 	}
 
+	// Set facet properties to the appropriate lists
+	nFacetConstr = facetConstr.size();
+	std::cout << "Number of facetconstraint " << nFacetConstr << std::endl;
+	for (int i = 0; i < nFacetConstr; ++i) {
+		// set facet constraints
+		tetin.facetconstraintlist[(facetConstrOffset+i)*2] = double(facetConstrOffset+i+1);
+		tetin.facetconstraintlist[(facetConstrOffset+i)*2+1] = facetConstr[i];
+	}
+
 	// Set connectivity through facet and polygon
 	countI = meshgeom.surfs.size();
+	if(nFacetConstr != 1 && nFacetConstr!=countI && nFacetConstr != 0){
+		std::cerr << "Warning: Number of constraints is not 1 or the "
+			"number of surfaces, the code will work but the behaviour "
+			"is suprising." << std::endl;
+	}
+	nFacetConstr = max(nFacetConstr,1);
 	for (int i = 0; i < countI; ++i){
 
 		tetin.allocatefacet(i+facetOffset,1);
@@ -124,7 +139,9 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 			tetin.facetlist[i+facetOffset].polygonlist[0].vertexlist[k] 
 				= meshgeom.verts.find(orderVert[k])+pointOffset;
 		}
-		tetin.facetmarkerlist[i+facetOffset]=pointMarker;
+		// Set the facet marker list to match the mod of the facets added
+		tetin.facetmarkerlist[i+facetOffset]=facetConstrOffset+(i%nFacetConstr)+1;
+		//pointMarker;//
 	}
 }
 
@@ -149,15 +166,19 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
 
 	tetin.numberofpointmtrs = 0;
+	tetin.numberoffacetconstraints = 2;
 
 
 	tetin.allocate();
 
 	// MeshData2Tetgenio(meshgeom, tetin, facetOffset, pointOffset, 
 	// pointMarker, pointMtrList);
-	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {});
+	// MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {},{0.05*0.05},0);
+	// MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
+	// 	meshgeom.verts.size(), 2, {},{0.01},1);
+	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {},{0.003},0);
 	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
-		meshgeom.verts.size(), 2, {});
+		meshgeom.verts.size(), 2, {},{0.1},1);
 
 }
 
@@ -204,7 +225,8 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 	mesh meshdomain, meshgeom, meshtemp;
 	triangulation triRSVS;
-	int nHoles, nPtsHole, kk, count;
+	int nHoles;
+	// int nPtsHole, kk, count;
 	std::vector<int> lowerB, upperB;
 
 	tecplotfile tecout;
@@ -245,7 +267,7 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 
 	// Find number of holes
-	nHoles = 0;
+	nHoles = 2;
 	// count = snakein.isMeshVertIn.size();
 	// for (int i = 0; i < count; ++i) {
 	// 	nHoles+=int(snakein.isMeshVertIn[i]);
@@ -257,6 +279,13 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
+	int jjj=0;
+	tetin.holelist[jjj++]=1.0;
+	tetin.holelist[jjj++]=0.5;
+	tetin.holelist[jjj++]=0.5;
+	tetin.holelist[jjj++]=2.0;
+	tetin.holelist[jjj++]=0.5;
+	tetin.holelist[jjj++]=0.5;
 	// Assign the holes
 	// kk = 0;
 	// nPtsHole = snakein.snakemesh->verts.size();
@@ -286,23 +315,33 @@ int tetcall()
 	mesh snakeMesh, voluMesh, triMesh;
 	snake snakein;
 
-	load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
-	TetgenInput_RSVS(snakein, tetin, inparam);
+	try {
+
+		inparam.lowerB= {-2.0, -2.0,-2.0};
+		inparam.upperB= {5.0, 5.0, 5.0};
+		inparam.distanceTol = 1e-3;
+		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
+		TetgenInput_RSVS(snakein, tetin, inparam);
 
 
-	tetin.save_nodes("rsvs_3cell_2body");
-	tetin.save_poly("rsvs_3cell_2body");
+		tetin.save_nodes("rsvs_3cell_2body");
+		tetin.save_poly("rsvs_3cell_2body");
+		
 
-	// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
-	//   do quality mesh generation (q) with a specified quality bound
-	//   (1.414), and apply a maximum volume constraint (a0.1).
-	inparam.command = "pkq1.414a0.1"; 
-	tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
+		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+		//   do quality mesh generation (q) with a specified quality bound
+		//   (1.414), and apply a maximum volume constraint (a0.1).
+		inparam.command = "pkqm"; 
+		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
-	// tetout.save_nodes("rsvsout_3cell_2body");
-	// tetout.save_elements("rsvsout_3cell_2body");
-	// tetout.save_faces("rsvsout_3cell_2body");
-
+		// tetout.save_nodes("rsvsout_3cell_2body");
+		// tetout.save_elements("rsvsout_3cell_2body");
+		// tetout.save_faces("rsvsout_3cell_2body");
+		std::cout << "Finished the tettgen process " << std::endl;
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	}
 	return 0;
 }
 
@@ -333,7 +372,11 @@ void tetgen::io_safe::allocate(){
 			this->facetlist[i].numberofholes=0;
 		}
 	}
-
+	// Allocation of facet constraints
+	if(this->numberoffacetconstraints>0){
+		// [boundary marker, area constraint value]
+		this->facetconstraintlist = new REAL[this->numberoffacetconstraints*2];
+	}
 	// Allocation of holes (a set of points)
 	if(this->numberofholes>0){
 		this->holelist = new REAL[this->numberofholes*3];
@@ -343,10 +386,7 @@ void tetgen::io_safe::allocate(){
 	if(this->numberofregions>0){
 		this->regionlist = new REAL[this->numberofregions*5];
 	}
-	// Allocate facet
-	if(this->numberoffacetconstraints>0){
-		this->facetconstraintlist = new REAL[this->numberoffacetconstraints*2];
-	}
+
 	// Allocate constraint
 	if(this->numberofsegmentconstraints>0){
 		this->segmentconstraintlist = new REAL[this->numberofsegmentconstraints*3];
