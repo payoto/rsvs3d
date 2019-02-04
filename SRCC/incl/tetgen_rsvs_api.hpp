@@ -13,6 +13,7 @@
 // included dependencies
 
 #include <array>
+#include <vector>
 #include <string>
 #include "tetgen.h"
 //=================================
@@ -92,15 +93,22 @@ namespace tetgen {
 		void allocatefacet(int fIndex, int numPoly);
 		void allocatefacetpolygon(int fIndex, int pIndex);
 		void allocatefacetpolygon(int fIndex, int pIndex, int numVerts);
+		void SpecifyTetPointMetric(int startPnt, int numPnt, 
+			const std::vector<double> &mtrs);
+		// void deallocate();
+		// ~io_safe(){
+		// 	this->deallocate();
+		// }
 	};
 
 	class apiparam {
 	public:
 		// Builds a cuboid bound
-		std::array<double,3> lowerB; // Lower domain bound
-		std::array<double,3> upperB; // Upper domain bound
-
-		double distanceTol; // Distance tolerance
+		std::array<double,3> lowerB={-3.0,-3.0,-3.0}; // Lower domain bound
+		std::array<double,3> upperB={4.0,4.0,4.0}; // Upper domain bound
+		// Controls the edgelengths 
+		std::vector<double> edgelengths={0.03,1.0}; 
+		double distanceTol = 0.3; // Distance tolerance
 		// mesh the inside of the geometry? (or the outside)
 		bool generateMeshInside = false;
 

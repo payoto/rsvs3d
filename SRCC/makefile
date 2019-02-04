@@ -84,7 +84,7 @@ CCFLAGDBG= -g -ggdb
 CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
 CCFLAGBOOST=
 CCFLAGEIG= 
-CCFLAGETETGEN= -DTETLIBRARY -DNDEBUG
+CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
 # Flags to add when the target is "testall"
@@ -239,16 +239,16 @@ $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc
 	$(COMPILECPP) -O3 $< -o $@
 	$(POSTCOMPILE)
 
-#  Always on optimisation and disabled warnings in the tetgen module
-$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
-$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
-	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
-	$(POSTCOMPILE)
+# #  Always on optimisation and disabled warnings in the tetgen module
+# $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
+# $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
+# 	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+# 	$(POSTCOMPILE)
 
-$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
-$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
-	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
-	$(POSTCOMPILE)
+# $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
+# $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
+# 	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+# 	$(POSTCOMPILE)
 
 # Folder depency used to mirror the SRCTREE into OBJDIR
 # Called by `$$(@D)/.f` in the object recipes 

@@ -175,14 +175,9 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 	tetin.allocate();
 
-	// MeshData2Tetgenio(meshgeom, tetin, facetOffset, pointOffset, 
-	// pointMarker, pointMtrList);
-	// MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {},{0.05*0.05},0);
-	// MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
-	// 	meshgeom.verts.size(), 2, {},{0.01},1);
-	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.05},{},0);
+	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{},0);
 	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
-		meshgeom.verts.size(), 2, {0.3},{},0);
+		meshgeom.verts.size(), -1, {-1.0},{},0);
 
 }
 
@@ -340,7 +335,9 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	These also serve to avoid having a badly conditioned initial triangulation
 	with very small edges.
 	
-	`nSteps` is the number of intermediate steps 
+	`nSteps` is the number of total domains.
+	0 will return an empty mesh, 1 will return a mesh of the inner bound
+	2 will return inner and outer bounds, 
 
 			{
 				{DomInter(x, innerLowerB[0], outerLowerB[0]),
@@ -364,6 +361,14 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	mesh meshdomain, meshtemp;
 	double x;
 	std::array<std::array<double, 2>,3> scaleDom;
+
+	// Special case if asked for  0 subdomains
+	if(nSteps==0){
+		meshdomain.Init(0, 0, 0, 0);
+		meshdomain.PrepareForUse();
+		return meshdomain;
+	}
+
 	// Start from inner bound
 	// Then step up 
 	vertPerSubDomain.clear();
@@ -373,8 +378,8 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	meshtemp.PrepareForUse();
 	vertPerSubDomain.push_back(meshtemp.verts.size());
 
-	for (int i = 1; i < nSteps+1; ++i){
-		x =double(i)/double(nSteps);
+	for (int i = 1; i < nSteps; ++i){
+		x =double(i)/double(nSteps-1);
 		for (int j=0; j<3;++j){	
 			scaleDom[j] ={DomInter(x, innerLowerB[j], outerLowerB[j]),
 				DomInter(x, innerUpperB[j], outerUpperB[j])};
@@ -458,28 +463,26 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 	meshgeom.ReturnBoundingBox(lowerB, upperB);
 	meshdomain = BuildCutCellDomain(tetgenParam.lowerB, tetgenParam.upperB,
-		lowerB, upperB, 3, vertPerSubDomain);
-
-	// meshdomain = BuildDomain(tetgenParam.lowerB, tetgenParam.upperB);
-	// meshdomain.PrepareForUse();
-	// meshdomain2 = BuildDomain({-1.0,-1.0,-1.0}, {4.0,2.0,2.0});
-	// meshdomain2.PrepareForUse();
-	// meshdomain.MakeCompatible_inplace(meshdomain2);
-	// meshdomain.Concatenate(meshdomain2);
-	// meshdomain.PrepareForUse();
-
+		lowerB, upperB, tetgenParam.edgelengths.size(), vertPerSubDomain);
 
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
 	// Assign the holes
-	
 	for (int i = 0; i < nHoles; ++i){
 		for (int j =0; j<3; ++j){
 			tetin.holelist[i*3+j] = snakein.snakemesh->verts.isearch(
 				holeIndices[i])->coord[j];
 		}
+	}
+
+	// Assign domain point metrics
+	int startPnt = meshgeom.verts.size();
+	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
+		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
+			{tetgenParam.edgelengths[i]});
+		startPnt = startPnt + vertPerSubDomain[i];
 	}
 
 
@@ -490,7 +493,8 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 
 int tetcall()
 {
-	tetgen::io_safe tetin, tetout;
+	tetgen::io_safe tetin;
+	tetgenio tetout;
 	tetgen::apiparam inparam;
 	mesh snakeMesh, voluMesh, triMesh;
 	snake snakein;
@@ -500,6 +504,7 @@ int tetcall()
 		inparam.lowerB= {-15.0, -15.0,-15.0};
 		inparam.upperB= {15.0, 15.0, 15.0};
 		inparam.distanceTol = 1e-3;
+		inparam.edgelengths = {0.03,0.3,0.7,2.0};
 		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
 		TetgenInput_RSVS(snakein, tetin, inparam);
 
@@ -601,10 +606,14 @@ void tetgen::io_safe::allocatefacet(int fIndex){
 		if(this->facetlist[fIndex].numberofpolygons>0){
 			this->facetlist[fIndex].polygonlist 
 				= new tetgenio::polygon[this->facetlist[fIndex].numberofpolygons];
+		} else {
+			this->facetlist[fIndex].polygonlist = (tetgenio::polygon *) NULL;
 		}
 		if(this->facetlist[fIndex].numberofholes>0){
 			this->facetlist[fIndex].holelist 
 				= new REAL[this->facetlist[fIndex].numberofholes];
+		} else {
+			this->facetlist[fIndex].holelist = (REAL *) NULL;
 		}
 
 	} else {
@@ -654,6 +663,32 @@ void tetgen::io_safe::allocatefacetpolygon(int fIndex, int pIndex, int numVerts)
 	} else {
 		std::cerr << "Error: Index passed to polygon allocation  "
 			"for  facet out of range" << std::endl;
+	}
+}
+void tetgen::io_safe::SpecifyTetPointMetric(int startPnt, int numPnt, 
+	const std::vector<double> &mtrs){
+	/*
+	assigns the mtr list from `startPnt` index
+	*/
+
+	int count = int(mtrs.size())<this->numberofpointmtrs ? 
+		mtrs.size() : this->numberofpointmtrs;
+
+
+
+	if((startPnt+numPnt)>this->numberofpoints){
+		throw invalid_argument ("Metrics out of range in tetgen_io (too high)");
+	} else if (startPnt<0){
+		throw invalid_argument ("Metrics out of range in tetgen_io (too low)");
+	}
+
+	for (int i = startPnt; i < startPnt+numPnt; ++i)	{
+		for (int j = 0; j < count; ++j)
+		{
+			this->pointmtrlist[(i*this->numberofpointmtrs)+j]
+				=mtrs[j];
+		}
+
 	}
 }
 
