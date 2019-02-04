@@ -58,11 +58,13 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 	// it is not cleaned up for tiny surfaces
 }
 
-mesh BuildDomain(const std::array<double,3> &lowerB, const std::array<double,3> &upperB){
+mesh BuildDomain(const std::array<double,3> &lowerB, 
+	const std::array<double,3> &upperB, double tolInner=0.0){
 	/*
 	Builds a parralelipipede domain stretching from lowerB to upperB
 
-	`lowerB` and `upperB` must be vectors of size 3.
+	`lowerB` and `upperB` must be vectors of size 3. `tolInner` specifies an
+	offset expanding the box by a set amount.
 	*/	
 	mesh cube;
 	int count; 
@@ -79,7 +81,7 @@ mesh BuildDomain(const std::array<double,3> &lowerB, const std::array<double,3> 
 	count = cube.verts.size();
 	for (int i = 0; i < count; ++i) {
 		for (int j = 0; j < 3; ++j)	{
-			cube.verts[i].coord[j] = (cube.verts[i].coord[j]*(upperB[j]-lowerB[j])) + lowerB[j];
+			cube.verts[i].coord[j] = (cube.verts[i].coord[j]*((upperB[j]+tolInner)-(lowerB[j]-tolInner))) + (lowerB[j]-tolInner);
 		}
 	}
 
@@ -110,7 +112,7 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 			tetin.pointmtrlist[(i+pointOffset)*countJ+j] =pointMtrList[j];
 		}
 		// set point markers
-		tetin.pointmarkerlist[i] = pointMarker;
+		tetin.pointmarkerlist[i+pointOffset] = pointMarker;
 	}
 
 	// Set facet properties to the appropriate lists
@@ -321,6 +323,74 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 	return (holeInds);
 }
 
+double DomInter(double x, double y1, double y2){
+	/*Interpolation function*/
+
+	return x*(y2-y1)+y1;
+}
+
+mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB, 
+	const std::array<double,3> &outerUpperB,
+	const std::array<double,3> &innerLowerB, const std::array<double,3> &innerUpperB, int nSteps, 
+	std::vector<int> &vertPerSubDomain){
+	/*
+	Builds a series of domains with different edge properties controlling
+	the interpolation of the metric.
+
+	These also serve to avoid having a badly conditioned initial triangulation
+	with very small edges.
+	
+	`nSteps` is the number of intermediate steps 
+
+			{
+				{DomInter(x, innerLowerB[0], outerLowerB[0]),
+				DomInter(x, innerUpperB[0], outerUpperB[0])},
+				{DomInter(x, innerLowerB[1], outerLowerB[1]),
+				DomInter(x, innerUpperB[1], outerUpperB[1])},
+				{DomInter(x, innerLowerB[2], outerLowerB[2]),
+				DomInter(x, innerUpperB[2], outerUpperB[2])}
+			}
+
+		meshtemp = BuildDomain(
+			{DomInter(x, innerLowerB[0], outerLowerB[0]),
+				DomInter(x, innerLowerB[1], outerLowerB[1]),
+				DomInter(x, innerLowerB[2], outerLowerB[2])},
+			{DomInter(x, innerUpperB[0], outerUpperB[0]),
+				DomInter(x, innerUpperB[1], outerUpperB[1]),
+				DomInter(x, innerUpperB[2], outerUpperB[2])}
+			);
+	*/
+
+	mesh meshdomain, meshtemp;
+	double x;
+	std::array<std::array<double, 2>,3> scaleDom;
+	// Start from inner bound
+	// Then step up 
+	vertPerSubDomain.clear();
+	meshdomain = BuildDomain(innerLowerB, innerUpperB, 0.1);
+	meshdomain.PrepareForUse();
+	meshtemp = meshdomain;
+	meshtemp.PrepareForUse();
+	vertPerSubDomain.push_back(meshtemp.verts.size());
+
+	for (int i = 1; i < nSteps+1; ++i){
+		x =double(i)/double(nSteps);
+		for (int j=0; j<3;++j){	
+			scaleDom[j] ={DomInter(x, innerLowerB[j], outerLowerB[j]),
+				DomInter(x, innerUpperB[j], outerUpperB[j])};
+		}
+
+		meshtemp.Scale(scaleDom);
+		meshtemp.PrepareForUse();
+		meshdomain.MakeCompatible_inplace(meshtemp);
+		meshdomain.Concatenate(meshtemp);
+		meshdomain.PrepareForUse();
+
+		vertPerSubDomain.push_back(meshtemp.verts.size());
+	}
+	
+	return meshdomain;
+}
 
 void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	const tetgen::apiparam &tetgenParam){
@@ -338,6 +408,8 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	// int nPtsHole, kk, count;
 
 	std::vector<int>  holeIndices;
+	std::array<double, 3> upperB, lowerB;
+	std::vector<int> vertPerSubDomain;
 
 	tecplotfile tecout;
 
@@ -384,13 +456,19 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	// 	nHoles+=int(snakein.isMeshVertIn[i]);
 	// }
 
-	meshdomain = BuildDomain(tetgenParam.lowerB, tetgenParam.upperB);
-	meshdomain.PrepareForUse();
-	meshdomain2 = BuildDomain({-1.0,-1.0,-1.0}, {4.0,2.0,2.0});
-	meshdomain2.PrepareForUse();
-	meshdomain.MakeCompatible_inplace(meshdomain2);
-	meshdomain.Concatenate(meshdomain2);
-	meshdomain.PrepareForUse();
+	meshgeom.ReturnBoundingBox(lowerB, upperB);
+	meshdomain = BuildCutCellDomain(tetgenParam.lowerB, tetgenParam.upperB,
+		lowerB, upperB, 3, vertPerSubDomain);
+
+	// meshdomain = BuildDomain(tetgenParam.lowerB, tetgenParam.upperB);
+	// meshdomain.PrepareForUse();
+	// meshdomain2 = BuildDomain({-1.0,-1.0,-1.0}, {4.0,2.0,2.0});
+	// meshdomain2.PrepareForUse();
+	// meshdomain.MakeCompatible_inplace(meshdomain2);
+	// meshdomain.Concatenate(meshdomain2);
+	// meshdomain.PrepareForUse();
+
+
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;

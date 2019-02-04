@@ -526,6 +526,8 @@ public:
 	void Scale();
 	void Scale(const std::array<std::array<double, 2>,3> &domain);
 	void LoadTargetFill(const std::string &fileName);
+	void ReturnBoundingBox(std::array<double,3> &lowerB, 
+		std::array<double,3> &upperB);
 
 	~mesh(){
 		RemoveFromFamily();
@@ -534,8 +536,10 @@ public:
 
 // Function declarations
 
-void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind);
-int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2);
+void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
+	vector<int> &vertind);
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+	int p1, int p2);
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();

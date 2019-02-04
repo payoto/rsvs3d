@@ -3123,8 +3123,24 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 				*transformation[jj][2]);
 		}
 	}
+}
 
+void mesh::ReturnBoundingBox(std::array<double,3> &lowerB, 
+	std::array<double,3> &upperB){
+	int count = this->verts.size();
 
+	lowerB.fill(INFINITY);
+	upperB.fill(-INFINITY);
+	for (int i = 0; i < count; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			lowerB[j] = lowerB[j] < this->verts(i)->coord[j] ?
+				lowerB[j] : this->verts(i)->coord[j];
+			upperB[j] = upperB[j] > this->verts(i)->coord[j] ?
+				upperB[j] : this->verts(i)->coord[j];
+		}
+	}
 }
 
 void mesh::LoadTargetFill(const std::string &fileName){
