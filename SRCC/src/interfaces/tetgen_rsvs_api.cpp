@@ -570,32 +570,79 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	mesh meshout;
 
 	int nVerts, nEdges, nSurfs, nVolus;
-	int count;
+	int count,INCR, DEINCR,n;
 
 	nVerts = tetout.numberofpoints;
+	nEdges = tetout.numberofedges;
+	nSurfs = tetout.numberoftrifaces;
 	nVolus = tetout.numberoftetrahedra;
-	nEdges = 0;
-	nSurfs = 0;
 
-	count = nVolus * 6;
-	for (int i = 0; i < count; ++i)
-	{
-		nEdges = nEdges>=tetout.tet2edgelist[i]?
-			nEdges : tetout.tet2edgelist[i];
-	}
-	count = nVolus * 4;
-	for (int i = 0; i < count; ++i)
-	{
-		nSurfs = nSurfs>=tetout.tet2facelist[i]?
-			nSurfs : tetout.tet2facelist[i];
-	}
-	if (tetout.firstnumber==0){
-		nSurfs++;
-		nEdges++;
+	// INCR and DEINCR convert from tetgen array position to index and
+	// index to array position respectively
+	INCR = tetout.firstnumber ? 0 : 1;
+	DEINCR = tetout.firstnumber ? -1 : 0;
+
+	// if `tetrahedralize` has not been run with the correct flags connectivity is
+	// unavailable, throw an error. (tests for flag -nn)
+	if(tetout.tet2facelist == NULL){
+		throw invalid_argument("TET2MESH requires flag -nn be passed to tetgen");
 	}
 
 	meshout.Init(nVerts, nEdges, nSurfs, nVolus);
+	meshout.PopulateIndices();
 
+	// These need to be cleared so that push_back works as expected
+	for (int i = 0; i < nSurfs; ++i){meshout.surfs[i].voluind.clear();}
+	for (int i = 0; i < nEdges; ++i){meshout.edges[i].vertind.clear();}
+
+	// Assign coordinates
+	count = nVerts;
+	n=3;
+	for (int i = 0; i < count; ++i){
+		for (int j = 0; j < n; ++j){
+			meshout.verts[i].coord[j] = tetout.pointlist[i*n+j];
+		}
+	}
+
+	// assign edge-vertex connectivity, relies on the implied ordering and 
+	// indexing of the output tetgenio object an of `PopulateIndices()`
+	count = nEdges;
+	for (int i = 0; i < count; ++i)	
+	{ // Assign edge to vertex connectivity
+		meshout.edges[i].vertind = {
+			tetout.edgelist[i*2]+INCR, tetout.edgelist[i*2+1]+INCR
+		};
+		for (int j = 0; j < 2; ++j)
+		{ // Assign equivalent vertex to edge connectivity
+			meshout.verts[tetout.edgelist[i*2+j]+DEINCR]
+				.edgeind.push_back(i+1);
+		}
+	}
+
+	// Volumes to surfaces
+	count = nVolus;	n = 4;
+	for (int i = 0; i < count; ++i)	{ // loop through volus
+		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
+			meshout.volus[i].surfind.push_back(tetout.tet2facelist[i*n+j]+INCR);
+			meshout.surfs[tetout.tet2facelist[i*n+j]+DEINCR].voluind.push_back(i+1);
+		}
+	}
+
+	// Surfaces to edges
+	count = nSurfs;	n = 3;
+	for (int i = 0; i < count; ++i)	{ // loop through volus
+		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
+			meshout.surfs[i].edgeind.push_back(tetout.face2edgelist[i*n+j]+INCR);
+			meshout.edges[tetout.face2edgelist[i*n+j]+DEINCR].surfind.push_back(i+1);
+		}
+	}
+
+	// Prepare mesh for use
+	meshout.TightenConnectivity();
+	meshout.PrepareForUse();
+
+	meshout.TestConnectivityBiDir();
+	meshout.displight();
 
 	return meshout;
 }

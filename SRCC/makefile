@@ -27,7 +27,7 @@ INCLDIR= incl
 MAINALLSRC = src/main.cpp
 MAINTESTSRC = src/test/test.cpp
 
-NOTNEEDEDNEWTEST = RSVScalc
+# NOTNEEDEDNEWTEST = src/rsvs/RSVScalc.cpp
 
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
@@ -190,7 +190,7 @@ endif
 
 ifeq ($(MAKECMDGOALS), testnew)
 SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
-SRCS := $(filter-out $(NOTNEEDEDNEWTEST),$(SRCS))
+# SRCS := $(filter-out $(NOTNEEDEDNEWTEST),$(SRCS))
 EXECUTABLE = $(TESTEXECUTABLE)
 endif
 
@@ -217,7 +217,7 @@ testall : $(SRCS) $(EXECUTABLE)
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
 $(BINDIR)/$(EXECUTABLE) : $(OBJECTS) 
-	$(LINK)  $(OBJECTS) -o $(BINDIR)/$@ $(LDFLAGS)
+	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
 # into OBJDIR
