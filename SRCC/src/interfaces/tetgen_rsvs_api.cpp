@@ -561,7 +561,233 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 
 void TetgenOutput_SU2(){}
 
+void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
+	std::vector<int> &rayEdges, int INCR, int DEINCR){
+	/*
+	Mesh is still missing some elements due to Voronoi diagrams not being
+	naturally closed:
+	1) Terminate rays with vertices
+	2.a) Link ray-vertices with edges 
+	2.b) Include edges in equivalent faces
+	3.a) Close volumes by creating faces from edges  
+	
+	Implementation notes:
+		will need hashed vectors of the edges added
 
+	Issue:
+		A voronoi is not bounded -> need another algorithm there
+		(idea -> points lying out of convex hull removed and the 
+		tetout vertex becomes a ray)
+	*/
+
+	int nVerts, nEdges, nSurfs;
+	int count, countI, countJ, n;
+	double lStep=0.2; 
+	vert vertNew;
+	edge edgeNew;
+	surf surfNew;
+	HashedVector<int, int> rays, newVerts, newEdges, newSurfs, rayFacesSearch;
+	std::vector<int> rayCells; // nonclosed voronoi faces
+	std::vector<int> &rayFaces = rayFacesSearch.vec; // nonclosed voronoi faces
+	std::vector<int> pair, temp;
+
+	nVerts = meshout.verts.size();
+	nEdges = meshout.edges.size();
+	nSurfs = meshout.surfs.size();
+
+	rays.vec = rayEdges;
+	rays.GenerateHash();
+	// Terminating rays:
+	// Use a fixed length and assign connectivity to the ray
+	count = rayEdges.size();
+	vertNew.edgeind.reserve(6);
+	vertNew.edgeind.assign(1,0);
+	for (int i = 0; i < count; ++i){
+		vertNew.index = nVerts+1;
+		vertNew.edgeind[0] = rayEdges[i];
+		meshout.edges[rayEdges[i]-1].vertind[1] = nVerts+1;
+		for (int j = 0; j < 3; ++j){
+			vertNew.coord[j]=lStep*tetout.vedgelist[rayEdges[i]-1].vnormal[j]
+				+ meshout.verts[tetout.vedgelist[rayEdges[i]-1].v1+DEINCR].coord[j];
+		}
+		meshout.verts.push_back(vertNew);
+		newVerts.vec.push_back(nVerts+1);
+		nVerts++;
+	}
+
+	newVerts.GenerateHash();
+	
+	// For each face 
+	// check if it is linked to rays, if it is
+	// an edge will be established between the two ray vertices
+	rayFaces = ConcatenateVectorField(meshout.edges, &edge::surfind, 
+		meshout.edges.find_list(rays.vec));
+	sort(rayFaces);
+	unique(rayFaces);
+	count = rayFaces.size();
+	edgeNew.surfind.reserve(6);
+	edgeNew.surfind.assign(1,0);
+	for (int i = 0; i < count; ++i){
+		// identify in each open face the 2 rays
+		pair.clear();
+		for (auto a : rays.find_list(meshout.surfs[rayFaces[i]-1].edgeind)){
+			if (a!=-1){
+				pair.push_back(a);
+			}
+		}
+		if (pair.size()!=2){throw logic_error("Voronoi open face should have 2 rays");}
+		// Connect the 2 rays and their edges
+		edgeNew.index = nEdges;
+		for (int j = 0; j < 2; ++j){
+			edgeNew.vertind[j] = meshout.edges[rays.vec[pair[j]]-1].vertind[1];
+			meshout.verts[edgeNew.vertind[j]-1].edgeind.push_back(edgeNew.index);
+		}
+		edgeNew.surfind[0] = rayFaces[i];
+		meshout.edges.push_back(edgeNew);
+		newEdges.vec.push_back(edgeNew.index);
+		nEdges++;
+	}
+
+	newEdges.GenerateHash();
+	rayFacesSearch.GenerateHash();
+	// For each volume a surface is established closing 
+	// the volume using all the face indices and looking 
+	// for those which have been modified.
+
+	rayCells = ConcatenateVectorField(meshout.surfs, &surf::voluind, 
+		meshout.surfs.find_list(rayFaces));
+	sort(rayCells);
+	unique(rayCells);
+	count = rayCells.size();
+
+	for (int i = 0; i < count; ++i){
+		// identify in each open cell the faces that were open
+		pair.clear();
+		temp.clear();
+		surfNew.edgeind.clear();
+		for (auto a : rayFacesSearch.find_list(
+				meshout.volus[rayCells[i]-1].surfind)){
+			if (a!=-1){
+				pair.push_back(a);
+			}
+		}
+		// identify the edge in each face which is new and assign correxponding
+		// connectivities to surfNew;
+		surfNew.index = nSurfs+1;
+		for (auto ind : pair){
+			auto &edgeind = meshout.surfs[rayFacesSearch.vec[ind]-1].edgeind;
+			n = edgeind.size();
+			int j;
+			for (j = 0; j < n; ++j){
+				if(newEdges.find(edgeind[j])!=-1){
+					surfNew.edgeind.push_back(edgeind[j]);
+					meshout.edges[edgeind[j]].surfind.push_back(surfNew.index);
+					break;
+				}
+			}
+			if(j>=n){
+				throw logic_error("None of the edges of the open face"
+				" were recognised as new. This should not happen.");
+			}
+
+			surfNew.voluind[0] = rayCells[0];
+			surfNew.voluind[1] = 0;
+			meshout.surfs.push_back(surfNew);
+			nSurfs++;
+		}
+	}
+
+}
+
+mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
+	/*
+	Translates a tetgen output to the RSVS native mesh format 
+	*/
+	mesh meshout;
+
+	int nVerts, nEdges, nSurfs, nVolus;
+	int count,INCR, DEINCR,n;
+	vector<int> rayInd;
+	nVerts = tetout.numberofvpoints;
+	nEdges = tetout.numberofvedges;
+	nSurfs = tetout.numberofvfacets;
+	nVolus = tetout.numberofvcells;
+
+	// INCR and DEINCR convert from tetgen array position to index and
+	// index to array position respectively
+	INCR = tetout.firstnumber ? 0 : 1;
+	DEINCR = tetout.firstnumber ? -1 : 0;
+
+	// if `tetrahedralize` has not been run with the correct flags connectivity is
+	// unavailable, throw an error. (tests for flag -v)
+	if(tetout.vpointlist == NULL){
+		throw invalid_argument("TET2MESH requires flag -v be passed to tetgen");
+	}
+
+	meshout.Init(nVerts, nEdges, nSurfs, nVolus);
+	meshout.PopulateIndices();
+
+	// These need to be cleared so that push_back works as expected
+	for (int i = 0; i < nEdges; ++i){meshout.edges[i].vertind.clear();}
+	rayInd.reserve(nEdges);
+
+	// Assign coordinates
+	count = nVerts;
+	n=3;
+	for (int i = 0; i < count; ++i){
+		for (int j = 0; j < n; ++j){
+			meshout.verts[i].coord[j] = tetout.vpointlist[i*n+j];
+		}
+	}
+
+	// assign edge-vertex connectivity, relies on the implied ordering and 
+	// indexing of the output tetgenio object an of `PopulateIndices()`
+	count = nEdges;
+	for (int i = 0; i < count; ++i)	
+	{ // Assign edge to vertex connectivity
+		meshout.edges[i].vertind = {
+			tetout.vedgelist[i].v1+INCR, tetout.vedgelist[i].v2+INCR
+		};
+		// Assign equivalent vertex to edge connectivity
+		meshout.verts[tetout.vedgelist[i].v1+DEINCR].edgeind.push_back(i+1);
+
+		if(tetout.vedgelist[i].v2>-1){
+			// if it is not a ray add it to vertex v2
+			meshout.verts[tetout.vedgelist[i].v2+DEINCR].edgeind.push_back(i+1);
+		} else {
+			// if it is a ray save it to the list of rays
+			rayInd.push_back(i+1);
+		}
+	}
+
+	count = nSurfs;
+	for (int i = 0; i < count; ++i)	{ // loop through surfs
+		// Surfaces to edges 
+		n = tetout.vfacetlist[i].elist[0];
+		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
+			meshout.surfs[i].edgeind.push_back(tetout.vfacetlist[i].elist[j+1]+INCR);
+			meshout.edges[tetout.vfacetlist[i].elist[j+1]+DEINCR].surfind.push_back(i+1);
+		}
+		//  surface to volumes
+		meshout.surfs[i].voluind[0]=tetout.vfacetlist[i].c1+INCR;
+		meshout.surfs[i].voluind[1]=tetout.vfacetlist[i].c2+INCR;
+		n=2;
+		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
+			meshout.volus[meshout.surfs[i].voluind[j]].surfind.push_back(i+1);
+		}
+	}
+
+	// Close the mesh
+	CloseVoronoiMesh(meshout, tetout, rayInd, INCR, DEINCR);
+	// Prepare mesh for use
+	meshout.TightenConnectivity();
+	meshout.PrepareForUse();
+
+	meshout.TestConnectivityBiDir();
+	meshout.displight();
+
+	return meshout;
+}
 
 mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	/*
