@@ -508,7 +508,57 @@ void TetgenInput_RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 	// tecout.PrintMesh(meshdomain);
 }
 
-int tetcall()
+
+void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
+	const tetgen::apiparam &tetgenParam){
+	/*
+	Processes a snake object into a tetgen input object.
+
+	This function processes snake objects into the safe tetgenio object.
+	This can then used to generate a tetrahedral mesh or to save it as the
+	input file.
+	*/
+
+	mesh meshgeom;
+	triangulation triRSVS;
+	int nHoles;
+	// int nPtsHole, kk, count;
+
+	std::vector<int>  holeIndices;
+	std::vector<int> vertPerSubDomain;
+	std::vector<double> holeCoords;
+
+	holeCoords.clear();
+	meshgeom.Init(0, 0, 0, 0);
+	meshgeom.PrepareForUse();
+
+	vertPerSubDomain.push_back(meshdomain.verts.size());
+	
+
+	nHoles=holeCoords.size()/3;
+	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
+
+	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
+
+	// Assign the holes
+
+	int count = holeCoords.size();
+	for (int i = 0; i < count; ++i){
+		tetin.holelist[i] = holeCoords[i];	
+	}
+
+	// Assign domain point metrics
+	int startPnt = meshgeom.verts.size();
+	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
+		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
+			{tetgenParam.edgelengths[i]});
+		startPnt = startPnt + vertPerSubDomain[i];
+	}
+
+	// tecout.PrintMesh(meshdomain);
+}
+
+int tetcall_CFD()
 {
 	/*CFD meshing process*/
 	tetgen::io_safe tetin, tetout;
@@ -548,14 +598,15 @@ int tetcall()
 	return 0;
 }
 
-int tetcall_RSVSgrid()
+int tetcall()
 {
-	/*CFD meshing process*/
+	/*_RSVSgrid*/
 	tetgen::io_safe tetin, tetout;
 
 	tetgen::apiparam inparam;
-	mesh snakeMesh, voluMesh, triMesh;
+	mesh meshdomain;
 	snake snakein;
+	std::array<std::array<double, 2>, 3> dimDomain;
 
 	try {
 
@@ -563,12 +614,19 @@ int tetcall_RSVSgrid()
 		inparam.upperB= {1.0, 1.0, 1.0};
 		inparam.distanceTol = 1e-3;
 		inparam.edgelengths = {0.2};
-		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
-		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
+
+		BuildBlockGrid({3,1,1}, meshdomain);
+		dimDomain[0] = {0,3.0};
+		dimDomain[1] = {0,1.0};
+		dimDomain[2] = {0,1.0};
+		meshdomain.Scale(dimDomain);
+		meshdomain.PrepareForUse();
+
+		TetgenInput_RSVSGRIDS(meshdomain,tetin, inparam);
 
 
-		tetin.save_nodes("rsvs_3cell_2body");
-		tetin.save_poly("rsvs_3cell_2body");
+		tetin.save_nodes("rsvs_3cell_grid");
+		tetin.save_poly("rsvs_3cell_grid");
 		
 
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
