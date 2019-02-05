@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <unordered_map>
 
 #include "tetgen_rsvs_api.hpp"
 #include "tetgen.h"
@@ -558,6 +559,93 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	// tecout.PrintMesh(meshdomain);
 }
 
+void TetgenOutput_SU2(){}
+
+
+void ParseTetgenioConnectivity(mesh &meshout, tetgen::io_safe &tetout){
+	/*
+	Algorithm for reconstructing all the tetgen connectivity
+	implied by the shitty ordering method.
+	*/
+	edge newEdge;
+	surf newSurf;
+	tetgen::tupleconn tempTestConn;
+	unordered_map<tetgen::tupleconn, int> volu2Edge;
+	int countI, countJ, countK, nptTet;
+	auto &tetlist = tetout.tetrahedronlist;
+	nptTet = tetout.numberofcorners;
+	
+	countI = tetout.numberoftetrahedra;
+	countJ = nptTet;
+	countK = nptTet;
+	// Explore each tetrahedra's vertex (corner) connectivity
+	for (int i = 0; i < countI; ++i){
+		// Build all possible vertex connections
+		for (int j = 0; j < nptTet; ++j){
+			for (int k = j+1; k < nptTet; ++k){
+				// Temporary connectivity array sorted lowest then highest
+				// Handles equal numbers through assert
+				tempTestConn = {
+					(tetlist[i*nptTet+j] < tetlist[i*nptTet+k] ?
+						tetlist[i*nptTet+j] : tetlist[i*nptTet+k]) , 
+					(tetlist[i*nptTet+j] < tetlist[i*nptTet+k] ?
+						tetlist[i*nptTet+k] : tetlist[i*nptTet+j])
+				};
+				assert(tetlist[i*nptTet+j]!=tetlist[i*nptTet+k]);
+				// Look for that connectivity array in the hashtable
+				auto search = volu2Edge.find(tempTestConn);
+				if (search==volu2Edge.end()){
+					// if not found: add a new edge
+					newEdge.index=0;
+					newEdge.vertind={tempTestConn[0],tempTestConn[1]};
+					newEdge.surfind={};
+				} else {
+					// if found connect find it's position
+
+				}
+			}
+		}
+	}
+}
+
+mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
+	/*
+	Translates a tetgen output to the RSVS native mesh format 
+	*/
+	mesh meshout;
+
+	int nVerts, nEdges, nSurfs, nVolus;
+	int count;
+
+	nVerts = tetout.numberofpoints;
+	nVolus = tetout.numberoftetrahedra;
+	nEdges = 0;
+	nSurfs = 0;
+
+	count = nVolus * 6;
+	for (int i = 0; i < count; ++i)
+	{
+		nEdges = nEdges>=tetout.tet2edgelist[i]?
+			nEdges : tetout.tet2edgelist[i];
+	}
+	count = nVolus * 4;
+	for (int i = 0; i < count; ++i)
+	{
+		nSurfs = nSurfs>=tetout.tet2facelist[i]?
+			nSurfs : tetout.tet2facelist[i];
+	}
+	if (tetout.firstnumber==0){
+		nSurfs++;
+		nEdges++;
+	}
+
+	meshout.Init(nVerts, nEdges, nSurfs, nVolus);
+	// meshout.edges.reserve(nVolus*6);
+	// meshout.surfs.reserve(nVolus*4);
+
+	return meshout;
+}
+
 int tetcall_CFD()
 {
 	/*CFD meshing process*/
@@ -604,7 +692,7 @@ int tetcall()
 	tetgen::io_safe tetin, tetout;
 
 	tetgen::apiparam inparam;
-	mesh meshdomain;
+	mesh meshdomain, meshout;
 	snake snakein;
 	std::array<std::array<double, 2>, 3> dimDomain;
 
@@ -632,13 +720,14 @@ int tetcall()
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 		//   do quality mesh generation (q) with a specified quality bound
 		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqm"; 
+		inparam.command = "pkqnnefm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
 		// tetout.save_nodes("rsvsout_3cell_2body");
 		// tetout.save_elements("rsvsout_3cell_2body");
 		// tetout.save_faces("rsvsout_3cell_2body");
 		std::cout << "Finished the tettgen process " << std::endl;
+		meshout = TetgenOutput_TET2MESH(tetout);
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;

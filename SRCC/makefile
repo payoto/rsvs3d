@@ -27,6 +27,8 @@ INCLDIR= incl
 MAINALLSRC = src/main.cpp
 MAINTESTSRC = src/test/test.cpp
 
+NOTNEEDEDNEWTEST = RSVScalc
+
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
 DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
@@ -188,6 +190,7 @@ endif
 
 ifeq ($(MAKECMDGOALS), testnew)
 SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
+SRCS := $(filter-out $(NOTNEEDEDNEWTEST),$(SRCS))
 EXECUTABLE = $(TESTEXECUTABLE)
 endif
 
@@ -195,6 +198,9 @@ ifeq ($(MAKECMDGOALS), testall)
 SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
 EXECUTABLE = $(TESTALLEXECUTABLE)
 endif
+
+$(info $(SRCS))
+$(info sources printed after filter)
 
 # Define objects from sources
 OBJECTS=$(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
@@ -208,9 +214,10 @@ testnew : $(SRCS) $(EXECUTABLE)
 testall : $(SRCS) $(EXECUTABLE) 
   
 # Linker recipes for the EXECUTABLES
-$(EXECUTABLE) : $(OBJECTS) 
-	$(LINK)  $(OBJECTS) -o $(BINDIR)/$@ $(LDFLAGS)
+$(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
+$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) 
+	$(LINK)  $(OBJECTS) -o $(BINDIR)/$@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
 # into OBJDIR
