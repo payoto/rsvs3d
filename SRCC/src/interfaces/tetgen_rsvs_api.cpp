@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <cmath>
 
 #include "tetgen_rsvs_api.hpp"
 #include "tetgen.h"
@@ -401,7 +402,8 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 void PrepareSnakeForCFD(const snake &snakein, const tetgen::apiparam &tetgenParam,
 	mesh &meshgeom, std::vector<double> &holeCoords){
 	/*
-	Prepares the snake to be used for CFD, removes duplicate points and triangulates it.
+	Prepares the snake to be used for CFD, removes duplicate points and 
+	triangulates it.
 
 	Coordinates of holes are also returned.
 	*/
@@ -562,7 +564,7 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 void TetgenOutput_SU2(){}
 
 void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
-	std::vector<int> &rayEdges, int INCR, int DEINCR){
+	std::vector<int> &rayEdges, int DEINCR){
 	/*
 	Mesh is still missing some elements due to Voronoi diagrams not being
 	naturally closed:
@@ -582,14 +584,14 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 
 	int nVerts, nEdges, nSurfs;
 	int count,  n;
-	double lStep=0.2; 
+	double lStep=-0.01; 
 	vert vertNew;
 	edge edgeNew;
 	surf surfNew;
 	HashedVector<int, int> rays, newVerts, newEdges, newSurfs, rayFacesSearch;
 	std::vector<int> rayCells; // nonclosed voronoi faces
 	std::vector<int> &rayFaces = rayFacesSearch.vec; // nonclosed voronoi faces
-	std::vector<int> pair, temp;
+	std::vector<int> pair;
 
 	nVerts = meshout.verts.size();
 	nEdges = meshout.edges.size();
@@ -620,6 +622,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	// For each face 
 	// check if it is linked to rays, if it is
 	// an edge will be established between the two ray vertices
+	meshout.edges.HashArray();
 	rayFaces = ConcatenateVectorField(meshout.edges, &edge::surfind, 
 		meshout.edges.find_list(rays.vec));
 	sort(rayFaces);
@@ -637,13 +640,15 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 		}
 		if (pair.size()!=2){throw logic_error("Voronoi open face should have 2 rays");}
 		// Connect the 2 rays and their edges
-		edgeNew.index = nEdges;
+		edgeNew.index = nEdges+1;
 		for (int j = 0; j < 2; ++j){
 			edgeNew.vertind[j] = meshout.edges[rays.vec[pair[j]]-1].vertind[1];
 			meshout.verts[edgeNew.vertind[j]-1].edgeind.push_back(edgeNew.index);
 		}
 		edgeNew.surfind[0] = rayFaces[i];
+
 		meshout.edges.push_back(edgeNew);
+		meshout.surfs[rayFaces[i]-1].edgeind.push_back(edgeNew.index);
 		newEdges.vec.push_back(edgeNew.index);
 		nEdges++;
 	}
@@ -654,6 +659,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	// the volume using all the face indices and looking 
 	// for those which have been modified.
 
+	meshout.surfs.HashArray();
 	rayCells = ConcatenateVectorField(meshout.surfs, &surf::voluind, 
 		meshout.surfs.find_list(rayFaces));
 	sort(rayCells);
@@ -663,7 +669,6 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	for (int i = 0; i < count; ++i){
 		// identify in each open cell the faces that were open
 		pair.clear();
-		temp.clear();
 		surfNew.edgeind.clear();
 		for (auto a : rayFacesSearch.find_list(
 				meshout.volus[rayCells[i]-1].surfind)){
@@ -671,30 +676,39 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 				pair.push_back(a);
 			}
 		}
+		if(pair.size()<3){
+			throw logic_error("At least 3 edges are required to close the face");
+		}
 		// identify the edge in each face which is new and assign correxponding
 		// connectivities to surfNew;
 		surfNew.index = nSurfs+1;
-		for (auto ind : pair){
+		for (auto ind : pair) {
 			auto &edgeind = meshout.surfs[rayFacesSearch.vec[ind]-1].edgeind;
 			n = edgeind.size();
-			int j;
+			int j, k=0;
 			for (j = 0; j < n; ++j){
 				if(newEdges.find(edgeind[j])!=-1){
 					surfNew.edgeind.push_back(edgeind[j]);
-					meshout.edges[edgeind[j]].surfind.push_back(surfNew.index);
-					break;
+					meshout.edges[edgeind[j]-1].surfind.push_back(surfNew.index);
+					// break;
+					k++;
 				}
 			}
-			if(j>=n){
+			// if(j>=n)
+			if(k==0){
 				throw logic_error("None of the edges of the open face"
 				" were recognised as new. This should not happen.");
 			}
-
-			surfNew.voluind[0] = rayCells[0];
-			surfNew.voluind[1] = 0;
-			meshout.surfs.push_back(surfNew);
-			nSurfs++;
+			if (k>1){
+				std::cerr << "Unexpected behaviour with number of edges" 
+					<< std::endl;
+			}
 		}
+		surfNew.voluind[0] = rayCells[i];
+		surfNew.voluind[1] = 0;
+		meshout.volus[rayCells[i]-1].surfind.push_back(surfNew.index);
+		meshout.surfs.push_back(surfNew);
+		nSurfs++;
 	}
 
 }
@@ -707,7 +721,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 
 	int nVerts, nEdges, nSurfs, nVolus;
 	int count,INCR, DEINCR,n;
-	vector<int> rayInd;
+	vector<int> rayInd, rayInd2;
 	nVerts = tetout.numberofvpoints;
 	nEdges = tetout.numberofvedges;
 	nSurfs = tetout.numberofvfacets;
@@ -761,29 +775,50 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	}
 
 	count = nSurfs;
+	int nRays = 0;
 	for (int i = 0; i < count; ++i)	{ // loop through surfs
 		// Surfaces to edges 
 		n = tetout.vfacetlist[i].elist[0];
 		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
-			meshout.surfs[i].edgeind.push_back(tetout.vfacetlist[i].elist[j+1]+INCR);
-			meshout.edges[tetout.vfacetlist[i].elist[j+1]+DEINCR].surfind.push_back(i+1);
+			if(tetout.vfacetlist[i].elist[j+1]>-1){
+				meshout.surfs[i].edgeind.push_back(
+					tetout.vfacetlist[i].elist[j+1]+INCR);
+				meshout.edges[tetout.vfacetlist[i].elist[j+1]+DEINCR]
+					.surfind.push_back(i+1);
+			} else {
+				nRays++;
+			}
 		}
 		//  surface to volumes
 		meshout.surfs[i].voluind[0]=tetout.vfacetlist[i].c1+INCR;
 		meshout.surfs[i].voluind[1]=tetout.vfacetlist[i].c2+INCR;
 		n=2;
 		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
-			meshout.volus[meshout.surfs[i].voluind[j]].surfind.push_back(i+1);
+			meshout.volus[meshout.surfs[i].voluind[j]-1].surfind.push_back(i+1);
 		}
 	}
 
+	if(nRays!=int(rayInd.size())){
+		// throw logic_error("Ray numbers are not consistant");
+	}
+	
 	// Close the mesh
-	CloseVoronoiMesh(meshout, tetout, rayInd, INCR, DEINCR);
+	CloseVoronoiMesh(meshout, tetout, rayInd, DEINCR);
 	// Prepare mesh for use
+	for (int i = 0; i < nVolus; ++i){
+		meshout.volus[i].target=(double(rand()%1000001)/1000000);
+		meshout.volus[i].fill = meshout.volus[i].target;
+		meshout.volus[i].error = meshout.volus[i].target;
+	}
+	meshout.HashArray();
+	meshout.TestConnectivityBiDir();
 	meshout.TightenConnectivity();
+	// meshout.verts.disp();
+	// meshout.edges.disp();
+	// meshout.surfs.disp();
+	// meshout.volus.disp();
 	meshout.PrepareForUse();
 
-	meshout.TestConnectivityBiDir();
 	meshout.displight();
 
 	return meshout;
@@ -853,6 +888,11 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 			meshout.surfs[tetout.tet2facelist[i*n+j]+DEINCR].voluind.push_back(i+1);
 		}
 	}
+	for (int i = 0; i < nSurfs; ++i){
+		if(meshout.surfs[i].voluind.size()==1){
+			meshout.surfs[i].voluind.push_back(0);
+		}
+	}
 
 	// Surfaces to edges
 	count = nSurfs;	n = 3;
@@ -864,6 +904,11 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	}
 
 	// Prepare mesh for use
+	for (int i = 0; i < nVolus; ++i){
+		meshout.volus[i].target=(double(rand()%1000001)/1000000);
+		meshout.volus[i].fill = meshout.volus[i].target;
+		meshout.volus[i].error = meshout.volus[i].target;
+	}
 	meshout.TightenConnectivity();
 	meshout.PrepareForUse();
 
@@ -908,7 +953,7 @@ int tetcall_CFD()
 		std::cout << "Finished the tettgen process " << std::endl;
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
-		return -1;
+		return 1;
 	}
 	return 0;
 }
@@ -917,14 +962,15 @@ int tetcall()
 {
 	/*_RSVSgrid*/
 	tetgen::io_safe tetin, tetout;
-
 	tetgen::apiparam inparam;
-	mesh meshdomain, meshout;
+	mesh meshdomain, meshout, meshout2;
 	snake snakein;
 	std::array<std::array<double, 2>, 3> dimDomain;
+	tecplotfile tecout;
+
 
 	try {
-
+		tecout.OpenFile("../TESTOUT/trianglemeshconv.plt");
 		inparam.lowerB= {-0.0, -0.0,-0.0};
 		inparam.upperB= {1.0, 1.0, 1.0};
 		inparam.distanceTol = 1e-3;
@@ -947,7 +993,7 @@ int tetcall()
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 		//   do quality mesh generation (q) with a specified quality bound
 		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqnnefm"; 
+		inparam.command = "pkqnnvefm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
 		// tetout.save_nodes("rsvsout_3cell_2body");
@@ -955,9 +1001,14 @@ int tetcall()
 		// tetout.save_faces("rsvsout_3cell_2body");
 		std::cout << "Finished the tettgen process " << std::endl;
 		meshout = TetgenOutput_TET2MESH(tetout);
+		tecout.PrintMesh(meshout);
+		std::cout << " Meshed the tetrahedralization" << std::endl;
+		meshout2 = TetgenOutput_VORO2MESH(tetout);
+		tecout.PrintMesh(meshout2);
+		std::cout << " Meshed the voronization" << std::endl;
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
-		return -1;
+		return 1;
 	}
 	return 0;
 }
@@ -1128,7 +1179,5 @@ void tetgen::io_safe::SpecifyTetPointMetric(int startPnt, int numPnt,
 // Test code
 int test_tetgenapi(){
 
-	tetcall();
-
-	return(0);
+	return(tetcall());
 }

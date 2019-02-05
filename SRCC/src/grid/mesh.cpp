@@ -1998,6 +1998,10 @@ int surf::OrderEdges(mesh *meshin)
 				//throw range_error ("Found a single vertex - surface is not closed");
 				cerr << " - surface "<< index <<" is not closed (single vertex "<<
 					 vertCurr <<")" << endl;
+				this->edgeind = edgeIndOrig;
+			 	this->disp();
+			 	isordered=true;
+				return(newSurfInd);
 				throw invalid_argument("Surface is not closed");
 			}
 		 	#endif // SAFe_ACCESS
