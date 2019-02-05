@@ -581,7 +581,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	*/
 
 	int nVerts, nEdges, nSurfs;
-	int count, countI, countJ, n;
+	int count,  n;
 	double lStep=0.2; 
 	vert vertNew;
 	edge edgeNew;
@@ -630,7 +630,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	for (int i = 0; i < count; ++i){
 		// identify in each open face the 2 rays
 		pair.clear();
-		for (auto a : rays.find_list(meshout.surfs[rayFaces[i]-1].edgeind)){
+		for (int a : rays.find_list(meshout.surfs[rayFaces[i]-1].edgeind)){
 			if (a!=-1){
 				pair.push_back(a);
 			}

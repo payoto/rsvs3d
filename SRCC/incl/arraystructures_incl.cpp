@@ -692,7 +692,6 @@ template <class T,class Q,class R> inline void HashedMap<T,Q,R>::GenerateHash()
 }
 template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &hashTable)  
 {
-
 	auto search=hashTable.find(key);
 
 	if (search==hashTable.end()){
@@ -726,6 +725,30 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<
 	return(returnSub);
 }
 
+
+template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList, const unordered_multimap<T,int> &hashTable) 
+{
+	vector<int> returnSub;
+	int ii;
+
+	returnSub.reserve(int(keyFind.size()));
+
+	if (hashTable.empty() && keyList.size()>0 && keyFind.size()>0){
+		throw invalid_argument("Hash table needs to be full to find list");
+	}
+
+	for (ii=0;ii<int(keyFind.size());++ii){
+		returnSub.push_back(FindSub(keyFind[ii],hashTable));
+      #ifdef SAFE_ACCESS
+		if(returnSub[ii]>=0){
+			if (keyList[returnSub[ii]]!=keyFind[ii]){
+				throw  invalid_argument ("FIND returned an invalid output ");
+			}
+		}
+      #endif //SAFE_ACCESS
+	}
+	return(returnSub);
+}
 
 
 template<class T, class Q> void HashVector(const vector<T> &elems, unordered_multimap<T,Q> &hashTable,
