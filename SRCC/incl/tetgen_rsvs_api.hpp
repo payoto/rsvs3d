@@ -24,7 +24,6 @@
 //
 // Substructure names are all 4-5 letters
 namespace tetgen {
-	typedef std::array<int, 2> tupleconn;
 
 	class io_safe : public tetgenio {
 		// Adds a semblance of prebuilt allocation functions
@@ -118,21 +117,6 @@ namespace tetgen {
 	};
 }
 
-// Specialise std hash to work with an array of two elements
-template<> class std::hash<tetgen::tupleconn>{
-	public:
-	size_t operator()(const tetgen::tupleconn &arr)const
-	{
-		// computes the hash of an employee using a variant 
-	    // of the Fowler-Noll-Vo hash function
-	    size_t result = 2166136261;
-	 
-	    for (size_t i = 0, ie = arr.size(); i != ie; ++i) {
-	    	result = (result * 16777619) ^ arr[i];
-    	}
-    	return result;
-	}
-};
 // Test functions
 
 int test_tetgenapi();
