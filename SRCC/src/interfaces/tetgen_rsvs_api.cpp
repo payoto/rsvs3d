@@ -397,31 +397,26 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	return meshdomain;
 }
 
-void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
-	const tetgen::apiparam &tetgenParam){
+void PrepareSnakeForCFD(const snake &snakein, const tetgen::apiparam &tetgenParam,
+	mesh &meshgeom, std::vector<double> &holeCoords){
 	/*
-	Processes a snake object into a tetgen input object.
+	Prepares the snake to be used for CFD, removes duplicate points and triangulates it.
 
-	This function processes snake objects into the safe tetgenio object.
-	This can then used to generate a tetrahedral mesh or to save it as the
-	input file.
+	Coordinates of holes are also returned.
 	*/
-
-	mesh meshdomain ,meshdomain2, meshgeom, meshtemp;
+	mesh  meshtemp;
 	triangulation triRSVS;
 	int nHoles;
 	// int nPtsHole, kk, count;
 
 	std::vector<int>  holeIndices;
-	std::array<double, 3> upperB, lowerB;
-	std::vector<int> vertPerSubDomain;
 
-	tecplotfile tecout;
+	// tecplotfile tecout;
 
 	// Cleanup the mesh
-	tecout.OpenFile("../TESTOUT/rsvs_tetgen_mesh.plt");
+	// tecout.OpenFile("../TESTOUT/rsvs_tetgen_mesh.plt");
 	meshtemp=snakein.snakeconn;
-	tecout.PrintMesh(meshtemp);
+	// tecout.PrintMesh(meshtemp);
 	meshtemp.displight();
 
 	auto groupedVertices = GroupCloseSnaxels(snakein, tetgenParam.distanceTol);
@@ -432,7 +427,7 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	meshtemp.TestConnectivityBiDir();
 	meshtemp.TightenConnectivity();
 	meshtemp.OrderEdges();
-	tecout.PrintMesh(meshtemp);
+	// tecout.PrintMesh(meshtemp);
 	meshtemp.displight();
 
 	// Triangulation preparation
@@ -450,31 +445,56 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 	meshgeom.TightenConnectivity();
 	meshgeom.OrderEdges();
 
-	tecout.PrintMesh(meshgeom);
-
-
 	// Find number of holes
 	holeIndices=FindHolesInSnake(snakein, groupedVertices);
 	nHoles = holeIndices.size();
-	// count = snakein.isMeshVertIn.size();
-	// for (int i = 0; i < count; ++i) {
-	// 	nHoles+=int(snakein.isMeshVertIn[i]);
-	// }
+
+	holeCoords.assign(nHoles*3,0.0);
+	// Assign the holes
+	for (int i = 0; i < nHoles; ++i){
+		for (int j =0; j<3; ++j){
+			holeCoords[i*3+j] = snakein.snakemesh->verts.isearch(
+				holeIndices[i])->coord[j];
+		}
+	}
+}
+
+void TetgenInput_RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
+	const tetgen::apiparam &tetgenParam){
+	/*
+	Processes a snake object into a tetgen input object.
+
+	This function processes snake objects into the safe tetgenio object.
+	This can then used to generate a tetrahedral mesh or to save it as the
+	input file.
+	*/
+
+	mesh meshdomain ,meshdomain2, meshgeom;
+	triangulation triRSVS;
+	int nHoles;
+	// int nPtsHole, kk, count;
+
+	std::vector<int>  holeIndices;
+	std::array<double, 3> upperB, lowerB;
+	std::vector<int> vertPerSubDomain;
+	std::vector<double> holeCoords;
+
+	PrepareSnakeForCFD(snakein, tetgenParam, meshgeom, holeCoords);
 
 	meshgeom.ReturnBoundingBox(lowerB, upperB);
 	meshdomain = BuildCutCellDomain(tetgenParam.lowerB, tetgenParam.upperB,
 		lowerB, upperB, tetgenParam.edgelengths.size(), vertPerSubDomain);
-
+	
+	nHoles=holeCoords.size()/3;
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
 	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
 	// Assign the holes
-	for (int i = 0; i < nHoles; ++i){
-		for (int j =0; j<3; ++j){
-			tetin.holelist[i*3+j] = snakein.snakemesh->verts.isearch(
-				holeIndices[i])->coord[j];
-		}
+
+	int count = holeCoords.size();
+	for (int i = 0; i < count; ++i){
+		tetin.holelist[i] = holeCoords[i];	
 	}
 
 	// Assign domain point metrics
@@ -485,16 +505,14 @@ void TetgenInput_RSVS(const snake &snakein, tetgen::io_safe &tetin,
 		startPnt = startPnt + vertPerSubDomain[i];
 	}
 
-
-	tecout.PrintMesh(meshdomain);
-
-	
+	// tecout.PrintMesh(meshdomain);
 }
 
 int tetcall()
 {
-	tetgen::io_safe tetin;
-	tetgenio tetout;
+	/*CFD meshing process*/
+	tetgen::io_safe tetin, tetout;
+
 	tetgen::apiparam inparam;
 	mesh snakeMesh, voluMesh, triMesh;
 	snake snakein;
@@ -506,7 +524,7 @@ int tetcall()
 		inparam.distanceTol = 1e-3;
 		inparam.edgelengths = {0.03,0.3,0.7,2.0};
 		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
-		TetgenInput_RSVS(snakein, tetin, inparam);
+		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
 
 
 		tetin.save_nodes("rsvs_3cell_2body");
@@ -530,6 +548,45 @@ int tetcall()
 	return 0;
 }
 
+int tetcall_RSVSgrid()
+{
+	/*CFD meshing process*/
+	tetgen::io_safe tetin, tetout;
+
+	tetgen::apiparam inparam;
+	mesh snakeMesh, voluMesh, triMesh;
+	snake snakein;
+
+	try {
+
+		inparam.lowerB= {-0.0, -0.0,-0.0};
+		inparam.upperB= {1.0, 1.0, 1.0};
+		inparam.distanceTol = 1e-3;
+		inparam.edgelengths = {0.2};
+		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
+		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
+
+
+		tetin.save_nodes("rsvs_3cell_2body");
+		tetin.save_poly("rsvs_3cell_2body");
+		
+
+		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+		//   do quality mesh generation (q) with a specified quality bound
+		//   (1.414), and apply a maximum volume constraint (a0.1).
+		inparam.command = "pkqm"; 
+		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
+
+		// tetout.save_nodes("rsvsout_3cell_2body");
+		// tetout.save_elements("rsvsout_3cell_2body");
+		// tetout.save_faces("rsvsout_3cell_2body");
+		std::cout << "Finished the tettgen process " << std::endl;
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	}
+	return 0;
+}
 
 void tetgen::io_safe::allocate(){
 
@@ -615,7 +672,6 @@ void tetgen::io_safe::allocatefacet(int fIndex){
 		} else {
 			this->facetlist[fIndex].holelist = (REAL *) NULL;
 		}
-
 	} else {
 		std::cerr << "Error: Index passed to facet allocation out "
 			"of range" << std::endl;
@@ -627,6 +683,9 @@ void tetgen::io_safe::allocatefacetpolygon(int fIndex, int pIndex){
 			if(this->facetlist[fIndex].polygonlist[pIndex].numberofvertices>0){
 				this->facetlist[fIndex].polygonlist[pIndex].vertexlist 
 					= new int[this->facetlist[fIndex].polygonlist[pIndex].numberofvertices];
+			} else {
+				this->facetlist[fIndex].polygonlist[pIndex].vertexlist =
+					(int *) NULL;
 			}
 
 		} else {
