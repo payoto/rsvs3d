@@ -187,7 +187,6 @@ HashedVector<int, int> GroupCloseSnaxels(const snake &snakein, double distTol){
 	/*
 	Merges snaxel which are `distTol` to the end of their carrying edge.
 	*/
-	std::vector<bool> isSnaxDone;
 	HashedVector<int, int> closeVert;
 	std::vector<int> sameSnaxs, rmvInds;
 	int nSnax;
@@ -205,6 +204,82 @@ HashedVector<int, int> GroupCloseSnaxels(const snake &snakein, double distTol){
 		} else if (((1-snakein.snaxs(i)->d)<distTol)){
 			closeVert.vec[i] = snakein.snaxs(i)->tovert;
 		} 
+	}
+
+	closeVert.GenerateHash();
+	return closeVert;
+}
+void TestVertClose(int vertIndIn, std::vector<bool> &isSnaxDone, 
+	const mesh &meshin, double distTol,
+	std::vector<int> &sameEdges){
+	/*
+	recursive function for finding edges which are short and should be collapsed
+	*/
+	int nextvertIndIn;
+	if(!isSnaxDone[vertIndIn]){
+			isSnaxDone[vertIndIn]=true;
+			for (auto eInd : meshin.verts(vertIndIn)->edgeind){
+				double d = 0.0;
+				for(int i = 0; i< 3; ++i){
+					d+=pow((meshin.verts.isearch(
+							meshin.edges.isearch(eInd)->vertind[0]
+						)->coord[i]-
+						meshin.verts.isearch(
+							meshin.edges.isearch(eInd)->vertind[1]
+							)->coord[i]),2.0);
+				}
+				if(d<distTol){
+					sameEdges.push_back(eInd);
+					nextvertIndIn = meshin.verts.find(
+								meshin.edges.isearch(eInd)->vertind[0]
+							);
+					for(int i = 0; i< 2; ++i){
+						TestVertClose(nextvertIndIn, isSnaxDone, 
+							meshin,  distTol, sameEdges);
+					}
+				}
+				
+			}
+		}
+}
+HashedVector<int, int> GroupCloseVertices(const mesh &meshin, double distTol){
+	/*
+	Groups vertices which are `distTol` close to each other.
+	*/
+	std::vector<bool> isSnaxDone, isEdgeDone;
+	HashedVector<int, int> closeVert;
+	std::vector<int> sameEdges, rmvInds;
+	int nSnax, nEdge, nGroup=1;
+
+	distTol = distTol*distTol;
+	nSnax = meshin.verts.size();
+	nEdge = meshin.edges.size();
+	closeVert.vec.assign(nSnax,-1);
+	isSnaxDone.assign(nSnax,false);
+	isEdgeDone.assign(nEdge,false);
+	sameEdges.reserve(10);
+	// This piece of code is going to be incomplete as it won't test
+	// for multiple snaxels very close on the same edge
+	// 
+	// closeVert is a list of vertices close
+	
+	for (int i = 0; i < nSnax; ++i)	{
+		sameEdges.clear();
+		TestVertClose(i, isSnaxDone,meshin, distTol,sameEdges);
+
+		if (sameEdges.size()>0){
+			for (auto eInd : sameEdges)
+			{
+				closeVert.vec[meshin.verts.find(
+						meshin.edges.isearch(eInd)->vertind[0]
+					)]=nGroup;
+				closeVert.vec[meshin.verts.find(
+						meshin.edges.isearch(eInd)->vertind[1]
+					)]=nGroup;
+			}
+			++nGroup;
+		}
+
 	}
 
 	closeVert.GenerateHash();
@@ -563,8 +638,9 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 
 void TetgenOutput_SU2(){}
 
+
 void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
-	std::vector<int> &rayEdges, int DEINCR){
+	std::vector<int> &rayEdges, int DEINCR, tetgen::dombounds boundBox){
 	/*
 	Mesh is still missing some elements due to Voronoi diagrams not being
 	naturally closed:
@@ -584,7 +660,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 
 	int nVerts, nEdges, nSurfs;
 	int count,  n;
-	double lStep=-0.01; 
+	double lStep, lStepMin=-0.00; 
 	vert vertNew;
 	edge edgeNew;
 	surf surfNew;
@@ -592,6 +668,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	std::vector<int> rayCells; // nonclosed voronoi faces
 	std::vector<int> &rayFaces = rayFacesSearch.vec; // nonclosed voronoi faces
 	std::vector<int> pair;
+	
 
 	nVerts = meshout.verts.size();
 	nEdges = meshout.edges.size();
@@ -608,6 +685,11 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 		vertNew.index = nVerts+1;
 		vertNew.edgeind[0] = rayEdges[i];
 		meshout.edges[rayEdges[i]-1].vertind[1] = nVerts+1;
+		lStep = tetgen::voronoi::ProjectRay(3, boundBox, 
+			tetout.vedgelist[rayEdges[i]-1].vnormal, 
+			meshout.verts[tetout.vedgelist[rayEdges[i]-1].v1+DEINCR].coord,
+			lStepMin);
+		// std::cout << lStep << " " << std::endl;
 		for (int j = 0; j < 3; ++j){
 			vertNew.coord[j]=lStep*tetout.vedgelist[rayEdges[i]-1].vnormal[j]
 				+ meshout.verts[tetout.vedgelist[rayEdges[i]-1].v1+DEINCR].coord[j];
@@ -706,11 +788,32 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 		}
 		surfNew.voluind[0] = rayCells[i];
 		surfNew.voluind[1] = 0;
+
 		meshout.volus[rayCells[i]-1].surfind.push_back(surfNew.index);
 		meshout.surfs.push_back(surfNew);
 		nSurfs++;
 	}
 
+}
+
+tetgen::dombounds TetgenOutput_GetBB(tetgen::io_safe &tetout){
+
+	tetgen::dombounds domBounds;
+	domBounds[0] = {INFINITY,INFINITY,INFINITY};
+	domBounds[1] = {-INFINITY,-INFINITY,-INFINITY};
+	int nVerts = tetout.numberofpoints;
+	int count = nVerts;
+	int n=3;
+	for (int i = 0; i < count; ++i){
+		for (int j = 0; j < n; ++j){
+			domBounds[0][j] = domBounds[0][j] <= tetout.pointlist[i*n+j] ?
+				domBounds[0][j] : tetout.pointlist[i*n+j];
+			domBounds[1][j] = domBounds[1][j] >= tetout.pointlist[i*n+j] ?
+				domBounds[1][j] : tetout.pointlist[i*n+j];
+		}
+	}
+
+	return domBounds;
 }
 
 mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
@@ -722,6 +825,8 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	int nVerts, nEdges, nSurfs, nVolus;
 	int count,INCR, DEINCR,n;
 	vector<int> rayInd, rayInd2;
+	tetgen::dombounds boundBox=TetgenOutput_GetBB(tetout);
+
 	nVerts = tetout.numberofvpoints;
 	nEdges = tetout.numberofvedges;
 	nSurfs = tetout.numberofvfacets;
@@ -803,7 +908,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	}
 	
 	// Close the mesh
-	CloseVoronoiMesh(meshout, tetout, rayInd, DEINCR);
+	CloseVoronoiMesh(meshout, tetout, rayInd, DEINCR, boundBox);
 	// Prepare mesh for use
 	for (int i = 0; i < nVolus; ++i){
 		meshout.volus[i].target=(double(rand()%1000001)/1000000);
@@ -818,6 +923,15 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	// meshout.surfs.disp();
 	// meshout.volus.disp();
 	meshout.PrepareForUse();
+
+	auto groupedVertices = GroupCloseVertices(meshout, 1e-9);
+	meshout.MergeGroupedVertices(groupedVertices);
+	meshout.RemoveSingularConnectors();
+
+	meshout.PrepareForUse();
+	meshout.TestConnectivityBiDir();
+	meshout.TightenConnectivity();
+	meshout.OrderEdges();
 
 	meshout.displight();
 
@@ -963,7 +1077,7 @@ int tetcall()
 	/*_RSVSgrid*/
 	tetgen::io_safe tetin, tetout;
 	tetgen::apiparam inparam;
-	mesh meshdomain, meshout, meshout2;
+	mesh meshdomain, meshtet, meshvoro;
 	snake snakein;
 	std::array<std::array<double, 2>, 3> dimDomain;
 	tecplotfile tecout;
@@ -982,6 +1096,7 @@ int tetcall()
 		dimDomain[2] = {0,1.0};
 		meshdomain.Scale(dimDomain);
 		meshdomain.PrepareForUse();
+		tecout.PrintMesh(meshdomain);
 
 		TetgenInput_RSVSGRIDS(meshdomain,tetin, inparam);
 
@@ -1000,11 +1115,11 @@ int tetcall()
 		// tetout.save_elements("rsvsout_3cell_2body");
 		// tetout.save_faces("rsvsout_3cell_2body");
 		std::cout << "Finished the tettgen process " << std::endl;
-		meshout = TetgenOutput_TET2MESH(tetout);
-		tecout.PrintMesh(meshout);
+		meshtet = TetgenOutput_TET2MESH(tetout);
+		tecout.PrintMesh(meshtet);
 		std::cout << " Meshed the tetrahedralization" << std::endl;
-		meshout2 = TetgenOutput_VORO2MESH(tetout);
-		tecout.PrintMesh(meshout2);
+		meshvoro = TetgenOutput_VORO2MESH(tetout);
+		tecout.PrintMesh(meshvoro);
 		std::cout << " Meshed the voronization" << std::endl;
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 

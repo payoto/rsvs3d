@@ -15,7 +15,11 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "tetgen.h"
+
+
+
 //=================================
 // Code
 // 
@@ -24,7 +28,7 @@
 //
 // Substructure names are all 4-5 letters
 namespace tetgen {
-
+	typedef std::array<std::array<double, 3>, 2> dombounds;
 	class io_safe : public tetgenio {
 		// Adds a semblance of prebuilt allocation functions
 		// to the io class build into tetgen
@@ -115,7 +119,32 @@ namespace tetgen {
 		// Commmand line string to be run
 		std::string command;
 	};
+	namespace voronoi {
+		template<class T, class V>
+		double ProjectRay(int count, const tetgen::dombounds &boundBox,
+			const T &dir, const V &orig, double minDist=0.0){
+			/*
+			Calculates the distance to project a single ray to reach the bounding box
+
+			It is templated to accept any types of containers with `count` elements, 
+			accessible by operator[];
+			*/
+
+			double l=-INFINITY;
+
+			for (int i = 0; i < count; ++i)
+			{
+				l = std::max(l,
+					std::min(
+						(boundBox[0][i]-orig[i])/dir[i] ,
+					(boundBox[1][i]-orig[i])/dir[i] ));
+			}
+			return std::min(l, minDist);
+		}
+	}
 }
+
+
 
 // Test functions
 
