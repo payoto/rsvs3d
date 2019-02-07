@@ -242,6 +242,7 @@ void TestVertClose(int vertIndIn, std::vector<bool> &isSnaxDone,
 			}
 		}
 }
+
 HashedVector<int, int> GroupCloseVertices(const mesh &meshin, double distTol){
 	/*
 	Groups vertices which are `distTol` close to each other.
@@ -648,7 +649,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 	2.a) Link ray-vertices with edges 
 	2.b) Include edges in equivalent faces
 	3.a) Close volumes by creating faces from edges  
-	
+	4) Triangulate the surface mesh to make sure it is flat
 	Implementation notes:
 		will need hashed vectors of the edges added
 
@@ -796,6 +797,64 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 
 }
 
+void FlattenBoundaryFaces(mesh &meshin){
+	/*
+	Flattens non flat border faces of a mesh by triangulating them
+
+	*/
+	mesh meshout;
+	vector<int> subList, vertList;
+	std::array<bool, 3> isFlat;
+	triangulation triangleRSVS;
+	int nSurf;
+	double tol=1e-9;
+
+	nSurf = meshin.surfs.size();
+	subList.reserve(nSurf);
+
+	triangleRSVS.stattri.clear();
+	triangleRSVS.trivert.clear();
+	triangleRSVS.PrepareForUse();
+	// Find Non flat boundary faces (only checks for one coordinate being the same)
+	for (int i = 0; i < nSurf; ++i)
+	{
+		if(meshin.surfs(i)->isBorder  && meshin.surfs(i)->edgeind.size()>3){
+			meshin.surfs(i)->OrderedVerts(&meshin,vertList);
+			vertList = meshin.verts.find_list(vertList);
+
+			isFlat.fill(true);
+			int count = vertList.size();
+			for (int j = 1; j < count; ++j)
+			{
+				for (int k = 0; k < 3; ++k)
+				{
+					isFlat[k] = isFlat[k] && (fabs(meshin.verts(vertList[j])->coord[k]-
+										meshin.verts(vertList[0])->coord[k])<tol);
+				}
+			}
+			if(!(isFlat[0] || isFlat[1] || isFlat[2])){
+				subList.push_back(i);
+			}
+		}
+	}
+	// triangulate the container
+	TriangulateContainer(meshin,triangleRSVS , 1, subList); 
+	triangleRSVS.meshDep = &meshin;
+
+
+	triangleRSVS.PrepareForUse();
+	triangleRSVS.CalcTriVertPos();
+	triangleRSVS.PrepareForUse();
+	MeshTriangulation(meshout,meshin,triangleRSVS.stattri,
+		triangleRSVS.trivert);
+	meshin=meshout;
+	meshin.PrepareForUse();
+	meshin.displight();
+	meshin.TightenConnectivity();
+	meshin.OrderEdges();
+
+}
+
 tetgen::dombounds TetgenOutput_GetBB(tetgen::io_safe &tetout){
 
 	tetgen::dombounds domBounds;
@@ -909,6 +968,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	
 	// Close the mesh
 	CloseVoronoiMesh(meshout, tetout, rayInd, DEINCR, boundBox);
+
 	// Prepare mesh for use
 	for (int i = 0; i < nVolus; ++i){
 		meshout.volus[i].target=(double(rand()%1000001)/1000000);
@@ -932,7 +992,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.TestConnectivityBiDir();
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
-
+	FlattenBoundaryFaces(meshout);
 	meshout.displight();
 
 	return meshout;
@@ -1075,9 +1135,9 @@ int tetcall_CFD()
 int tetcall()
 {
 	/*_RSVSgrid*/
-	tetgen::io_safe tetin, tetout;
+	tetgen::io_safe tetin, tetin2, tetout, tetout2;
 	tetgen::apiparam inparam;
-	mesh meshdomain, meshtet, meshvoro;
+	mesh meshdomain, meshtet, meshvoro, meshtet2;
 	snake snakein;
 	std::array<std::array<double, 2>, 3> dimDomain;
 	tecplotfile tecout;
@@ -1121,6 +1181,15 @@ int tetcall()
 		meshvoro = TetgenOutput_VORO2MESH(tetout);
 		tecout.PrintMesh(meshvoro);
 		std::cout << " Meshed the voronization" << std::endl;
+
+		inparam.edgelengths = {0.1};
+		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
+		inparam.command = "pkqnnvefm"; 
+		// tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
+		std::cout << "Finished the tettgen process " << std::endl;
+		// meshtet2 = TetgenOutput_TET2MESH(tetout2);
+		// tecout.PrintMesh(meshtet2);
+
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
 		return 1;
