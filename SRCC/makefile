@@ -72,7 +72,7 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 # Standard GCC warning, optimisation and c++ standard flags
 WARNFLAGS= -Wall -Wextra -pedantic
 OPTIMLVL=0
-CCPSTD=17
+CCPSTD=11
 
 # Other compiler flags
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC

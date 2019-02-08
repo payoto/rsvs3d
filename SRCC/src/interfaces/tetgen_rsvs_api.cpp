@@ -987,11 +987,15 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.TestConnectivityBiDir();
 	meshout.TightenConnectivity();
 	meshout.PrepareForUse();
-
+	meshout.displight();
+	
 	auto groupedVertices = GroupCloseVertices(meshout, 1e-7);
-	auto out = meshout.MergeGroupedVertices(groupedVertices);
-	meshout.RemoveSingularConnectors();
-
+	auto out = meshout.MergeGroupedVertices(groupedVertices,false);
+	sort(out);
+	unique(out);
+	meshout.RemoveSingularConnectors(out);
+	meshout.HashArray();
+	meshout.TestConnectivityBiDir();
 
 	meshout.PrepareForUse();
 	meshout.TestConnectivityBiDir();

@@ -1304,8 +1304,24 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 	} else if (typeInd==4){
 
-		cerr << "not coded yet" << endl;
-		throw;
+		sub = volus.find(oldInd);
+
+		subList=surfs.find_list(volus(sub)->surfind);
+		for (ii=0;ii<int(subList.size());++ii){
+			for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
+				if(surfs(subList[ii])->voluind[jj]==oldInd){
+					surfs[subList[ii]].voluind.erase(
+						surfs[subList[ii]].voluind.begin()+jj);
+					jj--;
+				}
+			}  
+		}
+
+		volus[sub].surfind.clear();
+		surfs.isHash=1;
+		volus.isHash=1;
+		surfs.isSetMI=1;
+		volus.isSetMI=1;
    } else if (typeInd==5){ // Modify vertex index in scoped mode
 
    	cerr << "not coded yet" << endl;
@@ -2233,6 +2249,51 @@ void surf::FlipVolus(){
 	voluind[1]=interm;
 }
 
+bool edge::vertconneq(const edge &other) const{
+
+	return 
+		(this->vertind[0]==other.vertind[0] 
+			&& this->vertind[1]==other.vertind[1])
+		|| (this->vertind[1]==other.vertind[0] 
+			&& this->vertind[0]==other.vertind[1]);
+}
+
+bool surf::edgeconneq(const surf &other, bool recurse) const{
+	/*
+	Explores all the edgeind combinations looking for a one to one 
+	match with each.
+
+	Boolean recurse controls the recursive behaviour of the function.
+	The default is true so that a user calling it will get robust
+	equality check between the connectivity lists. THis is then called by
+	itself with recurse=false to get the other direction.
+
+	This function is very inneficient at O(2*m*n) but exact, constant, and 
+	requires no memory allocation. 
+	*/
+	bool out, temp;
+	int count=this->edgeind.size();
+	int count2=other.edgeind.size();
+	out =true;
+	for (int i = 0; i < count; ++i)
+	{
+		temp = false;
+		for (int j = 0; j < count2; ++j)
+		{
+			temp = temp || (this->edgeind[i]==other.edgeind[j]);
+		}
+		out = out && temp;
+		if(!out){
+			break;
+		}
+	}
+	if (recurse){
+		return out && other.edgeconneq(*this, false);
+	} else {
+		return out;
+	}
+}
+
 vector<int> mesh::OrderEdges(){
 	int ii;
 	int newInd;
@@ -2250,7 +2311,6 @@ vector<int> mesh::OrderEdges(){
 	}
 	return(newSurfPairs);
 }
-
 
 void mesh::GetOffBorderVert(vector<int> &vertInd,  vector<int> &voluInd,
 	int outerVolume){
@@ -2279,7 +2339,6 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 	} else if (this->WhatDim()==2) {
 		this->GetOffBorderVert2D(vertInd, voluInd, outerVolume);
 	}
-
 }
 
 void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
@@ -2363,9 +2422,7 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 			}
 		}
 	}
-
 }
-
 
 void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 	int outerVolume) const{
@@ -2446,7 +2503,6 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 
 		}
 	}
-
 }
 
 void mesh::SetBorders(){
@@ -2666,7 +2722,8 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
 	Offers the option to delete vertices as well.
 	*/
 
-	std::vector<int> rmvInds;
+	std::vector<int> rmvInds,rmvInds2;
+	int nEdgeSurf;
 	int count, countRep;
 
 	if(rmvVertInds.size()>0){
@@ -2701,9 +2758,20 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
 	// Remove Surfs
 	count  = this->surfs.size();
 	countRep= 0;
+	rmvInds2.clear();
 	for (int i = 0; i < count; ++i)
 	{
-		if(this->surfs(i)->edgeind.size()<3){
+		nEdgeSurf = this->surfs(i)->edgeind.size();
+		if (nEdgeSurf==2){
+			bool edgeConnEq = this->edges.isearch(this->surfs(i)->edgeind[0])
+				->vertconneq(*(this->edges.isearch(this->surfs(i)->edgeind[1])));
+			if (edgeConnEq && (this->surfs(i)->edgeind[1]!=this->surfs(i)->edgeind[0])){
+				rmvInds2.push_back(this->surfs(i)->edgeind[1]);
+				this->SwitchIndex(2, this->surfs(i)->edgeind[1], 
+					this->surfs(i)->edgeind[0]);
+			}
+		}
+		if(nEdgeSurf<3){
 			this->RemoveIndex(3, this->surfs(i)->index);
 			rmvInds.push_back(this->surfs(i)->index);
 			countRep++;
@@ -2715,14 +2783,39 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
 	this->surfs.remove(rmvInds);
 	this->surfs.PrepareForUse();
 	rmvInds.clear();
+	sort(rmvInds2);
+	unique(rmvInds2);
+	std::cout << "Number of removed edges (duplicates) " << rmvInds2.size() << std::endl;
+	this->edges.remove(rmvInds2);
+	this->edges.PrepareForUse();
+	rmvInds2.clear();
 
 	// Remove Volus
 	count  = this->volus.size();
 	countRep= 0;
+	// std::cout << this->surfs.isHash <<  "  ";
 	for (int i = 0; i < count; ++i)
 	{
-		if(this->volus(i)->surfind.size()<4){
-			this->RemoveIndex(3, this->volus(i)->index);
+		nEdgeSurf = this->volus(i)->surfind.size();
+		if(nEdgeSurf==2){
+			// std::cout << i << " " << this->surfs.isHash <<  " | ";
+			bool surfConnEq = this->surfs.isearch(this->volus(i)->surfind[0])
+				->edgeconneq(*(this->surfs.isearch(this->volus(i)->surfind[1])));
+			// if the surfaces have the same edge connectivities and different indices
+			if(surfConnEq && (this->volus(i)->surfind[0]!=this->volus(i)->surfind[1])){
+				rmvInds2.push_back(this->volus(i)->surfind[1]);
+				this->SwitchIndex(3, this->volus(i)->surfind[1], 
+					this->volus(i)->surfind[0]);
+				// std::cout << i << " " << this->surfs.isHash <<  " | ";
+			}
+		} else if (nEdgeSurf==3){
+			// This case is unhandled as either there is still a degenerate face
+			// which should not be the case or a void is being created which should not
+			// be the case either.
+			throw logic_error("Unhandled case");
+		}
+		if(nEdgeSurf<4){
+			this->RemoveIndex(4, this->volus(i)->index);
 			rmvInds.push_back(this->volus(i)->index);
 			countRep++;
 		}
@@ -2733,6 +2826,12 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
 	this->volus.remove(rmvInds);
 	this->volus.PrepareForUse();
 	rmvInds.clear();
+	sort(rmvInds2);
+	unique(rmvInds2);
+	std::cout << "Number of removed surfs (duplicates) " << rmvInds2.size() << std::endl;
+	this->surfs.remove(rmvInds2);
+	this->surfs.PrepareForUse();
+	rmvInds2.clear();
 
 }
 
@@ -2895,9 +2994,8 @@ void mesh::OrientFaces(){
 	} else {
 
 	}
-
-
 }
+
 void mesh::OrientEdgeSurface(){
 	cerr << "Warning: not coded yet in " << __PRETTY_FUNCTION__ << endl;
 }
@@ -2953,7 +3051,6 @@ void mesh::OrientSurfaceVolume(){
 			surfs.elems[ii].FlipVolus();
 		}
 	}
-
 }
 
 int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){

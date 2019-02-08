@@ -742,7 +742,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	bool isObj, bool isConstr, bool isDeriv){
 
 
-	int ii,ni,jj,nj,kk,ll,nCellTarg;
+	int ii,ni,jj,nj,nCellTarg;
 	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;
 	SurfCentroid centreCalc;
 	LengthEdge EdgeCalc;
@@ -754,7 +754,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	MatrixXd HVal, dVal, HVal2, dVal2;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;
 	MatrixXd dObjPart;
-	double constrPart, objPart;
+	double objPart;
 	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
 	double * retVal;
 

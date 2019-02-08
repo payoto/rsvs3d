@@ -228,6 +228,7 @@ public:
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
 	void FlipVolus();
+	bool edgeconneq(const surf &other, bool recurse=true) const;
 	//bool returnIsModif() const {return(isModif);}
 
 	surf(){ // Constructor
@@ -291,7 +292,7 @@ public:
 	void write(FILE * fid) const;
 	void TightenConnectivity() {sort(surfind);unique(surfind);};
 	void GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const;
-
+	bool vertconneq(const edge &other) const;
 	edge(){ // Constructor
 		index=0;
 		vertind.reserve(2);

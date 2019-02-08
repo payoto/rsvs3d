@@ -88,7 +88,7 @@
  
  "settings":
  {
- 	"sublimegdb_workingdir": "${folder:${project_path:main_test.exe}}",
+ 	"sublimegdb_workingdir": "${folder:${project_path:test_RSVS3D.exe}}",
          // NOTE: You MUST provide --interpreter=mi for the plugin to work
          "sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
 
