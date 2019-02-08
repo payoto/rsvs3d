@@ -921,6 +921,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	count = nVerts;
 	n=3;
 	for (int i = 0; i < count; ++i){
+		meshout.verts[i].index = i+1;
 		for (int j = 0; j < n; ++j){
 			meshout.verts[i].coord[j] = tetout.vpointlist[i*n+j];
 		}
@@ -989,7 +990,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.PrepareForUse();
 	meshout.displight();
 	
-	auto groupedVertices = GroupCloseVertices(meshout, 1e-7);
+	auto groupedVertices = GroupCloseVertices(meshout, 0);
 	auto out = meshout.MergeGroupedVertices(groupedVertices,false);
 	sort(out);
 	unique(out);
@@ -1002,6 +1003,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
+	meshout.displight();
 	FlattenBoundaryFaces(meshout);
 	meshout.PrepareForUse();
 	meshout.TightenConnectivity();
@@ -1162,10 +1164,12 @@ int tetcall()
 		inparam.lowerB= {-0.0, -0.0,-0.0};
 		inparam.upperB= {1.0, 1.0, 1.0};
 		inparam.distanceTol = 1e-3;
-		inparam.edgelengths = {0.4};
+		// inparam.edgelengths = {0.2};
+		inparam.edgelengths = {0.25};
 
 		BuildBlockGrid({1,1,1}, meshdomain);
 		dimDomain[0] = {0,1.0};
+		// dimDomain[0] = {0,3.0};
 		dimDomain[1] = {0,1.0};
 		dimDomain[2] = {0,1.0};
 		meshdomain.Scale(dimDomain);
@@ -1193,10 +1197,13 @@ int tetcall()
 		tecout.PrintMesh(meshtet);
 		std::cout << " Meshed the tetrahedralization" << std::endl;
 		meshvoro = TetgenOutput_VORO2MESH(tetout);
+		// tecout.PrintMesh(meshvoro,0,0,2);
 		tecout.PrintMesh(meshvoro);
+		tecout.PrintMesh(meshvoro,0,0,3);
+		tecout.PrintMesh(meshvoro,0,0,4);
 		std::cout << " Meshed the voronization" << std::endl;
 
-		inparam.edgelengths = {0.1};
+		inparam.edgelengths = {0.15};
 		meshvoro.PrepareForUse();
 
 
@@ -1212,7 +1219,7 @@ int tetcall()
 
 		tetin2.save_nodes("rsvs_voro_grid");
 		tetin2.save_poly("rsvs_voro_grid");
-		meshvoro.write("testvoromesh.msh");
+
 		tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
 		std::cout << "Finished the tettgen process " << std::endl;
 		meshtet2 = TetgenOutput_TET2MESH(tetout2);
