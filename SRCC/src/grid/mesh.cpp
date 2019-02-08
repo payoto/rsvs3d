@@ -2602,7 +2602,8 @@ void mesh::ForceCloseContainers(){
 	volus.ForceArrayReady();
 }
 
-std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert, bool delVerts){
+std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert,
+	bool delVerts){
 	/*
 	Uses a hashed vector to merge points grouped together.
 
@@ -2617,12 +2618,15 @@ std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert, b
 		closeVert.GenerateHash();
 	}
 	rmvInds.reserve(nSnax);
-	isSnaxDone.reserve(nSnax);
+	isSnaxDone.assign(nSnax,false);
+
 	// Find matching elements and perform the replacement process
+	// DisplayVector(closeVert.vec);
 	for (int i = 0; i < nSnax; ++i)
 	{
-		if(!isSnaxDone[i] && closeVert.vec[i]!=-1)
+		if((!isSnaxDone[i]) && (closeVert.vec[i]!=-1))
 		{
+			sameSnaxs.clear();
 			sameSnaxs=closeVert.findall(closeVert.vec[i]);
 			countJ = sameSnaxs.size();
 			for (int j = 1; j < countJ; ++j)
@@ -2635,10 +2639,11 @@ std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert, b
 			}
 			isSnaxDone[sameSnaxs[0]]=true;
 
-		} else {
+		}  else{
 			isSnaxDone[i]=true;
 		}
 	}
+
 	if(rmvInds.size()>0 && delVerts){
 		sort(rmvInds);
 		unique(rmvInds);

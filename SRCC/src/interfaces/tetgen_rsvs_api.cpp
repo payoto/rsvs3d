@@ -230,10 +230,10 @@ void TestVertClose(int vertIndIn, std::vector<bool> &isSnaxDone,
 				}
 				if(d<distTol){
 					sameEdges.push_back(eInd);
-					nextvertIndIn = meshin.verts.find(
-								meshin.edges.isearch(eInd)->vertind[0]
-							);
 					for(int i = 0; i< 2; ++i){
+						nextvertIndIn = meshin.verts.find(
+								meshin.edges.isearch(eInd)->vertind[i]
+							);
 						TestVertClose(nextvertIndIn, isSnaxDone, 
 							meshin,  distTol, sameEdges);
 					}
@@ -274,15 +274,23 @@ HashedVector<int, int> GroupCloseVertices(const mesh &meshin, double distTol){
 				closeVert.vec[meshin.verts.find(
 						meshin.edges.isearch(eInd)->vertind[0]
 					)]=nGroup;
+				// std::cout << meshin.verts.find(
+				// 		meshin.edges.isearch(eInd)->vertind[0]
+				// 	) << " " << nGroup << "|";
 				closeVert.vec[meshin.verts.find(
 						meshin.edges.isearch(eInd)->vertind[1]
 					)]=nGroup;
+				// std::cout << meshin.verts.find(
+				// 		meshin.edges.isearch(eInd)->vertind[1]
+				// 	) << " " << nGroup << "|";
 			}
+			// std::cout << "|";
 			++nGroup;
 		}
-
 	}
+	// std::cout << std::endl;
 
+	// std::cout << nGroup << std::endl;
 	closeVert.GenerateHash();
 	return closeVert;
 }
@@ -978,21 +986,23 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.HashArray();
 	meshout.TestConnectivityBiDir();
 	meshout.TightenConnectivity();
-	// meshout.verts.disp();
-	// meshout.edges.disp();
-	// meshout.surfs.disp();
-	// meshout.volus.disp();
 	meshout.PrepareForUse();
 
-	auto groupedVertices = GroupCloseVertices(meshout, 1e-9);
-	meshout.MergeGroupedVertices(groupedVertices);
+	auto groupedVertices = GroupCloseVertices(meshout, 1e-7);
+	auto out = meshout.MergeGroupedVertices(groupedVertices);
 	meshout.RemoveSingularConnectors();
+
 
 	meshout.PrepareForUse();
 	meshout.TestConnectivityBiDir();
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
+	meshout.SetBorders();
 	FlattenBoundaryFaces(meshout);
+	meshout.PrepareForUse();
+	meshout.TightenConnectivity();
+	meshout.OrderEdges();
+	meshout.SetBorders();
 	meshout.displight();
 
 	return meshout;
@@ -1148,10 +1158,10 @@ int tetcall()
 		inparam.lowerB= {-0.0, -0.0,-0.0};
 		inparam.upperB= {1.0, 1.0, 1.0};
 		inparam.distanceTol = 1e-3;
-		inparam.edgelengths = {0.2};
+		inparam.edgelengths = {0.4};
 
-		BuildBlockGrid({3,1,1}, meshdomain);
-		dimDomain[0] = {0,3.0};
+		BuildBlockGrid({1,1,1}, meshdomain);
+		dimDomain[0] = {0,1.0};
 		dimDomain[1] = {0,1.0};
 		dimDomain[2] = {0,1.0};
 		meshdomain.Scale(dimDomain);
@@ -1183,12 +1193,26 @@ int tetcall()
 		std::cout << " Meshed the voronization" << std::endl;
 
 		inparam.edgelengths = {0.1};
-		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
+		meshvoro.PrepareForUse();
+
+
+		std::vector<int> subs;
+		subs=ConcatenateVectorField(meshvoro.volus, &volu::surfind,
+			0, meshvoro.volus.size());
+		std::cout << "Number of surfs " << subs.size() << std::endl;
+		sort(subs);
+		unique(subs);
+		std::cout << "Number of surfs " << subs.size() << std::endl;
 		inparam.command = "pkqnnvefm"; 
-		// tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
+		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
+
+		tetin2.save_nodes("rsvs_voro_grid");
+		tetin2.save_poly("rsvs_voro_grid");
+		meshvoro.write("testvoromesh.msh");
+		tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
 		std::cout << "Finished the tettgen process " << std::endl;
-		// meshtet2 = TetgenOutput_TET2MESH(tetout2);
-		// tecout.PrintMesh(meshtet2);
+		meshtet2 = TetgenOutput_TET2MESH(tetout2);
+		tecout.PrintMesh(meshtet2);
 
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
