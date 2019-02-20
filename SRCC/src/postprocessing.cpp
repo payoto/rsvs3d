@@ -55,7 +55,7 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVert
 	return(0);
 }
 
-int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert,int nVolu, int nVertDat){
+int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,nCoord;
@@ -397,16 +397,16 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 
 	if (forceOutType==1){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert,nVolu, nVertDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
 	else if (forceOutType==2){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert,nVolu, nVertDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==3){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert,nVolu, nVertDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==4){
 		if(int(vertList.size())==nVert){
@@ -418,7 +418,7 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 			nVert=vertList.size();
 		}
 		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert,nVolu, nVertDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		// No map just points
 	}
 	return(0);

@@ -95,7 +95,7 @@ public:
 		int strandID=0, double timeStep=0, int forceOutType=0);
 
 	// Snak especific functions
-	int SnakeDataBlock(const snake& snakeout,int nVert,int nVolu, int nVertDat);
+	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
 		int forceOutType=0, const vector<int> &vertList={});
 	// Zone Headers

@@ -176,8 +176,8 @@ $(shell mkdir -p $(BINDIR) >/dev/null)
 # Object definitions
 SOURCES = $(foreach d,$(wildcard $(SRCTREE)*),$(call rwildcard,$d/,*.cpp))
 # SOURCES = $(call rwildcard,$(SRCTREE),*.cpp)
-$(info $(SOURCES))
-$(info sources printed)
+# $(info $(SOURCES))
+# $(info sources printed)
 # Handling target differences
 ifeq ($(MAKECMDGOALS), )
 SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
@@ -199,8 +199,8 @@ SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
 EXECUTABLE = $(TESTALLEXECUTABLE)
 endif
 
-$(info $(SRCS))
-$(info sources printed after filter)
+# $(info $(SRCS))
+# $(info sources printed after filter)
 
 # Define objects from sources
 OBJECTS=$(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))

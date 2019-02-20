@@ -185,7 +185,7 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 
 void Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &meshdomain,
-	tetgen::io_safe &tetin, int numHoles){
+	tetgen::io_safe &tetin){
 	/*
 	Converts a mesh into the safe allocation tetgenio format.
 	
@@ -688,7 +688,8 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 
 	// tecout.PrintMesh(meshdomain);
 }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	const tetgen::apiparam &tetgenParam){
 	/*
@@ -701,17 +702,13 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 
 	mesh meshgeom;
 	triangulation triRSVS;
-	int nHoles;
 	// int nPtsHole, kk, count;
-
 	meshgeom.Init(0, 0, 0, 0);
 	meshgeom.PrepareForUse();
 	
-
-	nHoles=0;
-	Mesh2TetgenioPoints(meshgeom, meshdomain, tetin, nHoles);
-
+	Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
 }
+#pragma GCC diagnostic pop
 
 void TetgenOutput_SU2(){}
 
