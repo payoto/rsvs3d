@@ -69,7 +69,9 @@ int main(){
 	gridTest.Run(integrate::test::All,"Test full integration");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
 	#endif //TEST_ALL
-	gridTest.Run(test_tetgenapi,"tegen API testing"); // Non working test
+	// gridTest.Run(test_tetgenapi,"tegen API testing"); // working test
+	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); // working test
+	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); // working test
 	
 
 	gridTest.PrintSummary();

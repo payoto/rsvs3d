@@ -149,5 +149,7 @@ namespace tetgen {
 // Test functions
 
 int test_tetgenapi();
+int tetcall();
+int tetcall_CFD();
 
 #endif

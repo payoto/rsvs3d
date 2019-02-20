@@ -183,6 +183,50 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 }
 
+
+void Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &meshdomain,
+	tetgen::io_safe &tetin, int numHoles){
+	/*
+	Converts a mesh into the safe allocation tetgenio format.
+	
+	Rules of conversion are: 
+		- volu becomes a facet
+		- surf becomes a polygon in the facet
+		- edges are not logged
+		- points come as a list
+	*/
+	
+
+	tetin.firstnumber=0;
+
+	tetin.numberoffacets = 0;
+	tetin.numberofholes = 0;
+	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
+
+	tetin.numberofpointmtrs = 0;
+	tetin.numberoffacetconstraints = 0;
+
+
+	tetin.allocate();
+	int nPtsGeom = meshgeom.verts.size();
+	for (int i = 0; i < nPtsGeom; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			tetin.pointlist[i*3+j]=meshgeom.verts(i)->coord[j];
+		}
+	}
+	int nPtsDom = meshdomain.verts.size();
+	for (int i = 0; i < nPtsDom; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			tetin.pointlist[(i+nPtsGeom)*3+j]=meshdomain.verts(i)->coord[j];
+		}
+	}
+
+}
+
 HashedVector<int, int> GroupCloseSnaxels(const snake &snakein, double distTol){
 	/*
 	Merges snaxel which are `distTol` to the end of their carrying edge.
@@ -645,6 +689,30 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	// tecout.PrintMesh(meshdomain);
 }
 
+void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
+	const tetgen::apiparam &tetgenParam){
+	/*
+	Processes a snake object into a tetgen input object.
+
+	This function processes snake objects into the safe tetgenio object.
+	This can then used to generate a tetrahedral mesh or to save it as the
+	input file.
+	*/
+
+	mesh meshgeom;
+	triangulation triRSVS;
+	int nHoles;
+	// int nPtsHole, kk, count;
+
+	meshgeom.Init(0, 0, 0, 0);
+	meshgeom.PrepareForUse();
+	
+
+	nHoles=0;
+	Mesh2TetgenioPoints(meshgeom, meshdomain, tetin, nHoles);
+
+}
+
 void TetgenOutput_SU2(){}
 
 
@@ -990,7 +1058,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.PrepareForUse();
 	meshout.displight();
 	
-	auto groupedVertices = GroupCloseVertices(meshout, 0);
+	auto groupedVertices = GroupCloseVertices(meshout, 1e-7);
 	auto out = meshout.MergeGroupedVertices(groupedVertices,false);
 	sort(out);
 	unique(out);
@@ -1127,8 +1195,8 @@ int tetcall_CFD()
 		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
 
 
-		tetin.save_nodes("rsvs_3cell_2body");
-		tetin.save_poly("rsvs_3cell_2body");
+		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_2body");
+		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_2body");
 		
 
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
@@ -1137,9 +1205,9 @@ int tetcall_CFD()
 		inparam.command = "pkqm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
-		// tetout.save_nodes("rsvsout_3cell_2body");
-		// tetout.save_elements("rsvsout_3cell_2body");
-		// tetout.save_faces("rsvsout_3cell_2body");
+		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
 		std::cout << "Finished the tettgen process " << std::endl;
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -1151,7 +1219,7 @@ int tetcall_CFD()
 int tetcall()
 {
 	/*_RSVSgrid*/
-	tetgen::io_safe tetin, tetin2, tetout, tetout2;
+	tetgen::io_safe tetin, tetin2,tetin3, tetout, tetout2, tetout3;
 	tetgen::apiparam inparam;
 	mesh meshdomain, meshtet, meshvoro, meshtet2;
 	snake snakein;
@@ -1167,8 +1235,8 @@ int tetcall()
 		// inparam.edgelengths = {0.2};
 		inparam.edgelengths = {0.25};
 
-		BuildBlockGrid({1,1,1}, meshdomain);
-		dimDomain[0] = {0,1.0};
+		BuildBlockGrid({3,1,1}, meshdomain);
+		dimDomain[0] = {0,3.0};
 		// dimDomain[0] = {0,3.0};
 		dimDomain[1] = {0,1.0};
 		dimDomain[2] = {0,1.0};
@@ -1179,8 +1247,8 @@ int tetcall()
 		TetgenInput_RSVSGRIDS(meshdomain,tetin, inparam);
 
 
-		tetin.save_nodes("rsvs_3cell_grid");
-		tetin.save_poly("rsvs_3cell_grid");
+		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_grid");
+		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_grid");
 		
 
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
@@ -1189,14 +1257,19 @@ int tetcall()
 		inparam.command = "pkqnnvefm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
-		// tetout.save_nodes("rsvsout_3cell_2body");
-		// tetout.save_elements("rsvsout_3cell_2body");
-		// tetout.save_faces("rsvsout_3cell_2body");
+		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
 		std::cout << "Finished the tettgen process " << std::endl;
 		meshtet = TetgenOutput_TET2MESH(tetout);
 		tecout.PrintMesh(meshtet);
+
+
 		std::cout << " Meshed the tetrahedralization" << std::endl;
-		meshvoro = TetgenOutput_VORO2MESH(tetout);
+		TetgenInput_POINTGRIDS(meshtet,tetin3, inparam);
+		inparam.command = "v"; 
+		tetrahedralize(inparam.command.c_str(), &tetin3, &tetout3);
+		meshvoro = TetgenOutput_VORO2MESH(tetout3);
 		// tecout.PrintMesh(meshvoro,0,0,2);
 		tecout.PrintMesh(meshvoro);
 		tecout.PrintMesh(meshvoro,0,0,3);
@@ -1214,11 +1287,11 @@ int tetcall()
 		sort(subs);
 		unique(subs);
 		std::cout << "Number of surfs " << subs.size() << std::endl;
-		inparam.command = "pkqnnvefm"; 
+		inparam.command = "pkqnnefm"; 
 		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
 
-		tetin2.save_nodes("rsvs_voro_grid");
-		tetin2.save_poly("rsvs_voro_grid");
+		tetin2.save_nodes("../TESTOUT/testtetgen/rsvs_voro_grid");
+		tetin2.save_poly("../TESTOUT/testtetgen/rsvs_voro_grid");
 
 		tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
 		std::cout << "Finished the tettgen process " << std::endl;
