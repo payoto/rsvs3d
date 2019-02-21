@@ -247,15 +247,15 @@ $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc
 	$(POSTCOMPILE)
 
 # #  Always on optimisation and disabled warnings in the tetgen module
-# $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
-# $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
-# 	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
-# 	$(POSTCOMPILE)
+$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
+$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
+	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+	$(POSTCOMPILE)
 
-# $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
-# $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
-# 	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
-# 	$(POSTCOMPILE)
+$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
+$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
+	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+	$(POSTCOMPILE)
 
 # Folder depency used to mirror the SRCTREE into OBJDIR
 # Called by `$$(@D)/.f` in the object recipes 

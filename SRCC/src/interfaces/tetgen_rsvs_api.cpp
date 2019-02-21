@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <array>
 #include <unordered_map>
@@ -172,14 +173,14 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
 
 	tetin.numberofpointmtrs = 1;
-	tetin.numberoffacetconstraints = 0;
+	tetin.numberoffacetconstraints = 2;
 
 
 	tetin.allocate();
 
-	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{},0);
+	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{0.0},0);
 	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
-		meshgeom.verts.size(), -1, {-1.0},{},0);
+		meshgeom.verts.size(), -1, {-1.0},{0.0},1);
 
 }
 
@@ -710,7 +711,115 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 }
 #pragma GCC diagnostic pop
 
-void TetgenOutput_SU2(){}
+void TetgenOutput_SU2(const char* fileName, const tetgenio &tetout){
+	/*
+	Ouputs a tetgen io object to an SU2 mesh file.
+	
+	Args:
+		fileName: is a string with the path to the target mesh fileName
+		tetout: is tetgenio object (safe) 
+
+	Raises:
+		- invalid_argument if `fileName` cannot be opened. 
+
+	File format:
+	https://su2code.github.io/docs/Mesh-File/
+	*/
+	std::ofstream meshFile;
+	std::vector<int> diffBounds, numBounds;
+	int DEINCR;
+
+	meshFile.open(fileName);
+	// De-increments indices if tetgen indices start from 1 to match SU2
+	// which is 0 indexed
+	DEINCR = tetout.firstnumber ? -1 : 0;
+
+	// If file was not opened correctly
+	if(meshFile.fail()){
+		std::cerr << "Error: " << fileName << std::endl <<
+			 " in " << __PRETTY_FUNCTION__ << std::endl; 
+		throw invalid_argument("Output mesh file could not be opened");
+	}
+	// Set appropriate precision for mesh point position
+	meshFile.precision(16);
+	// Dimensions
+	meshFile << "NDIME= 3" << std::endl;
+	// Points
+	meshFile << "NPOIN= " << tetout.numberofpoints << std::endl;
+	for (int i = 0; i < tetout.numberofpoints; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			meshFile << tetout.pointlist[i*3+j] << " ";
+		}
+		meshFile << std::endl;
+	}
+	// Elements (edges, triangles and tets)
+	int nElms = tetout.numberoftetrahedra;
+	meshFile << "NELEM= " << nElms << std::endl;
+
+	for (int i = 0; i < tetout.numberoftetrahedra; ++i)
+	{ // Tetrahedra
+		meshFile << "10 " ;
+		for (int j = 0; j < 4; ++j)
+		{
+			meshFile << tetout.tetrahedronlist[i*tetout.numberofcorners+j]+DEINCR<< " ";
+		}
+		meshFile << std::endl;
+	}
+	// Boundaries
+	// 1 - Process number of different boundaries
+	diffBounds.reserve(10);
+	numBounds.reserve(10);
+	diffBounds.push_back(0);
+	numBounds.push_back(0);
+	int nBounds = diffBounds.size();
+	// Build an array of different boundary numbers.
+	// 0 is first as it is likely the most common
+	for (int i = 0; i < tetout.numberoftrifaces; ++i)
+	{	
+		bool flagSame=false;
+		int j = 0;
+		while ((j < nBounds) && !flagSame){
+			flagSame = flagSame || (diffBounds[j]== tetout.trifacemarkerlist[i]);
+			++j;
+		}
+		if(!flagSame){
+			diffBounds.push_back(tetout.trifacemarkerlist[i]);
+			numBounds.push_back(0);
+			++nBounds;
+			++j;
+		}
+		numBounds[j-1]++;
+	}
+	DisplayVector(diffBounds);
+	DisplayVector(numBounds);
+	// 2 - write boundaries (skipping 0 boundary)
+	meshFile << "NMARK= " << nBounds-1 << std::endl;
+	for (int k = 1; k < nBounds; ++k)
+	{
+		meshFile << "MARKER_TAG= " << diffBounds[k] << std::endl;
+		meshFile << "MARKER_ELEMS= " << numBounds[k] << std::endl;
+		for (int i = 0; i < tetout.numberoftrifaces; ++i)
+		{ // Triangular faces
+			if(tetout.trifacemarkerlist[i]==diffBounds[k]){
+				meshFile << "5 " ;
+				for (int j = 0; j < 3; ++j)
+				{
+					meshFile << tetout.trifacelist[i*3+j]+DEINCR<< " ";
+				}
+				meshFile << std::endl;
+			}
+		}
+	}
+
+	// Edges not needed
+	// for (int i = 0; i < tetout.numberofedges; ++i)
+	// { // Edges
+	// 	meshFile << "3 " << tetout.edgelist[i*2]<< " "
+	// 		<< tetout.edgelist[i*2+1] << " " << std::endl;
+	// }
+}
 
 
 void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
@@ -1187,7 +1296,7 @@ int tetcall_CFD()
 		inparam.lowerB= {-15.0, -15.0,-15.0};
 		inparam.upperB= {15.0, 15.0, 15.0};
 		inparam.distanceTol = 1e-3;
-		inparam.edgelengths = {0.03,0.3,0.7,2.0};
+		inparam.edgelengths = {0.06,0.3,1.0,3.0};
 		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
 		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
 
@@ -1205,6 +1314,7 @@ int tetcall_CFD()
 		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
 		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
 		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		TetgenOutput_SU2("../TESTOUT/testtetgen/rsvs_3cell_2body.su2",tetout);
 		std::cout << "Finished the tettgen process " << std::endl;
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
