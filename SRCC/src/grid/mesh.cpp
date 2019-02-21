@@ -2592,6 +2592,7 @@ void mesh::ForceCloseContainers(){
 	vector<int> vertBlock;
 	vector<bool> surfsIsDone;
 
+	vertBlock.clear();
 	nBlocks=this->ConnectedVertex(vertBlock);
 	surfsIsDone.assign(surfs.size(),false);
 	nVert=verts.size();
@@ -2853,7 +2854,28 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	nVertExplored=0;
 
 	vertStatus.assign(nVerts,false);
-	vertBlock.assign(nVerts,0);
+
+	if(int(vertBlock.size())==0){
+		// Standard behaviour of grouping all connected vertices when vertBlock
+		// is empty
+		vertBlock.clear();
+		vertBlock.assign(nVerts,0);
+	} else if(int(vertBlock.size())==nVerts){
+		// Treat vertices with non zero value as already processed.
+		// This allows these vertices to separate blocks of vertices.
+		for (int i = 0; i < nVerts; ++i){
+			if(vertBlock[i]!=0){
+				vertStatus[i] = true;
+				nVertExplored++;
+			}
+		}	
+	} else {
+		// If vertBlock and nVerts are difference sizes the behaviour is
+		// undefined.
+		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
+			<< "vertBlock should be empty or the size of mesh.verts";
+		throw invalid_argument("vertBlock vector incompatible with mesh.");
+	}
 	currQueue.reserve(nVerts/2);
 	nextQueue.reserve(nVerts/2);
 

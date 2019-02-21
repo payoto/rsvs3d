@@ -153,6 +153,7 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	}
 	// cout << "nSnax " << delSnax.size() << endl;
 	// cout << "Find snax to del" << endl;
+	vertBlocks.clear();
 	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
 	isBlockDel.assign(nBlocks,false);
 	ni=delSnax.size();
@@ -247,6 +248,7 @@ void RemoveSnakeInSurf(snake &snakein, vector<int> &voluInd, int outerBorder){
 	}
 	// cout << "nSnax " << delSnax.size() << endl;
 	// cout << "Find snax to del" << endl;
+	vertBlocks.clear();
 	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
 	isBlockDel.assign(nBlocks,false);
 	ni=delSnax.size();
