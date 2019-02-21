@@ -153,5 +153,6 @@ namespace tetgen {
 int test_tetgenapi();
 int tetcall();
 int tetcall_CFD();
+int tetcall_RSVSVORO();
 
 #endif

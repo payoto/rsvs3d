@@ -13,6 +13,7 @@
 #include "voxel.hpp"
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
+#include "meshrefinement.hpp"
 
 
 void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
@@ -1330,8 +1331,9 @@ namespace voronoimesh {
 
 		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
 		cmd = "pqnnefm"; 
+		// throw invalid_argument("exit now");
 		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
-		tetMesh = TetgenOutput_VORO2MESH(tetoutV);
+		tetMesh = TetgenOutput_TET2MESH(tetoutT);
 
 		INCR = tetoutT.firstnumber ? 0 : 1;
 
@@ -1383,19 +1385,82 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 		parent mesh.
 
 	*/
-	mesh voroMesh, tetMesh;
+	mesh voroMesh;
 	tetgen::apiparam inparam;
 	std::vector<int> vertsVoro;
-	std::vector<int> vertBlock;
+	std::vector<int> vertBlock, elmMapping;
+
+	inparam.lowerB= {-0.0, -0.0,-0.0};
+	inparam.upperB= {1.0, 1.0, 1.0};
+	inparam.distanceTol = 1e-3;
+	// inparam.edgelengths = {0.2};
+	inparam.edgelengths = {0.25};
+
 	// Step 1 - 2 
-	vertsVoro = voronoimesh::Points2VoroAndTetmesh(vecPts,voroMesh, tetMesh, inparam);
+	vertsVoro = voronoimesh::Points2VoroAndTetmesh(vecPts,voroMesh, snakMesh, inparam);
 	// Step 3 - Floods the vertices to establish the cells
-	vertBlock.assign(tetMesh.verts.size(),0);
+	vertBlock.assign(snakMesh.verts.size(),0);
 	for (int i = 0; i < int(vertsVoro.size()); ++i)
 	{
-		vertBlock[tetMesh.verts.find(vertsVoro[i])]=-1;
+		vertBlock[snakMesh.verts.find(vertsVoro[i])]=-1;
 	}
-	int nBlocks=tetMesh.ConnectedVertex(vertBlock);
+	int nBlocks=snakMesh.ConnectedVertex(vertBlock);
+	#ifdef SAFE_ALGO
+	if(nBlocks!=voroMesh.volus.size()){
+		std::cerr << "Error : nBlocks (" << nBlocks 
+			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
+			<< std::endl;
+		throw logic_error("Voromesh and flooding do not match");
+	}
+	#endif //SAFE_ALGO
+
+	// Step 4/5 - Create an element mapping
+	elmMapping.assign(snakMesh.volus.size(), 0);
+	for (int i = 0; i < snakMesh.volus.size(); ++i)
+	{	
+		auto surfSubs = snakMesh.surfs.find_list(snakMesh.volus(i)->surfind);
+		for (auto edgeInd : ConcatenateVectorField(snakMesh.surfs, &surf::edgeind, surfSubs)){
+			for(auto vertInd : snakMesh.edges.isearch(edgeInd)->vertind){
+				int temp = vertBlock[snakMesh.verts.find(vertInd)];
+				if (temp>0){
+					elmMapping[i]=temp;
+					break;
+				}
+			}
+			if (elmMapping[i]>0){break;}
+		}
+	}
+	for (int i = 0; i < snakMesh.volus.size(); ++i){
+		if (elmMapping[i]>0){
+			auto surfSubs = snakMesh.surfs.find_list(snakMesh.volus(i)->surfind);
+			for (auto voluInd : ConcatenateVectorField(snakMesh.surfs, 
+				&surf::voluind, surfSubs)){
+				if(voluInd>0){
+					int temp = elmMapping[snakMesh.volus.find(voluInd)];
+					if (temp>0){
+						elmMapping[i]=temp;
+						break;
+					}
+				}
+			}
+		}
+		#ifdef SAFE_ALGO
+		if(elmMapping[i]==0){
+			throw logic_error("element mapping not updated");
+		}
+		#endif //SAFE_ALGO
+	}
+
+
+	CoarsenMesh(snakMesh,vosMesh,elmMapping);
+	snakMesh.AddParent(&vosMesh,elmMapping);
+	
+	snakMesh.PrepareForUse();
+	snakMesh.OrientFaces();
+	vosMesh.PrepareForUse();
+
+	// Step 6 - Check original points containments
+
 
 }
 
@@ -1524,6 +1589,42 @@ int tetcall()
 
 	} catch (exception const& ex) {
 		cerr << "Exception: " << ex.what() <<endl; 
+		return 1;
+	}
+	return 0;
+}
+int tetcall_RSVSVORO()
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh;
+	tecplotfile tecout;
+
+	int nPts = 20;
+	
+	tecout.OpenFile("../TESTOUT/rsvs_voro.plt");
+
+	try {
+		for (int i = 0; i < nPts*4; ++i)
+		{
+			vecPts.push_back(double(abs(rand())%32767)/32767.0);
+		}
+		for (int i = 0; i < 8; ++i)
+		{
+			std::cout << std::endl << i%2 << " "
+				<< (i/2)%2 << " " << (i/4)%2 << " ";
+			vecPts.push_back(-0.5+2*(i%2));	
+			vecPts.push_back(-0.5+2*((i/2)%2));	
+			vecPts.push_back(-0.5+2*((i/4)%2));	
+			vecPts.push_back(0);	
+		}
+		DisplayVector(vecPts);
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
+		tecout.PrintMesh(vosMesh);
+		tecout.PrintMesh(snakMesh);
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		tecout.PrintMesh(snakMesh);
+		tecout.PrintMesh(vosMesh);
 		return 1;
 	}
 	return 0;
