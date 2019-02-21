@@ -13,8 +13,6 @@
 #include "voxel.hpp"
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
-// void tetrahedralize(char *switches, tetgenio *in, tetgenio *out, 
-//                     tetgenio *addin, tetgenio *bgmin)
 
 
 void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
@@ -636,8 +634,13 @@ void TetgenInput_RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 			{tetgenParam.edgelengths[i]});
 		startPnt = startPnt + vertPerSubDomain[i];
 	}
-
-	// tecout.PrintMesh(meshdomain);
+	// Remove facet markers from the internal domain faces
+	startPnt = meshgeom.surfs.size();
+	int nSurfPerSubDomain = meshdomain.surfs.size()/vertPerSubDomain.size();
+	for (int i = 0; i < int(vertPerSubDomain.size())-1; ++i){
+		tetin.SpecifyTetFacetMetric(startPnt, nSurfPerSubDomain ,0);
+		startPnt = startPnt + nSurfPerSubDomain;
+	}
 }
 
 
@@ -1282,6 +1285,120 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	return meshout;
 }
 
+namespace voronoimesh {
+	mesh Points2Mesh(const std::vector<double> &vecPts){
+		/*
+		Takes in a set of points and returns a mesh of points ready for
+		voronisation.
+		*/
+		mesh meshpts;
+		int nProp = 3+1; // Number of properties per point
+		if((vecPts.size()%nProp)!=0){
+			std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
+			throw invalid_argument("Vector of points is an invalid size");
+		}
+		int nPts = vecPts.size()/nProp;
+		meshpts.Init(nPts, 0, 0, 0);
+
+		for (int i = 0; i < nPts; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				meshpts.verts[i].coord[j] = vecPts[i*nProp+j]; 
+			}
+		}
+		meshpts.verts.PrepareForUse();
+		return meshpts;
+	}
+
+	std::vector<int> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
+		mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
+		/*
+		Turns a set of points into the voronisation and tetrahedralisation.
+		*/
+		tetgen::io_safe tetinV, tetoutV, tetinT, tetoutT;
+		mesh ptsMesh = Points2Mesh(vecPts);
+		std::string cmd;
+		int INCR;
+		std::vector<int> voroPts;
+
+
+		TetgenInput_POINTGRIDS(ptsMesh, tetinV, inparam);
+		cmd = "v"; 
+		tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
+		voroMesh = TetgenOutput_VORO2MESH(tetoutV);
+
+		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
+		cmd = "pqnnefm"; 
+		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
+		tetMesh = TetgenOutput_VORO2MESH(tetoutV);
+
+		INCR = tetoutT.firstnumber ? 0 : 1;
+
+		for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
+		{
+			if(tetoutT.trifacemarkerlist[i]!=0){
+				for (int j = 0; j < 3; ++j)
+				{
+					voroPts.push_back(tetoutT.trifacelist[i*3+j]+INCR);
+				}
+			}
+		}
+		sort(voroPts);
+		unique(voroPts);
+
+		return(voroPts);
+	}
+
+}
+
+void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh){
+	/*
+	Generates a VOS and snaking grid from a set of points
+	
+	Args:
+		vecPts: A 1 dimensional vector containing point coordinates and 
+		a point metric which will be used as the fill of the vosMesh.
+		vosMesh: a reference to an empty mesh object in which the VOS mesh
+		will be stored.
+		snakMesh: a reference to an empty mesh object in which a snaking mesh
+		will be stored.
+
+	Steps:
+		1. Voronoi the set of points
+		2. Tetrahedralize the voronoi diagram
+		3. Use flooding to establish the relationship between voronoi cells
+		and new cells
+		4. Establish the containments of the original set of points matching
+		the additional data to the cells.
+		5. Prep meshes, as parent child
+		6. Use that info to establish containments of the original points.
+
+	Step 3 - detail:
+		1. Mark each point in the original facets with -1.
+		2. Flood all points in the tetrahedralisation with the same number
+		not allowing a point with a -1 to be processed.
+		3. Transfer these point blocks to the tetrahedrons.
+		4. Remove all points which are marked with block numbers to generate the
+		parent mesh.
+
+	*/
+	mesh voroMesh, tetMesh;
+	tetgen::apiparam inparam;
+	std::vector<int> vertsVoro;
+	std::vector<int> vertBlock;
+	// Step 1 - 2 
+	vertsVoro = voronoimesh::Points2VoroAndTetmesh(vecPts,voroMesh, tetMesh, inparam);
+	// Step 3 - Floods the vertices to establish the cells
+	vertBlock.assign(tetMesh.verts.size(),0);
+	for (int i = 0; i < int(vertsVoro.size()); ++i)
+	{
+		vertBlock[tetMesh.verts.find(vertsVoro[i])]=-1;
+	}
+	int nBlocks=tetMesh.ConnectedVertex(vertBlock);
+
+}
+
 int tetcall_CFD()
 {
 	/*CFD meshing process*/
@@ -1572,6 +1689,22 @@ void tetgen::io_safe::SpecifyTetPointMetric(int startPnt, int numPnt,
 				=mtrs[j];
 		}
 
+	}
+}
+void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt, 
+	int marker){
+	/*
+	assigns the marker from `startPnt` index
+	*/
+
+	if((startPnt+numPnt)>this->numberoffacets){
+		throw invalid_argument ("Metrics out of range in tetgen_io (too high)");
+	} else if (startPnt<0){
+		throw invalid_argument ("Metrics out of range in tetgen_io (too low)");
+	}
+
+	for (int i = startPnt; i < startPnt+numPnt; ++i)	{
+		this->facetmarkerlist[i] = marker;
 	}
 }
 

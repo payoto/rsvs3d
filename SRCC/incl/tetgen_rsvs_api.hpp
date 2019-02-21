@@ -99,6 +99,8 @@ namespace tetgen {
 		void allocatefacetpolygon(int fIndex, int pIndex, int numVerts);
 		void SpecifyTetPointMetric(int startPnt, int numPnt, 
 			const std::vector<double> &mtrs);
+		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
+			int marker);
 		// void deallocate();
 		// ~io_safe(){
 		// 	this->deallocate();
