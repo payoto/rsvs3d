@@ -1224,8 +1224,21 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 	if(typeInd==1){
 
-		cerr << "not coded yet" << endl;
-		throw;
+		sub = verts.find(oldInd);
+		subList=edges.find_list(verts(sub)->edgeind);
+		for (ii=0;ii<int(subList.size());++ii){
+			for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
+				if(edges(subList[ii])->vertind[jj]==oldInd){
+					edges[subList[ii]].vertind.erase(
+						edges[subList[ii]].vertind.begin()+jj);
+					jj--;
+				}
+			}  
+		}
+		edges.isHash=1;
+		verts.isHash=1;
+		edges.isSetMI=1;
+		verts.isSetMI=1;
 
 	} else if (typeInd==2){
 
@@ -2710,7 +2723,7 @@ std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert,
 	return(rmvInds);
 }
 
-void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
+void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool voidError){
 	/*
 	Removes degenerate connectors.
 
@@ -2809,7 +2822,7 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds){
 					this->volus(i)->surfind[0]);
 				// std::cout << i << " " << this->surfs.isHash <<  " | ";
 			}
-		} else if (nEdgeSurf==3){
+		} else if (nEdgeSurf==3 && voidError){
 			// This case is unhandled as either there is still a degenerate face
 			// which should not be the case or a void is being created which should not
 			// be the case either.
