@@ -351,8 +351,12 @@ int Test_Crop(){
       ub = {0.9,0.9,0.9};
       meshin.PrepareForUse();
       tecout.PrintMesh(meshin);
+      tecout.PrintMesh(meshin,0,0,3);
       auto verts = meshin.AddBoundary(lb, ub);
+      tecout.PrintMesh(meshin,0,0,3);
       tecout.PrintMesh(meshin);
+      // tecout.PrintMesh(meshin,0,0,2);
+      return(-2);
       meshin.Crop(verts);
       tecout.PrintMesh(meshin);
    } catch (exception const& ex) { 

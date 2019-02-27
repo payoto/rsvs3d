@@ -291,7 +291,12 @@ public:
 	#pragma GCC diagnostic pop
 	void read(FILE * fid);
 	void write(FILE * fid) const;
-	void TightenConnectivity() {sort(surfind);unique(surfind);};
+	void TightenConnectivity() {
+		if(vertind.size()>2){
+			throw invalid_argument("vertind should be size 2");
+		}
+		sort(surfind);unique(surfind);
+	};
 	void GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const;
 	bool vertconneq(const edge &other) const;
 	edge(){ // Constructor

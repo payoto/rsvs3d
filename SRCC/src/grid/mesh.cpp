@@ -1957,7 +1957,7 @@ void mesh::MakeCompatible_inplace(mesh &other) const{
 	int nVert,nEdge,nSurf,nVolu;
 
    // Define Max indices in current mesh
-	this->GetMaxIndex(&nVert,&nEdge,&nVolu,&nSurf);
+	this->GetMaxIndex(&nVert,&nEdge,&nSurf,&nVolu);
 	other.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 }
 
@@ -2086,13 +2086,15 @@ int surf::OrderEdges(mesh *meshin)
 				vertCurr=edge2Vert[((it->second)/2)*2+jj];
 				edgeind[ii]=edgeCurr;
 			} else {
-				// cerr << endl;
-				// edgeind = edgeIndOrig;
+				cerr << endl;
+				disptree((*meshin),1);
+				edgeind = edgeIndOrig;
+				DisplayVector(edgeIndOrig);
+				disptree((*meshin),1);
 				edgeind.erase(edgeind.begin()+ii, edgeind.end());
-				// DisplayVector(edgeIndOrig);
-				// disptree((*meshin),1);
-
-				// cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+				disptree((*meshin),1);
+				
+				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
 
 				isTruncated=true;
 				break;
@@ -3448,9 +3450,13 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	// Create all the mesh containers for the new mesh parts
 	meshAdd.Init(edgeBound.size(), edgeBound.size()+surfBound.size(),
 		surfBound.size()+voluBound.size(), voluBound.size());
+	this->displight();
+	meshAdd.PopulateIndices();
 	this->MakeCompatible_inplace(meshAdd);
+	// meshAdd.disp();
 	this->Concatenate(meshAdd);
 	this->HashArray();
+	this->displight();
 
 	// Handle edges:
 	//   1 - Double the edge.
@@ -3465,8 +3471,11 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		auto tempInd = this->edges[i+edgeSize].index;
 		this->edges[i+edgeSize] = this->edges[tempVec[i]];
 		this->edges[i+edgeSize].index = tempInd;
+		for (auto temp : this->surfs.find_list(this->edges[i+edgeSize].surfind)){
+			this->surfs[temp].edgeind.push_back(tempInd);
+		}
 		// Compute vertex position
-		int iIn=0, iOut=0;
+		int iIn=0, iOut=0, subIn, subOut;
 		iOut += !vertOut[this->verts.find(this->edges[tempVec[i]].vertind[0])];
 		iIn += vertOut[this->verts.find(this->edges[tempVec[i]].vertind[0])];
 		#ifdef SAFE_ALGO
@@ -3485,12 +3494,20 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 			throw logic_error("Coord out is in");
 		}
 		#endif // SAFE_ALGO
-		iIn = this->verts.find(this->edges[tempVec[i]].vertind[iIn]);
-		iOut = this->verts.find(this->edges[tempVec[i]].vertind[iOut]);
+		subIn = this->verts.find(this->edges[tempVec[i]].vertind[iIn]);
+		subOut = this->verts.find(this->edges[tempVec[i]].vertind[iOut]);
 		meshhelp::PlaceBorderVertex(
-			this->verts[iIn].coord, this->verts[iOut].coord,
+			this->verts[subIn].coord, this->verts[subOut].coord,
 			lb, ub, this->verts[i+vertSize].coord
 			);
+
+		int count2 = this->verts[subOut].edgeind.size();
+		for (int j = 0; j < count2; ++j)
+		{
+			if(this->verts[subOut].edgeind[j]==this->edges[tempVec[i]].index){
+				this->verts[subOut].edgeind[j]=this->edges[i+edgeSize].index;
+			}
+		}
 
 		this->edges[i+edgeSize].vertind[iIn]=this->verts[i+vertSize].index;
 		this->edges[tempVec[i]].vertind[iOut]=this->verts[i+vertSize].index;
@@ -3520,18 +3537,20 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		auto tempInd = this->surfs[i+surfSize].index;
 		this->surfs[i+surfSize] = this->surfs[tempVec[i]];
 		this->surfs[i+surfSize].index = tempInd;
-		
+		cout << " ==============" << endl;
+		this->surfs(tempVec[i])->disp();
+		this->surfs(i+surfSize)->disp();
 		meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
 			this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
 		// Switch the edge connectivity of certain edges in scoped mode
 		this->ArraysAreHashed();
 		this->SwitchIndex(6, this->surfs(tempVec[i])->index,
 			this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
-		// ^ triggers a warning which will need to be suppressed
 
 		// Find the vertind connectivity of the new edge.
 		this->edges[edgeSize2+i].vertind = 
-			meshhelp::FindVertInFromEdgeOut(*this, vertOut, this->surfs(i+surfSize)->edgeind);
+			meshhelp::FindVertInFromEdgeOut(*this, vertOut, 
+			this->surfs(i+surfSize)->edgeind);
 		// assign new edge.surfind and surf.edgeind connectivity
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
@@ -3545,6 +3564,8 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 				.edgeind.push_back(this->edges[edgeSize2+i].index);
 		}
 		edgeOut.push_back(false); // New edge is inside
+		this->surfs(tempVec[i])->disp();
+		this->surfs(i+surfSize)->disp();
 		this->ArraysAreHashed();
 	}
 	this->verts.HashArray();
@@ -3604,7 +3625,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	}
 	this->HashArray();
 	voluSize2 = voluSize+count;
-	voluOut.assign(voluSize, false);
+	voluOut.assign(voluSize2, false);
 	for (int i = 0; i < voluSize2; ++i)
 	{ // assigns a surf as outside if any of it's surfs are out
 		for (auto temp : this->volus(i)->surfind)
@@ -3613,6 +3634,8 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 				|| surfOut[this->surfs.find(temp)] ;
 		}
 	}
+	this->HashArray();
+	this->TightenConnectivity();
 	this->TestConnectivityBiDir();
 	this->PrepareForUse();
 	vertOutInd.reserve(this->verts.size());
@@ -3985,7 +4008,8 @@ namespace meshhelp {
 				}
 			}
 		}
-
+		sort(vertList);
+		unique(vertList);
 		return(vertList);
 	}
 	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, const std::vector<bool> &edgeOut,
