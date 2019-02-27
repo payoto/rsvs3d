@@ -104,7 +104,7 @@ public:
 	void disp(const vector<int> &subs) const;
 	void disp(int iStart, int iEnd) const;
 	int find(int key, bool noWarn=false) const ;
-	vector<int> find_list(const vector<int> &key) const ;
+	vector<int> find_list(const vector<int> &key, bool noWarn=false) const ;
 	inline int GetMaxIndex() const;
 	inline void Init(int n);
 	bool isready() const {return(readyforuse);};

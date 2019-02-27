@@ -42,6 +42,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
+#include <cmath>
 
 #include "arraystructures.hpp"
 
@@ -431,6 +432,7 @@ private:
 	void OrientSurfaceVolume();
 	void OrientEdgeSurface();
 	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
+	void ArraysAreHashed();
 	friend class snake;
 public:
 	vertarray verts;
@@ -491,7 +493,7 @@ public:
 	void TightenConnectivity();
 	int TestConnectivity();
 	int TestConnectivityBiDir();
-	//File I/o
+	// File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
 	int write(const char *str) const;
@@ -530,7 +532,10 @@ public:
 	void LoadTargetFill(const std::string &fileName);
 	void ReturnBoundingBox(std::array<double,3> &lowerB, 
 		std::array<double,3> &upperB);
-
+	// Mesh Splitting and cropping
+	void Crop(vector<int> indList, int indType=1);
+	vector<int> AddBoundary(const vector<double> &lb, const vector<double> &ub);
+	void CropAtBoundary(const vector<double> &lb, const vector<double> &ub);
 	~mesh(){
 		RemoveFromFamily();
 	}
@@ -542,6 +547,32 @@ void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
 	vector<int> &vertind);
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	int p1, int p2);
+void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
+		const std::vector<double> &ub);
+namespace meshhelp {
+	template<class T, class V, class W>
+	double ProjectRay(int count, const W &&boundBox,
+		const T &dir, const V &orig, double minDist=0.0);
+
+	void PlaceBorderVertex(const std::vector<double> &coordIn, 
+		const std::vector<double> &coordOut,
+		const std::vector<double> &lb,
+		const std::vector<double> &ub, std::vector<double> &coordTarg);
+
+	void SplitBorderSurfaceEdgeind(const mesh &meshin,
+		const std::vector<bool> &edgeOut, 
+		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut);
+	void SplitBorderVolumeSurfind(const mesh &meshin, 
+		const std::vector<bool> &edgeOut, 
+		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut);
+
+	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, 
+		const std::vector<bool> &vertOut,
+		std::vector<int> edgeList);
+	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, 
+		const std::vector<bool> &edgeOut,
+		std::vector<int> surfList);
+}
 //test functions
 int Test_ArrayStructures();
 int Test_Volu();
@@ -549,9 +580,34 @@ int Test_Surf();
 int Test_Vert();
 int Test_Edge();
 int Test_Mesh();
+int Test_Crop();
 void PopulateIndices(mesh *meshin);
 //template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 //bool CompareFuncOut(function<void()> mesh1, function<void()> mesh2);
 
+  
+template<class T, class V, class W>
+double meshhelp::ProjectRay(int count, const W &&boundBox,
+	const T &dir, const V &orig, double minDist){
+	/*
+	Calculates the distance to project a single ray to reach the bounding box
+
+	It is templated to accept any types of containers with `count` elements, 
+	accessible by operator[];
+
+	W is an object of size [2][count] accessible by operators [][]
+	*/
+
+	double l=-INFINITY;
+
+	for (int i = 0; i < count; ++i)
+	{
+		l = std::max(l,
+				std::min(
+					(boundBox[0][i]-orig[i])/dir[i] ,
+				(boundBox[1][i]-orig[i])/dir[i] ));
+	}
+	return std::min(l, minDist);
+}
 
 #endif // MESH_H_INCLUDED

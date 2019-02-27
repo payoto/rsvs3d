@@ -71,8 +71,9 @@ int main(){
 	// gridTest.Run(test_tetgenapi,"tegen API testing"); // working test
 	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); // working test
 	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); // working test
-	#endif //TEST_ALL
 	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
+	#endif //TEST_ALL
+	gridTest.Run(Test_Crop,"test cropping of meshes"); // working test
 	
 
 	gridTest.PrintSummary();

@@ -378,12 +378,12 @@ template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const
 	return(search->second);
 }
 
-template<class T> vector<int> ArrayStruct <T>::find_list(const vector<int> &key) const 
+template<class T> vector<int> ArrayStruct <T>::find_list(const vector<int> &key, bool noWarn) const 
 {
 	vector<int> returnSub=key;
 	int ii;
 	for (ii=0;ii<int(key.size());++ii){
-		returnSub[ii]=this->find(key[ii]);
+		returnSub[ii]=this->find(key[ii], noWarn);
 	}
 	return(returnSub);
 }
