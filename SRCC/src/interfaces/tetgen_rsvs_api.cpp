@@ -1022,20 +1022,26 @@ void FlattenBoundaryFaces(mesh &meshin){
 		}
 	}
 	// triangulate the container
-	TriangulateContainer(meshin,triangleRSVS , 1, subList); 
-	triangleRSVS.meshDep = &meshin;
+	if(subList.size()>0){
+		TriangulateContainer(meshin,triangleRSVS , 1, subList); 
+		triangleRSVS.meshDep = &meshin;
 
 
-	triangleRSVS.PrepareForUse();
-	triangleRSVS.CalcTriVertPos();
-	triangleRSVS.PrepareForUse();
-	MeshTriangulation(meshout,meshin,triangleRSVS.stattri,
-		triangleRSVS.trivert);
-	meshin=meshout;
-	meshin.PrepareForUse();
-	meshin.displight();
-	meshin.TightenConnectivity();
-	meshin.OrderEdges();
+		triangleRSVS.PrepareForUse();
+		triangleRSVS.CalcTriVertPos();
+		triangleRSVS.PrepareForUse();
+		meshin.displight();
+		auto newSurfs = ConcatenateVectorField(meshin.surfs, &surf::edgeind, subList);
+		cerr << "Num new surfs " << newSurfs.size()-subList.size() << " from " << subList.size() << endl;
+		MeshTriangulation(meshout,meshin,triangleRSVS.stattri,
+			triangleRSVS.trivert);
+		meshin=meshout;
+		meshin.PrepareForUse();
+		meshin.displight();
+		meshin.TightenConnectivity();
+		meshin.OrderEdges();
+		meshin.displight();
+	}
 }
 
 tetgen::dombounds TetgenOutput_GetBB(tetgen::io_safe &tetout){
@@ -1329,13 +1335,15 @@ namespace voronoimesh {
 		// Crop mesh 
 		lowerB={-0.1,-0.1,-0.1};
 		upperB={1.1,1.1,1.1};
+		voroMesh.displight();
 		voroMesh.CropAtBoundary(lowerB, upperB);
 		voroMesh.TightenConnectivity();
 		voroMesh.OrderEdges();
 		voroMesh.SetBorders();
+		voroMesh.displight();
 		FlattenBoundaryFaces(voroMesh);
 		voroMesh.PrepareForUse();
-		voroMesh.TightenConnectivity();
+		voroMesh.TightenConnectivity(); 
 		voroMesh.OrderEdges();
 		voroMesh.SetBorders();
 		// Input mesh
@@ -1645,6 +1653,7 @@ int tetcall_RSVSVORO()
 		cerr << "Exception: " << ex.what() <<endl; 
 		// tecout.PrintMesh(snakMesh);
 		tecout.PrintMesh(vosMesh);
+		tecout.PrintMesh(vosMesh,0,0,3);
 		return 1;
 	}
 	return 0;

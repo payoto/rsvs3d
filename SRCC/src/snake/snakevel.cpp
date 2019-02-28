@@ -535,7 +535,8 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 				}
 
 				subSurf=meshin.surfs.find(triangul(ii)->KeyParent());
-				tempVert=ConcatenateVectorField(meshin.edges,&edge::vertind,meshin.edges.find_list(meshin.surfs(subSurf)->edgeind));
+				tempVert=ConcatenateVectorField(meshin.edges,&edge::vertind,
+					meshin.edges.find_list(meshin.surfs(subSurf)->edgeind));
 				sort(tempVert);
 				unique(tempVert);
 
@@ -578,9 +579,9 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 					meshout.verts[vertSub].edgeind.push_back(maxIndEdge+nNewEdge+1+kk);
 
 					buildEdge.surfind[0]=(kk==0)*(meshin.surfs(subSurf)->index)
-					+(kk!=0)*(maxIndSurf+nNewSurf+kk);
+						+(kk!=0)*(maxIndSurf+nNewSurf+kk);
 					buildEdge.surfind[1]=(kk==(nSub-1))*(meshin.surfs(subSurf)->index)
-					+(kk!=(nSub-1))*(maxIndSurf+nNewSurf+kk+1);
+						+(kk!=(nSub-1))*(maxIndSurf+nNewSurf+kk+1);
 
 					tempMesh.edges.push_back(buildEdge);
 

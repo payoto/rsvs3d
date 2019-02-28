@@ -1393,10 +1393,19 @@ int mesh::TestConnectivity(){
 		if(verts(ii)->edgeind.size()==0){
 			errCount++;
 			cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-			<< " Has empty connectivity list "; 
+				<< " Has empty connectivity list "; 
 			cerr << endl;
 
 		} else {
+			#ifdef RSVS_DIAGNOSTIC
+			if (verts(ii)->edgeind.size()==2) {
+				errCount++;
+				cerr << " Test Connectivity Error :" << errCount << " vertex " 
+					<< verts(ii)->index << " Has connectivity list of length 2 ";
+				DisplayVector(verts(ii)->edgeind); 
+				cerr << endl;
+			}
+			#endif
 			testSub=edges.find_list(verts(ii)->edgeind);
 			kk2=testSub.size();
 			for(jj=0;jj< kk2; ++jj){

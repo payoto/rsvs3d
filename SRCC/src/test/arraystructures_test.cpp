@@ -355,8 +355,7 @@ int Test_Crop(){
       auto verts = meshin.AddBoundary(lb, ub);
       tecout.PrintMesh(meshin,0,0,3);
       tecout.PrintMesh(meshin);
-      // tecout.PrintMesh(meshin,0,0,2);
-      meshin.Crop(verts);
+      meshin.Crop(verts, 1);
       tecout.PrintMesh(meshin);
    } catch (exception const& ex) { 
       cerr << "Exception: " << ex.what() <<endl; 
