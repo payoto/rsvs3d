@@ -49,6 +49,7 @@ int main(){
 	gridTest.Run(Test_surfcentre,"test SurfCentroid"); 
 	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
 	gridTest.Run(Test_MeshOrient,"Output mesh orientation");
+	gridTest.Run(Test_Crop,"test cropping of meshes"); 
 	// Snakstruct 3D tests
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
 	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
@@ -67,15 +68,15 @@ int main(){
 	// RSVS and integration tests
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
 	gridTest.Run(integrate::test::All,"Test full integration");
-	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test
-	// gridTest.Run(test_tetgenapi,"tegen API testing"); // working test
-	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); // working test
-	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); // working test
+	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished
+	// Tetgen interface tests
+	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); 
+	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); 
 	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
 	#endif //TEST_ALL
-	gridTest.Run(Test_Crop,"test cropping of meshes"); // working test
-	
 
+	gridTest.Run(Test_Crop,"test cropping of meshes"); 
+	
 	gridTest.PrintSummary();
 
 	return(0);
