@@ -2086,15 +2086,15 @@ int surf::OrderEdges(mesh *meshin)
 				vertCurr=edge2Vert[((it->second)/2)*2+jj];
 				edgeind[ii]=edgeCurr;
 			} else {
-				cerr << endl;
-				disptree((*meshin),1);
-				edgeind = edgeIndOrig;
-				DisplayVector(edgeIndOrig);
-				disptree((*meshin),1);
+				// cerr << endl;
+				// disptree((*meshin),1);
+				// edgeind = edgeIndOrig;
+				// DisplayVector(edgeIndOrig);
+				// disptree((*meshin),1);
 				edgeind.erase(edgeind.begin()+ii, edgeind.end());
-				disptree((*meshin),1);
+				// disptree((*meshin),1);
 				
-				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+				// cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
 
 				isTruncated=true;
 				break;
@@ -2790,7 +2790,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 		unique(rmvInds);
 		this->verts.remove(rmvInds);
 		this->verts.PrepareForUse();
+		#ifdef RSVS_VERBOSE
 		std::cout << "Number of removed vertices " << rmvInds.size() << std::endl;
+		#endif //RSVS_VERBOSE
 		rmvInds.clear();
 	}
 	
@@ -2805,7 +2807,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 			countRep++;
 		}
 	}
+	#ifdef RSVS_VERBOSE
 	std::cout << "Number of removed edges " << countRep << std::endl;
+	#endif //RSVS_VERBOSE
 	sort(rmvInds);
 	unique(rmvInds);
 	this->edges.remove(rmvInds);
@@ -2834,7 +2838,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 			countRep++;
 		}
 	}
+	#ifdef RSVS_VERBOSE
 	std::cout << "Number of removed surfs " << countRep << std::endl;
+	#endif //RSVS_VERBOSE
 	sort(rmvInds);
 	unique(rmvInds);
 	this->surfs.remove(rmvInds);
@@ -2842,7 +2848,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	rmvInds.clear();
 	sort(rmvInds2);
 	unique(rmvInds2);
+	#ifdef RSVS_VERBOSE
 	std::cout << "Number of removed edges (duplicates) " << rmvInds2.size() << std::endl;
+	#endif //RSVS_VERBOSE
 	this->edges.remove(rmvInds2);
 	this->edges.PrepareForUse();
 	rmvInds2.clear();
@@ -2869,7 +2877,8 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 			// This case is unhandled as either there is still a degenerate face
 			// which should not be the case or a void is being created which should not
 			// be the case either.
-			throw logic_error("Unhandled case");
+			throw logic_error("Unhandled case - Degenerate face or "
+				"unwanted Void creation");
 		}
 		if(nEdgeSurf<4){
 			this->RemoveIndex(4, this->volus(i)->index);
@@ -2877,7 +2886,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 			countRep++;
 		}
 	}
+	#ifdef RSVS_VERBOSE
 	std::cout << "Number of removed volus " << countRep << std::endl;
+	#endif //RSVS_VERBOSE
 	sort(rmvInds);
 	unique(rmvInds);
 	this->volus.remove(rmvInds);
@@ -2885,7 +2896,9 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	rmvInds.clear();
 	sort(rmvInds2);
 	unique(rmvInds2);
+	#ifdef RSVS_VERBOSE
 	std::cout << "Number of removed surfs (duplicates) " << rmvInds2.size() << std::endl;
+	#endif //RSVS_VERBOSE
 	this->surfs.remove(rmvInds2);
 	this->surfs.PrepareForUse();
 	rmvInds2.clear();
@@ -3450,13 +3463,17 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	// Create all the mesh containers for the new mesh parts
 	meshAdd.Init(edgeBound.size(), edgeBound.size()+surfBound.size(),
 		surfBound.size()+voluBound.size(), voluBound.size());
+	#ifdef RSVS_VERBOSE
 	this->displight();
+	#endif //RSVS_VERBOSE
 	meshAdd.PopulateIndices();
 	this->MakeCompatible_inplace(meshAdd);
 	// meshAdd.disp();
 	this->Concatenate(meshAdd);
 	this->HashArray();
+	#ifdef RSVS_VERBOSE
 	this->displight();
+	#endif //RSVS_VERBOSE
 
 	// Handle edges:
 	//   1 - Double the edge.
@@ -3537,9 +3554,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		auto tempInd = this->surfs[i+surfSize].index;
 		this->surfs[i+surfSize] = this->surfs[tempVec[i]];
 		this->surfs[i+surfSize].index = tempInd;
-		cout << " ==============" << endl;
-		this->surfs(tempVec[i])->disp();
-		this->surfs(i+surfSize)->disp();
+
 		meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
 			this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
 		// Switch the edge connectivity of certain edges in scoped mode
@@ -3564,8 +3579,6 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 				.edgeind.push_back(this->edges[edgeSize2+i].index);
 		}
 		edgeOut.push_back(false); // New edge is inside
-		this->surfs(tempVec[i])->disp();
-		this->surfs(i+surfSize)->disp();
 		this->ArraysAreHashed();
 	}
 	this->verts.HashArray();
@@ -3725,7 +3738,7 @@ void mesh::Crop(vector<int> indList, int indType){
 			this->surfs[i].voluind.push_back(0);
 		}
 	}
-
+	this->ArraysAreHashed();
 	sort(surfDel);
 	unique(surfDel);
 	count = surfDel.size();
@@ -3762,11 +3775,8 @@ void mesh::Crop(vector<int> indList, int indType){
 	this->volus.remove(voluDel);
 
 	this->PrepareForUse();
-
 	this->RemoveSingularConnectors();
-
 	this->PrepareForUse();
-	this->OrderEdges();
 }
 
 void mesh::CropAtBoundary(const vector<double> &lb, const vector<double> &ub){

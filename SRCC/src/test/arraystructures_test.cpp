@@ -356,7 +356,6 @@ int Test_Crop(){
       tecout.PrintMesh(meshin,0,0,3);
       tecout.PrintMesh(meshin);
       // tecout.PrintMesh(meshin,0,0,2);
-      return(-2);
       meshin.Crop(verts);
       tecout.PrintMesh(meshin);
    } catch (exception const& ex) { 
