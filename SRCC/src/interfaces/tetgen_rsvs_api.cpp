@@ -1315,7 +1315,7 @@ namespace voronoimesh {
 		return (meshpts);
 	}
 
-	std::vector<int> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
+	std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
 		mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
 		/*
 		Turns a set of points into the voronisation and tetrahedralisation.
@@ -1325,6 +1325,7 @@ namespace voronoimesh {
 		std::string cmd;
 		int INCR;
 		std::vector<int> voroPts;
+		std::vector<bool> tetSurfInVoro;
 		std::vector<double> lowerB, upperB;
 
 
@@ -1350,8 +1351,7 @@ namespace voronoimesh {
 		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
 		tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
 		tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
-		cmd = "pq1.3/15nnefO9/7m"; 
-		throw invalid_argument("exit now");
+		cmd = "pqmnnefO9/7"; 
 		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
 		tetMesh = TetgenOutput_TET2MESH(tetoutT);
 
@@ -1368,12 +1368,57 @@ namespace voronoimesh {
 		}
 		sort(voroPts);
 		unique(voroPts);
+		tetSurfInVoro.reserve(tetoutT.numberoftrifaces);
 
-		return(voroPts);
+		for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
+		{
+			tetSurfInVoro.push_back(tetoutT.trifacemarkerlist[i]!=0);
+		}
+
+		return(tetSurfInVoro);
+	}
+	std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
+		const std::vector<int> &boundaryPts){
+		/*
+		
+		*/
+
+		int nSurfs, nVerts;
+		std::vector<bool> boundaryFaces, boundaryVertsLog;
+		std::vector<int> tempVerts;
+
+		nVerts = meshin.verts.size();
+		nSurfs = meshin.surfs.size();
+
+		boundaryVertsLog.assign(nVerts, false);
+		boundaryFaces.assign(nSurfs, false);
+		int count  = boundaryPts.size();
+		for (int i = 0; i < count; ++i)
+		{
+			boundaryVertsLog[meshin.verts.find(boundaryPts[i])]=true;
+		}
+		DisplayVector(boundaryVertsLog);
+		cout << endl;
+		for (int i = 0; i < nSurfs; ++i)
+		{
+			tempVerts.clear();
+			meshin.surfs(i)->OrderedVerts(&meshin, tempVerts);
+			bool isBound = true;
+			for (auto j : tempVerts){
+				isBound = isBound && boundaryVertsLog[meshin.verts.find(j)];
+				if(!isBound){
+					break;
+				}
+			}
+			boundaryFaces[i] = isBound;
+		}
+		DisplayVector(boundaryFaces);
+		return boundaryFaces;
 	}
 }
 
-void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh){
+void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh,
+	tecplotfile &tecout){
 	/*
 	Generates a VOS and snaking grid from a set of points
 	
@@ -1413,28 +1458,23 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	inparam.upperB= {1.0, 1.0, 1.0};
 	inparam.distanceTol = 1e-3;
 	// inparam.edgelengths = {0.2};
-	inparam.edgelengths = {0.25};
+	inparam.edgelengths = {0.1};
 
 	// Step 1 - 2 
-	vertsVoro = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
+	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
+	voroMesh = vosMesh;
 	// Step 3 - Floods the vertices to establish the cells
+	/*
 	vertBlock.assign(snakMesh.verts.size(),0);
-	for (int i = 0; i < int(vertsVoro.size()); ++i)
+	int count = int(vertsVoro.size());
+	for (int i = 0; i < count; ++i)
 	{
 		vertBlock[snakMesh.verts.find(vertsVoro[i])]=-1;
 	}
-	if (false) {
-	int nBlocks=snakMesh.ConnectedVertex(vertBlock);
-	#ifdef SAFE_ALGO
-	if(nBlocks!=voroMesh.volus.size()){
-		std::cerr << "Error : nBlocks (" << nBlocks 
-			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
-			<< std::endl;
-		throw logic_error("Voromesh and flooding do not match");
-	}
-	#endif //SAFE_ALGO
+	int nBlocksVert=snakMesh.ConnectedVertex(vertBlock);
+	#ifdef RSVS_DIAGNOSTIC
 	int k=0, k2 = 0, k3 = 0;
-	int count = vertBlock.size();
+	count = vertBlock.size();
 	for (int i = 0; i < count; ++i)
 	{
 		k+=vertBlock[i]==0;
@@ -1442,48 +1482,42 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 		k3+=vertBlock[i]!=-1;
 	}
 	std::cout << "Num 0 vert " << k << " k2 "<< k2 << " k3 "<< k3 << std::endl;
-	// Step 4/5 - Create an element mapping
-	elmMapping.assign(snakMesh.volus.size(), 0);
-	for (int i = 0; i < snakMesh.volus.size(); ++i)
-	{	
-		auto surfSubs = snakMesh.surfs.find_list(snakMesh.volus(i)->surfind);
-		for (auto edgeInd : ConcatenateVectorField(snakMesh.surfs, &surf::edgeind, surfSubs)){
-			for(auto vertInd : snakMesh.edges.isearch(edgeInd)->vertind){
-				int temp = vertBlock[snakMesh.verts.find(vertInd)];
-				if (temp>0){
-					elmMapping[i]=temp;
-					break;
+	#endif //RSVS_DIAGNOSTIC
+	*/
+	// auto boundFaces = voronoimesh::BoundaryFacesFromPoints(snakMesh, vertsVoro);
+	int nBlocks = snakMesh.ConnectedVolumes(elmMapping, boundFaces);
+	#ifdef SAFE_ALGO
+	if(nBlocks!=voroMesh.volus.size()){
+		std::cerr << "Error : nBlocks (" << nBlocks 
+			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
+			<< std::endl;
+		/*std::cerr << "Error : nBlocksVert (" << nBlocksVert 
+			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
+			<< std::endl;
+		tecout.PrintMesh(snakMesh,0,0,4, vertsVoro);
+		std::vector<int> vertIn;
+		count = snakMesh.verts.size();
+		vertIn.reserve(count);
+		for (int i = 1; i <= nBlocksVert; ++i)
+		{	
+			vertIn.clear();
+			for (int j = 0; j < count; ++j)
+			{
+				if(vertBlock[j]==i){
+					vertIn.push_back(snakMesh.verts(j)->index);
 				}
 			}
-			if (elmMapping[i]>0){break;}
+			tecout.PrintMesh(snakMesh,0,0,4, vertIn);
 		}
+		tecout.PrintMesh(snakMesh,0,0,4);*/
+		throw logic_error("Voromesh and flooding do not match");
 	}
-	for (int i = 0; i < snakMesh.volus.size(); ++i){
-		if (elmMapping[i]==0){
-			auto surfSubs = snakMesh.surfs.find_list(snakMesh.volus(i)->surfind);
-			for (auto voluInd : ConcatenateVectorField(snakMesh.surfs, 
-				&surf::voluind, surfSubs)){
-				if(voluInd>0){
-					int temp = elmMapping[snakMesh.volus.find(voluInd)];
-					if (temp>0){
-						elmMapping[i]=temp;
-						break;
-					}
-				}
-			}
-		}
-		#ifdef SAFE_ALGO
-		if(elmMapping[i]==0){
-			DisplayVector(elmMapping);
-			throw logic_error("element mapping not updated");
-		}
-		#endif //SAFE_ALGO
-	}
+	#endif //SAFE_ALGO
+
 
 
 	CoarsenMesh(snakMesh,vosMesh,elmMapping);
 	snakMesh.AddParent(&vosMesh,elmMapping);
-	}
 	vosMesh=voroMesh;
 	snakMesh.PrepareForUse();
 	snakMesh.OrientFaces();
@@ -1627,7 +1661,7 @@ int tetcall_RSVSVORO()
 	mesh vosMesh, snakMesh;
 	tecplotfile tecout;
 
-	int nPts;
+	int nPts=0;
 	std :: cin >> nPts;
 	tecout.OpenFile("../TESTOUT/rsvs_voro.plt");
 
@@ -1646,7 +1680,7 @@ int tetcall_RSVSVORO()
 			vecPts.push_back(0);	
 		}
 		DisplayVector(vecPts);
-		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh, tecout);
 		tecout.PrintMesh(snakMesh);
 		tecout.PrintMesh(vosMesh);
 	} catch (exception const& ex) {
@@ -1654,6 +1688,7 @@ int tetcall_RSVSVORO()
 		// tecout.PrintMesh(snakMesh);
 		tecout.PrintMesh(vosMesh);
 		tecout.PrintMesh(vosMesh,0,0,3);
+		tecout.PrintMesh(snakMesh);
 		return 1;
 	}
 	return 0;
