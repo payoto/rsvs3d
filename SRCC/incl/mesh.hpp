@@ -510,6 +510,8 @@ public:
 	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
 	void RemoveIndex(int typeInd, int oldInd);
 	int ConnectedVertex(vector<int> &vertBlock) const;
+	int ConnectedVolumes(vector<int> &volBlock, 
+		const vector<bool> &boundaryFaces={}) const;
 	void ForceCloseContainers();
 	void RemoveSingularConnectors(const std::vector<int> &rmvVertInds={},
 		bool voidError=true);
@@ -573,7 +575,8 @@ namespace meshhelp {
 
 	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, 
 		const std::vector<bool> &vertOut,
-		std::vector<int> edgeList);
+		const std::vector<int> &edgeList, 
+		const std::vector<int> &edgeListCheck);
 	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, 
 		const std::vector<bool> &edgeOut,
 		std::vector<int> surfList);

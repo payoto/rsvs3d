@@ -3093,6 +3093,127 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	return(nBlocks);
 }
 
+int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryFaces) const {
+	// Fills a vector with a number for each volume corresponding to a
+	// group of connected edges it is part of , can be used close surfaces in 2D or volumes
+	// in 3D.
+	// Uses a flood fill with queue method
+	// Boundary faces are faces which stop the the flood exploring through them
+	// it is a boolean 
+
+	int nVoluExplored,nVolus, nSurfs,nBlocks,nCurr,nSurfsCurr,ii,jj,kk;
+	vector<bool> volStatus; // 1 explored 0 not explored
+
+	vector<int> currQueue, nextQueue; // Current and next queues of indices
+	bool boundConstrAct;
+	// Preparation of the arrays;
+	nVolus=volus.size();
+	nSurfs=surfs.size();
+	nBlocks=0;
+	nVoluExplored=0;
+
+	volStatus.assign(nVolus,false);
+
+	if(int(voluBlock.size())==0){
+		// Standard behaviour of grouping all connected volumes when voluBlock
+		// is empty
+		voluBlock.clear();
+		voluBlock.assign(nVolus,0);
+	} else if(int(voluBlock.size())==nVolus){
+		// Treat volumes with non zero value as already processed.
+		// This allows these volumes to separate blocks of volumes.
+		for (int i = 0; i < nVolus; ++i){
+			if(voluBlock[i]!=0){
+				volStatus[i] = true;
+				nVoluExplored++;
+			}
+		}	
+	} else {
+		// If voluBlock and nVolus are difference sizes the behaviour is
+		// undefined.
+		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
+			<< "voluBlock should be empty or the size of mesh.volus";
+		throw invalid_argument("voluBlock vector incompatible with mesh.");
+	}
+	if(boundaryFaces.size()==0){
+		boundConstrAct =false;
+	} else if (int(boundaryFaces.size())==nSurfs){
+		boundConstrAct =true;
+	} else {
+		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
+			<< "boundaryFaces should be empty or the size of mesh.surfs";
+		throw invalid_argument("boundaryFaces vector incompatible with mesh.");
+	}
+	currQueue.reserve(nVolus/2);
+	nextQueue.reserve(nVolus/2);
+
+   
+   	// While Loop, while not all volumes explored
+   	while(nVoluExplored<nVolus){
+
+	  	// if currQueue is empty start new block
+		if(currQueue.size()<1){
+
+			 //cout << "Block " << nBlocks << " - " << nVoluExplored << " - " << nVolus << endl;
+	   		ii=0;
+	   		while(ii<nVolus && volStatus[ii]){
+	   			ii++;
+	   		}
+	   		if (volStatus[ii]){
+	   			cerr << "Error starting point for loop not found despite max number of volume not reached" <<endl;
+	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+	   			throw range_error (" : Starting point for block not found");
+	   		}
+	   		currQueue.push_back(ii);
+	   		nBlocks++;
+
+	   	}
+		  // Explore current queue
+	   	nCurr=currQueue.size();
+	   	for (ii = 0; ii < nCurr; ++ii){
+	   		if (volStatus[currQueue[ii]]){
+	   			// Volume already explored
+	   			continue;
+	   		}
+   			voluBlock[currQueue[ii]]=nBlocks;
+   			nSurfsCurr=volus(currQueue[ii])->surfind.size();
+   			for(jj=0;jj<nSurfsCurr;++jj){
+   				int sTempInd = surfs.find(volus(currQueue[ii])->surfind[jj]);
+   				if(boundConstrAct && boundaryFaces[sTempInd]){
+   					// If a boundary has been provided and this face is one
+   					continue;
+   				}
+   				kk=int(surfs(sTempInd)->voluind[0]==volus(currQueue[ii])->index);
+   				if(surfs(sTempInd)->voluind[kk]==0){
+   					// if volume index is 0 skip this
+   					continue;
+   				}
+   				nextQueue.push_back(volus.find(surfs(sTempInd)->voluind[kk]));
+			   	#ifdef SAFE_ALGO
+   				if (volus.find(surfs(sTempInd)->voluind[kk])==-1){
+   					cerr << "Surf index: " << volus(currQueue[ii])->surfind[jj] << " volume index:" <<  
+	   				surfs(sTempInd)->voluind[kk] << endl;
+	   				cerr << "Surf connected to non existant volume" <<endl;
+	   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+   					throw range_error (" : Volume not found");
+   				}
+				#endif
+	   			
+
+   			}
+			volStatus[currQueue[ii]]=true;
+			nVoluExplored++;
+	   		
+	   	}
+
+		// Reset current queue and set to next queue
+		currQueue.clear();
+		currQueue.swap(nextQueue);
+
+	}
+	return(nBlocks);
+}
+
 coordvec mesh::CalcCentreVolu(int ind) const{
 	//takes the position int
 
@@ -3653,7 +3774,8 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		// Find the vertind connectivity of the new edge.
 		this->edges[edgeSize2+i].vertind = 
 			meshhelp::FindVertInFromEdgeOut(*this, vertOut, 
-			this->surfs(i+surfSize)->edgeind);
+			this->surfs(i+surfSize)->edgeind,
+			this->surfs(tempVec[i])->edgeind);
 		// assign new edge.surfind and surf.edgeind connectivity
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
@@ -3812,10 +3934,12 @@ void mesh::Crop(vector<int> indList, int indType){
 	// Remove volumes
 	sort(voluDel);
 	unique(voluDel);
-	if (voluDel[0]==0){voluDel.erase(voluDel.begin());}
 	int count = voluDel.size();
-	for (int i = 0; i < count; ++i)	{this->RemoveIndex(4, voluDel[i]);}
-
+	if (count>0){
+		if (voluDel[0]==0){voluDel.erase(voluDel.begin());}
+		count--;
+		for (int i = 0; i < count; ++i)	{this->RemoveIndex(4, voluDel[i]);}
+	}
 	// Expand surf removal list
 	count = this->surfs.size();
 	for (int i = 0; i < count; ++i)
@@ -4089,7 +4213,7 @@ namespace meshhelp {
 	}
 
 	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, const std::vector<bool> &vertOut,
-		std::vector<int> edgeList){
+		const std::vector<int> &edgeList, const std::vector<int> &edgeListCheck){
 		/*
 		Returns the vertices which are in (false in vertOut) from a list of edges
 		 which are outside.
@@ -4108,6 +4232,31 @@ namespace meshhelp {
 		}
 		sort(vertList);
 		unique(vertList);
+		if(vertList.size()!=2){
+			DisplayVector(vertList);
+			std::vector<int> vertListTemp={};
+			vertList.swap(vertListTemp);
+
+			for (auto k : edgeListCheck)
+			{ // 
+				for (auto i : meshin.edges.isearch(k)->vertind){
+					for (int j : vertListTemp){
+						if(i==j){
+							vertList.push_back(i);
+							break;
+						}
+					}
+				}
+			}
+		}
+		sort(vertList);
+		unique(vertList);
+		if(vertList.size()!=2){
+			DisplayVector(edgeList);
+			DisplayVector(vertList);
+			throw logic_error("vertind should be of size 2,"
+				"due to a surface being cut twice");
+		}
 		return(vertList);
 	}
 	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, const std::vector<bool> &edgeOut,
