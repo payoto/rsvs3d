@@ -1417,8 +1417,7 @@ namespace voronoimesh {
 	}
 }
 
-void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh,
-	tecplotfile &tecout){
+void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh){
 	/*
 	Generates a VOS and snaking grid from a set of points
 	
@@ -1680,7 +1679,7 @@ int tetcall_RSVSVORO()
 			vecPts.push_back(0);	
 		}
 		DisplayVector(vecPts);
-		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh, tecout);
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
 		tecout.PrintMesh(snakMesh);
 		tecout.PrintMesh(vosMesh);
 	} catch (exception const& ex) {
@@ -1689,6 +1688,38 @@ int tetcall_RSVSVORO()
 		tecout.PrintMesh(vosMesh);
 		tecout.PrintMesh(vosMesh,0,0,3);
 		tecout.PrintMesh(snakMesh);
+		return 1;
+	}
+	return 0;
+}
+
+int tetcall_RSVSVOROFunc(int nPts=0)
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh;
+	tecplotfile tecout;
+
+	try {
+		for (int i = 0; i < nPts*4; ++i)
+		{
+			vecPts.push_back(double(abs(rand())%32767)/32767.0);
+		}
+		for (int i = 0; i < 8; ++i)
+		{
+			std::cout << std::endl << i%2 << " "
+				<< (i/2)%2 << " " << (i/4)%2 << " ";
+			vecPts.push_back((i%2));	
+			vecPts.push_back(((i/2)%2));	
+			vecPts.push_back(((i/4)%2));	
+			vecPts.push_back(0);	
+		}
+
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
+
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		// tecout.PrintMesh(snakMesh);
+		cerr << "for " << __PRETTY_FUNCTION__ << "with nPoints = " << nPts << endl;
 		return 1;
 	}
 	return 0;
