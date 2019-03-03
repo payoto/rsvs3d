@@ -447,8 +447,8 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 }
 
 double DomInter(double x, double y1, double y2){
-	/*Interpolation function*/
 
+	/*Interpolation function*/
 	return x*(y2-y1)+y1;
 }
 
@@ -1416,6 +1416,7 @@ namespace voronoimesh {
 		return boundaryFaces;
 	}
 }
+
 
 void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh){
 	/*

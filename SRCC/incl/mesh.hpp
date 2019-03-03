@@ -225,6 +225,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	int OrderEdges(mesh *meshin);
+	int SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd);
 	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
@@ -497,7 +498,7 @@ public:
 	void PopulateIndices();
 	void TightenConnectivity();
 	int TestConnectivity();
-	int TestConnectivityBiDir();
+	int TestConnectivityBiDir(bool emptyIsErr=true) const;
 	// File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);
@@ -507,7 +508,8 @@ public:
 	void MakeCompatible_inplace(mesh &other) const;
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
-	void SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd={0});
+	void SwitchIndex(int typeInd, int oldInd, int newInd,
+		const vector<int> &scopeInd={0});
 	void RemoveIndex(int typeInd, int oldInd);
 	int ConnectedVertex(vector<int> &vertBlock) const;
 	int ConnectedVolumes(vector<int> &volBlock, 

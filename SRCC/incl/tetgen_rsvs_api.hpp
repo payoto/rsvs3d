@@ -29,6 +29,10 @@
 // Substructure names are all 4-5 letters
 namespace tetgen {
 	typedef std::array<std::array<double, 3>, 2> dombounds;
+
+	/**
+	 * @brief      Class for i/o safe.
+	 */
 	class io_safe : public tetgenio {
 		// Adds a semblance of prebuilt allocation functions
 		// to the io class build into tetgen
@@ -92,13 +96,30 @@ namespace tetgen {
 
 		// using tetgenio::~tetgenio;
 
+		
 		void allocate();
 		void allocatefacet(int fIndex);
 		void allocatefacet(int fIndex, int numPoly);
 		void allocatefacetpolygon(int fIndex, int pIndex);
 		void allocatefacetpolygon(int fIndex, int pIndex, int numVerts);
+
+		/**
+		 * @brief      { function_description }
+		 *
+		 * @param[in]  startPnt  The start point
+		 * @param[in]  numPnt    The number point
+		 * @param[in]  mtrs      The mtrs
+		 */
 		void SpecifyTetPointMetric(int startPnt, int numPnt, 
 			const std::vector<double> &mtrs);
+
+		/**
+		 * @brief      { function_description }
+		 *
+		 * @param[in]  startPnt  The start point
+		 * @param[in]  numPnt    The number point
+		 * @param[in]  marker    The marker
+		 */
 		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
 			int marker);
 		// void deallocate();
@@ -122,6 +143,7 @@ namespace tetgen {
 		std::string command;
 	};
 	namespace voronoi {
+		
 		template<class T, class V>
 		double ProjectRay(int count, const tetgen::dombounds &boundBox,
 			const T &dir, const V &orig, double minDist=0.0){

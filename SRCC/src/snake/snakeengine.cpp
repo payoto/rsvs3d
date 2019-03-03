@@ -806,7 +806,7 @@ void CleanupSnakeConnec(snake &snakein){
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
-				ii=snakein.snakeconn.TestConnectivityBiDir();
+				ii=snakein.snakeconn.TestConnectivityBiDir(false);
 				if(ii>0){
 					dispconnrmv(connecEdit);
 				}

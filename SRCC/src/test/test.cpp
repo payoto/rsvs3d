@@ -29,8 +29,8 @@
 int main(){
 	customtest gridTest;
 
-	#ifdef TEST_ALL
-	// BASE templatess
+	#ifdef TEST_ALL_WORKING
+	// BASE templatess 
 	gridTest.Run(Test_ArrayStructures,"arraystructures");
 	gridTest.Run(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
 	gridTest.Run(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
@@ -52,11 +52,8 @@ int main(){
 	gridTest.Run(Test_Crop,"test cropping of meshes"); 
 	// Snakstruct 3D tests
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
-	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
-	gridTest.Run(Test_snakeinit,"Snake rand velocity"); 
-	gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
-	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
-	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
+
+
 	// Snakstruct 2D tests
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
 	// Parameter and JSON tests
@@ -67,15 +64,26 @@ int main(){
 	gridTest.Run(param::test::autoflat,"Algorithm for automatic determination of flat json");
 	// RSVS and integration tests
 	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
-	gridTest.Run(integrate::test::All,"Test full integration");
-	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished
 	// Tetgen interface tests
 	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); 
 	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); 
-	#endif //TEST_ALL
+	#endif //TEST_ALL_WORKING
+	#ifdef TEST_ALL_BREAKING
+	gridTest.Run(Test_snakeinit,"Snake rand velocity"); 
+
+	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
+	gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
+	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
+	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
+	
+	gridTest.Run(integrate::test::All,"Test full integration");
+
+	// gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
+	#endif
+	
 	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
 	gridTest.Run(Test_Crop,"test cropping of meshes"); 
-
+ 
 	
 	gridTest.PrintSummary();
 

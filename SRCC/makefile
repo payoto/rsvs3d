@@ -90,7 +90,8 @@ CCFLAGETETGEN= -DTETLIBRARY
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
 # Flags to add when the target is "testall"
-CFTESTFLAG= -DTEST_ALL
+# -DTEST_ALL_WORKING
+CFTESTFLAG= -DTEST_ALL  -DTEST_ALL_BREAKING
 
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work

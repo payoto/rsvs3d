@@ -306,6 +306,10 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
+	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert==0){ // Don't print mesh
+		return(1);
+	}
 	if(nZones==0){
 		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
 	}
@@ -315,7 +319,6 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 	if(strandID>0){
 		this->StrandTime(strandID, timeStep);
 	}
-	ExtractMeshData(meshout,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
 	nCellDat=3;

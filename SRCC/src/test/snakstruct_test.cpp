@@ -1055,7 +1055,7 @@ int Test_snakeRSVS(){
 
 	dims.assign(3,0);
 	dims[0]=2;dims[1]=3;dims[2]=1;
-	// try {
+	try {
 		fileToOpen="../TESTOUT/TestSnakeRSVS.plt";
 		outSnake.OpenFile(fileToOpen);
 		fileToOpen="../TESTOUT/TestSnakeRSVS_snake.plt";
@@ -1104,10 +1104,10 @@ int Test_snakeRSVS(){
 		testSnake.displight();
 
 
-	// } catch (exception const& ex) { 
-	// 	cerr << "Exception: " << ex.what() <<endl; 
-	// 	return -1;
-	// } 
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
 	return(errTest);
 
 }
