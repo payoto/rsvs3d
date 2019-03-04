@@ -52,7 +52,10 @@ int main(){
 	gridTest.Run(Test_Crop,"test cropping of meshes"); 
 	// Snakstruct 3D tests
 	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.Run(Test_snakeinit,"Snake rand velocity"); 
+	gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
 
+	gridTest.Run(integrate::test::All,"Test full integration");
 
 	// Snakstruct 2D tests
 	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
@@ -69,14 +72,11 @@ int main(){
 	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); 
 	#endif //TEST_ALL_WORKING
 	#ifdef TEST_ALL_BREAKING
-	gridTest.Run(Test_snakeinit,"Snake rand velocity"); 
 
 	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
-	gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
 	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
 	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
 	
-	gridTest.Run(integrate::test::All,"Test full integration");
 
 	// gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif

@@ -108,14 +108,20 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 }
 
 
+/**
+ * @brief      Returns velocities to the snake in the triangulation object.
+ *
+ * @param      triRSVS  The triangulation object of the RSVS
+ */
 void RSVScalc::ReturnVelocities(triangulation &triRSVS){
 
-	int ii, ni;
+	int ii, ni, temp;
 
 	ni=triRSVS.snakeDep->snaxs.size();
 	for(ii=0; ii<ni; ii++){
-		triRSVS.snakeDep->snaxs[ii].v = 
-			deltaDV[dvMap.find(triRSVS.snakeDep->snaxs(ii)->index)];
+		temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+		triRSVS.snakeDep->snaxs[ii].v = temp!=-1 ?
+				this->deltaDV[temp] : 0;
 	}
 	triRSVS.snakeDep->snaxs.PrepareForUse();
 }
