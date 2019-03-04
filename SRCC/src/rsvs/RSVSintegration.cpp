@@ -25,7 +25,7 @@ int SAFE_ALGO_TestConn(snake &snakein){
 
 	if (snakein.Check3D()){
 		#ifdef SAFE_ALGO
-		ret = snakein.snakeconn.TestConnectivityBiDir();
+		ret = snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 		#endif //SAFE_ALGO
 	}
 

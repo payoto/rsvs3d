@@ -208,7 +208,7 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 
 	snakein.snakeconn.TightenConnectivity();
 	snakein.HashArray();
-	snakein.snakeconn.TestConnectivityBiDir();
+	snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	snakein.ForceCloseContainers();
 	snakein.PrepareForUse();
 	// snakein.displight();
@@ -303,7 +303,7 @@ void RemoveSnakeInSurf(snake &snakein, vector<int> &voluInd, int outerBorder){
 
 	snakein.snakeconn.TightenConnectivity();
 	snakein.HashArray();
-	snakein.snakeconn.TestConnectivityBiDir();
+	snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	snakein.ForceCloseContainers();
 	snakein.PrepareForUse();
 	// snakein.displight();

@@ -29,13 +29,13 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 	snakein.snakemesh = &snakeMesh;
 	
 	snakeMesh.PrepareForUse();
-	snakeMesh.displight();
+	// snakeMesh.displight();
 	
 	voluMesh.PrepareForUse();
-	voluMesh.displight();
+	// voluMesh.displight();
 
 	snakein.PrepareForUse();
-	snakein.displight();
+	// snakein.displight();
 	snakein.AssignInternalVerts();
 
 	snakeMesh.AddParent(&voluMesh);
@@ -50,10 +50,10 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 	MaintainTriangulateSnake(triRSVS);
 
 	MeshTriangulation(triMesh,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
-	triMesh.displight();
+	// triMesh.displight();
 	triMesh.PrepareForUse();
 	triMesh.OrderEdges();
-	triMesh.TestConnectivityBiDir();
+	triMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 
 	// triMesh is the triangulation in mesh format
 	// it is not cleaned up for tiny surfaces
@@ -118,7 +118,7 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 
 	// Set facet properties to the appropriate lists
 	nFacetConstr = facetConstr.size();
-	std::cout << "Number of facetconstraint " << nFacetConstr << std::endl;
+	// std::cout << "Number of facetconstraint " << nFacetConstr << std::endl;
 	for (int i = 0; i < nFacetConstr; ++i) {
 		// set facet constraints
 		tetin.facetconstraintlist[(facetConstrOffset+i)*2] = double(facetConstrOffset+i+1);
@@ -546,18 +546,18 @@ void PrepareSnakeForCFD(const snake &snakein, const tetgen::apiparam &tetgenPara
 	// tecout.OpenFile("../TESTOUT/rsvs_tetgen_mesh.plt");
 	meshtemp=snakein.snakeconn;
 	// tecout.PrintMesh(meshtemp);
-	meshtemp.displight();
+	// meshtemp.displight();
 
 	auto groupedVertices = GroupCloseSnaxels(snakein, tetgenParam.distanceTol);
 	meshtemp.MergeGroupedVertices(groupedVertices);
 	meshtemp.RemoveSingularConnectors();
 
 	meshtemp.PrepareForUse();
-	meshtemp.TestConnectivityBiDir();
+	meshtemp.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	meshtemp.TightenConnectivity();
 	meshtemp.OrderEdges();
 	// tecout.PrintMesh(meshtemp);
-	meshtemp.displight();
+	// meshtemp.displight();
 
 	// Triangulation preparation
 	triRSVS.stattri.clear();
@@ -570,7 +570,7 @@ void PrepareSnakeForCFD(const snake &snakein, const tetgen::apiparam &tetgenPara
 	MeshTriangulation(meshgeom,meshtemp,triRSVS.stattri,
 		triRSVS.trivert);
 	meshgeom.PrepareForUse();
-	meshgeom.displight();
+	// meshgeom.displight();
 	meshgeom.TightenConnectivity();
 	meshgeom.OrderEdges();
 
@@ -617,7 +617,7 @@ void TetgenInput_RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 	nHoles=holeCoords.size()/3;
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
-	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
+	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
 	// Assign the holes
 
@@ -672,7 +672,7 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	nHoles=holeCoords.size()/3;
 	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
-	std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
+	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
 	// Assign the holes
 
@@ -795,8 +795,8 @@ void TetgenOutput_SU2(const char* fileName, const tetgenio &tetout){
 		}
 		numBounds[j-1]++;
 	}
-	DisplayVector(diffBounds);
-	DisplayVector(numBounds);
+	// DisplayVector(diffBounds);
+	// DisplayVector(numBounds);
 	// 2 - write boundaries (skipping 0 boundary)
 	meshFile << "NMARK= " << nBounds-1 << std::endl;
 	for (int k = 1; k < nBounds; ++k)
@@ -1030,17 +1030,19 @@ void FlattenBoundaryFaces(mesh &meshin){
 		triangleRSVS.PrepareForUse();
 		triangleRSVS.CalcTriVertPos();
 		triangleRSVS.PrepareForUse();
-		meshin.displight();
-		auto newSurfs = ConcatenateVectorField(meshin.surfs, &surf::edgeind, subList);
-		cerr << "Num new surfs " << newSurfs.size()-subList.size() << " from " << subList.size() << endl;
+		// meshin.displight();
+		auto newSurfs = ConcatenateVectorField(meshin.surfs,
+			&surf::edgeind, subList);
+		// cerr << "Num new surfs " << newSurfs.size()-subList.size() 
+		// 	<< " from " << subList.size() << endl;
 		MeshTriangulation(meshout,meshin,triangleRSVS.stattri,
 			triangleRSVS.trivert);
 		meshin=meshout;
 		meshin.PrepareForUse();
-		meshin.displight();
+		// meshin.displight();
 		meshin.TightenConnectivity();
 		meshin.OrderEdges();
-		meshin.displight();
+		// meshin.displight();
 	}
 }
 
@@ -1166,10 +1168,10 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 		meshout.volus[i].error = meshout.volus[i].target;
 	}
 	meshout.HashArray();
-	meshout.TestConnectivityBiDir();
+	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	meshout.TightenConnectivity();
 	meshout.PrepareForUse();
-	meshout.displight();
+	// meshout.displight();
 	
 	auto groupedVertices = GroupCloseVertices(meshout, 1e-7);
 	auto out = meshout.MergeGroupedVertices(groupedVertices,false);
@@ -1177,20 +1179,20 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	unique(out);
 	meshout.RemoveSingularConnectors(out);
 	meshout.HashArray();
-	meshout.TestConnectivityBiDir();
+	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 
 	meshout.PrepareForUse();
-	meshout.TestConnectivityBiDir();
+	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
-	meshout.displight();
+	// meshout.displight();
 	FlattenBoundaryFaces(meshout);
 	meshout.PrepareForUse();
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
-	meshout.displight();
+	// meshout.displight();
 
 	return meshout;
 }
@@ -1283,8 +1285,8 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	meshout.TightenConnectivity();
 	meshout.PrepareForUse();
 
-	meshout.TestConnectivityBiDir();
-	meshout.displight();
+	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
+	// meshout.displight();
 
 	return meshout;
 }
@@ -1330,18 +1332,19 @@ namespace voronoimesh {
 
 
 		TetgenInput_POINTGRIDS(ptsMesh, tetinV, inparam);
-		cmd = "v"; 
+		cmd = "Qv"; 
 		tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
 		voroMesh = TetgenOutput_VORO2MESH(tetoutV);
 		// Crop mesh 
 		lowerB={-0.1,-0.1,-0.1};
 		upperB={1.1,1.1,1.1};
-		voroMesh.displight();
+		// voroMesh.displight();
+		voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 		voroMesh.CropAtBoundary(lowerB, upperB);
 		voroMesh.TightenConnectivity();
 		voroMesh.OrderEdges();
 		voroMesh.SetBorders();
-		voroMesh.displight();
+		// voroMesh.displight();
 		FlattenBoundaryFaces(voroMesh);
 		voroMesh.PrepareForUse();
 		voroMesh.TightenConnectivity(); 
@@ -1351,7 +1354,7 @@ namespace voronoimesh {
 		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
 		tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
 		tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
-		cmd = "pqmnnefO9/7"; 
+		cmd = "QpqmnnefO9/7"; 
 		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
 		tetMesh = TetgenOutput_TET2MESH(tetoutT);
 
@@ -1397,8 +1400,6 @@ namespace voronoimesh {
 		{
 			boundaryVertsLog[meshin.verts.find(boundaryPts[i])]=true;
 		}
-		DisplayVector(boundaryVertsLog);
-		cout << endl;
 		for (int i = 0; i < nSurfs; ++i)
 		{
 			tempVerts.clear();
@@ -1412,7 +1413,6 @@ namespace voronoimesh {
 			}
 			boundaryFaces[i] = isBound;
 		}
-		DisplayVector(boundaryFaces);
 		return boundaryFaces;
 	}
 }
@@ -1463,27 +1463,6 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	// Step 1 - 2 
 	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
 	voroMesh = vosMesh;
-	// Step 3 - Floods the vertices to establish the cells
-	/*
-	vertBlock.assign(snakMesh.verts.size(),0);
-	int count = int(vertsVoro.size());
-	for (int i = 0; i < count; ++i)
-	{
-		vertBlock[snakMesh.verts.find(vertsVoro[i])]=-1;
-	}
-	int nBlocksVert=snakMesh.ConnectedVertex(vertBlock);
-	#ifdef RSVS_DIAGNOSTIC
-	int k=0, k2 = 0, k3 = 0;
-	count = vertBlock.size();
-	for (int i = 0; i < count; ++i)
-	{
-		k+=vertBlock[i]==0;
-		k2+=vertBlock[i]!=0;
-		k3+=vertBlock[i]!=-1;
-	}
-	std::cout << "Num 0 vert " << k << " k2 "<< k2 << " k3 "<< k3 << std::endl;
-	#endif //RSVS_DIAGNOSTIC
-	*/
 	// auto boundFaces = voronoimesh::BoundaryFacesFromPoints(snakMesh, vertsVoro);
 	int nBlocks = snakMesh.ConnectedVolumes(elmMapping, boundFaces);
 	#ifdef SAFE_ALGO
@@ -1491,30 +1470,9 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 		std::cerr << "Error : nBlocks (" << nBlocks 
 			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
 			<< std::endl;
-		/*std::cerr << "Error : nBlocksVert (" << nBlocksVert 
-			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
-			<< std::endl;
-		tecout.PrintMesh(snakMesh,0,0,4, vertsVoro);
-		std::vector<int> vertIn;
-		count = snakMesh.verts.size();
-		vertIn.reserve(count);
-		for (int i = 1; i <= nBlocksVert; ++i)
-		{	
-			vertIn.clear();
-			for (int j = 0; j < count; ++j)
-			{
-				if(vertBlock[j]==i){
-					vertIn.push_back(snakMesh.verts(j)->index);
-				}
-			}
-			tecout.PrintMesh(snakMesh,0,0,4, vertIn);
-		}
-		tecout.PrintMesh(snakMesh,0,0,4);*/
 		throw logic_error("Voromesh and flooding do not match");
 	}
 	#endif //SAFE_ALGO
-
-
 
 	CoarsenMesh(snakMesh,vosMesh,elmMapping);
 	snakMesh.AddParent(&vosMesh,elmMapping);
@@ -1524,206 +1482,6 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	vosMesh.PrepareForUse();
 
 	// Step 6 - Check original points containments
-}
-
-int tetcall_CFD()
-{
-	/*CFD meshing process*/
-	tetgen::io_safe tetin, tetout;
-
-	tetgen::apiparam inparam;
-	mesh snakeMesh, voluMesh, triMesh;
-	snake snakein;
-
-	try {
-
-		inparam.lowerB= {-15.0, -15.0,-15.0};
-		inparam.upperB= {15.0, 15.0, 15.0};
-		inparam.distanceTol = 1e-3;
-		inparam.edgelengths = {0.06,0.3,1.0,3.0};
-		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
-		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
-
-
-		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_2body");
-		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_2body");
-		
-
-		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
-		//   do quality mesh generation (q) with a specified quality bound
-		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqm"; 
-		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
-
-		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		TetgenOutput_SU2("../TESTOUT/testtetgen/rsvs_3cell_2body.su2",tetout);
-		std::cout << "Finished the tettgen process " << std::endl;
-	} catch (exception const& ex) {
-		cerr << "Exception: " << ex.what() <<endl; 
-		return 1;
-	}
-	return 0;
-}
-
-int tetcall()
-{
-	/*_RSVSgrid*/
-	tetgen::io_safe tetin, tetin2,tetin3, tetout, tetout2, tetout3;
-	tetgen::apiparam inparam;
-	mesh meshdomain, meshtet, meshvoro, meshtet2;
-	snake snakein;
-	std::array<std::array<double, 2>, 3> dimDomain;
-	tecplotfile tecout;
-
-
-	try {
-		tecout.OpenFile("../TESTOUT/trianglemeshconv.plt");
-		inparam.lowerB= {-0.0, -0.0,-0.0};
-		inparam.upperB= {1.0, 1.0, 1.0};
-		inparam.distanceTol = 1e-3;
-		// inparam.edgelengths = {0.2};
-		inparam.edgelengths = {0.25};
-
-		BuildBlockGrid({3,1,1}, meshdomain);
-		dimDomain[0] = {0,3.0};
-		// dimDomain[0] = {0,3.0};
-		dimDomain[1] = {0,1.0};
-		dimDomain[2] = {0,1.0};
-		meshdomain.Scale(dimDomain);
-		meshdomain.PrepareForUse();
-		tecout.PrintMesh(meshdomain);
-
-		TetgenInput_RSVSGRIDS(meshdomain,tetin, inparam);
-
-
-		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_grid");
-		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_grid");
-		
-
-		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
-		//   do quality mesh generation (q) with a specified quality bound
-		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqnnvefm"; 
-		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
-
-		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
-		std::cout << "Finished the tettgen process " << std::endl;
-		meshtet = TetgenOutput_TET2MESH(tetout);
-		tecout.PrintMesh(meshtet);
-
-
-		std::cout << " Meshed the tetrahedralization" << std::endl;
-		TetgenInput_POINTGRIDS(meshtet,tetin3, inparam);
-		inparam.command = "v"; 
-		tetrahedralize(inparam.command.c_str(), &tetin3, &tetout3);
-		meshvoro = TetgenOutput_VORO2MESH(tetout3);
-		// tecout.PrintMesh(meshvoro,0,0,2);
-		tecout.PrintMesh(meshvoro);
-		tecout.PrintMesh(meshvoro,0,0,3);
-		tecout.PrintMesh(meshvoro,0,0,4);
-		std::cout << " Meshed the voronization" << std::endl;
-
-		inparam.edgelengths = {0.15};
-		meshvoro.PrepareForUse();
-
-
-		std::vector<int> subs;
-		subs=ConcatenateVectorField(meshvoro.volus, &volu::surfind,
-			0, meshvoro.volus.size());
-		std::cout << "Number of surfs " << subs.size() << std::endl;
-		sort(subs);
-		unique(subs);
-		std::cout << "Number of surfs " << subs.size() << std::endl;
-		inparam.command = "pkqnnefm"; 
-		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
-
-		tetin2.save_nodes("../TESTOUT/testtetgen/rsvs_voro_grid");
-		tetin2.save_poly("../TESTOUT/testtetgen/rsvs_voro_grid");
-
-		tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
-		std::cout << "Finished the tettgen process " << std::endl;
-		meshtet2 = TetgenOutput_TET2MESH(tetout2);
-		tecout.PrintMesh(meshtet2);
-
-	} catch (exception const& ex) {
-		cerr << "Exception: " << ex.what() <<endl; 
-		return 1;
-	}
-	return 0;
-}
-int tetcall_RSVSVORO()
-{
-	std::vector<double> vecPts;
-	mesh vosMesh, snakMesh;
-	tecplotfile tecout;
-
-	int nPts=0;
-	std :: cin >> nPts;
-	tecout.OpenFile("../TESTOUT/rsvs_voro.plt");
-
-	try {
-		for (int i = 0; i < nPts*4; ++i)
-		{
-			vecPts.push_back(double(abs(rand())%32767)/32767.0);
-		}
-		for (int i = 0; i < 8; ++i)
-		{
-			std::cout << std::endl << i%2 << " "
-				<< (i/2)%2 << " " << (i/4)%2 << " ";
-			vecPts.push_back((i%2));	
-			vecPts.push_back(((i/2)%2));	
-			vecPts.push_back(((i/4)%2));	
-			vecPts.push_back(0);	
-		}
-		DisplayVector(vecPts);
-		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
-		tecout.PrintMesh(snakMesh);
-		tecout.PrintMesh(vosMesh);
-	} catch (exception const& ex) {
-		cerr << "Exception: " << ex.what() <<endl; 
-		// tecout.PrintMesh(snakMesh);
-		tecout.PrintMesh(vosMesh);
-		tecout.PrintMesh(vosMesh,0,0,3);
-		tecout.PrintMesh(snakMesh);
-		return 1;
-	}
-	return 0;
-}
-
-int tetcall_RSVSVOROFunc(int nPts=0)
-{
-	std::vector<double> vecPts;
-	mesh vosMesh, snakMesh;
-	tecplotfile tecout;
-
-	try {
-		for (int i = 0; i < nPts*4; ++i)
-		{
-			vecPts.push_back(double(abs(rand())%32767)/32767.0);
-		}
-		for (int i = 0; i < 8; ++i)
-		{
-			std::cout << std::endl << i%2 << " "
-				<< (i/2)%2 << " " << (i/4)%2 << " ";
-			vecPts.push_back((i%2));	
-			vecPts.push_back(((i/2)%2));	
-			vecPts.push_back(((i/4)%2));	
-			vecPts.push_back(0);	
-		}
-
-		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
-
-	} catch (exception const& ex) {
-		cerr << "Exception: " << ex.what() <<endl; 
-		// tecout.PrintMesh(snakMesh);
-		cerr << "for " << __PRETTY_FUNCTION__ << "with nPoints = " << nPts << endl;
-		return 1;
-	}
-	return 0;
 }
 
 void tetgen::io_safe::allocate(){
@@ -1909,4 +1667,192 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 int test_tetgenapi(){
 
 	return(tetcall());
+}
+
+int tetcall_CFD()
+{
+	/*CFD meshing process*/
+	tetgen::io_safe tetin, tetout;
+
+	tetgen::apiparam inparam;
+	mesh snakeMesh, voluMesh, triMesh;
+	snake snakein;
+
+	try {
+
+		inparam.lowerB= {-15.0, -15.0,-15.0};
+		inparam.upperB= {15.0, 15.0, 15.0};
+		inparam.distanceTol = 1e-3;
+		inparam.edgelengths = {0.06,0.3,1.0,3.0};
+		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
+		TetgenInput_RSVS2CFD(snakein, tetin, inparam);
+
+
+		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_2body");
+		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_2body");
+		
+
+		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+		//   do quality mesh generation (q) with a specified quality bound
+		//   (1.414), and apply a maximum volume constraint (a0.1).
+		inparam.command = "pkqm"; 
+		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
+
+		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		TetgenOutput_SU2("../TESTOUT/testtetgen/rsvs_3cell_2body.su2",tetout);
+		std::cout << "Finished the tettgen process " << std::endl;
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		return 1;
+	}
+	return 0;
+}
+
+int tetcall()
+{
+	/*_RSVSgrid*/
+	tetgen::io_safe tetin, tetin2,tetin3, tetout, tetout2, tetout3;
+	tetgen::apiparam inparam;
+	mesh meshdomain, meshtet, meshvoro, meshtet2;
+	snake snakein;
+	std::array<std::array<double, 2>, 3> dimDomain;
+	tecplotfile tecout;
+
+
+	try {
+		tecout.OpenFile("../TESTOUT/trianglemeshconv.plt");
+		inparam.lowerB= {-0.0, -0.0,-0.0};
+		inparam.upperB= {1.0, 1.0, 1.0};
+		inparam.distanceTol = 1e-3;
+		// inparam.edgelengths = {0.2};
+		inparam.edgelengths = {0.25};
+
+		BuildBlockGrid({3,1,1}, meshdomain);
+		dimDomain[0] = {0,3.0};
+		// dimDomain[0] = {0,3.0};
+		dimDomain[1] = {0,1.0};
+		dimDomain[2] = {0,1.0};
+		meshdomain.Scale(dimDomain);
+		meshdomain.PrepareForUse();
+		tecout.PrintMesh(meshdomain);
+
+		TetgenInput_RSVSGRIDS(meshdomain,tetin, inparam);
+
+
+		tetin.save_nodes("../TESTOUT/testtetgen/rsvs_3cell_grid");
+		tetin.save_poly("../TESTOUT/testtetgen/rsvs_3cell_grid");
+		
+
+		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+		//   do quality mesh generation (q) with a specified quality bound
+		//   (1.414), and apply a maximum volume constraint (a0.1).
+		inparam.command = "pkqnnvefm"; 
+		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
+
+		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_elements("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		// tetout.save_faces("../TESTOUT/testtetgen/rsvsout_3cell_2body");
+		std::cout << "Finished the tettgen process " << std::endl;
+		meshtet = TetgenOutput_TET2MESH(tetout);
+		tecout.PrintMesh(meshtet);
+
+
+		std::cout << " Meshed the tetrahedralization" << std::endl;
+		TetgenInput_POINTGRIDS(meshtet,tetin3, inparam);
+		inparam.command = "v"; 
+		tetrahedralize(inparam.command.c_str(), &tetin3, &tetout3);
+		meshvoro = TetgenOutput_VORO2MESH(tetout3);
+		// tecout.PrintMesh(meshvoro,0,0,2);
+		tecout.PrintMesh(meshvoro);
+		tecout.PrintMesh(meshvoro,0,0,3);
+		tecout.PrintMesh(meshvoro,0,0,4);
+		std::cout << " Meshed the voronization" << std::endl;
+
+		inparam.edgelengths = {0.15};
+		meshvoro.PrepareForUse();
+
+
+		std::vector<int> subs;
+		subs=ConcatenateVectorField(meshvoro.volus, &volu::surfind,
+			0, meshvoro.volus.size());
+		std::cout << "Number of surfs " << subs.size() << std::endl;
+		sort(subs);
+		unique(subs);
+		std::cout << "Number of surfs " << subs.size() << std::endl;
+		inparam.command = "pkqnnefm"; 
+		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
+
+		tetin2.save_nodes("../TESTOUT/testtetgen/rsvs_voro_grid");
+		tetin2.save_poly("../TESTOUT/testtetgen/rsvs_voro_grid");
+
+		tetrahedralize(inparam.command.c_str(), &tetin2, &tetout2);
+		std::cout << "Finished the tettgen process " << std::endl;
+		meshtet2 = TetgenOutput_TET2MESH(tetout2);
+		tecout.PrintMesh(meshtet2);
+
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		return 1;
+	}
+	return 0;
+}
+int tetcall_RSVSVORO()
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh;
+	tecplotfile tecout;
+
+	int nErrors=0;
+	const char* tecoutStr =  "../TESTOUT/rsvs_voro.plt";
+	vector<int> numCells = {
+		0,
+		1,
+		// 2,3,4,5,10,20,100,1000
+	};
+	// std :: cin >> nPts;
+	tecout.OpenFile(tecoutStr);
+
+	for(auto i : numCells){
+		nErrors += tetcall_RSVSVOROFunc(i, tecoutStr);
+	}
+	return nErrors;
+}
+
+int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh;
+	tecplotfile tecout;
+
+	try {
+		cout << "__________________________________________________" << endl;
+		cout << "Start Voronoi mesh generation for " << nPts 
+			<< " points"<< endl;
+		cout << "__________________________________________________" << endl;
+		for (int i = 0; i < nPts*4; ++i)
+		{
+			vecPts.push_back(double(abs(rand())%32767)/32767.0);
+		}
+		for (int i = 0; i < 8; ++i)
+		{
+			vecPts.push_back((i%2));	
+			vecPts.push_back(((i/2)%2));	
+			vecPts.push_back(((i/4)%2));	
+			vecPts.push_back(0);	
+		}
+		tecout.OpenFile(tecoutStr, "a");
+
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
+		tecout.PrintMesh(snakMesh);
+		tecout.PrintMesh(vosMesh);
+		cout << "__________________________________________________" << endl;
+
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		cerr << "for " << __PRETTY_FUNCTION__ << "with nPoints = " << nPts << endl;
+		return 1;
+	}
+	return 0;
 }

@@ -637,7 +637,7 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, trip
 
 	meshout.Concatenate(tempMesh);
 	meshout.PrepareForUse();
-	//meshout.TestConnectivityBiDir();
+	//meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 }
 
 

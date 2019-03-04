@@ -514,7 +514,7 @@ void CleanupSnakeConnec(snake &snakein){
 	snakein.HashParent();
 	#ifdef SAFE_ALGO
 	if (snakein.Check3D()){
-		snakein.snakeconn.TestConnectivityBiDir();
+		snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	}
 	#endif
 	while(iterFlag){
@@ -806,7 +806,7 @@ void CleanupSnakeConnec(snake &snakein){
 
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
-				ii=snakein.snakeconn.TestConnectivityBiDir(false);
+				ii=snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__,false);
 				if(ii>0){
 					dispconnrmv(connecEdit);
 				}
@@ -834,7 +834,7 @@ void CleanupSnakeConnec(snake &snakein){
 			snakein.snakeconn.TightenConnectivity();
 			#ifdef SAFE_ALGO
 			if (snakein.Check3D()){
-				snakein.snakeconn.TestConnectivityBiDir();
+				snakein.snakeconn.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 			}
 			#endif
 		}

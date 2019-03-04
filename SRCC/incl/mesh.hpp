@@ -497,8 +497,9 @@ public:
 	bool isready() const;
 	void PopulateIndices();
 	void TightenConnectivity();
-	int TestConnectivity();
-	int TestConnectivityBiDir(bool emptyIsErr=true) const;
+	int TestConnectivity(const char *strRoot="") const;
+	int TestConnectivityBiDir(const char *strRoot="",
+		bool emptyIsErr=true) const;
 	// File I/o
 	void write(FILE *fid) const;
 	void read(FILE *fid);

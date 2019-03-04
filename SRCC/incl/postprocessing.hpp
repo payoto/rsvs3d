@@ -45,7 +45,7 @@ private:
 	int lengthLine;
 	int nZones=0;
 public:
-	int OpenFile(const char *str);
+	int OpenFile(const char *str, const char *mode="w");
 	void CloseFile();
 	int ZoneNum() const {return(nZones);}
 	// Mesh out

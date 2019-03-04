@@ -1254,9 +1254,9 @@ void tecplotfile::ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat){
 
 }
 
-int tecplotfile::OpenFile (const char *str){
+int tecplotfile::OpenFile (const char *str, const char *mode){
 	fclose(fid);
-	fid=fopen(str,"w");
+	fid=fopen(str,mode);
 	if (fid==NULL){
 		cout << "File '" << str << "' failed to open" << endl; 
 		return(-1);

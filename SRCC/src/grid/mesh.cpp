@@ -1382,7 +1382,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
 }
 
-int mesh::TestConnectivity(){
+int mesh::TestConnectivity(const char *strRoot) const{
 	int ii,jj,kk,kk2,errCount, errTot;
 	vector<int> testSub;
 
@@ -1524,13 +1524,15 @@ int mesh::TestConnectivity(){
 	}
 	errTot+=errCount;
 	if (errTot>0){
-		cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+		cerr << errTot << "  Total errors were detected in the connectivity "
+			"list in: " << endl << strRoot <<endl;
 	}
 	return(errTot);
 }
 
 
-int mesh::TestConnectivityBiDir(bool emptyIsErr) const{
+int mesh::TestConnectivityBiDir(const char *strRoot,
+	bool emptyIsErr) const{
 	int ii,jj,ll,ll2,kk,kk2,errCount, errTot,errCountBiDir,errTotBiDir;
 	bool flag;
 	vector<int> testSub;
@@ -1713,10 +1715,10 @@ int mesh::TestConnectivityBiDir(bool emptyIsErr) const{
 	for (ii=0; ii<kk;++ii){
 		testSub=volus.find_list(surfs(ii)->voluind);
 		kk2=testSub.size();
-		if(emptyIsErr && testSub.size()!=2){ // voluind should be of size 2
+		if(emptyIsErr && kk2!=2){ // voluind should be of size 2
 			errCount++;
 			cerr <<  " Test Connectivity Error :"  << errCount << " surf " << surfs(ii)->index
-				<< " has voluind of length " << testSub.size() << " list (surf::voluind): " ;
+				<< " has voluind of length " <<kk2 << " list (surf::voluind): " ;
 			DisplayVector(surfs(ii)->voluind); 
 			cerr << endl;
 		}
@@ -1787,13 +1789,13 @@ int mesh::TestConnectivityBiDir(bool emptyIsErr) const{
 	errTot+=errCount;
 	errTotBiDir+=errCountBiDir;
 	if (errTot>0){
-		cerr << errTot << "  Total errors were detected in the connectivity list" <<endl;
+		cerr << errTot << "  Total errors were detected in the connectivity list "
+			" in: " << endl << strRoot <<endl;
 	}
 	if (errTotBiDir>0){
-		cerr << errTotBiDir << "  Total errors were detected in the bi-directionality of the connectivity list" << endl;
+		cerr << errTotBiDir << "  Total errors were detected in the bi-directionality of the connectivity  list in: " << endl << strRoot <<endl;
 	}
 	return(errTot);
-
 }
 
 #pragma GCC diagnostic pop
@@ -3871,7 +3873,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	voluBound = ConcatenateVectorField(this->surfs, &surf::voluind, tempVec);
 	sort(voluBound);
 	unique(voluBound);
-	if(voluBound[0]==0){
+	if(voluBound.size() && voluBound[0]==0){
 		voluBound[0] = voluBound.back();
 		voluBound.pop_back();
 	}
@@ -4043,7 +4045,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	//  1 - Double the volume
 	//  2 - Add the new surface
 	//  3 - Close the two volumes
-	count = voluBound.size(); DisplayVector<int>(voluBound);
+	count = voluBound.size();
 	tempVec.clear(); tempVec = this->volus.find_list(voluBound);
 	for (int i = 0; i < count; ++i)
 	{
@@ -4093,7 +4095,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	}
 	this->HashArray();
 	this->TightenConnectivity();
-	this->TestConnectivityBiDir();
+	this->TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	this->PrepareForUse();
 	vertOutInd.reserve(this->verts.size());
 	count = this->verts.size();
@@ -4514,6 +4516,9 @@ namespace meshhelp {
 		/*
 		Returns the vertices which are in (false in vertOut) from a list of edges
 		 which are outside.
+
+		 This may be larger than two as edgeList are not guaranteed to be part of
+		 a single surface. If there are two cuts this would yield 4 vertices.
 		*/
 		std::vector<int> vertList;
 		int count = edgeList.size();
@@ -4530,7 +4535,7 @@ namespace meshhelp {
 		sort(vertList);
 		unique(vertList);
 		if(vertList.size()!=2){
-			DisplayVector(vertList);
+			// DisplayVector(vertList);
 			std::vector<int> vertListTemp={};
 			vertList.swap(vertListTemp);
 
@@ -4548,16 +4553,7 @@ namespace meshhelp {
 		}
 		sort(vertList);
 		unique(vertList);
-		if(vertList.size()!=2){
-			DisplayVector(edgeList);
-			DisplayVector(vertList);
-			// throw logic_error
-			cerr << 
-				("vertind should be of size 2,"
-				"due to a surface being cut twice")
-				<< endl
-				;
-		}
+
 		return(vertList);
 	}
 	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, const std::vector<bool> &edgeOut,
