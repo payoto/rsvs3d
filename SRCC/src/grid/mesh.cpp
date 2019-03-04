@@ -2047,8 +2047,9 @@ void mesh::PopulateIndices(){
  * 				0 - the edges have been ordered and closed 
  *              1 - the edges have been ordered and closed but
  *             the list was truncated. 
- *              2 - The edges are ordered but not closed.
- *             (need errout to be false)
+ *              <0 - The edges are ordered but not closed.
+ *             (need errout to be false) for edgeind of size
+ *             -<return val>
  */
 int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
 	bool warn=true, bool errout=true, 
@@ -2057,9 +2058,9 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
 	unordered_multimap<int,int> vert2Edge;
 	vector<bool> isDone;
 	vector<int> edgeIndOrig;
-	int vertCurr, edgeCurr, ii, jj;
+	int vertCurr, edgeCurr, ii, jj, endsExpl=0;
 
-	int return_ordered=0, return_truncated=1, return_open=2;
+	int return_ordered=0, return_truncated=1, return_open=-1;
 
 	if (edgeind.size()<=0){
 		return(return_ordered);
@@ -2085,18 +2086,6 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
 	auto it=vert2Edge.end();
 	for(ii=1;ii<int(edgeind.size());++ii){
 		auto range=vert2Edge.equal_range(vertCurr);
-	 	#ifdef SAFE_ACCESS
-		if (range.first==vert2Edge.end()){
-			surfin->disptree(meshin,0);
-
-			cerr << ii << " vert " << vertCurr << "  ";
-			DisplayVector(edge2Vert);
-			DisplayVector(edgeind);
-			meshin.verts.isearch(vertCurr)->disp();
-			cout << it->second << " " << 1/2 << 2/3 <<  endl;
-			cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-			throw range_error ("unordered_multimap went beyond its range in OrderEdges");
-		}
 		if (vert2Edge.count(vertCurr)==1){
 			if(warn || errout){
 				if(errout){
@@ -2111,8 +2100,27 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
 					throw invalid_argument("edgelist is not closed");
 				}
 			}
-			
-			return return_open;
+			if(!endsExpl){ // explore the one way chain the other way
+				endsExpl++;
+				vertCurr=edge2Vert[1];
+				edgeCurr=edgeind[0];
+				range=vert2Edge.equal_range(vertCurr);
+			} else { // Exit
+
+				return return_open*ii;
+			}
+		}
+	 	#ifdef SAFE_ACCESS
+		if (range.first==vert2Edge.end()){
+			surfin->disptree(meshin,0);
+
+			cerr << ii << " vert " << vertCurr << "  ";
+			DisplayVector(edge2Vert);
+			DisplayVector(edgeind);
+			meshin.verts.isearch(vertCurr)->disp();
+			cout << it->second << " " << 1/2 << 2/3 <<  endl;
+			cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+			throw range_error ("unordered_multimap went beyond its range in OrderEdges");
 		}
 	 	#ifdef RSVS_DIAGNOSTIC
 		if (vert2Edge.count(vertCurr)!=2){
@@ -3817,7 +3825,8 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	std::vector<bool> voluOut;
 	std::vector<int>  voluBound;
 
-	int vertSize, edgeSize, edgeSize2, surfSize, surfSize2, voluSize,voluSize2, count;
+	int vertSize, edgeSize, edgeSize2, surfSize, surfSize2,
+		voluSize, voluSize2, count, countPrev;
 
 	vertSize=this->verts.size();
 	edgeSize=this->edges.size();
@@ -3947,9 +3956,12 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	//  2 - add the new edge
 	//  3 - close the two surfaces
 	// Need to handle multiple cuts in the same surface
-	count = surfBound.size();
-	tempVec.clear(); tempVec = this->surfs.find_list(surfBound);
-	for (int i = 0; i < count; ++i)
+	countPrev=0;
+	do {
+		count = surfBound.size();
+		tempVec.clear(); tempVec = this->surfs.find_list(surfBound);
+	//===============================================
+	for (int i = countPrev; i < count; ++i)
 	{
 		// Replicate surf (changing index)
 		auto tempInd = this->surfs[i+surfSize].index;
@@ -3958,16 +3970,73 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 
 		meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
 			this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
-		// Switch the edge connectivity of certain edges in scoped mode
-		this->ArraysAreHashed();
-		this->SwitchIndex(6, this->surfs(tempVec[i])->index,
-			this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
 
 		// Find the vertind connectivity of the new edge.
 		this->edges[edgeSize2+i].vertind = 
 			meshhelp::FindVertInFromEdgeOut(*this, vertOut, 
 			this->surfs(i+surfSize)->edgeind,
 			this->surfs(tempVec[i])->edgeind);
+		
+		if(this->edges[edgeSize2+i].vertind.size()>2){
+			this->ArraysAreHashed();
+			sort(this->surfs.elems[i+surfSize].edgeind); 
+			unique(this->surfs.elems[i+surfSize].edgeind);
+			auto edgeOrig = this->surfs(i+surfSize)->edgeind;
+			int outFlag=OrderEdgeList(this->surfs.elems[i+surfSize].edgeind, *this,
+				false, false, &edgeOrig);
+			// trim edgeind
+			this->surfs[i+surfSize].edgeind.erase(
+				this->surfs(i+surfSize)->edgeind.begin()-outFlag,
+				this->surfs(i+surfSize)->edgeind.end()
+				);
+			for (auto edgeIndAll : edgeOrig){
+				bool flag=true;
+				for (auto edgeindOut : this->surfs[i+surfSize].edgeind){
+					if(edgeIndAll==edgeindOut){
+						flag=false;
+						break;
+					}
+				}
+				if(flag){
+					this->surfs[tempVec[i]].edgeind.push_back(edgeIndAll);
+				}
+			}
+			cerr << "Splitting face outflag " << outFlag << endl;
+			DisplayVector(edgeOrig); DisplayVector(this->surfs.elems[i+surfSize].edgeind);
+			std::array<int, 2> inds;
+			int k=0;
+			int nVertExtra = this->edges(edgeSize2+i)->vertind.size();
+			for (auto edgei : this->surfs(i+surfSize)->edgeind){
+				int temp = this->edges.find(edgei);
+				for (int j = 0; j < 2; ++j)
+				{
+					for (int l = 0; l < nVertExtra; ++l)
+					{
+						if(this->edges(edgeSize2+i)->vertind[l]
+							==this->edges(temp)->vertind[j]){
+							inds[k++]=l;
+							break;
+						}
+					}
+					if(k==2){break;}
+				}
+				if(k==2){break;}
+			}
+			DisplayVector<int>(this->edges(edgeSize2+i)->vertind);
+			this->edges.elems[edgeSize2+i].vertind = {
+				this->edges(edgeSize2+i)->vertind[inds[0]],
+				this->edges(edgeSize2+i)->vertind[inds[1]]
+			};
+			DisplayVector<int>(this->edges(edgeSize2+i)->vertind);
+			auto temp2 = edges.find_list(this->surfs(i+surfSize)->edgeind);
+			auto temp = ConcatenateVectorField(edges, &edge::vertind, temp2);
+			DisplayVector<int>(temp);
+			surfBound.push_back(this->surfs(tempVec[i])->index);
+		}
+		// Switch the edge connectivity of certain edges in scoped mode
+		this->ArraysAreHashed();
+		this->SwitchIndex(6, this->surfs(tempVec[i])->index,
+			this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
 		// assign new edge.surfind and surf.edgeind connectivity
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
 		this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
@@ -3983,6 +4052,23 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		edgeOut.push_back(false); // New edge is inside
 		this->ArraysAreHashed();
 	}
+	//===============================================
+
+		// if surfBound has grown surfaces require cutting more than once.
+		countPrev = count;
+		count=surfBound.size();
+		if(count!=countPrev){
+			meshAdd.Init(0, count-countPrev,
+				count-countPrev, 0);
+			meshAdd.PopulateIndices();
+			this->SetMaxIndex();
+			meshAdd.SetMaxIndex();
+			this->MakeCompatible_inplace(meshAdd);
+			this->Concatenate(meshAdd);
+			meshAdd.disp();
+			this->HashArray();
+		}
+	} while (count != countPrev);
 	this->verts.HashArray();
 	this->edges.HashArray();
 	this->surfs.HashArray();
@@ -4472,8 +4558,12 @@ namespace meshhelp {
 		if(vertList.size()!=2){
 			DisplayVector(edgeList);
 			DisplayVector(vertList);
-			throw logic_error("vertind should be of size 2,"
-				"due to a surface being cut twice");
+			// throw logic_error
+			cerr << 
+				("vertind should be of size 2,"
+				"due to a surface being cut twice")
+				<< endl
+				;
 		}
 		return(vertList);
 	}
