@@ -558,6 +558,10 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	int p1, int p2);
 void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 		const std::vector<double> &ub);
+int OrderEdgeList(vector<int> &edgeind, const mesh &meshin, bool warn=true,
+	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL,
+	const surf* surfin=NULL);
+
 namespace meshhelp {
 	template<class T, class V, class W>
 	double ProjectRay(int count, const W &&boundBox,
@@ -574,7 +578,9 @@ namespace meshhelp {
 	void SplitBorderVolumeSurfind(const mesh &meshin, 
 		const std::vector<bool> &edgeOut, 
 		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut);
-
+	void HandleMultiSurfaceSplit(mesh &meshin, 
+		vector<int> &edgeindOld, vector<int> &edgeindNew,
+		vector<int> &vertindNew);
 	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, 
 		const std::vector<bool> &vertOut,
 		const std::vector<int> &edgeList, 

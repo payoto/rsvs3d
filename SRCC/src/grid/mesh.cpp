@@ -2051,9 +2051,9 @@ void mesh::PopulateIndices(){
  *             (need errout to be false) for edgeind of size
  *             -<return val>
  */
-int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
-	bool warn=true, bool errout=true, 
-	const vector<int>* edgeIndOrigPtr=NULL, const surf* surfin=NULL){
+int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
+	bool errout, const vector<int>* edgeIndOrigPtr,
+	const surf* surfin){
 
 	unordered_multimap<int,int> vert2Edge;
 	vector<bool> isDone;
@@ -2143,6 +2143,8 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,
 			jj=edge2Vert[((it->second)/2)*2]==vertCurr; 
 			vertCurr=edge2Vert[((it->second)/2)*2+jj];
 			edgeind[ii]=edgeCurr;
+		} else if (endsExpl) {
+			return return_open*ii;
 		} else {
 		 	#ifdef RSVS_DIAGNOSTIC_FIXED
 			cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
@@ -2395,11 +2397,11 @@ int surf::OrderEdges(mesh *meshin)
 	if ((meshin->surfs.capacity()-meshin->surfs.size())==0){
 		// Checks that there is space to add a new face if surface truncation
 		// is in order. If there is no space add space and exit
- 		#ifdef RSVS_DIAGNOSTIC
+ 		#ifdef RSVS_DIAGNOSTIC_FIXED
  		cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
  			<< " reallocation necessary."
  			<< endl; 
-		#endif //RSVS_DIAGNOSTIC
+		#endif //RSVS_DIAGNOSTIC_FIXED
 		this->edgeind = edgeIndOrig;
 		this->isordered = false;
 		meshin->surfs.reserve(meshin->surfs.capacity() 
@@ -3869,6 +3871,10 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	voluBound = ConcatenateVectorField(this->surfs, &surf::voluind, tempVec);
 	sort(voluBound);
 	unique(voluBound);
+	if(voluBound[0]==0){
+		voluBound[0] = voluBound.back();
+		voluBound.pop_back();
+	}
 	// Create all the mesh containers for the new mesh parts
 	meshAdd.Init(edgeBound.size(), edgeBound.size()+surfBound.size(),
 		surfBound.size()+voluBound.size(), voluBound.size());
@@ -3960,100 +3966,51 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	do {
 		count = surfBound.size();
 		tempVec.clear(); tempVec = this->surfs.find_list(surfBound);
-	//===============================================
-	for (int i = countPrev; i < count; ++i)
-	{
-		// Replicate surf (changing index)
-		auto tempInd = this->surfs[i+surfSize].index;
-		this->surfs[i+surfSize] = this->surfs[tempVec[i]];
-		this->surfs[i+surfSize].index = tempInd;
-
-		meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
-			this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
-
-		// Find the vertind connectivity of the new edge.
-		this->edges[edgeSize2+i].vertind = 
-			meshhelp::FindVertInFromEdgeOut(*this, vertOut, 
-			this->surfs(i+surfSize)->edgeind,
-			this->surfs(tempVec[i])->edgeind);
-		
-		if(this->edges[edgeSize2+i].vertind.size()>2){
-			this->ArraysAreHashed();
-			sort(this->surfs.elems[i+surfSize].edgeind); 
-			unique(this->surfs.elems[i+surfSize].edgeind);
-			auto edgeOrig = this->surfs(i+surfSize)->edgeind;
-			int outFlag=OrderEdgeList(this->surfs.elems[i+surfSize].edgeind, *this,
-				false, false, &edgeOrig);
-			// trim edgeind
-			this->surfs[i+surfSize].edgeind.erase(
-				this->surfs(i+surfSize)->edgeind.begin()-outFlag,
-				this->surfs(i+surfSize)->edgeind.end()
-				);
-			for (auto edgeIndAll : edgeOrig){
-				bool flag=true;
-				for (auto edgeindOut : this->surfs[i+surfSize].edgeind){
-					if(edgeIndAll==edgeindOut){
-						flag=false;
-						break;
-					}
-				}
-				if(flag){
-					this->surfs[tempVec[i]].edgeind.push_back(edgeIndAll);
-				}
-			}
-			cerr << "Splitting face outflag " << outFlag << endl;
-			DisplayVector(edgeOrig); DisplayVector(this->surfs.elems[i+surfSize].edgeind);
-			std::array<int, 2> inds;
-			int k=0;
-			int nVertExtra = this->edges(edgeSize2+i)->vertind.size();
-			for (auto edgei : this->surfs(i+surfSize)->edgeind){
-				int temp = this->edges.find(edgei);
-				for (int j = 0; j < 2; ++j)
-				{
-					for (int l = 0; l < nVertExtra; ++l)
-					{
-						if(this->edges(edgeSize2+i)->vertind[l]
-							==this->edges(temp)->vertind[j]){
-							inds[k++]=l;
-							break;
-						}
-					}
-					if(k==2){break;}
-				}
-				if(k==2){break;}
-			}
-			DisplayVector<int>(this->edges(edgeSize2+i)->vertind);
-			this->edges.elems[edgeSize2+i].vertind = {
-				this->edges(edgeSize2+i)->vertind[inds[0]],
-				this->edges(edgeSize2+i)->vertind[inds[1]]
-			};
-			DisplayVector<int>(this->edges(edgeSize2+i)->vertind);
-			auto temp2 = edges.find_list(this->surfs(i+surfSize)->edgeind);
-			auto temp = ConcatenateVectorField(edges, &edge::vertind, temp2);
-			DisplayVector<int>(temp);
-			surfBound.push_back(this->surfs(tempVec[i])->index);
-		}
-		// Switch the edge connectivity of certain edges in scoped mode
-		this->ArraysAreHashed();
-		this->SwitchIndex(6, this->surfs(tempVec[i])->index,
-			this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
-		// assign new edge.surfind and surf.edgeind connectivity
-		this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
-		this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
-		this->surfs[i+surfSize].edgeind.push_back(this->edges[edgeSize2+i].index);
-		this->surfs[tempVec[i]].edgeind.push_back(this->edges[edgeSize2+i].index);
-		// Assign the vertices edgeind connectivity
-		int count2 = this->edges[edgeSize2+i].vertind.size();
-		for (int j = 0; j < count2; ++j)
+		//===============================================
+		for (int i = countPrev; i < count; ++i)
 		{
-			this->verts.elems[this->verts.find(this->edges[edgeSize2+i].vertind[j])]
-				.edgeind.push_back(this->edges[edgeSize2+i].index);
-		}
-		edgeOut.push_back(false); // New edge is inside
-		this->ArraysAreHashed();
-	}
-	//===============================================
+			// Replicate surf (changing index)
+			auto tempInd = this->surfs[i+surfSize].index;
+			this->surfs[i+surfSize] = this->surfs[tempVec[i]];
+			this->surfs[i+surfSize].index = tempInd;
 
+			meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
+				this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
+
+			// Find the vertind connectivity of the new edge.
+			this->edges[edgeSize2+i].vertind = 
+				meshhelp::FindVertInFromEdgeOut(*this, vertOut, 
+				this->surfs(i+surfSize)->edgeind,
+				this->surfs(tempVec[i])->edgeind);
+			
+			if(this->edges[edgeSize2+i].vertind.size()>2){
+				this->ArraysAreHashed();
+				meshhelp::HandleMultiSurfaceSplit(*this, 
+					this->surfs.elems[tempVec[i]].edgeind,
+					this->surfs.elems[surfSize+i].edgeind,
+					this->edges.elems[edgeSize2+i].vertind);
+				surfBound.push_back(this->surfs(tempVec[i])->index);
+			}
+			// Switch the edge connectivity of certain edges in scoped mode
+			this->ArraysAreHashed();
+			this->SwitchIndex(6, this->surfs(tempVec[i])->index,
+				this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
+			// assign new edge.surfind and surf.edgeind connectivity
+			this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
+			this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
+			this->surfs[i+surfSize].edgeind.push_back(this->edges[edgeSize2+i].index);
+			this->surfs[tempVec[i]].edgeind.push_back(this->edges[edgeSize2+i].index);
+			// Assign the vertices edgeind connectivity
+			int count2 = this->edges[edgeSize2+i].vertind.size();
+			for (int j = 0; j < count2; ++j)
+			{
+				this->verts.elems[this->verts.find(this->edges[edgeSize2+i].vertind[j])]
+					.edgeind.push_back(this->edges[edgeSize2+i].index);
+			}
+			edgeOut.push_back(false); // New edge is inside
+			this->ArraysAreHashed();
+		}
+		//===============================================
 		// if surfBound has grown surfaces require cutting more than once.
 		countPrev = count;
 		count=surfBound.size();
@@ -4065,7 +4022,6 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 			meshAdd.SetMaxIndex();
 			this->MakeCompatible_inplace(meshAdd);
 			this->Concatenate(meshAdd);
-			meshAdd.disp();
 			this->HashArray();
 		}
 	} while (count != countPrev);
@@ -4087,7 +4043,7 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 	//  1 - Double the volume
 	//  2 - Add the new surface
 	//  3 - Close the two volumes
-	count = voluBound.size();
+	count = voluBound.size(); DisplayVector<int>(voluBound);
 	tempVec.clear(); tempVec = this->volus.find_list(voluBound);
 	for (int i = 0; i < count; ++i)
 	{
@@ -4464,31 +4420,68 @@ namespace meshhelp {
 		}
 	}
 
-	void SplitBorderSurfaceEdgeind2(const mesh &meshin, const std::vector<bool> &edgeOut, 
-		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut){
-		/*
-		Splits the connectivity of a surface lying on the border into 
-		list of edges which 
-
-		*/
-
-		vecconnOut.clear();
-		int count = vecconnIn.size();
-		auto temp = meshin.edges.find_list(vecconnIn, true);
-		vecconnIn.clear();
-		for (int i = 0; i < count; ++i)
-		{
-			if(temp[i]==-1){
-				std::cerr << "Error in : " << __PRETTY_FUNCTION__ << std::endl;
-				throw invalid_argument("Edge index in connectivity list not found");
+	/**
+	 * @brief      Handles case for AddBoundary where a surface more than one split. 
+	 *
+	 * @param      meshin      The mesh
+	 * @param      edgeindOld  the edgeind internal
+	 * @param      edgeindNew  the edgeind out of the boundary (that will be split)
+	 * @param      vertindNew  the vertex index that must be trimmed to be of size 2
+	 */
+	void HandleMultiSurfaceSplit(mesh &meshin, 
+		vector<int> &edgeindOld, vector<int> &edgeindNew,
+		vector<int> &vertindNew){
+		sort(edgeindNew); 
+		unique(edgeindNew);
+		auto edgeOrig = edgeindNew;
+		int outFlag=OrderEdgeList(edgeindNew, meshin,
+			false, false, &edgeOrig);
+		// trim edgeind
+		if(outFlag!=1){
+			edgeindNew.erase(
+				edgeindNew.begin()-outFlag,
+				edgeindNew.end()
+				);
+		}
+		for (auto edgeIndAll : edgeOrig){
+			bool flag=true;
+			for (auto edgeindOut : edgeindNew){
+				if(edgeIndAll==edgeindOut){
+					flag=false;
+					break;
+				}
 			}
-			if(edgeOut[temp[i]]){
-				vecconnOut.push_back(meshin.edges(temp[i])->index);
-			} else {
-				vecconnIn.push_back(meshin.edges(temp[i])->index);
+			if(flag){
+				edgeindOld.push_back(edgeIndAll);
 			}
 		}
+		if(outFlag>=0){
+			throw logic_error("The result of OrderEdgeList should be "
+				"negative to indicate an open surface");
+		}
+		std::array<int, 2> inds;
+		int k=0;
+		int nVertExtra = vertindNew.size();
+		for (auto edgei : edgeindNew){
+			int temp = meshin.edges.find(edgei);
+			for (int j = 0; j < 2; ++j)
+			{
+				for (int l = 0; l < nVertExtra; ++l)
+				{
+					if(vertindNew[l]
+						==meshin.edges(temp)->vertind[j]){
+						inds[k++]=l;
+						break;
+					}
+				}
+				if(k==2){break;}
+			}
+			if(k==2){break;}
+		}
+		vertindNew = {vertindNew[inds[0]], vertindNew[inds[1]]};
+
 	}
+
 	void SplitBorderVolumeSurfind(const mesh &meshin, const std::vector<bool> &edgeOut, 
 		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut){
 		/*
