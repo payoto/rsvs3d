@@ -1266,7 +1266,7 @@ int Test_snakeRSVS_singlevol(){
 
 	dims.assign(3,0);
 	dims[0]=1;dims[1]=1;dims[2]=1;
-	// try {
+	try {
 		fileToOpen="../TESTOUT/TestSnakeRSVS.plt";
 		outSnake.OpenFile(fileToOpen);
 		fileToOpen="../TESTOUT/TestSnakeRSVS_snake.plt";
@@ -1315,10 +1315,10 @@ int Test_snakeRSVS_singlevol(){
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
 
-	// } catch (exception const& ex) { 
-	// 	cerr << "Exception: " << ex.what() <<endl; 
-	// 	return -1;
-	// } 
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
 	return(errTest);
 }
 

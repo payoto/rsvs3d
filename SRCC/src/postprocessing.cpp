@@ -311,7 +311,8 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 		return(1);
 	}
 	if(nZones==0){
-		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" "
+			",\"v2\", \"v3\"\n" );
 	}
 
 	this->NewZone();
@@ -337,7 +338,8 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 
 
 	if (forceOutType==1){
-		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
+		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat);
 		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
 		this->VolFaceMap(meshout,nSurf);
 	}
@@ -371,6 +373,11 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
+	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert==0){ // Don't print mesh
+		return(1);
+	}
+	
 	if(nZones==0){
 		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n" );
 	}
@@ -380,7 +387,6 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 	if(strandID>0){
 		this->StrandTime(strandID, timeStep);
 	}
-	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
 	nCellDat=3;
@@ -399,7 +405,8 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 
 
 	if (forceOutType==1){
-		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
+		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
