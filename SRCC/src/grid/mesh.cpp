@@ -978,7 +978,6 @@ void mesh::TightenConnectivity(){
 	surfs.TightenConnectivity();
 	edges.TightenConnectivity();
 	volus.TightenConnectivity();
-
 }
 
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &scopeInd)
@@ -1247,7 +1246,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 		throw invalid_argument (" Type is out of range");
 	}
-
 }
 
 void mesh::RemoveIndex(int typeInd, int oldInd)
@@ -1379,7 +1377,6 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
    	cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
    	throw invalid_argument (" : Type is out of range");
    }
-
 }
 
 int mesh::TestConnectivity(const char *strRoot) const{
@@ -1529,7 +1526,6 @@ int mesh::TestConnectivity(const char *strRoot) const{
 	}
 	return(errTot);
 }
-
 
 int mesh::TestConnectivityBiDir(const char *strRoot,
 	bool emptyIsErr) const{
@@ -1932,8 +1928,6 @@ bool mesh::isready() const {
 	return(readyforuse);
 }
 
-
-
 void mesh::displight() const {
 	cout << "mesh: vert " << verts.size();
 	cout << "; edges " << edges.size();
@@ -1972,7 +1966,6 @@ void mesh::reserve(int nVe,int nE, int nS, int nVo)
 	edges.isInMesh=true;
 	surfs.isInMesh=true;
 	volus.isInMesh=true;
-
 }
 
 void mesh::MakeCompatible_inplace(mesh &other) const{

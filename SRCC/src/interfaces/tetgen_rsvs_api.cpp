@@ -1148,14 +1148,16 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 		//  surface to volumes
 		meshout.surfs[i].voluind[0]=tetout.vfacetlist[i].c1+INCR;
 		meshout.surfs[i].voluind[1]=tetout.vfacetlist[i].c2+INCR;
+		#ifdef SAFE_ALGO
+		if(tetout.vfacetlist[i].c1==tetout.vfacetlist[i].c2){
+			throw logic_error("Tetgen outputs returns a face connected to "
+				"the same two cells");
+		}
+		#endif //SAFE_ALGO
 		n=2;
 		for (int j = 0; j < n; ++j)	{ // loop through corresponding connections
 			meshout.volus[meshout.surfs[i].voluind[j]-1].surfind.push_back(i+1);
 		}
-	}
-
-	if(nRays!=int(rayInd.size())){
-		// throw logic_error("Ray numbers are not consistant");
 	}
 	
 	// Close the mesh
@@ -1179,10 +1181,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	unique(out);
 	meshout.RemoveSingularConnectors(out);
 	meshout.HashArray();
-	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
-
 	meshout.PrepareForUse();
-	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
@@ -1192,6 +1191,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
+	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 	// meshout.displight();
 
 	return meshout;

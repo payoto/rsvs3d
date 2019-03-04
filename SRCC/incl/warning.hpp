@@ -33,19 +33,10 @@
 //       ie replaced by their code at compile time
 
 using namespace std;
-
-// class userwarning {
-// private:
-// 	const char* message;
-
-// public:
-// 	void SetMessage(const char* message)=0;
-// 	void ThrowME(){
-// 		cerr << message <<endl;
-// 	};
-// };
-
-
+namespace rsvs3d {
+	template <class E=std::exception>
+	void rsvs3d_error(const char* message="", const char* caller="");
+}
 void ThrowWarning(const char * message);
 template<class T>
 void CheckFStream(const T &file, const char* callerID, 
@@ -58,5 +49,14 @@ void CheckFStream(const T &file, const char* callerID,
 		errstr += " \n:  " + fileName;
 		throw std::invalid_argument(errstr.c_str());
 	}
+}
+
+namespace rsvs3d {
+	template <class E=std::exception>
+	void error(const char* message="", const char* caller=""){
+		cerr << endl << "Error in :" << endl << caller << endl;
+		throw E(message);
+	}
+	//(?s)throw\s+([a-zA-Z:_]*)\s*\(([^;]*)\);
 }
 #endif // WARNING_H_INCLUDED
