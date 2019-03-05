@@ -1357,6 +1357,9 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 				if(surfs(subList[ii])->voluind[jj]==oldInd){
 					surfs[subList[ii]].voluind.erase(
 						surfs[subList[ii]].voluind.begin()+jj);
+					if(surfs[subList[ii]].voluind.size()<2){
+						surfs[subList[ii]].voluind.push_back(0);
+					}
 					jj--;
 				}
 			}  

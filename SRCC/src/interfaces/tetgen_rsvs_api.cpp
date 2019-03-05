@@ -14,6 +14,7 @@
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp"
+#include "warning.hpp"
 
 void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
 	/*
@@ -1185,14 +1186,24 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
-	// meshout.displight();
+
+	#ifdef SAFE_ALGO
+	if(meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__)){
+		RSVS3D_ERROR_LOGIC("Errors in connectivity detected.");
+	}
+	#endif
+
 	FlattenBoundaryFaces(meshout);
 	meshout.PrepareForUse();
 	meshout.TightenConnectivity();
 	meshout.OrderEdges();
 	meshout.SetBorders();
-	meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
-	// meshout.displight();
+	
+	#ifdef SAFE_ALGO
+	if(meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__)){
+		RSVS3D_ERROR_LOGIC("Errors in connectivity detected.");
+	}
+	#endif
 
 	return meshout;
 }
