@@ -35,7 +35,8 @@
 using namespace std;
 namespace rsvs3d {
 	template <class E=std::exception>
-	void rsvs3d_error(const char* message="", const char* caller="");
+	void error(const char* message="", const char* caller="",
+		const char *file="", int line=0, bool throwError=true);
 }
 void ThrowWarning(const char * message);
 template<class T>
@@ -52,11 +53,49 @@ void CheckFStream(const T &file, const char* callerID,
 }
 
 namespace rsvs3d {
-	template <class E=std::exception>
-	void error(const char* message="", const char* caller=""){
-		cerr << endl << "Error in :" << endl << caller << endl;
-		throw E(message);
+
+	/**
+	 * Custom error function. 
+	 * 
+	 * Displays the name of the caller
+	 * function and throw an exception type object with the message
+	 * specified. can be turned off by setting the last parameter to
+	 * false.
+	 *
+	 * @param[in]  message     Error message
+	 * @param[in]  caller      Caller function
+	 * @param[in]  file        The file
+	 * @param[in]  line        The line
+	 * @param[in]  throwError  should the error be thrown (True) or a warning
+	 *                         (False)?
+	 *
+	 * @tparam     E           Exception type to throw
+	 *
+	 * Convenience macros are also provided to use this function
+	 * without typing all the file, line and caller function macro
+	 * names:
+	 *  - RSVS3D_ERROR(M) : throws the default exception type (std::exception);
+	 *  - RSVS3D_ERROR_LOGIC(M) : throws std::logic_error;
+	 *  - RSVS3D_ERROR_ARGUMENT(M) : throws std::invalid_argument;
+	 *  - RSVS3D_ERROR_TYPE(M, T) : throws T(M);
+	 */
+	template <class E>
+	void error(const char* message, const char* caller,
+		const char *file, int line, bool throwError){
+		cerr << endl << "Error at: " << file << ":" << line 
+			<< endl << "    " <<  caller << endl;
+		if (throwError){
+			throw E(message);
+		} else {
+			cerr << "Exception (not thrown)" << message << endl;
+		}
 	}
+
+	#define RSVS3D_ERROR(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+	
+	#define RSVS3D_ERROR_TYPE(M, T) (rsvs3d::error<T>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+	#define RSVS3D_ERROR_LOGIC(M) (rsvs3d::error<std::logic_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+	#define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 	//(?s)throw\s+([a-zA-Z:_]*)\s*\(([^;]*)\);
 }
 #endif // WARNING_H_INCLUDED
