@@ -17,7 +17,7 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *n
 	*nEdge=grid.edges.size();
 	*totNumFaceNode=0;
 	for (ii=0;ii<*nSurf;++ii){
-		*totNumFaceNode=*totNumFaceNode+grid.surfs(ii)->edgeind.size();
+		*totNumFaceNode=*totNumFaceNode+int(grid.surfs(ii)->edgeind.size());
 	}
 }
 
@@ -359,7 +359,7 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 				nVert += int(vertList[ii]); 
 			}
 		} else if (vertList.size()>0){
-			nVert=vertList.size();
+			nVert=int(vertList.size());
 		}
 		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
 		this->VertDataBlock(meshout,nVert, nVertDat,nCellDat,vertList);
@@ -426,7 +426,7 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 				nVert += int(vertList[ii]); 
 			}
 		} else if (vertList.size()>0){
-			nVert=vertList.size();
+			nVert=int(vertList.size());
 		}
 		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
@@ -678,7 +678,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 
 	int ii,jj,kk;
 	int nTri,currInd,currType,nCoord;
-	nTri=triList.size();
+	nTri=int(triList.size());
 	nCoord=int(triout.meshDep->verts(0)->coord.size());
 	// Print vertex Data
 	for (jj=0;jj<nCoord;++jj){
@@ -774,7 +774,7 @@ int tecplotfile::LineFaceMap(const vector<int> &triList){
 	int ii,jj,kk;
 
 	int nTri;
-	nTri=triList.size();
+	nTri=int(triList.size());
 	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face

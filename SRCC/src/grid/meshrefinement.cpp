@@ -9,8 +9,8 @@ using namespace std;
 
 void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmMapping){
 
-	int ii,n,nDim;
-	bool flag;
+	int ii,n=0,nDim;
+	bool flag=true;
 	HashedVector<int,int> hashedMapping;
 	vector<int> indRmvVert,indRmvEdge,indRmvSurf,indRmvVolu;
 
