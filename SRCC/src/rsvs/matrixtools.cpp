@@ -3,6 +3,7 @@
 #include <fstream>
 #include <Eigen>
 #include "vectorarray.hpp"
+#include "warning.hpp"
 // #include "matrixtools.hpp"
 
 using namespace std;
@@ -52,7 +53,7 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	#ifdef SAFE_ALGO
 	// size checks
 	if ((nVec*nColFin)!=nCol){
-		throw invalid_argument("Sizes do not match in 3D array collapse");
+		RSVS3D_ERROR_ARGUMENT("Sizes do not match in 3D array collapse");
 	}
 	#endif
 

@@ -3,6 +3,7 @@
 
 #include "mesh.hpp"
 #include "meshrefinement.hpp"
+#include "warning.hpp"
 
 using namespace std; 
 
@@ -19,10 +20,10 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 
 	switch (newparent.WhatDim()){
 		case 0: // verts
-		throw invalid_argument ("unhandled dimension");
+		RSVS3D_ERROR_ARGUMENT("unhandled dimension");
 		break;
 		case 1: // edges
-		throw invalid_argument ("unhandled dimension");
+		RSVS3D_ERROR_ARGUMENT("unhandled dimension");
 		break;
 		case 2: // surfs
 		n=int(newparent.surfs.size());
@@ -45,12 +46,12 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 		}
 		break;
 		default:
-		throw invalid_argument("Dimensionality too high.");
+		RSVS3D_ERROR_ARGUMENT("Dimensionality too high.");
 		break;
 	}
 
 	if(flag){
-		throw invalid_argument ("Element mapping and mesh did not match");
+		RSVS3D_ERROR_ARGUMENT("Element mapping and mesh did not match");
 	}
 
 	// Switch element indices according to elmMapping
@@ -208,7 +209,7 @@ void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &
 			sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
 				+(dims[0])*(dims[1])*int(cellCoord[2]);
 			if (sub>=nBox){
-				throw invalid_argument("sub was larger than available size");
+				RSVS3D_ERROR_ARGUMENT("sub was larger than available size");
 			}
 			if(boxMap[sub]==0){
 			// if the box as never been explored put the index in it
@@ -248,7 +249,7 @@ void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &
 			sub=int(cellCoord[0])+(dims[0])*int(cellCoord[1])
 				+(dims[0])*(dims[1])*int(cellCoord[2]);
 			if (sub>=nBox){
-				throw invalid_argument("sub was larger than available size");
+				RSVS3D_ERROR_ARGUMENT("sub was larger than available size");
 			}
 			if(boxMap[sub]==0){
 			// if the box as never been explored put the index in it

@@ -12,6 +12,7 @@
 #include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
 #include "RSVSintegration.hpp"
+#include "warning.hpp"
 
 using namespace std;
 
@@ -136,7 +137,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 			elmMapping.push_back(1);
 		}
 	} else { 
-		throw invalid_argument("Incorrect dimension");
+		RSVS3D_ERROR_ARGUMENT("Incorrect dimension");
 	}
 	CartesianMapping(snakeMesh,  elmMapping, dims);
 	CoarsenMesh(snakeMesh,voluMesh,elmMapping);

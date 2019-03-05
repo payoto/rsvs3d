@@ -74,7 +74,7 @@ mesh BuildDomain(const std::array<double,3> &lowerB,
 	if(lowerB.size()!=3 || upperB.size()!=3){
 		std::cerr << "Error in " << __PRETTY_FUNCTION__ << " vectors must be"
 			" of size 3" << std::endl;
-		throw invalid_argument("Input vectors must be of size 3");
+		RSVS3D_ERROR_ARGUMENT("Input vectors must be of size 3");
 	}
 
 	std::array<int, 3> dimGrid={1, 1, 1};
@@ -742,7 +742,7 @@ void TetgenOutput_SU2(const char* fileName, const tetgenio &tetout){
 	if(meshFile.fail()){
 		std::cerr << "Error: " << fileName << std::endl <<
 			 " in " << __PRETTY_FUNCTION__ << std::endl; 
-		throw invalid_argument("Output mesh file could not be opened");
+		RSVS3D_ERROR_ARGUMENT("Output mesh file could not be opened");
 	}
 	// Set appropriate precision for mesh point position
 	meshFile.precision(16);
@@ -907,7 +907,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 				pair.push_back(a);
 			}
 		}
-		if (pair.size()!=2){throw logic_error("Voronoi open face should have 2 rays");}
+		if (pair.size()!=2){RSVS3D_ERROR_LOGIC("Voronoi open face should have 2 rays");}
 		// Connect the 2 rays and their edges
 		edgeNew.index = nEdges+1;
 		for (int j = 0; j < 2; ++j){
@@ -946,7 +946,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 			}
 		}
 		if(pair.size()<3){
-			throw logic_error("At least 3 edges are required to close the face");
+			RSVS3D_ERROR_LOGIC("At least 3 edges are required to close the face");
 		}
 		// identify the edge in each face which is new and assign correxponding
 		// connectivities to surfNew;
@@ -965,7 +965,7 @@ void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 			}
 			// if(j>=n)
 			if(k==0){
-				throw logic_error("None of the edges of the open face"
+				RSVS3D_ERROR_LOGIC("None of the edges of the open face"
 				" were recognised as new. This should not happen.");
 			}
 			if (k>1){
@@ -1091,7 +1091,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 	// if `tetrahedralize` has not been run with the correct flags connectivity is
 	// unavailable, throw an error. (tests for flag -v)
 	if(tetout.vpointlist == NULL){
-		throw invalid_argument("TET2MESH requires flag -v be passed to tetgen");
+		RSVS3D_ERROR_ARGUMENT("TET2MESH requires flag -v be passed to tetgen");
 	}
 
 	meshout.Init(nVerts, nEdges, nSurfs, nVolus);
@@ -1151,7 +1151,7 @@ mesh TetgenOutput_VORO2MESH(tetgen::io_safe &tetout){
 		meshout.surfs[i].voluind[1]=tetout.vfacetlist[i].c2+INCR;
 		#ifdef SAFE_ALGO
 		if(tetout.vfacetlist[i].c1==tetout.vfacetlist[i].c2){
-			throw logic_error("Tetgen outputs returns a face connected to "
+			RSVS3D_ERROR_LOGIC("Tetgen outputs returns a face connected to "
 				"the same two cells");
 		}
 		#endif //SAFE_ALGO
@@ -1230,7 +1230,7 @@ mesh TetgenOutput_TET2MESH(tetgen::io_safe &tetout){
 	// if `tetrahedralize` has not been run with the correct flags connectivity is
 	// unavailable, throw an error. (tests for flag -nn)
 	if(tetout.tet2facelist == NULL){
-		throw invalid_argument("TET2MESH requires flag -nn be passed to tetgen");
+		RSVS3D_ERROR_ARGUMENT("TET2MESH requires flag -nn be passed to tetgen");
 	}
 
 	meshout.Init(nVerts, nEdges, nSurfs, nVolus);
@@ -1312,7 +1312,7 @@ namespace voronoimesh {
 		int nProp = 3+1; // Number of properties per point
 		if((vecPts.size()%nProp)!=0){
 			std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
-			throw invalid_argument("Vector of points is an invalid size");
+			RSVS3D_ERROR_ARGUMENT("Vector of points is an invalid size");
 		}
 		int nPts = vecPts.size()/nProp;
 		meshpts.Init(nPts, 0, 0, 0);
@@ -1481,7 +1481,7 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 		std::cerr << "Error : nBlocks (" << nBlocks 
 			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
 			<< std::endl;
-		throw logic_error("Voromesh and flooding do not match");
+		RSVS3D_ERROR_LOGIC("Voromesh and flooding do not match");
 	}
 	#endif //SAFE_ALGO
 
@@ -1643,9 +1643,9 @@ void tetgen::io_safe::SpecifyTetPointMetric(int startPnt, int numPnt,
 
 
 	if((startPnt+numPnt)>this->numberofpoints){
-		throw invalid_argument ("Metrics out of range in tetgen_io (too high)");
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too high)");
 	} else if (startPnt<0){
-		throw invalid_argument ("Metrics out of range in tetgen_io (too low)");
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too low)");
 	}
 
 	for (int i = startPnt; i < startPnt+numPnt; ++i)	{
@@ -1664,9 +1664,9 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 	*/
 
 	if((startPnt+numPnt)>this->numberoffacets){
-		throw invalid_argument ("Metrics out of range in tetgen_io (too high)");
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too high)");
 	} else if (startPnt<0){
-		throw invalid_argument ("Metrics out of range in tetgen_io (too low)");
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too low)");
 	}
 
 	for (int i = startPnt; i < startPnt+numPnt; ++i)	{
@@ -1820,7 +1820,7 @@ int tetcall_RSVSVORO()
 	vector<int> numCells = {
 		0,
 		1,
-		// 2,3,4,5,10,20,100,1000
+		2,3,4,5,10,20,100,1000
 	};
 	// std :: cin >> nPts;
 	tecout.OpenFile(tecoutStr);

@@ -8,6 +8,8 @@ compiled on its own.
 #define ARRAYSTRUCTS_INCL_H_INCLUDED
 
 #include "arraystructures.hpp"
+#include "warning.hpp"
+
 template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat)
 {
 	vecRoot.insert(vecRoot.end(),vecConcat.begin(),vecConcat.end());
@@ -163,7 +165,7 @@ template <typename T> inline void set_intersection(vector<T> &targVec,const vect
 	typename std::vector<T>::iterator it;
 	targVec.assign(vec1.size(),tempType);
 	if(!isSort){
-		throw invalid_argument("Constant vectors are unsorted cannot intersect");
+		RSVS3D_ERROR_ARGUMENT("Constant vectors are unsorted cannot intersect");
 	}
 	it =set_intersection(vec1.begin(),vec1.end(),vec2.begin(),vec2.end(),targVec.begin());
 
@@ -372,7 +374,7 @@ template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const
 	key2=elems[search->second].index;
 	if (key2!=key){
 		cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
-		throw  invalid_argument ("FIND returned an invalid output ");
+		RSVS3D_ERROR_ARGUMENT("FIND returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);
@@ -717,7 +719,7 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<
       #ifdef SAFE_ACCESS
 		if(returnSub[ii]>=0){
 			if (keyList[returnSub[ii]]!=keyFind[ii]){
-				throw  invalid_argument ("FIND returned an invalid output ");
+				RSVS3D_ERROR_ARGUMENT("FIND returned an invalid output ");
 			}
 		}
       #endif //SAFE_ACCESS
@@ -734,7 +736,7 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<
 	returnSub.reserve(int(keyFind.size()));
 
 	if (hashTable.empty() && keyList.size()>0 && keyFind.size()>0){
-		throw invalid_argument("Hash table needs to be full to find list");
+		RSVS3D_ERROR_ARGUMENT("Hash table needs to be full to find list");
 	}
 
 	for (ii=0;ii<int(keyFind.size());++ii){
@@ -742,7 +744,7 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<
       #ifdef SAFE_ACCESS
 		if(returnSub[ii]>=0){
 			if (keyList[returnSub[ii]]!=keyFind[ii]){
-				throw  invalid_argument ("FIND returned an invalid output ");
+				RSVS3D_ERROR_ARGUMENT("FIND returned an invalid output ");
 			}
 		}
       #endif //SAFE_ACCESS
@@ -769,7 +771,7 @@ template<class T, class Q> void HashVector(const vector<T> &elems, unordered_mul
 			hashTable.emplace(elems[i],targElems[i]);
 		}
 	} else {
-		throw invalid_argument("HashVector failed as input vectors are of different sizes");
+		RSVS3D_ERROR_ARGUMENT("HashVector failed as input vectors are of different sizes");
 	}
 
 }
@@ -790,7 +792,7 @@ template<template<class Q, class R> class T,class Q, class R>
 		cerr << "Error: Key value pair not found and could not be removed "<< endl;
 		cerr << " key " << key << " pos " << pos << endl;
 		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument ("Key value pair not found and could not be removed");
+		RSVS3D_ERROR_ARGUMENT("Key value pair not found and could not be removed");
 	}
 }
 

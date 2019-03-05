@@ -46,6 +46,9 @@
 	#include <boost/stacktrace.hpp>
 #endif
 
+
+#include "warning.hpp"
+
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
@@ -137,7 +140,7 @@ public:
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" Index is out of range");
+			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 	}
@@ -154,7 +157,7 @@ public:
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" Index is out of range");
+			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));
@@ -173,7 +176,7 @@ public:
 				<< " at position " << a <<
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error (" Index is out of range");
+			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(elems[a]));
@@ -190,7 +193,7 @@ public:
 			cerr << "Attempt to access position " << a << 
 				" in array of size " << elems.size() << endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
-			throw range_error ("Index is out of range");
+			RSVS3D_ERROR_RANGE("Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		isHash=0;
@@ -319,7 +322,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		isHash=0;
@@ -330,7 +333,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(vec[a]);
@@ -342,7 +345,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(&(vec[a]));

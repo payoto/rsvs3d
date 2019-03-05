@@ -9,6 +9,7 @@
 #include "vectorarray.hpp"
 #include "RSVScalc.hpp"
 #include "matrixtools.hpp"
+#include "warning.hpp"
 
 using namespace std; 
 using namespace Eigen; 
@@ -642,7 +643,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 		// 	// cout << endl;
 		// 	// DisplayVector(*veccoord[2]);
 		// 	// cout << endl;
-		// 	// throw invalid_argument("");
+		// 	// RSVS3D_ERROR_ARGUMENT("");
 		// }
 		// Assign Constraint
 		// and constraint derivative
@@ -822,7 +823,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 
 
 	if(false){
-		throw invalid_argument("2D Area constraint not implemented yet");
+		RSVS3D_ERROR_ARGUMENT("2D Area constraint not implemented yet");
 		HVal.setZero(9,9);
 		dVal.setZero(1,9);
 		dConstrPart.setZero(1,nDvAct);

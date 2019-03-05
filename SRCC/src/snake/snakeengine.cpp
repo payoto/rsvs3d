@@ -7,6 +7,7 @@
 #include "snake.hpp"
 #include "snakeengine.hpp"
 #include "mesh.hpp"
+#include "warning.hpp"
 
 using namespace std;
 
@@ -316,7 +317,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	} else {
 		cerr << "Error: Direction of arrived snaxel is invalid "<< endl;
 		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument("direction was invalid");
+		RSVS3D_ERROR_ARGUMENT("direction was invalid");
 	}
 	isReady=fullsnake.snaxs.checkready();
 
@@ -1059,7 +1060,7 @@ void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone
 			cerr << "Error: Algorithm not conceived for this case "<< endl;
 			cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
 			cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-			//throw invalid_argument ("Unexpected algorithmic behaviour");
+			//RSVS3D_ERROR_ARGUMENT("Unexpected algorithmic behaviour");
 		}
 		#endif // SAFE_ALGO
 		flag3=tempCount[jjNext]==3;
@@ -1083,7 +1084,7 @@ void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone
 			cerr << "Error: Algorithm not conceived for this case "<< endl;
 			cerr << " jj>3 Unsafe read has happened "<< endl;
 			cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-			throw invalid_argument ("Unexpected algorithmic behaviour");
+			RSVS3D_ERROR_ARGUMENT("Unexpected algorithmic behaviour");
 		}
 		#endif // SAFE_ALGO
 
@@ -1474,7 +1475,7 @@ void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,v
 				cerr << "Error: Unexpected  behaviour "<< endl;
 				cerr << " jjStart not found but vertex does not have 2 connections "<< endl;
 				cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-				throw invalid_argument ("Unexpected algorithmic behaviour"); 
+				RSVS3D_ERROR_ARGUMENT("Unexpected algorithmic behaviour"); 
 			}
 			#endif //SAFE_ALGO
 		}
@@ -1505,7 +1506,7 @@ void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,v
 					cerr << "Error: Algorithm not conceived for this case "<< endl;
 					cerr << " snake has more than 2 edges connected to the same snaxel inside the same surface "<< endl;
 					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-					throw invalid_argument ("Unexpected algorithmic behaviour");
+					RSVS3D_ERROR_ARGUMENT("Unexpected algorithmic behaviour");
 				}
 				#endif // SAFE_ALGO
 
@@ -1520,7 +1521,7 @@ void IdentifyMergeEdgeGeneralOLD(const snake &snakein, vector<bool> &isObjDone,v
 					cerr << "Error: Algorithm not conceived for this case "<< endl;
 					cerr << " jj>3 Unsafe read has happened "<< endl;
 					cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-					throw invalid_argument ("Unexpected algorithmic behaviour");
+					RSVS3D_ERROR_ARGUMENT("Unexpected algorithmic behaviour");
 				}
 				#endif // SAFE_ALGO
 

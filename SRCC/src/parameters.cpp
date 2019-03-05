@@ -370,7 +370,7 @@ void param::io::write(const std::string &fileName, const parameters &p){
 	// 	errstr += "in " ;
 	// 	errstr +=__PRETTY_FUNCTION__  ;
 	// 	errstr += " \n:  " + fileName;
-	// 	throw std::invalid_argument(errstr.c_str());
+	// 	RSVS3D_ERROR_ARGUMENT(errstr.c_str());
 	// }
 	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 	j = p; 

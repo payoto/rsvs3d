@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "snake.hpp"
+#include "warning.hpp"
 
 using namespace std;
 
@@ -515,7 +516,7 @@ void snake::Concatenate(const snake &other, int isInternal){
 		// 	} //xor
 		// }
 	} else {
-		throw invalid_argument("Concatenation of snakes with different base meshes not supported");
+		RSVS3D_ERROR_ARGUMENT("Concatenation of snakes with different base meshes not supported");
 	}
 
 }
@@ -943,7 +944,7 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 			} else {
 				cerr << "Error: hashParent was not up to date" << endl;
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-				throw range_error ("Incorrect hash table provided");
+				RSVS3D_ERROR_RANGE("Incorrect hash table provided");
 			}
 		}
 	}
@@ -1021,7 +1022,7 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 			} else {
 				cerr << "Error: hashParent was not up to date" << endl;
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-				throw range_error ("Incorrect hash table provided");
+				RSVS3D_ERROR_RANGE("Incorrect hash table provided");
 			}
 		}
 	}
@@ -1265,7 +1266,7 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 			if (snaxStatus[ii]){
 				cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-				throw range_error (" : Starting point for block not found");
+				RSVS3D_ERROR_RANGE(" : Starting point for block not found");
 			}
 			currQueue.push_back(snakemesh->verts.find(snaxs(ii)->fromvert));
 			nBlocks++;
@@ -1298,7 +1299,7 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 								currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
 							cerr << "Edge connected to non existant vertex" <<endl;
 							cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-							throw range_error (" : Vertex not found");
+							RSVS3D_ERROR_RANGE(" : Vertex not found");
 						}
 						#endif
 					} else {

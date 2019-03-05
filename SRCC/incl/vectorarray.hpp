@@ -26,6 +26,7 @@
 #include <iostream>
 #include <vector>
 
+#include "warning.hpp"
 
 //==================================
 // Code
@@ -53,7 +54,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if (((a)>=int(elems.size())) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(elems[a]);
@@ -64,7 +65,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if (((a)>=int(elems.size())) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(elems[a]);
@@ -85,7 +86,7 @@ public:
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if (((a)>=int(size())) | (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			throw range_error (" : Index is out of range");
+			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return((*this)[a]);

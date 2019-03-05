@@ -52,7 +52,7 @@ template<class T> void SnakStruct<T>::DeHashParent(const int pos){
 		cerr << "Error: Key value pair not found and could not be removed "<< endl;
 		cerr << " key " << key << " pos " << pos << endl;
 		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument ("Key value pair not found and could not be removed");
+		RSVS3D_ERROR_ARGUMENT("Key value pair not found and could not be removed");
 	}
 }
 template<class T> bool SnakStruct<T>::memberIsHashParent(const int pos) const{
@@ -136,7 +136,7 @@ int SnakStruct<T>::findparent(int key) const
 	int key2;
 	key2=elems[search->second].KeyParent();
 	if (key2!=key){
-		throw  invalid_argument ("FINDPARENT returned an invalid output ");
+		RSVS3D_ERROR_ARGUMENT("FINDPARENT returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);

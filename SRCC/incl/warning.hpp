@@ -38,6 +38,13 @@ namespace rsvs3d {
 	void error(const char* message="", const char* caller="",
 		const char *file="", int line=0, bool throwError=true);
 }
+#define RSVS3D_ERROR(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
+#define RSVS3D_ERROR_TYPE(M, T) (rsvs3d::error<T>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+#define RSVS3D_ERROR_LOGIC(M) (rsvs3d::error<std::logic_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+#define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+#define RSVS3D_ERROR_RANGE(M) (rsvs3d::error<std::range_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
 void ThrowWarning(const char * message);
 template<class T>
 void CheckFStream(const T &file, const char* callerID, 
@@ -48,7 +55,7 @@ void CheckFStream(const T &file, const char* callerID,
 		errstr += "in " ;
 		errstr += callerID;
 		errstr += " \n:  " + fileName;
-		throw std::invalid_argument(errstr.c_str());
+		RSVS3D_ERROR_ARGUMENT(errstr.c_str());
 	}
 }
 
@@ -91,11 +98,7 @@ namespace rsvs3d {
 		}
 	}
 
-	#define RSVS3D_ERROR(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
-	
-	#define RSVS3D_ERROR_TYPE(M, T) (rsvs3d::error<T>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
-	#define RSVS3D_ERROR_LOGIC(M) (rsvs3d::error<std::logic_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
-	#define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
 	//(?s)throw\s+([a-zA-Z:_]*)\s*\(([^;]*)\);
 }
 #endif // WARNING_H_INCLUDED

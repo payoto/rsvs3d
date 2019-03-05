@@ -2,12 +2,14 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp" 
 #include "snakevel.hpp"
 #include "RSVSmath.hpp"
 #include "RSVScalc.hpp"
+#include "warning.hpp"
 
 using namespace std;
 
@@ -155,7 +157,7 @@ void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS ,
 	} else if (typeMesh==3) {
 		mp=&triangulation::intertri; 
 	} else {
-		throw invalid_argument("Invalid type of mesh, typeMesh [1,2,3]");
+		RSVS3D_ERROR_ARGUMENT("Invalid type of mesh, typeMesh [1,2,3]");
 	}
 
 	maxIndVert=triangleRSVS.trivert.GetMaxIndex();
@@ -232,7 +234,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	}
 
 	if (n<3){
-		throw invalid_argument("cannot build triangle less than 3 points");
+		RSVS3D_ERROR_ARGUMENT("cannot build triangle less than 3 points");
 	} else if (n>3){
 		for(ii=0; ii<n; ++ii){
 			//meshin.edges.isearch(surfin.edgeind[ii])->
@@ -293,7 +295,7 @@ void TriangulateTriSurface(const trianglesurf &surfin,
 	triangleEdge.connec.constrinfluence={-1.0, 1.0};
 	kk=0;
 	if (n<3){
-		throw invalid_argument("cannot build triangle less than 3 points");
+		RSVS3D_ERROR_ARGUMENT("cannot build triangle less than 3 points");
 	} else if (n>3){
 		for(ii=0; ii<n; ++ii){
 
@@ -674,7 +676,7 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 		cerr << "Error : Cannot build grid/snake intersection a suitable edge in the surface" << endl;
 		cerr << "        was not found." << endl; 
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument ("edge not found in surface");
+		RSVS3D_ERROR_ARGUMENT("edge not found in surface");
 	}
 	
 	snaxedgeSub=snakeRSVS.snaxedges.find(followSnaxEdge);
@@ -767,7 +769,7 @@ int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int
 	tempVert=vertSurfInd.findall(actVert);
 
 	if(tempVert.size()!=2){
-		throw invalid_argument("Edge and Vertex list out of surface are broken");
+		RSVS3D_ERROR_ARGUMENT("Edge and Vertex list out of surface are broken");
 	}
 
 	jj=1;	
@@ -1058,7 +1060,7 @@ void triangulation::SetActiveStaticTri()
 					}
 				}
 				if(jj==nj){
-					throw invalid_argument("Static triangulation failed to return a mesh vertex");
+					RSVS3D_ERROR_ARGUMENT("Static triangulation failed to return a mesh vertex");
 				}
 				if(snakeDep->isMeshVertIn[meshDep->verts.find(stattri(ii)->pointind[jj])]){
 					nj=subList.size();

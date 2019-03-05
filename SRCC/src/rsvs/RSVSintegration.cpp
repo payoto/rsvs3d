@@ -4,9 +4,9 @@
 #include <ctime>
 #include <vector>
 #include <string>
-
-
 #include<tuple>
+
+
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
 #include "snake.hpp"
@@ -17,6 +17,7 @@
 #include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
 #include "postprocessing.hpp"
+#include "warning.hpp"
 
 #include "filesystem.hpp"
 
@@ -326,7 +327,7 @@ void integrate::prepare::Mesh(
 			elmMapping.push_back(1);
 		}
 	} else { 
-		throw invalid_argument("Incorrect dimension");
+		RSVS3D_ERROR_ARGUMENT("Incorrect dimension");
 	}
 	CartesianMapping(snakeMesh,  elmMapping, backgroundGrid);
 	CoarsenMesh(snakeMesh,voluMesh,elmMapping);

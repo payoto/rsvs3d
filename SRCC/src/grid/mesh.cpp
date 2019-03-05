@@ -23,7 +23,7 @@ double& coordvec::operator[](int a)
 	// returns a reference to the value and can be used to set a value
 	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
+		RSVS3D_ERROR_RANGE("Index is out of range");
 	}
 	#endif //SAFE_ACCESS
 	isuptodate=0;
@@ -34,7 +34,7 @@ double coordvec::operator()(int a) const
 	// returns the value (cannot be used to set data)
 	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
+		RSVS3D_ERROR_RANGE("Index is out of range");
 	}
 	#endif // SAFE_ACCESS
 	return(elems[a]);
@@ -55,7 +55,7 @@ double coordvec::Unit(const int a) const
 {
 	#ifdef SAFE_ACCESS // adds a check in debug mode
 	if ((unsigned_int(a)>=3) | (0>a)){
-		throw range_error ("Index is out of range");
+		RSVS3D_ERROR_RANGE("Index is out of range");
 	}
 	#endif // SAFE_ACCESS
 	if (isuptodate==0){
@@ -238,7 +238,7 @@ void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
 
 	if (parentind.size()!=elemind.size()){
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl; 
-		throw invalid_argument("parent and child index list must be the same size.");
+		RSVS3D_ERROR_ARGUMENT("parent and child index list must be the same size.");
 	}
 
 	temp=parentind;
@@ -1244,7 +1244,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 
 		cerr << "Error unknown type " << typeInd << " of object for index switching" <<endl;
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument (" Type is out of range");
+		RSVS3D_ERROR_ARGUMENT(" Type is out of range");
 	}
 }
 
@@ -1378,7 +1378,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
 
    	cerr << "Error unknown type of object for index switching" <<endl;
    	cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   	throw invalid_argument (" : Type is out of range");
+   	RSVS3D_ERROR_ARGUMENT(" : Type is out of range");
    }
 }
 
@@ -2095,7 +2095,7 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 				cerr << " - edgeind is not closed (single vertex "<<
 					 vertCurr <<")" << endl;
 				if(errout){
-					throw invalid_argument("edgelist is not closed");
+					RSVS3D_ERROR_ARGUMENT("edgelist is not closed");
 				}
 			}
 			if(!endsExpl){ // explore the one way chain the other way
@@ -2118,7 +2118,7 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 			meshin.verts.isearch(vertCurr)->disp();
 			cout << it->second << " " << 1/2 << 2/3 <<  endl;
 			cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-			throw range_error ("unordered_multimap went beyond its range in OrderEdges");
+			RSVS3D_ERROR_RANGE("unordered_multimap went beyond its range in OrderEdges");
 		}
 	 	#ifdef RSVS_DIAGNOSTIC
 		if (vert2Edge.count(vertCurr)!=2){
@@ -2220,7 +2220,7 @@ int surf::OrderEdges(mesh *meshin)
 				meshin->verts.isearch(vertCurr)->disp();
 				cout << it->second << " " << 1/2 << 2/3 <<  endl;
 				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-				throw range_error ("unordered_multimap went beyond its range in OrderEdges");
+				RSVS3D_ERROR_RANGE("unordered_multimap went beyond its range in OrderEdges");
 			}
 			if (vert2Edge.count(vertCurr)==1){
 				// cerr << "ERROR : Surface does not form closed loop" << endl;
@@ -2236,7 +2236,7 @@ int surf::OrderEdges(mesh *meshin)
 				// jj=vert2Edge.count(vertCurr);
 				// cerr << jj  <<  endl; 
 				cerr << "Error in :" << __PRETTY_FUNCTION__ ;
-				//throw range_error ("Found a single vertex - surface is not closed");
+				//RSVS3D_ERROR_RANGE("Found a single vertex - surface is not closed");
 				cerr << " - surface "<< index <<" is not closed (single vertex "<<
 					 vertCurr <<")" << endl;
 				this->edgeind = edgeIndOrig;
@@ -2245,7 +2245,7 @@ int surf::OrderEdges(mesh *meshin)
 			 	isordered=true; // uncomment these two to allow run through for diagnostic
 				return(newSurfInd);
 				#endif //RSVS_DIAGNOSTIC
-				throw invalid_argument("Surface is not closed");
+				RSVS3D_ERROR_ARGUMENT("Surface is not closed");
 			}
 		 	#ifdef RSVS_DIAGNOSTIC
 			if (vert2Edge.count(vertCurr)!=2){
@@ -2337,7 +2337,7 @@ int surf::OrderEdges(mesh *meshin)
 			if (this->voluind.size()<2){
 				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 				cerr << " voluind is of size " << this->voluind.size() << endl;
-				throw logic_error("surf::voluind should be size 2");
+				RSVS3D_ERROR_LOGIC("surf::voluind should be size 2");
 			}
 		 	#endif // SAFE_ACCESS
 			for (int i = 0; i < 2; ++i)
@@ -2444,7 +2444,7 @@ int surf::SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd){
 			<< ") !=  fullEdgeInd (" << fullEdgeInd.size()
 			<< ")-this::edgeind(" << this->edgeind.size()
 			<< ")" << endl;
-		throw invalid_argument("Size of edgeind of truncated surface is incorrect.");
+		RSVS3D_ERROR_ARGUMENT("Size of edgeind of truncated surface is incorrect.");
 	}
 	#endif
 	#ifdef RSVS_DIAGNOSTIC_FIXED
@@ -2459,7 +2459,7 @@ int surf::SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd){
 	meshin.SwitchIndex(6,this->index,newSurf.index,newSurf.edgeind);
 	#ifdef SAFE_ALGO
 	if(this->edgeind.size()==0){
-		throw invalid_argument("surf::edgeind was deleted in "
+		RSVS3D_ERROR_ARGUMENT("surf::edgeind was deleted in "
 			"surf::SplitSurface process");
 	}
 	#endif //SAFE_ALGO
@@ -2471,7 +2471,7 @@ int surf::SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd){
 	if (this->voluind.size()<2){
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 		cerr << " voluind is of size " << this->voluind.size() << endl;
-		throw logic_error("surf::voluind should be size 2");
+		RSVS3D_ERROR_LOGIC("surf::voluind should be size 2");
 	}
  	#endif // SAFE_ACCESS
 	for (int i = 0; i < 2; ++i)
@@ -2525,7 +2525,7 @@ void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
 			#ifdef SAFE_ALGO
 			cerr << "Error: Surface is not ordered " << endl;
 			cerr << "	in " << __PRETTY_FUNCTION__ << endl;
-			throw invalid_argument("Surface not ordered");
+			RSVS3D_ERROR_ARGUMENT("Surface not ordered");
 			#endif
 		}
 
@@ -2619,7 +2619,7 @@ vector<int> mesh::OrderEdges(){
 		for (ii = 0; ii < surfs.size(); ++ii)
 		{
 			if (!surfs(ii)->isready(true)){
-				throw logic_error("After ordering edges a surface is not ordered.");
+				RSVS3D_ERROR_LOGIC("After ordering edges a surface is not ordered.");
 			}
 		}
 		#endif //SAFE_ALGO
@@ -2699,7 +2699,7 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 					++jj;
 				}
 			} else if(outerVolume!=-1){
-				throw invalid_argument("Unkownn value of outerVolume -1,0, or 1");
+				RSVS3D_ERROR_ARGUMENT("Unkownn value of outerVolume -1,0, or 1");
 			}
 		} 
 		// THIS IS DODGY HOW to pick the side to delete can fail
@@ -2782,7 +2782,7 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 					++jj;
 				}
 			} else if(outerVolume!=-1){
-				throw invalid_argument("Unkownn value of outerVolume -1,0, or 1");
+				RSVS3D_ERROR_ARGUMENT("Unkownn value of outerVolume -1,0, or 1");
 			}
 		} 
 		// THIS IS DODGY HOW to pick the side to delete can fail
@@ -3136,7 +3136,7 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 			// This case is unhandled as either there is still a degenerate face
 			// which should not be the case or a void is being created which should not
 			// be the case either.
-			throw logic_error("Unhandled case - Degenerate face or "
+			RSVS3D_ERROR_LOGIC("Unhandled case - Degenerate face or "
 				"unwanted Void creation");
 		}
 		if(nEdgeSurf<4){
@@ -3202,7 +3202,7 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 		// undefined.
 		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
 			<< "vertBlock should be empty or the size of mesh.verts";
-		throw invalid_argument("vertBlock vector incompatible with mesh.");
+		RSVS3D_ERROR_ARGUMENT("vertBlock vector incompatible with mesh.");
 	}
 	currQueue.reserve(nVerts/2);
 	nextQueue.reserve(nVerts/2);
@@ -3222,7 +3222,7 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	   		if (vertStatus[ii]){
 	   			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
 	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-	   			throw range_error (" : Starting point for block not found");
+	   			RSVS3D_ERROR_RANGE(" : Starting point for block not found");
 	   		}
 	   		currQueue.push_back(ii);
 	   		nBlocks++;
@@ -3246,7 +3246,7 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 		   				edges.isearch(verts(currQueue[ii])->edgeind[jj])->vertind[kk] << endl;
 		   				cerr << "Edge connected to non existant vertex" <<endl;
 		   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-	   					throw range_error (" : Vertex not found");
+	   					RSVS3D_ERROR_RANGE(" : Vertex not found");
 	   				}
 					#endif
 
@@ -3304,7 +3304,7 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
 		// undefined.
 		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
 			<< "voluBlock should be empty or the size of mesh.volus";
-		throw invalid_argument("voluBlock vector incompatible with mesh.");
+		RSVS3D_ERROR_ARGUMENT("voluBlock vector incompatible with mesh.");
 	}
 	if(boundaryFaces.size()==0){
 		boundConstrAct =false;
@@ -3313,7 +3313,7 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
 	} else {
 		cerr << "Error in " << __PRETTY_FUNCTION__ << ": " << endl
 			<< "boundaryFaces should be empty or the size of mesh.surfs";
-		throw invalid_argument("boundaryFaces vector incompatible with mesh.");
+		RSVS3D_ERROR_ARGUMENT("boundaryFaces vector incompatible with mesh.");
 	}
 	currQueue.reserve(nVolus/2);
 	nextQueue.reserve(nVolus/2);
@@ -3333,7 +3333,7 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
 	   		if (volStatus[ii]){
 	   			cerr << "Error starting point for loop not found despite max number of volume not reached" <<endl;
 	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-	   			throw range_error (" : Starting point for block not found");
+	   			RSVS3D_ERROR_RANGE(" : Starting point for block not found");
 	   		}
 	   		currQueue.push_back(ii);
 	   		nBlocks++;
@@ -3366,7 +3366,7 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
 	   				surfs(sTempInd)->voluind[kk] << endl;
 	   				cerr << "Surf connected to non existant volume" <<endl;
 	   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-   					throw range_error (" : Volume not found");
+   					RSVS3D_ERROR_RANGE(" : Volume not found");
    				}
 				#endif
 	   			
@@ -3573,14 +3573,14 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 				{ ii++; }
 			if (ii==nSurfs){
 				//cout << " | " << nSurfs << " | " ;
-				throw range_error (" Start point not found");
+				RSVS3D_ERROR_RANGE(" Start point not found");
 			}
 			// ii=nSurfs-1;
 			// while(ii>=0 && surfStatus[ii])
 			// 	{ ii--; }
 			// if (ii==-1){
 			// 	//cout << " | " << nSurfs << " | " ;
-			// 	throw range_error (" Start point not found");
+			// 	RSVS3D_ERROR_RANGE(" Start point not found");
 			// }
 			currQueue.push_back(ii);
 			nBlocks++;
@@ -3911,17 +3911,17 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		#ifdef SAFE_ALGO
 		if (!(vertOut[this->verts.find(this->edges[tempVec[i]].vertind[0])]
 				^ vertOut[this->verts.find(this->edges[tempVec[i]].vertind[1])])){
-			throw logic_error("Edge Should be connected to one inner and one outer"
+			RSVS3D_ERROR_LOGIC("Edge Should be connected to one inner and one outer"
 				"vertex, this is not the case.");
 		}
 		flagErr1 = vertOut[this->verts.find(this->edges[tempVec[i]].vertind[iIn])];
 		flagErr2 = !vertOut[this->verts.find(this->edges[tempVec[i]].vertind[iOut])];
 		if (flagErr1 && flagErr2) {
-			throw logic_error("Coord In is Out and Coord out is in");
+			RSVS3D_ERROR_LOGIC("Coord In is Out and Coord out is in");
 		} else if(flagErr1){
-			throw logic_error("Coord In is Out");
+			RSVS3D_ERROR_LOGIC("Coord In is Out");
 		} else if(flagErr2){
-			throw logic_error("Coord out is in");
+			RSVS3D_ERROR_LOGIC("Coord out is in");
 		}
 		#endif // SAFE_ALGO
 		subIn = this->verts.find(this->edges[tempVec[i]].vertind[iIn]);
@@ -4129,7 +4129,7 @@ void mesh::Crop(vector<int> indList, int indType){
 
 	// Check validity of input
 	if (indType>4 || indType<1){
-		throw invalid_argument("Type of index not recognised: \n"
+		RSVS3D_ERROR_ARGUMENT("Type of index not recognised: \n"
 			" vertex (indType=1), edge (2), surf (3), volu (4)");
 	}
 
@@ -4259,7 +4259,7 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, in
 		cerr << "Error : indices were not found in lists " << endl;
 		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
 		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument("Incaompatible list and index");
+		RSVS3D_ERROR_ARGUMENT("Incaompatible list and index");
 	}
 
 	ord2=0;kk=0;
@@ -4279,7 +4279,7 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, in
 		cerr << "Error : indices were not found in lists " << endl;
 		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
 		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
-		throw invalid_argument("Incaompatible list and index");
+		RSVS3D_ERROR_ARGUMENT("Incaompatible list and index");
 	}
 
 	retVal=(ord1==ord2)*2-1;
@@ -4378,7 +4378,7 @@ namespace meshhelp {
 			cout << " coordTarg : ";
 			DisplayVector(coordTarg);
 			cout << endl << "lStep : " << lStep << endl; 
-			throw logic_error("The lstep for a vertex should be between 0"
+			RSVS3D_ERROR_LOGIC("The lstep for a vertex should be between 0"
 				" and 1 for it to lie on the original edge.");
 		}
 		#endif // SAFE_ALGO
@@ -4408,7 +4408,7 @@ namespace meshhelp {
 		{
 			if(temp[i]==-1){
 				std::cerr << "Error in : " << __PRETTY_FUNCTION__ << std::endl;
-				throw invalid_argument("Edge index in connectivity list not found");
+				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list not found");
 			}
 			if(edgeOut[temp[i]]){
 				vecconnOut.push_back(meshin.edges(temp[i])->index);
@@ -4454,7 +4454,7 @@ namespace meshhelp {
 			}
 		}
 		if(outFlag>=0){
-			throw logic_error("The result of OrderEdgeList should be "
+			RSVS3D_ERROR_LOGIC("The result of OrderEdgeList should be "
 				"negative to indicate an open surface");
 		}
 		std::array<int, 2> inds;
@@ -4497,7 +4497,7 @@ namespace meshhelp {
 		{
 			if(temp[i]==-1){
 				std::cerr << "Error in : " << __PRETTY_FUNCTION__ << std::endl;
-				throw invalid_argument("Edge index in connectivity list not found");
+				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list not found");
 			}
 			if(edgeOut[temp[i]]){
 				vecconnOut.push_back(meshin.surfs(temp[i])->index);

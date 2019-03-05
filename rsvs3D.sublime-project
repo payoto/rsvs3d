@@ -39,10 +39,16 @@
 	"folders":
 	[
 		{
-			"path": "SRCC"
+			"path": "SRCC",
+			"file_exclude_patterns": [
+				"*.d", "*.o"
+			],
 		},
 		{
-			"path": "."
+			"path": ".",
+			"file_exclude_patterns": [
+				"*.cpp", "*.hpp",
+			],
 		},
 		{
 			"path": "D:\\alexa\\Documents\\MATLAB"

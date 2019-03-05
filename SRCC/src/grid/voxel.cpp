@@ -20,6 +20,7 @@
 using namespace std;
 using namespace Eigen;
 
+// Main code
 int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid){
 
 	int out; 
@@ -46,15 +47,17 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	surfProp=(MatrixXi::Identity(3,3)).rowwise().reverse();
 	edgeProp=(1-MatrixXi::Identity(3,3).array());
 
-	nSurfDim=((dimGrid.colwise().replicate(3).array())+surfProp.array()).rowwise().prod();
-	nEdgeDim=((dimGrid.colwise().replicate(3).array())+edgeProp.array()).rowwise().prod();
+	nSurfDim=((dimGrid.colwise().replicate(3).array())
+		+surfProp.array()).rowwise().prod();
+	nEdgeDim=((dimGrid.colwise().replicate(3).array())
+		+edgeProp.array()).rowwise().prod();
 
 	nSurf=nSurfDim.sum();
 	nEdge=nEdgeDim.sum();
 
 	blockGrid.Init(nVert,nEdge,nSurf,nVolu);
 
-#ifdef TEST_VOXEL
+	#ifdef TEST_VOXEL
 	cout << "nVert: " << nVert << " nVolu: " << nVolu 
 	<< " nEdge: " << nEdge << " nSurf: " << nSurf << endl; 
 	cout << "surfProp: " << endl << surfProp << endl;
@@ -63,9 +66,9 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	cout << "nEdgeDim: " << endl << nEdgeDim << endl;
 	cout << endl;
 
-#endif //TEST_VOXEL
+	#endif //TEST_VOXEL
 
-#ifdef TEST_EIGENEXT
+	#ifdef TEST_EIGENEXT
 	cout << "cumprod(nSurfDim): " << endl << cumprod(nSurfDim,0) << endl;
 	cout << "nSurfDim: " << endl << nSurfDim << endl;
 	cout << "cumsum(nSurfDim): " << endl << cumsum(nSurfDim,0) << endl;
@@ -78,7 +81,7 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	cout << "cumprod(edgeProp')': " << endl << cumprod(edgeProp,1) << endl;
 	cout << "edgeProp: " << endl << edgeProp << endl;
 	cout << endl << "------------------------" << endl << endl;
-#endif // TEST_EIGENEXT
+	#endif // TEST_EIGENEXT
 
 	BuildBlockVolu(dimGrid, nVolu, blockGrid, nSurfDim, surfProp);
 	BuildBlockSurf( dimGrid,  nSurf , blockGrid ,
@@ -135,7 +138,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 
 	}
 
-#ifdef TEST_VOXEL_VOLU
+	#ifdef TEST_VOXEL_VOLU
 	cout << "--------------------------------------------" << endl << "Test BuildBlockVolu" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -143,7 +146,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempSurfInd: " << endl << tempSurfInd << endl;
 	blockGrid.volus.disp();
-#endif //TEST_VOXEL_VOLU
+	#endif //TEST_VOXEL_VOLU
 
 	return(0);
 }
@@ -190,13 +193,8 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 		blockGrid.surfs[ii].index=ii+1;
 		blockGrid.surfs[ii].fill=isFill*double(rand()%1000+1)/1000.0;
 
-		/*jPlane=0;
-		for (jj=0;jj<3;++jj){
-			jPlane=jPlane+(ii>=cumSurfDim[jj]);
-		}*/
 		jPlane=(ii>=cumSurfDim.array()).cast<int>().sum();
 		
-
 		dimGridCur=matSurf.row(jPlane);
 
 		pos(0)=(ii-incrSurf[jPlane])%(dimGridCur[0]);
@@ -239,7 +237,7 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 		}
 	}
 
-#ifdef TEST_VOXEL_SURF
+	#ifdef TEST_VOXEL_SURF
 	cout << "--------------------------------------------" << endl << "Test BuildBlockSurf" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -249,7 +247,7 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "tempEdgeInd: " << endl << tempEdgeInd << endl;
 	blockGrid.surfs.disp();
-#endif //TEST_VOXEL_SURF
+	#endif //TEST_VOXEL_SURF
 
 
 	return(0);
@@ -362,7 +360,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i 
 		//if (kk==1){blockGrid.edges[ii].surfind[kk]=0;} // not needed as already initialised
 	}
 
-#ifdef TEST_VOXEL_EDGE
+	#ifdef TEST_VOXEL_EDGE
 	cout << "--------------------------------------------" << endl << "Test BuildBlockEdge" << endl;
 	cout << "matSurf: " << endl << matSurf << endl;
 	cout << "incrSurf: " << endl << incrSurf << endl;
@@ -370,7 +368,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i 
 	cout << "incPos: " << endl << incPos << endl;
 	cout << "vertIndTemp: " << endl << vertIndTemp << endl;
 	blockGrid.edges.disp();
-#endif //TEST_VOXEL_EDGE
+	#endif //TEST_VOXEL_EDGE
 
 	return(0);
 }
@@ -431,13 +429,13 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 
 	}
 
-#ifdef TEST_VOXEL_VERT
+	#ifdef TEST_VOXEL_VERT
 	cout << "--------------------------------------------" << endl << "Test BuildBlockVert" << endl;
 	cout << "matEdge: " << endl << matEdge << endl;
 	cout << "incPos: " << endl << incPos << endl;
 
 	blockGrid.verts.disp();
-#endif
+	#endif
 	return(0);
 }
 

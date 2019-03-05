@@ -2,6 +2,7 @@
 #include "RSVSmath.hpp"
 #include "RSVSmath_automatic.hpp"
 #include "arraystructures.hpp" // for use of DisplayVector
+#include "warning.hpp"
 
 using namespace std;
 
@@ -176,7 +177,7 @@ void CoordFunc::assign(int pRepI, const vector<double> &pRep){
 	if ((pRepI<nCoord) & (pRepI>=0)){
 		coords[pRepI]=&pRep;
 	} else {
-		throw invalid_argument("pointer index out off bound in CoordFunc::assign");
+		RSVS3D_ERROR_ARGUMENT("pointer index out off bound in CoordFunc::assign");
 	}
 	
 	isCalc=false;
@@ -437,7 +438,7 @@ the jacobian is arranged :
 			}
 		}
 		if  (nCoord<4){
-			throw invalid_argument("nCoord <= 3 surfCentroid Not implemented");
+			RSVS3D_ERROR_ARGUMENT("nCoord <= 3 surfCentroid Not implemented");
 		} else if (nCoord<7){
 			x.reserve(nCoord);
 			y.reserve(nCoord);

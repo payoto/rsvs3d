@@ -294,7 +294,7 @@ public:
 	void write(FILE * fid) const;
 	void TightenConnectivity() {
 		if(vertind.size()>2){
-			throw invalid_argument("vertind should be size 2");
+			RSVS3D_ERROR_ARGUMENT("vertind should be size 2");
 		}
 		sort(surfind);unique(surfind);
 	};

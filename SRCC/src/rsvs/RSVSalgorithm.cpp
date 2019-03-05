@@ -5,6 +5,7 @@
 #include "RSVSalgorithm.hpp"
 #include "snake.hpp"
 #include "snakeengine.hpp"
+#include "warning.hpp"
 
 void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	vector<int> &voluOutList, int outerBorder){
@@ -27,7 +28,7 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 		meshin.GetOffBorderVert(offBorderVert,voluOutList,0);
 		meshin.ElmOnParentBound(internalSurf,voluIndIntern,false,false);
 	} else {
-		throw invalid_argument("outerBorder has an unknown value");
+		RSVS3D_ERROR_ARGUMENT("outerBorder has an unknown value");
 	}
 	ni=meshin.verts.size();
 	vertList.reserve(ni);

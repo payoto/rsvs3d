@@ -72,13 +72,13 @@ int main(){
 	// Tetgen interface tests
 	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); 
 	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); 
+	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
+	gridTest.Run(Test_Crop,"test cropping of meshes"); 
+	
 	#endif //TEST_ALL_WORKING
 	#ifdef TEST_ALL_BREAKING
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
-	
-	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
-	gridTest.Run(Test_Crop,"test cropping of meshes"); 
  
 	
 	gridTest.PrintSummary();

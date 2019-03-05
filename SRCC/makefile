@@ -71,7 +71,7 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 #------------------------------------------------------
 # Standard GCC warning, optimisation and c++ standard flags
 WARNFLAGS= -Wall -Wextra -pedantic
-OPTIMLVL=0
+OPTIMLVL=3
 CCPSTD=11
 
 # Other compiler flags
@@ -91,7 +91,7 @@ CCFLAGUSER=
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
-CFTESTFLAG= -DTEST_ALL  -DTEST_ALL_BREAKING
+CFTESTFLAG= -DTEST_ALL  -DTEST_ALL_WORKING
 
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work

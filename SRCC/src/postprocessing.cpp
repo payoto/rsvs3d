@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "postprocessing.hpp" 
 #include "snakevel.hpp"
+#include "warning.hpp"
 
 
 // Functions
@@ -479,9 +480,9 @@ int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, int strandID
 		//this->SurfFaceMap(meshout,nEdge);
 
 	} else if (forceOutType==3){
-		throw invalid_argument("Cannot output volume of line");
+		RSVS3D_ERROR_ARGUMENT("Cannot output volume of line");
 	} else if (forceOutType==4){
-		throw invalid_argument("Cannot output volume of point");
+		RSVS3D_ERROR_ARGUMENT("Cannot output volume of point");
 	}
 	return(0);
 	//CONNECTIVITYSHAREZONE=<zone>
@@ -649,7 +650,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 				} else if (currType==3) {
 					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
 				} else {
-					throw invalid_argument("unknown point type");
+					RSVS3D_ERROR_ARGUMENT("unknown point type");
 				}
 			}
 		}
@@ -692,7 +693,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 				} else if (currType==3) {
 					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
 				} else {
-					throw invalid_argument("unknown point type");
+					RSVS3D_ERROR_ARGUMENT("unknown point type");
 				}
 			}
 		}
@@ -719,7 +720,7 @@ int tecplotfile::SurfFaceMap(const triangulation &triout, triarray triangulation
 
 	int nTri;
 	nTri=(triout.*mp).size();
-	//throw invalid_argument("Surface Map not supported for triangulation")
+	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
 		for(jj=0;jj<3;++jj){
@@ -752,7 +753,7 @@ int tecplotfile::LineFaceMap(const triangulation &triout, triarray triangulation
 
 	int nTri;
 	nTri=(triout.*mp).size();
-	//throw invalid_argument("Surface Map not supported for triangulation")
+	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
 		for(jj=0;jj<3;++jj){
@@ -774,7 +775,7 @@ int tecplotfile::LineFaceMap(const vector<int> &triList){
 
 	int nTri;
 	nTri=triList.size();
-	//throw invalid_argument("Surface Map not supported for triangulation")
+	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
 		for(jj=0;jj<3;++jj){
@@ -1007,7 +1008,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, trisurfarray triangu
 				} else if (currType==3) {
 					this->Print("%.16lf ",triout.trivert.isearch(currInd)->coord(jj));
 				} else {
-					throw invalid_argument("unknown point type");
+					RSVS3D_ERROR_ARGUMENT("unknown point type");
 				}
 			}
 		}
@@ -1033,7 +1034,7 @@ int tecplotfile::SurfFaceMap(const triangulation &triout, trisurfarray triangula
 
 	int nTri;
 	nTri=(triout.*mp).size();
-	//throw invalid_argument("Surface Map not supported for triangulation")
+	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
 		for(jj=0;jj<int((triout.*mp)(ii)->typevert.size());++jj){
@@ -1066,7 +1067,7 @@ int tecplotfile::LineFaceMap(const triangulation &triout, trisurfarray triangula
 
 	int nTri;
 	nTri=(triout.*mp).size();
-	//throw invalid_argument("Surface Map not supported for triangulation")
+	//RSVS3D_ERROR_ARGUMENT("Surface Map not supported for triangulation")
 	kk=1;
 	for (ii=0;ii<nTri;++ii){ // Print Number of vertices per face
 		for(jj=0;jj<int((triout.*mp)(ii)->typevert.size());++jj){
