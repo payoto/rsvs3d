@@ -82,16 +82,20 @@ CCPSTD=11
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # Tetgen flag to use as library: -DTETLIBRARY
 # cxxopts #
-CCFLAGDBG= -g -ggdb
-CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
+CCFLAGDBG=
+# -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
+CCFLAGPROJ= -march=native -ffast-math -ffinite-math-only
 CCFLAGBOOST=
-CCFLAGEIG= 
+CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
 CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
+# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation 
+# beyond O3. It will break using -march and/or -ffast-math and co...
+CCFLAGETETGEN += $(CCFLAGDBG)
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
-CFTESTFLAG= -DTEST_ALL  -DTEST_ALL_WORKING
+CFTESTFLAG= -DTEST_ALL -DTEST_ALL_WORKING
 
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work
@@ -145,7 +149,7 @@ LDDIR = $(LDDIRBOOST)
 LDFLAGS = 
 
 # Compile list of flags
-CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) $(CCFLAGCUSTOM)
+CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) 
 ifeq ($(MAKECMDGOALS),testall)
 CFLAGS+= $(CFTESTFLAG)
 endif
@@ -237,25 +241,25 @@ $(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
 # 	POSTCOMPILE (Dependency actions and flags)
 $(OBJDIR)/%.o : %.cpp
 $(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f 
-	$(COMPILECPP) $< -o $@
+	$(COMPILECPP) $(CCFLAGCUSTOM) $< -o $@
 	$(POSTCOMPILE)
 
 # Special case for this source and object which cannot be compiled without optimisation
 # or the object file is too large on windows
 $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp
 $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f 
-	$(COMPILECPP) -O3 $< -o $@
+	$(COMPILECPP) $(CCFLAGCUSTOM) -O3 $< -o $@
 	$(POSTCOMPILE)
 
 # #  Always on optimisation and disabled warnings in the tetgen module
 $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
 $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
-	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
 $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
 $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
-	$(COMPILECPP) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
+	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
 # Folder depency used to mirror the SRCTREE into OBJDIR

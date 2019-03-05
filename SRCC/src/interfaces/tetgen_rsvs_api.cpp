@@ -1706,7 +1706,7 @@ int tetcall_CFD()
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 		//   do quality mesh generation (q) with a specified quality bound
 		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqm"; 
+		inparam.command = "Qpkqm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
 		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
@@ -1759,7 +1759,7 @@ int tetcall()
 		// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 		//   do quality mesh generation (q) with a specified quality bound
 		//   (1.414), and apply a maximum volume constraint (a0.1).
-		inparam.command = "pkqnnvefm"; 
+		inparam.command = "Qpkqnnvefm"; 
 		tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
 		// tetout.save_nodes("../TESTOUT/testtetgen/rsvsout_3cell_2body");
@@ -1772,7 +1772,7 @@ int tetcall()
 
 		std::cout << " Meshed the tetrahedralization" << std::endl;
 		TetgenInput_POINTGRIDS(meshtet,tetin3, inparam);
-		inparam.command = "v"; 
+		inparam.command = "Qv"; 
 		tetrahedralize(inparam.command.c_str(), &tetin3, &tetout3);
 		meshvoro = TetgenOutput_VORO2MESH(tetout3);
 		// tecout.PrintMesh(meshvoro,0,0,2);
@@ -1792,7 +1792,7 @@ int tetcall()
 		sort(subs);
 		unique(subs);
 		std::cout << "Number of surfs " << subs.size() << std::endl;
-		inparam.command = "pkqnnefm"; 
+		inparam.command = "Qpkqnnefm"; 
 		TetgenInput_RSVSGRIDS(meshvoro,tetin2, inparam);
 
 		tetin2.save_nodes("../TESTOUT/testtetgen/rsvs_voro_grid");
@@ -1828,6 +1828,7 @@ int tetcall_RSVSVORO()
 	for(auto i : numCells){
 		nErrors += tetcall_RSVSVOROFunc(i, tecoutStr);
 	}
+	
 	return nErrors;
 }
 

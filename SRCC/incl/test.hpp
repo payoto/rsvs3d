@@ -26,6 +26,7 @@
 #include <iostream>
 #include <stdarg.h>
 #include <ctime>
+#include <fstream>
 
 //==================================
 // Code
@@ -41,68 +42,33 @@ class customtest {
 		int testCount;
 		int errFlag;
 		int errCount;
+		int unhandledError;
 		int prevTime;
 		int runTotal;
+		int lastRunTime;
 	public:
 		customtest(){
 			testCount=0;
 			errFlag=0;
 			errCount=0;
+			unhandledError=0;
 			runTotal=0;
+			lastRunTime=0;
+			cout << "-------------------------------------------------------------"
+				"---------------------------" << endl;
+			cout << "-------------------------------------------------------------"
+				"---------------------------" << endl;
+			cout << "      Start testing " << endl;
+			cout << "-------------------------------------------------------------"
+				"---------------------------" << endl;
+		}
+		~customtest(){
+			this->PrintSummary();
 		}
 
-		void Run(function<int()> test, const char * funcName){
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "      Start testing " << funcName << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			this->prevTime=clock();
-			errFlag=test();
-			int runTime = clock() - this->prevTime;
-			runTotal += runTime;
-			++testCount;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			if (errFlag!=0){
-				++errCount;
-				cout << "Finished testing " << funcName << endl;
-				cout << "                      - Caught Error: " << errFlag << endl;
-			} else {
-				cout << "Finished testing "<< funcName << endl;
-				cout << "                      - No Error" << endl;
-			}
-			cout << "                Execution time : " << 
-				double(runTime)/double(CLOCKS_PER_SEC)*1000 << " ms" << endl; 
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << endl;
-		}
-		void PrintSummary(){
-			cout << endl;
-
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "      Summary of Tests:" << endl;
-			cout << "         " << testCount << " tests completed" << endl;
-			cout << "         " << errCount << "  detected errors  " << endl;
-			cout << "      Total run time:" << endl;
-			cout << "         " << double(this->runTotal)/double(CLOCKS_PER_SEC) 
-				<< "  seconds  " << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			cout << "-------------------------------------------------------------"
-				"---------------------------" << endl;
-			#ifdef DBG_MEMLEAK
-			_CrtDumpMemoryLeaks();
-			#endif
-		}
+		int Run(function<int()> test, const char * funcName);
+		int RunSilent(function<int()> test, const char * funcName);
+		void PrintSummary();
 
 
 };

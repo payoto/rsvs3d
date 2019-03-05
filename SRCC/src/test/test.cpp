@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <string>
 #include <functional>
+#include <sstream>
 
 #include "test.hpp"
 
@@ -20,70 +21,169 @@
 #include "meshrefinement.hpp"
 #include "snakevel.hpp"
 #include "RSVSalgorithm.hpp"
-#ifdef TEST_ALL
-#endif //TEST_ALL
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
 #include "tetgen_rsvs_api.hpp"
+
 
 int main(){
 	customtest gridTest;
 
 	#ifdef TEST_ALL_WORKING
 	// BASE templatess 
-	gridTest.Run(Test_ArrayStructures,"arraystructures");
-	gridTest.Run(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
-	gridTest.Run(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
-	gridTest.Run(TestTemplate_ArrayStruct<surf>,"TestTemplate_ArrayStruct<surf>");
-	gridTest.Run(TestTemplate_ArrayStruct<volu>,"TestTemplate_ArrayStruct<volu>");
-	gridTest.Run(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
-	gridTest.Run(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
-	gridTest.Run(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
+	gridTest.RunSilent(Test_ArrayStructures,"arraystructures");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<surf>,"TestTemplate_ArrayStruct<surf>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<volu>,"TestTemplate_ArrayStruct<volu>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
 	// Building blocks
-	gridTest.Run(Test_BuildBlockGrid_noout,"Voxel");
-	gridTest.Run(Test_tecplotfile,"post-processing");
-	gridTest.Run(Test_tecplotfile,"post-processing class");
-	gridTest.Run(Test_snakeOrderEdges,"Snake Order error");
-	gridTest.Run(Test_SnakeStructures,"Snake containers");
-	gridTest.Run(Test_MeshOut,"Mesh output"); 
-	gridTest.Run(Test_surfcentre,"test SurfCentroid"); 
-	gridTest.Run(Test_MeshRefinement,"Multi-Level Meshes");
-	gridTest.Run(Test_MeshOrient,"Output mesh orientation");
-	gridTest.Run(Test_Crop,"test cropping of meshes"); 
+	gridTest.RunSilent(Test_BuildBlockGrid_noout,"Voxel");
+	gridTest.RunSilent(Test_tecplotfile,"post-processing");
+	gridTest.RunSilent(Test_tecplotfile,"post-processing class");
+	gridTest.RunSilent(Test_snakeOrderEdges,"Snake Order error");
+	gridTest.RunSilent(Test_SnakeStructures,"Snake containers");
+	gridTest.RunSilent(Test_MeshOut,"Mesh output"); 
+	gridTest.RunSilent(Test_surfcentre,"test SurfCentroid"); 
+	gridTest.RunSilent(Test_MeshRefinement,"Multi-Level Meshes");
+	gridTest.RunSilent(Test_MeshOrient,"Output mesh orientation");
+	gridTest.RunSilent(Test_Crop,"test cropping of meshes"); 
 	// Snakstruct 3D tests
-	gridTest.Run(Test_RSVSalgo_init,"RSVS spawn");
-	gridTest.Run(Test_snakeinit,"Snake rand velocity"); 
-	gridTest.Run(Test_RSVSalgo,"Snake RSVS from spawn");
-	gridTest.Run(Test_snakeRSVS,"Snake RSVS");
-	gridTest.Run(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
-	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS single vol");
-	gridTest.Run(integrate::test::All,"Test full integration");
+	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.RunSilent(Test_snakeinit,"Snake rand velocity"); 
+	gridTest.RunSilent(Test_RSVSalgo,"Snake RSVS from spawn");
+	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS");
+	gridTest.RunSilent(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
+	gridTest.RunSilent(Test_RSVSalgo_singlevol,"Snake RSVS algorithm single vol");
+	gridTest.RunSilent(integrate::test::All,"Test full integration");
 
 	// Snakstruct 2D tests
-	gridTest.Run(Test_snakeinitflat,"Snake spawning 2D");
+	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	// Parameter and JSON tests
-	gridTest.Run(param::test::base,"parameter implementation");
-	gridTest.Run(param::test::io,"parameter read write");
-	gridTest.Run(param::test::ioflat,"parameter read write flat format");
-	gridTest.Run(param::test::ipartialread,"parameter partial read write flat format");
-	gridTest.Run(param::test::autoflat,"Algorithm for automatic determination of flat json");
+	gridTest.RunSilent(param::test::base,"parameter implementation");
+	gridTest.RunSilent(param::test::io,"parameter read write");
+	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
+	gridTest.RunSilent(param::test::ipartialread,"parameter partial read write flat format");
+	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic determination of flat json");
 	// RSVS and integration tests
-	gridTest.Run(integrate::test::Prepare,"Mesh integration function");
+	gridTest.RunSilent(integrate::test::Prepare,"Mesh integration function");
 	// Tetgen interface tests
-	gridTest.Run(tetcall_CFD,"tegen API testing - CFD meshing"); 
-	gridTest.Run(tetcall,"tegen API testing - RSVS meshing"); 
-	gridTest.Run(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
-	gridTest.Run(Test_Crop,"test cropping of meshes"); 
-	
+	gridTest.RunSilent(tetcall_CFD,"tegen API testing - CFD meshing"); 
+	gridTest.RunSilent(tetcall,"tegen API testing - RSVS meshing"); 
+	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
+
 	#endif //TEST_ALL_WORKING
 	#ifdef TEST_ALL_BREAKING
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
- 
-	
-	gridTest.PrintSummary();
 
 	return(0);
 }
 
 
+int customtest::Run(function<int ()> test, const char *funcName){
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "      Start testing " << funcName << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	this->prevTime=clock();
+	errFlag=test();
+	this->lastRunTime = clock() - this->prevTime;
+
+	runTotal += this->lastRunTime;
+	++testCount;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	if (errFlag!=0){
+		++errCount;
+		cout << "Finished testing " << funcName << endl;
+		cout << "                      - Caught Error: " << errFlag << endl;
+	} else {
+		cout << "Finished testing "<< funcName << endl;
+		cout << "                      - No Error" << endl;
+	}
+	cout << "                Execution time : " << 
+		double(this->lastRunTime)/double(CLOCKS_PER_SEC)*1000 << " ms" << endl; 
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << endl;
+	return(errFlag);
+}
+
+/**
+ * @brief      Runs a test function silently except if it returns an error.
+ *
+ * @param[in]  test      The test function
+ * @param[in]  funcName  string descriptor for the test.
+ *
+ * @return     int number of errors captured.
+ */
+int customtest::RunSilent(function<int ()> test, const char *funcName){
+	
+	stringstream streamOut;
+	int errFlag;
+
+	std::cout << "START test " << this->testCount+1 
+		<< ": " << funcName << endl;
+
+	auto coutBuff=std::cout.rdbuf(streamOut.rdbuf());
+	auto cerrBuff=std::cerr.rdbuf(streamOut.rdbuf());
+	try{
+		try{
+			errFlag = this->Run(test, funcName);
+		} catch(exception const& ex){
+			cerr << "Exception: " << ex.what() <<endl;
+			throw ex;
+		}
+	} catch (...){
+		std::cerr << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+		errFlag=1;
+		this->unhandledError++;
+		std::cerr << "Unhandled error in " << funcName << endl;
+		std::cerr << "-------------------------------------------------------------"
+			"---------------------------" << endl;
+		std::cerr << "-------------------------------------------------------------"
+			"---------------------------" << endl;
+	}
+	std::cout.rdbuf(coutBuff);
+	std::cerr.rdbuf(cerrBuff);
+	if (errFlag!=0){
+		std::cerr << streamOut.str();
+	} else {
+		std::cout << " DONE, finished in " 
+			<< double(this->lastRunTime)/double(CLOCKS_PER_SEC)*1000 
+			<< " ms" << endl;
+	}
+	return errFlag;
+}
+
+void customtest::PrintSummary(){
+	cout << endl;
+
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "      Summary of Tests:" << endl;
+	cout << "         " << testCount << " tests completed" << endl;
+	cout << "         " << errCount << "  detected errors  " << endl;
+	cout << "         " << unhandledError << " errors handled by the test class " << endl;
+	cout << "      Total run time:" << endl;
+	cout << "         " << double(this->runTotal)/double(CLOCKS_PER_SEC) 
+		<< "  seconds  " << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	cout << "-------------------------------------------------------------"
+		"---------------------------" << endl;
+	#ifdef DBG_MEMLEAK
+	_CrtDumpMemoryLeaks();
+	#endif
+}
