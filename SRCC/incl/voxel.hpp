@@ -46,9 +46,10 @@
 using namespace std;
 using namespace Eigen;
 // Templates
-template <class T> T cumsum(T mat, int d) {
+template <class T> T cumsum(const T &matIn, int d) {
 	/* template which applies cumsum to Eigen Matrix
 	Cumsum is applied row-wise for d=0 and col-wise for d=1*/
+	T mat=matIn;
 	if (!d) {
 		for (int i=0;i<mat.rows();++i){
 			for (int j=1;j<mat.cols();++j){
@@ -66,9 +67,10 @@ template <class T> T cumsum(T mat, int d) {
 
 }
 
-template <class T> T cumprod(T mat, int d) {
+template <class T> T cumprod(const T &matIn, int d) {
 	/* template which applies cumsum to Eigen Matrix
 	Cumprod is applied row-wise for d=0 and col-wise for d=1*/
+	T mat=matIn;
 	if (!d) {
 		for (int i=0;i<mat.rows();++i){
 			for (int j=1;j<mat.cols();++j){
@@ -85,7 +87,9 @@ template <class T> T cumprod(T mat, int d) {
 	return(mat);
 
 }
-
+// Declare a couple of template specialisations
+// template<> RowVector3i cumprod<RowVector3i>(RowVector3i mat, int d);
+// template<> RowVector3i cumsum<RowVector3i>(RowVector3i mat, int d);
 // Base classes
 
 // Derived Classes
