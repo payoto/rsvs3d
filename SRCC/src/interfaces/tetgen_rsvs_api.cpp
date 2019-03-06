@@ -453,14 +453,19 @@ double DomInter(double x, double y1, double y2){
 	return x*(y2-y1)+y1;
 }
 
-mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB, 
-	const std::array<double,3> &outerUpperB,
-	const std::array<double,3> &innerLowerB, const std::array<double,3> &innerUpperB, int nSteps, 
-	std::vector<int> &vertPerSubDomain){
-	/*
-	Builds a series of domains with different edge properties controlling
-	the interpolation of the metric.
-
+/**
+ * @brief      Builds a series of domains with different edge 
+ *  properties controlling the interpolation of the metric.
+ *
+ * @param[in]  outerLowerB       The outer lower b
+ * @param[in]  outerUpperB       The outer upper b
+ * @param[in]  innerLowerB       The inner lower b
+ * @param[in]  innerUpperB       The inner upper b
+ * @param[in]  nSteps            The steps
+ * @param      vertPerSubDomain  The vertical per sub domain
+ *
+ * @return     The cut cell domain.
+ * 
 	These also serve to avoid having a badly conditioned initial triangulation
 	with very small edges.
 	
@@ -485,7 +490,11 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 				DomInter(x, innerUpperB[1], outerUpperB[1]),
 				DomInter(x, innerUpperB[2], outerUpperB[2])}
 			);
-	*/
+ */
+mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB, 
+	const std::array<double,3> &outerUpperB,
+	const std::array<double,3> &innerLowerB, const std::array<double,3> &innerUpperB, int nSteps, 
+	std::vector<int> &vertPerSubDomain){
 
 	mesh meshdomain, meshtemp;
 	double x;
@@ -644,8 +653,9 @@ void TetgenInput_RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 }
 
 
-void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
-	const tetgen::apiparam &tetgenParam){
+
+void TetgenInput_RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
+	tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam){
 	/*
 	Processes a snake object into a tetgen input object.
 
@@ -654,7 +664,6 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	input file.
 	*/
 
-	mesh meshgeom;
 	triangulation triRSVS;
 	int nHoles;
 	// int nPtsHole, kk, count;
@@ -664,14 +673,12 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	std::vector<double> holeCoords;
 
 	holeCoords.clear();
-	meshgeom.Init(0, 0, 0, 0);
-	meshgeom.PrepareForUse();
 
 	vertPerSubDomain.push_back(meshdomain.verts.size());
 	
 
 	nHoles=holeCoords.size()/3;
-	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
+	Mesh2Tetgenio(meshboundary, meshdomain, tetin, nHoles);
 
 	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
@@ -683,7 +690,7 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	}
 
 	// Assign domain point metrics
-	int startPnt = meshgeom.verts.size();
+	int startPnt = meshboundary.verts.size();
 	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
 		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
 			{tetgenParam.edgelengths[i]});
@@ -693,10 +700,20 @@ void TetgenInput_RSVSGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	// tecout.PrintMesh(meshdomain);
 }
 
+void TetgenInput_RSVSGRIDS(const mesh &meshdomain,
+	tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam){
+	mesh meshboundary;
+	meshboundary.Init(0,0,0,0);
+	meshboundary.PrepareForUse();
+
+	TetgenInput_RSVSGRIDS(meshdomain, meshboundary, 
+		tetin, tetgenParam);
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
-	const tetgen::apiparam &tetgenParam){
+	const tetgen::apiparam &tetgenParam, bool generateVoroBound=false){
 	/*
 	Processes a snake object into a tetgen input object.
 
@@ -708,7 +725,43 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	mesh meshgeom;
 	triangulation triRSVS;
 	// int nPtsHole, kk, count;
-	meshgeom.Init(0, 0, 0, 0);
+	if(generateVoroBound){
+		// Generate a set of points which fulfill the following:
+		// - off the boundaries by dist tol using the "pinch" technique:
+		// 	not on the corners or edges but on the faces that need
+		// 	to be closed
+		// 	For each face place 1 point in the middle.
+		// 	For each edge place 2 points in the middle.
+		// 	For each face place 3 points on the outside.
+		std::vector<double> vertsToAdd;
+		std::array<double, 3> vertModif = {0,0,0};
+		vertsToAdd.reserve(100);
+		// add the points associated with the vertices
+		for (int l = 0; l < 3; ++l)
+		{
+			vertModif = {0,0,0};
+			vertModif[l] = 1.0;
+			for (int i = 0; i < 8; ++i)
+			{	
+				for (int j = 0; j < 3; ++j)
+				{
+					int k = pow(2,j);
+					double delta = (tetgenParam.upperB[j]-tetgenParam.lowerB[j])*vertModif[l];
+					vertsToAdd.push_back(
+						(((i/k)%2) ? 
+							tetgenParam.upperB[j]+delta 
+							: tetgenParam.lowerB[j]-delta)
+						);
+				}
+			}
+		}
+		// add the points associated with the edges
+
+
+
+	} else{ 
+		meshgeom.Init(0, 0, 0, 0);
+	}
 	meshgeom.PrepareForUse();
 	
 	Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
@@ -1341,14 +1394,19 @@ namespace voronoimesh {
 		std::vector<bool> tetSurfInVoro;
 		std::vector<double> lowerB, upperB;
 
-
 		TetgenInput_POINTGRIDS(ptsMesh, tetinV, inparam);
 		cmd = "Qv"; 
 		tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
 		voroMesh = TetgenOutput_VORO2MESH(tetoutV);
 		// Crop mesh 
-		lowerB={-0.1,-0.1,-0.1};
-		upperB={1.1,1.1,1.1};
+		lowerB.assign(3, 0.0);
+		upperB.assign(3, 0.0);
+		for (int i = 0; i < 3; ++i)
+		{
+			double delta = inparam.upperB[i]-inparam.lowerB[i];
+			lowerB[i]=inparam.lowerB[i] + delta/2.0;
+			upperB[i]=inparam.upperB[i] + delta/2.0;
+		}
 		// voroMesh.displight();
 		voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 		voroMesh.CropAtBoundary(lowerB, upperB);
@@ -1362,7 +1420,12 @@ namespace voronoimesh {
 		voroMesh.OrderEdges();
 		voroMesh.SetBorders();
 		// Input mesh
-		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
+		
+		std::vector<int> vertPerSubDomain;
+		mesh meshdomain = BuildCutCellDomain({0,0,0}, {0,0,0}, // upper bounds are not used
+			inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
+
+		TetgenInput_RSVSGRIDS(voroMesh, meshdomain, tetinT, inparam);
 		tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
 		tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
 		cmd = "QpqmnnefO9/7"; 
