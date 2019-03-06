@@ -88,6 +88,7 @@ protected:
 public:
 	double CalcNorm();
 	double GetNorm();
+	double GetNorm() const ;
 	void PrepareForUse();
 	coordvec Unit() const ;
 	double Unit(const int a) const;
@@ -110,6 +111,7 @@ public:
 	void mult(double scalin);
 	vector<double> cross(const vector<double> &vecin) const ;
 	double dot(const vector<double> &vecin) const ;
+	double angle(const coordvec &coordin) const ;
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -300,6 +302,9 @@ public:
 		sort(surfind);unique(surfind);
 	};
 	void GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const;
+	double Length(const mesh &meshin) const;
+	double LengthSquared(const mesh &meshin) const;
+	bool IsLength0(const mesh &meshin, double eps=__DBL_EPSILON__) const;
 	bool vertconneq(const edge &other) const;
 	edge(){ // Constructor
 		index=0;
@@ -537,6 +542,8 @@ public:
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;
+ 	vector<int> VertexInVolume(const vector<double> testVertices,
+ 		int sizeVert=3) const; 
 	// Mesh size and position
 	void Scale();
 	void Scale(const std::array<std::array<double, 2>,3> &domain);
@@ -575,6 +582,14 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
 	const vector<double> &testVertices,
 	coordvec &temp1, 
 	coordvec &temp2);
+double VertexDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertex);
+vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertices);
 
 namespace meshhelp {
 	template<class T, class V, class W>
@@ -602,6 +617,14 @@ namespace meshhelp {
 	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, 
 		const std::vector<bool> &edgeOut,
 		std::vector<int> surfList);
+	double VerticesDistanceSquared(const mesh &meshin,
+		const vector<int> &vertind);
+	double VerticesDistance(const mesh &meshin,
+		const vector<int> &vertind);
+	bool IsVerticesDistance0(const mesh &meshin,
+		const vector<int> &vertind, double eps=__DBL_EPSILON__);
+	int VertexInVolume(const mesh &meshin, 
+		const vector<double> testCoord);
 }
 //test functions
 int Test_ArrayStructures();

@@ -73,6 +73,13 @@ double coordvec::GetNorm(){
 	}
 	return(norm);
 }
+double coordvec::GetNorm() const {
+	// TEST_RANGE
+	if (~isuptodate){
+		RSVS3D_ERROR_ARGUMENT("coordvec is not ready for norm return");
+	}
+	return(norm);
+}
 
 double coordvec::CalcNorm(){
 	norm=sqrt(pow(elems[0],2)+pow(elems[1],2)+pow(elems[2],2));
@@ -185,6 +192,13 @@ double coordvec::dot(const std::vector<double> &vecin) const {
 	}
 	return(retVec);
 }
+double coordvec::angle(const coordvec &coordin) const {
+
+	return acos(
+		this->dot(coordin.usedata())
+		/(coordin.GetNorm()*this->GetNorm())
+		);
+}
 
 //// ----------------------------------------
 // Implementation of point location
@@ -205,8 +219,8 @@ double coordvec::dot(const std::vector<double> &vecin) const {
  * @param[in]  planeVert2  The plane vertex 2
  * @param[in]  planeVert3  The plane vertex 3
  * @param[in]  testVertex  The test vertex
- * @param[in]  temp1       The temporary array 1
- * @param[in]  temp2       The temporary array 2
+ * @param[in|out]  temp1       The temporary array 1
+ * @param[in|out]  temp2       The temporary array 2
  *
  * @return     the distance from the plane to the vertex
  */
@@ -232,21 +246,23 @@ double VertexDistanceToPlane(const vector<double> &planeVert1,
 	return planeDistance;
 }
 /**
- * @brief      Calculates the distance from a set of vertices to a plane.
- * calculates the distance from a plane to a vertex, with the plane
+ * Calculates the distance from a set of vertices to a plane.
+ * 
+ * Calculates the distance from a plane to a vertex, with the plane
  * defined by three vertices. 
  * 
  * Two optional arguments can be provided to avoid the need for
  * memory allocation if this is called in a loop. For max speedup 
  * if testing a surface multiple times against many vertices temp2
- * can be reused
+ * is reused internally allowing surface properties to only be 
+ * calculated once.
  *
  * @param[in]  planeVert1  The plane vertex 1
  * @param[in]  planeVert2  The plane vertex 2
  * @param[in]  planeVert3  The plane vertex 3
  * @param[in]  testVertices  The test vertices
- * @param[in]  temp1       The temporary array 1
- * @param[in]  temp2       The temporary array 2
+ * @param[in|out]  temp1       The temporary array 1
+ * @param[in|out]  temp2       The temporary array 2
  *
  * @return     the distance from the plane to the vertex
  */
@@ -295,9 +311,44 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
 	coordvec temp1, temp2;
 	return VerticesDistanceToPlane(planeVert1, planeVert2, 
 		planeVert3, testVertices, temp1, temp2);
-
 }
 
+/**
+ * @brief      Finds for each vertex, the volume object containing it.
+ *
+ * @param[in]  testVertices  The test vertices
+ * @param[in]  sizeVert      The size of each vertex data
+ *
+ * @return     returns a list of indices containing the same number of
+ * 	values as there are input vertices (testVertices/sizeVert) 
+ */
+vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert) const {
+	if(sizeVert<3){
+		RSVS3D_ERROR_ARGUMENT("sizeVert must be at least 3.");
+	}
+	if(testVertices.size()%sizeVert != 0){
+		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be a multiple of sizeVert.");
+	}
+
+	vector<int> vertVolumeIndices;
+	size_t nPts = testVertices.size()/sizeVert;
+	vector<double> tempCoord;
+	vertVolumeIndices.assign(nPts,-1);
+	#ifdef RSVS_DIAGNOSTIC
+	cout << endl << " Number of volumes explored before final "
+		"candidate out of " << this->volus.size() << endl ;
+	#endif
+	for (size_t i = 0; i < nPts; ++i)
+	{
+		tempCoord.assign(testVertices.begin()+i*sizeVert,
+			testVertices.begin()+(i*sizeVert+3));
+		vertVolumeIndices[i] = meshhelp::VertexInVolume(*this, tempCoord);
+	}
+	#ifdef RSVS_DIAGNOSTIC 
+	cout << endl ;
+	#endif
+	return vertVolumeIndices;
+}
 //// ----------------------------------------
 // Implementation of mesh dependence
 //// ----------------------------------------
@@ -813,6 +864,48 @@ void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &len
 	centre.div(2);
 }
 
+/**
+ * @brief      Calculate squared edge length
+ *
+ * @param[in]  meshin  the mesh in which the edge existes
+ *
+ * @return     the squared length of the edge
+ */
+double edge::LengthSquared(const mesh &meshin) const {
+	double lengthSquared=0.0;
+
+	for (int i = 0; i < meshin.WhatDim(); ++i)
+	{
+		lengthSquared += pow(
+				meshin.verts.isearch(this->vertind[0])->coord[i]
+				-meshin.verts.isearch(this->vertind[1])->coord[i]
+			,2.0);
+	}
+
+	return lengthSquared;
+}
+/**
+ * @brief      Calculate the edge length
+ *
+ * @param[in]  meshin  the mesh in which the edge existes
+ *
+ * @return     the length of the edge
+ */
+double edge::Length(const mesh &meshin) const {
+	return sqrt(this->LengthSquared(meshin));
+}
+/**
+ * @brief      Returns
+ *
+ * @param[in]  meshin  the mesh in which the edge existes
+ * @param[in]  eps     Tolerance, number under which the length must 
+ * 						be to be considered 0. Defaults to __DBL_EPSILON__.
+ *
+ * @return     Wether Length squared is below eps squared.
+ */
+bool edge::IsLength0(const mesh &meshin, double eps) const {
+	return this->LengthSquared(meshin)< pow(eps,2.0);
+}
 
 // Methods of meshpart : volu surf edge vert
 void volu::disp() const{
@@ -4690,5 +4783,144 @@ namespace meshhelp {
 		}
 
 		return(edgeList);
+	}
+
+	int VertexInVolume(const mesh &meshin, const vector<double> testCoord){
+		/*
+		 for each point
+		 Start at a surface (any)
+		 Find which side it is on
+		 -> gives me a candidate volume 
+		 -> candidate volume is stored and provides a list of 
+		 surfaces to test against
+		 -> if candidate is 0 and outside of the mesh convex its done. 	
+		 */
+
+		if(meshin.volus.size()==0){
+			return 0;
+		}
+		coordvec temp1, temp2;
+		std::array<int, 3> surfacePoints = {0,0,0};
+		bool isInCandidate=false, candidateIsValid;
+		int volumeCandidate=0;
+		int pointInVolu, alternateVolume, nVolusExplored=0, nVolus;
+		double distToPlane;
+
+		nVolus=meshin.volus.size();
+		volumeCandidate=meshin.volus(0)->index;
+		do{
+			// assume the vertex is out of the candidate
+			isInCandidate=true;
+			candidateIsValid=false;
+			// for each face of the candidate volume
+			for(auto surfCurr : meshin.volus.isearch(volumeCandidate)->surfind){
+				#ifdef SAFE_ALGO
+				// Checks that ordering and edgeind are correct
+				if(!meshin.surfs.isearch(surfCurr)->isready(true)){
+					RSVS3D_ERROR_ARGUMENT("Surfaces of `meshin` need to be ordered."
+						" Run meshin.OrderEdges() before calling");
+				}
+				if(meshin.surfs.isearch(surfCurr)->edgeind.size()<3){
+					std::string strErr;
+					strErr = "Surface "+to_string(surfCurr)+" has less than 3 edges.";
+					RSVS3D_ERROR_ARGUMENT(strErr.c_str());
+				}
+				#endif
+
+				// assign surfacePoints the indices of 3 non coincident points appearing
+				// in the surface
+				int surfacePointsIdentified = 0;
+				for (auto edgeCurr : meshin.surfs.isearch(surfCurr)->edgeind)
+				{
+					if(meshin.edges.isearch(edgeCurr)->IsLength0(meshin)){
+						continue;
+					}
+					if(surfacePointsIdentified==0){
+						surfacePoints[0] = meshin.edges.isearch(edgeCurr)->vertind[0];
+						surfacePoints[1] = meshin.edges.isearch(edgeCurr)->vertind[1];
+						surfacePointsIdentified=2;
+					} else {
+						for (auto vertCurr : meshin.edges.isearch(edgeCurr)->vertind){
+							if(vertCurr!=surfacePoints[0] 
+								&& vertCurr!=surfacePoints[1]
+								&& !(meshhelp::IsVerticesDistance0(meshin, 
+									{vertCurr, surfacePoints[0]}))
+								&& !(meshhelp::IsVerticesDistance0(meshin, 
+									{vertCurr, surfacePoints[1]}))
+							){
+								surfacePoints[2] = vertCurr;
+								surfacePointsIdentified++;
+								break;
+							}
+						}
+					}
+					if(surfacePointsIdentified==3){
+						break;
+					}
+				}
+				if(surfacePointsIdentified!=3){
+					// if the surface has less than 3 non-coincident points it is 
+					// degenerate and equivalent to an edge. It does not invalidate or
+					// validate the candidate
+					int jj=meshin.surfs.isearch(surfCurr)->voluind[0]==volumeCandidate;
+					alternateVolume = meshin.surfs.isearch(surfCurr)->voluind[jj];
+					continue;
+				}
+				// candidate is valid if it has one non-degenerate face
+				candidateIsValid=true; 
+				distToPlane = VertexDistanceToPlane(
+					meshin.verts.isearch(surfacePoints[0])->coord,
+					meshin.verts.isearch(surfacePoints[1])->coord,
+					meshin.verts.isearch(surfacePoints[2])->coord,
+					testCoord,temp1, temp2);
+				if(fabs(distToPlane)<__DBL_EPSILON__){
+					continue;
+				}
+				pointInVolu = meshin.surfs.isearch(surfCurr)->voluind[int(distToPlane>0)];
+				if(pointInVolu==0){
+					volumeCandidate=pointInVolu;
+					break;
+				} else if(pointInVolu!=volumeCandidate){
+					isInCandidate=false;
+					volumeCandidate=pointInVolu;
+					break;
+				}
+			}
+			if(!candidateIsValid && isInCandidate){
+				isInCandidate=false;
+				volumeCandidate = alternateVolume;
+			}
+			nVolusExplored++;
+		} while (!isInCandidate && nVolusExplored<nVolus);
+		if (!isInCandidate){
+			RSVS3D_ERROR_LOGIC("Algorithm did not find the cell in which the vertex lies.");
+		}
+		#ifdef RSVS_DIAGNOSTIC
+		cout << nVolusExplored << " ";
+		#endif
+		return volumeCandidate;
+	}
+
+	double VerticesDistanceSquared(const mesh &meshin,
+		const vector<int> &vertind){
+		double lengthSquared=0.0;
+
+		for (int i = 0; i < meshin.WhatDim(); ++i)
+		{
+			lengthSquared += pow(
+					meshin.verts.isearch(vertind[0])->coord[i]
+					-meshin.verts.isearch(vertind[1])->coord[i]
+				,2.0);
+		}
+
+		return lengthSquared;
+	}
+	double VerticesDistance(const mesh &meshin,
+		const vector<int> &vertind){
+		return sqrt(VerticesDistanceSquared(meshin, vertind));
+	}
+	bool IsVerticesDistance0(const mesh &meshin,
+		const vector<int> &vertind, double eps){ 
+		return VerticesDistanceSquared(meshin,vertind)< pow(eps,2.0);
 	}
 }

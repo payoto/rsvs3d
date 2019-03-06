@@ -1497,10 +1497,9 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	vosMesh.PrepareForUse();
 
 	// Step 6 - Check original points containments
-	std::vector<int> vecPtsMapping;
-	size_t nPts = vecPts.size()/4;
-	vecPtsMapping.reserve(nPts);
-	
+	std::vector<int> vecPtsMapping = snakMesh.VertexInVolume(vecPts, 4);
+	DisplayVector(vecPtsMapping);
+	cout << endl;
 }
 
 void tetgen::io_safe::allocate(){
@@ -1843,7 +1842,7 @@ int tetcall_RSVSVORO()
 int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
 {
 	std::vector<double> vecPts;
-	mesh vosMesh, snakMesh;
+	mesh vosMesh, snakMesh, meshPts;
 	tecplotfile tecout;
 
 	try {
@@ -1865,8 +1864,17 @@ int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
 		tecout.OpenFile(tecoutStr, "a");
 
 		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
-		tecout.PrintMesh(snakMesh);
-		tecout.PrintMesh(vosMesh);
+		tecout.PrintMesh(snakMesh,1,nPts);
+		tecout.PrintMesh(vosMesh,2,nPts);
+		meshPts.Init(nPts+8,0,0,0);
+		meshPts.PopulateIndices();
+		for (int i = 0; i < nPts+8; ++i)
+		{	
+			meshPts.verts[i].coord.assign(vecPts.begin()+i*4,
+				vecPts.begin()+i*4+3);
+		}
+		meshPts.PrepareForUse();
+		tecout.PrintMesh(meshPts,3,nPts,4);
 		cout << "__________________________________________________" << endl;
 
 	} catch (exception const& ex) {
