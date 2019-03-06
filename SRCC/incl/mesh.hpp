@@ -108,8 +108,8 @@ public:
 	void div(double scalin);
 	void mult(const vector<double> &vecin);
 	void mult(double scalin);
-	vector<double> cross(const vector<double> &vecin);
-	double dot(const vector<double> &vecin);
+	vector<double> cross(const vector<double> &vecin) const ;
+	double dot(const vector<double> &vecin) const ;
 
 	coordvec(){
 		elems.reserve(3); // reserves 3 as this is the size of the array
@@ -122,7 +122,8 @@ public:
 	}
 	void operator=(const vector<double> &a){
 		if(int(a.size())!=3){
-			cout << "Warning : Coordinate vector is being a vecetor other than 3 long" << endl;
+			cout << "Warning : Coordinate vector is being a "
+				"vector other than 3 long" << endl;
 		}
 		elems=a;
 		isuptodate=0;
@@ -562,6 +563,18 @@ void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 int OrderEdgeList(vector<int> &edgeind, const mesh &meshin, bool warn=true,
 	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL,
 	const surf* surfin=NULL);
+double VertexDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertex,
+	coordvec &temp1, 
+	coordvec &temp2);
+vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertices,
+	coordvec &temp1, 
+	coordvec &temp2);
 
 namespace meshhelp {
 	template<class T, class V, class W>

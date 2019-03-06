@@ -1426,6 +1426,7 @@ namespace voronoimesh {
 		}
 		return boundaryFaces;
 	}
+
 }
 
 
@@ -1465,6 +1466,7 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	std::vector<int> vertsVoro;
 	std::vector<int> vertBlock, elmMapping;
 
+
 	inparam.lowerB= {-0.0, -0.0,-0.0};
 	inparam.upperB= {1.0, 1.0, 1.0};
 	inparam.distanceTol = 1e-3;
@@ -1495,6 +1497,10 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	vosMesh.PrepareForUse();
 
 	// Step 6 - Check original points containments
+	std::vector<int> vecPtsMapping;
+	size_t nPts = vecPts.size()/4;
+	vecPtsMapping.reserve(nPts);
+	
 }
 
 void tetgen::io_safe::allocate(){

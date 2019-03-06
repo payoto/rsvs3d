@@ -164,7 +164,7 @@ void coordvec::mult(double scalin){
 	}
 }
 
-vector<double> coordvec::cross(const std::vector<double> &vecin){
+vector<double> coordvec::cross(const std::vector<double> &vecin) const {
 
 	vector<double> retVec;
 	retVec.assign(3,0.0);
@@ -176,7 +176,7 @@ vector<double> coordvec::cross(const std::vector<double> &vecin){
 	return(retVec);
 }
 
-double coordvec::dot(const std::vector<double> &vecin){
+double coordvec::dot(const std::vector<double> &vecin) const {
 
 	double retVec=0.0;
 	
@@ -184,6 +184,118 @@ double coordvec::dot(const std::vector<double> &vecin){
 		retVec+=elems[ii]*vecin[ii];
 	}
 	return(retVec);
+}
+
+//// ----------------------------------------
+// Implementation of point location
+//// ----------------------------------------
+// Detects which volume (if any a point is in)
+
+/**
+ * @brief      Calculates the distance from a vertex to a plane.
+ * calculates the distance from a plane to a vertex, with the plane
+ * defined by three vertices. 
+ * 
+ * Two optional arguments can be provided to avoid the need for
+ * memory allocation if this is called in a loop. For max speedup 
+ * if testing a surface multiple times against many vertices temp2
+ * can be reused
+ *
+ * @param[in]  planeVert1  The plane vertex 1
+ * @param[in]  planeVert2  The plane vertex 2
+ * @param[in]  planeVert3  The plane vertex 3
+ * @param[in]  testVertex  The test vertex
+ * @param[in]  temp1       The temporary array 1
+ * @param[in]  temp2       The temporary array 2
+ *
+ * @return     the distance from the plane to the vertex
+ */
+double VertexDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertex,
+	coordvec &temp1, coordvec &temp2){
+	
+	double planeDistance=0.0;
+	if(testVertex.size()!=3){
+		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be of size 3.");
+	}
+	temp1 = planeVert1;
+	temp2 = planeVert1;
+	temp1.substractfrom(planeVert2);
+	temp2.substractfrom(planeVert3);
+
+	temp2 = temp1.cross(temp2.usedata()); // causes allocation
+
+	planeDistance = temp2.dot(testVertex)-temp2.dot(planeVert1);
+
+	return planeDistance;
+}
+/**
+ * @brief      Calculates the distance from a set of vertices to a plane.
+ * calculates the distance from a plane to a vertex, with the plane
+ * defined by three vertices. 
+ * 
+ * Two optional arguments can be provided to avoid the need for
+ * memory allocation if this is called in a loop. For max speedup 
+ * if testing a surface multiple times against many vertices temp2
+ * can be reused
+ *
+ * @param[in]  planeVert1  The plane vertex 1
+ * @param[in]  planeVert2  The plane vertex 2
+ * @param[in]  planeVert3  The plane vertex 3
+ * @param[in]  testVertices  The test vertices
+ * @param[in]  temp1       The temporary array 1
+ * @param[in]  temp2       The temporary array 2
+ *
+ * @return     the distance from the plane to the vertex
+ */
+vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertices,
+	coordvec &temp1, coordvec &temp2){
+	
+	if(testVertices.size()%3 != 0){
+		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be a multiple of 3.");
+	}
+
+	std::vector<double> planeDistances, testVertex;
+	size_t nPts = testVertices.size()/3;
+	planeDistances.assign(nPts, 0.0);
+	if(nPts==0){
+		return planeDistances;
+	}
+	testVertex.assign(3, 0.0);
+	testVertex.assign(testVertices.begin(),	testVertices.begin()+3);
+	planeDistances[0]=VertexDistanceToPlane(planeVert1,planeVert2,planeVert3,
+		testVertex, temp1, temp2);
+	auto planePosition = temp2.dot(planeVert1);
+	for (size_t i = 1; i < nPts; ++i)
+	{
+		testVertex.assign(testVertices.begin()+3*i, testVertices.begin()+3*i);
+		planeDistances[i] = temp2.dot(testVertex)-planePosition;
+	}
+
+	return planeDistances;
+}
+
+double VertexDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertex){
+	coordvec temp1, temp2;
+	return VertexDistanceToPlane(planeVert1, planeVert2, 
+		planeVert3, testVertex, temp1, temp2);
+}
+vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &testVertices){
+	coordvec temp1, temp2;
+	return VerticesDistanceToPlane(planeVert1, planeVert2, 
+		planeVert3, testVertices, temp1, temp2);
+
 }
 
 //// ----------------------------------------
