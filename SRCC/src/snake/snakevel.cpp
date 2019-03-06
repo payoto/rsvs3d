@@ -148,7 +148,7 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS){
 void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , 
 	const int typeMesh, const vector<int> &subList){
 	int ii,n,nTriS,nTriE,maxIndVert, maxIndTriangle;
-	triarray triangulation::*mp;
+	triarray triangulation::*mp=NULL;
 
 	if (typeMesh==1){
 		mp=&triangulation::stattri;
@@ -492,7 +492,8 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 
 }
 
-void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert){
+void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul,
+	tripointarray& trivert){
 	// Adds a triarray and corresponding 
 	int ii,jj,kk,ll,n, nSub,subSurf,nSurfInd,mm;
 	int nNewVert, nNewEdge, nNewSurf,maxIndVert, maxIndEdge, maxIndSurf,vertSub;

@@ -305,7 +305,7 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	int nVert, nEdge, nSurf, nVolu,ii,jj,kk;
 	bool isReady;
 	vector<int> vertSpawn,subList;
-	int snax::*mp;
+	int snax::*mp=NULL;
 
 	nVert=0; nEdge=0; nSurf=0; nVolu=0;jj=-1;
 

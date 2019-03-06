@@ -736,12 +736,13 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 // =====================================
 //
 //
-
-
+// Flag change is temporary
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wunused-parameter"
 void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	const triangulation &triRSVS,
 	bool isObj, bool isConstr, bool isDeriv){
-
+#pragma GCC diagnostic pop
 
 	int ii,ni,jj,nj,nCellTarg;
 	int subTemp,subTemp1,subTemp2,subTemp3,nDvAct;

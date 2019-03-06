@@ -1474,8 +1474,10 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	// Step 1 - 2 
 	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
 	voroMesh = vosMesh;
-	// auto boundFaces = voronoimesh::BoundaryFacesFromPoints(snakMesh, vertsVoro);
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored  "-Wunused-variable"
 	int nBlocks = snakMesh.ConnectedVolumes(elmMapping, boundFaces);
+	#pragma GCC diagnostic pop
 	#ifdef SAFE_ALGO
 	if(nBlocks!=voroMesh.volus.size()){
 		std::cerr << "Error : nBlocks (" << nBlocks 

@@ -70,8 +70,8 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 #                 COMPILER FLAGS
 #------------------------------------------------------
 # Standard GCC warning, optimisation and c++ standard flags
-WARNFLAGS= -Wall -Wextra -pedantic 
-#-Werror
+WARNFLAGS= -Wall -Wextra -pedantic -Werror
+#
 OPTIMLVL=3
 CCPSTD=11
 
@@ -83,9 +83,9 @@ CCPSTD=11
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # Tetgen flag to use as library: -DTETLIBRARY
 # cxxopts #
-CCFLAGDBG=
+CCFLAGDBG= -g -ggdb
 # -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
-CCFLAGPROJ= -march=native -ffast-math -ffinite-math-only
+CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO
 CCFLAGBOOST=
 CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT 
 CCFLAGETETGEN= -DTETLIBRARY 

@@ -257,6 +257,10 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	TimeStamp(" - Connec Update: ", start_f);
 }
 
+#ifndef TIME_EXEC
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored  "-Wunused-parameter"
+#endif
 int TimeStamp(const char* str,int start_s){
 	int stop_s=clock();
 	#ifdef TIME_EXEC
@@ -264,6 +268,9 @@ int TimeStamp(const char* str,int start_s){
 	#endif
 	return(stop_s);
 }
+#ifndef TIME_EXEC
+	#pragma GCC diagnostic pop
+#endif
 
 // ====================
 // integrate

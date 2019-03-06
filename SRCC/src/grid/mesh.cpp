@@ -2049,9 +2049,12 @@ void mesh::PopulateIndices(){
  *             (need errout to be false) for edgeind of size
  *             -<return val>
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 	bool errout, const vector<int>* edgeIndOrigPtr,
 	const surf* surfin){
+#pragma GCC diagnostic pop
 
 	unordered_multimap<int,int> vert2Edge;
 	vector<bool> isDone;
@@ -3734,6 +3737,8 @@ void mesh::LoadTargetFill(const std::string &fileName){
 		nElms = this->volus.size();
 	} else if(this->WhatDim()==2){
 		nElms = this->surfs.size();
+	} else {
+		RSVS3D_ERROR_ARGUMENT("Dimensionality of the target not supported.");
 	}
 
 	fillVals.reserve(nElms);
