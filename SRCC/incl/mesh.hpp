@@ -488,6 +488,7 @@ public:
 		int volType=0) const;
 	void SurfValuesofParents(int elmInd, vector<double> &vals,
 		double surf::*mp) const;
+	int ParentElementIndex(int childElmInd, int parentInd=0) const;
 	// Mesh property
 	int WhatDim() const {return(meshDim);}
 	// basic operations grouped from each field

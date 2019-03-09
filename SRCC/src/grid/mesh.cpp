@@ -334,7 +334,7 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert
 	size_t nPts = testVertices.size()/sizeVert;
 	vector<double> tempCoord;
 	vertVolumeIndices.assign(nPts,-1);
-	#ifdef RSVS_DIAGNOSTIC
+	#ifdef RSVS_DIAGNOSTIC_RESOLVED
 	cout << endl << " Number of volumes explored before final "
 		"candidate out of " << this->volus.size() << endl ;
 	#endif
@@ -348,7 +348,7 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert
 			testVertices.begin()+(i*sizeVert+3));
 		vertVolumeIndices[i] = meshhelp::VertexInVolume(*this, tempCoord, needFlip);
 	}
-	#ifdef RSVS_DIAGNOSTIC 
+	#ifdef RSVS_DIAGNOSTIC_RESOLVED 
 	cout << endl ;
 	#endif
 	return vertVolumeIndices;
@@ -404,7 +404,6 @@ void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
 	HashedVectorSafe<int,int> temp;
 
 	if (parentind.size()!=elemind.size()){
-		cerr << "Error in " << __PRETTY_FUNCTION__ << endl; 
 		RSVS3D_ERROR_ARGUMENT("parent and child index list must be the same size.");
 	}
 
@@ -853,6 +852,26 @@ int mesh::CountVoluParent() const {
 	}
 	return(n);
 }
+
+int mesh::ParentElementIndex(int childElmInd, int parentInd) const{
+	/*
+	 Returns the parent of an element.
+	 */
+	if(parentInd>=int(this->meshtree.parentconn.size())
+		|| parentInd<0){
+		RSVS3D_ERROR_ARGUMENT("parentInd is larger than the number of mesh parents");
+	}
+	if (this->WhatDim()==3){
+		return (this->meshtree.parentconn[parentInd][this->volus.find(childElmInd)]);
+	} else if (this->WhatDim()==2){
+		return (this->meshtree.parentconn[parentInd][this->surfs.find(childElmInd)]);
+	} else {
+		RSVS3D_ERROR_ARGUMENT("Dimensionality other than 2 or 3 not supported yet");
+		return(-1);
+	}
+
+}
+
 /// MAth operations in mesh
 void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const {
 
@@ -4900,7 +4919,7 @@ namespace meshhelp {
 		if (!isInCandidate){
 			RSVS3D_ERROR_LOGIC("Algorithm did not find the cell in which the vertex lies.");
 		}
-		#ifdef RSVS_DIAGNOSTIC
+		#ifdef RSVS_DIAGNOSTIC_RESOLVED
 		cout << nVolusExplored << " ";
 		#endif
 		return volumeCandidate;

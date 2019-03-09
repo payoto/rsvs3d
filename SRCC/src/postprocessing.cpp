@@ -21,7 +21,8 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *n
 	}
 }
 
-int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat){
+int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
+	const std::vector<int> &voluList){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,nCoord;
@@ -41,18 +42,34 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVert
 		fprintf(fid,"\n");this->ResetLine();
 	}
 	// Print Cell Data
-	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->fill);
+	if(voluList.size()==0){
+		for ( ii = 0; ii<nVolu; ++ii){
+			this->Print("%.16lf ",meshout.volus(ii)->fill);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+		for ( ii = 0; ii<nVolu; ++ii){
+			this->Print("%.16lf ",meshout.volus(ii)->target);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+		for ( ii = 0; ii<nVolu; ++ii){
+			this->Print("%.16lf ",meshout.volus(ii)->error);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	} else {
+		for(auto ii : voluList){
+			this->Print("%.16lf ",meshout.volus.isearch(ii)->fill);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+		
+		for(auto ii : voluList){
+			this->Print("%.16lf ",meshout.volus.isearch(ii)->target);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+		for(auto ii : voluList){
+			this->Print("%.16lf ",meshout.volus.isearch(ii)->error);
+		}
+		fprintf(fid,"\n");this->ResetLine();
 	}
-	fprintf(fid,"\n");this->ResetLine();
-	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->target);
-	}
-	fprintf(fid,"\n");this->ResetLine();
-	for ( ii = 0; ii<nVolu; ++ii){
-		this->Print("%.16lf ",meshout.volus(ii)->error);
-	}
-	fprintf(fid,"\n");this->ResetLine();
 	return(0);
 }
 
@@ -301,6 +318,77 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 
 	return(0);
 }
+int tecplotfile::VolFaceMap(const mesh &meshout, 
+	const std::vector<int> &surfList,const std::vector<int> &voluList){
+	int jj,actVert,edgeCurr;
+	int verts[2],vertsPast[2];
+	for (auto ii : meshout.surfs.find_list(surfList)){ // Print Number of vertices per face
+		this->Print("%i ",meshout.surfs(ii)->edgeind.size());
+	}
+	fprintf(fid,"\n");this->ResetLine();
+
+	for (auto ii : meshout.surfs.find_list(surfList))
+	{// print ordered  list of vertices in face
+		jj=int(meshout.surfs(ii)->edgeind.size())-1;
+
+		edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
+		verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
+		verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
+		vertsPast[0]=verts[0];
+		vertsPast[1]=verts[1];
+
+		for(jj=0;jj<int(meshout.surfs(ii)->edgeind.size());++jj){
+			edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
+
+			verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
+			verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
+
+			if ((verts[0]==vertsPast[0]) || (verts[1]==vertsPast[0])){
+				actVert=0;
+			} 
+			#ifdef TEST_POSTPROCESSING
+			else if ((verts[0]==vertsPast[1]) || (verts[1]==vertsPast[1])) {
+				actVert=1;
+			}
+			#endif //TEST_POSTPROCESSING
+			else {
+				actVert=1;
+				#ifdef TEST_POSTPROCESSING
+				//meshout.surfs(ii)->disptree(meshout,4);
+				
+				cerr << "Warning: postprocessing.cpp:tecplotfile::VolFaceMap"<< endl ;
+				cerr << "		Mesh Output failed in output of facemap data" << endl;
+				cerr << "		Surface is not ordered " << endl;
+				return(-1);
+				#endif
+			}
+
+			this->Print("%i ",vertsPast[actVert]+1);
+			vertsPast[0]=verts[0];
+			vertsPast[1]=verts[1];
+
+		}
+		fprintf(fid,"\n");this->ResetLine();
+		
+
+	}
+	for (jj=0;jj<2;++jj){// print index of left and right facing volumes
+		for (auto ii : meshout.surfs.find_list(surfList)){
+			//cout << ii << "," << jj << endl ;
+			actVert=meshout.surfs(ii)->voluind[jj];
+			int k=0;
+			for(auto j : voluList){
+				k++;
+				if(j==actVert){}break;
+			}
+			if (k==int(voluList.size())){k=0;}
+			this->Print("%i ",k);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+
+	return(0);
+}
 // Class function Implementation
 int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, 
 	int forceOutType, const vector<int> &vertList){
@@ -364,6 +452,29 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
 		this->VertDataBlock(meshout,nVert, nVertDat,nCellDat,vertList);
 		// No map just points
+	} else if (forceOutType==5){
+		if (vertList.size()>0){
+			nVolu=int(vertList.size());
+		} else {
+			RSVS3D_ERROR_ARGUMENT("voluList with forceOutType == 5 must at"
+				" least be length 1");
+		}
+		nSurf=0; totNumFaceNode=0;
+		auto voluSubList = meshout.volus.find_list(vertList);
+		auto surfList = ConcatenateVectorField(meshout.volus,
+			&volu::surfind, voluSubList);
+		sort(surfList);
+		unique(surfList);
+		nSurf = surfList.size();
+
+		for(auto j : surfList){
+			totNumFaceNode += meshout.surfs.isearch(j)->edgeind.size();
+		}
+
+		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat);
+		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
+		this->VolFaceMap(meshout, surfList,vertList);
 	}
 	return(0);
 }

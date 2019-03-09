@@ -176,7 +176,8 @@ int test_tetgenapi();
 int tetcall();
 int tetcall_CFD();
 int tetcall_RSVSVORO();
-int tetcall_RSVSVOROFunc(int nPts=0, 
+int tetcall_RSVSVORO_Contain();
+int tetcall_RSVSVOROFunc(int nPts=0, double distanceTol=0.26,
 	const char* tecoutStr="../TESTOUT/rsvs_voro.plt");
 
 #endif

@@ -77,6 +77,7 @@ CCPSTD=11
 
 # Other compiler flags
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE
+# -DRSVS_DIAGNOSTIC_RESOLVED
 # gdb (debug) flags: # -g -ggdb 
 # boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL

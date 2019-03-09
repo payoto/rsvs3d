@@ -736,8 +736,10 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 		int nVertsAdded = 0;
 		std::vector<double> vertsToAdd;
 		std::array<double, 3> vertModif = {0,0,0}, edgeModif = {0,0,0};
+		#ifdef RSVS_DIAGNOSTIC_RESOLVED
 		tecplotfile  tecout;
 		tecout.OpenFile("../TESTOUT/rsvs_voro.plt", "a");
+		#endif
 		vertsToAdd.reserve(100);
 		// add the points associated with the vertices
 		for (int l = 0; l < 3; ++l)
@@ -811,7 +813,9 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 			meshgeom.disp();
 		}
 		meshgeom.PrepareForUse();
+		#ifdef RSVS_DIAGNOSTIC_RESOLVED
 		tecout.PrintMesh(meshgeom, 0,0,4);
+		#endif
 	} else{ 
 		meshgeom.Init(0, 0, 0, 0);
 	}
@@ -1457,8 +1461,8 @@ namespace voronoimesh {
 		for (int i = 0; i < 3; ++i)
 		{
 			double delta = inparam.upperB[i]-inparam.lowerB[i];
-			lowerB[i]=inparam.lowerB[i] - delta*inparam.distanceTol*0.98;
-			upperB[i]=inparam.upperB[i] + delta*inparam.distanceTol*0.98;
+			lowerB[i]=inparam.lowerB[i] - delta*inparam.distanceTol*0.999;
+			upperB[i]=inparam.upperB[i] + delta*inparam.distanceTol*0.999;
 		}
 		// voroMesh.displight();
 		voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
@@ -1546,7 +1550,9 @@ namespace voronoimesh {
 }
 
 
-void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snakMesh){
+std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts, 
+	mesh &vosMesh, mesh &snakMesh,
+	tetgen::apiparam &inparam){
 	/*
 	Generates a VOS and snaking grid from a set of points
 	
@@ -1578,20 +1584,14 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 
 	*/
 	mesh voroMesh;
-	tetgen::apiparam inparam;
+	// tetgen::apiparam inparam;
 	std::vector<int> vertsVoro;
 	std::vector<int> vertBlock, elmMapping;
 
 
-	inparam.lowerB= {-0.0, -0.0,-0.0};
-	inparam.upperB= {1.0, 1.0, 1.0};
-	inparam.distanceTol = 1e-3;
-	// inparam.edgelengths = {0.2};
-	inparam.edgelengths = {0.1};
-	inparam.distanceTol = 0.05;
-
 	// Step 1 - 2 
-	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
+	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh,
+		snakMesh, inparam);
 	voroMesh = vosMesh;
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored  "-Wunused-variable"
@@ -1615,8 +1615,33 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 
 	// Step 6 - Check original points containments
 	std::vector<int> vecPtsMapping = snakMesh.VertexInVolume(vecPts, 4);
+	#ifdef RSVS_DIAGNOSTIC_RESOLVED
 	DisplayVector(vecPtsMapping);
 	cout << endl;
+	#endif //RSVS_DIAGNOSTIC_RESOLVED
+	int count = vosMesh.volus.size();
+	for (int i = 0; i < count; ++i)
+	{
+		vosMesh.volus[i].fill = 0.0;
+	}
+	int nVecMap = vecPtsMapping.size();
+	for (int i = 0; i < nVecMap; ++i)
+	{
+		vosMesh.volus[
+			vosMesh.volus.find(
+				elmMapping[snakMesh.volus.find(vecPtsMapping[i])]
+			, true) // turn off warning
+			].fill=vecPts[i*4+3];
+	}
+	for (int i = 0; i < count; ++i)
+	{
+		vosMesh.volus[i].target = vosMesh.volus[i].fill;
+		vosMesh.volus[i].error = 0.0;
+	}
+	vosMesh.PrepareForUse();
+
+	
+	return vecPtsMapping;
 }
 
 void tetgen::io_safe::allocate(){
@@ -1946,22 +1971,89 @@ int tetcall_RSVSVORO()
 		1,
 		2,3,4,5,10,20,100,1000
 	};
+	vector<double> numEdge = {
+		0.05, 0.1, 0.3
+	};
 	// std :: cin >> nPts;
 	tecout.OpenFile(tecoutStr);
 
 	for(auto i : numCells){
-		nErrors += tetcall_RSVSVOROFunc(i, tecoutStr);
+		for(auto j : numEdge){
+			nErrors += tetcall_RSVSVOROFunc(i, j, tecoutStr);
+		}
 	}
 	
 	return nErrors;
 }
 
-int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
+
+
+int tetcall_RSVSVOROFunc_containtest(int nPts, double distanceTol, const char* tecoutStr)
 {
 	std::vector<double> vecPts;
 	mesh vosMesh, snakMesh, meshPts;
 	tecplotfile tecout;
+	tetgen::apiparam inparam;
+	try {
+		cout << "__________________________________________________" << endl;
+		cout << "Start Voronoi mesh generation for " << nPts 
+			<< " points"<< endl;
+		cout << "__________________________________________________" << endl;
+		for (int i = 0; i < nPts*4; ++i)
+		{
+			vecPts.push_back(double(abs(rand())%32767)/32767.0);
+		}
+		for (int i = 0; i < 8; ++i)
+		{
+			vecPts.push_back((i%2));	
+			vecPts.push_back(((i/2)%2));	
+			vecPts.push_back(((i/4)%2));	
+			vecPts.push_back(0);	
+		}
+		// tecout.OpenFile(tecoutStr, "a");
+		tecout.OpenFile(tecoutStr,"a");
 
+		inparam.lowerB= {-0.0, -0.0,-0.0};
+		inparam.upperB= {1.0, 1.0, 1.0};
+		inparam.distanceTol = 1e-3;
+		// inparam.edgelengths = {0.2};
+		inparam.edgelengths = {0.1};
+		inparam.distanceTol = distanceTol;
+
+		auto vecMap = RSVSVoronoiMesh(vecPts, vosMesh, snakMesh, inparam);
+
+		meshPts.Init(nPts+8,0,0,0);
+		meshPts.PopulateIndices();
+		for (int i = 0; i < nPts+8; ++i)
+		{	
+			meshPts.verts[i].coord.assign(vecPts.begin()+i*4,
+				vecPts.begin()+i*4+3);
+		}
+		meshPts.PrepareForUse();
+		// tecout.PrintMesh(meshPts,0,nPts+distanceTol,4);
+		int nVecMap = vecMap.size();
+		for (int i = 0; i < nVecMap; ++i)
+		{
+			tecout.PrintMesh(vosMesh,1,i,5,{snakMesh.ParentElementIndex(vecMap[i])});
+			tecout.PrintMesh(snakMesh,1,i,5,{vecMap[i]});
+			tecout.PrintMesh(meshPts,1,i,4,{i+1});
+		}
+		cout << "__________________________________________________" << endl;
+
+	} catch (exception const& ex) {
+		cerr << "Exception: " << ex.what() <<endl; 
+		cerr << "for " << __PRETTY_FUNCTION__ << "with nPoints = " << nPts << endl;
+		return 1;
+	}
+	return 0;
+}
+
+int tetcall_RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutStr)
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh, meshPts;
+	tecplotfile tecout;
+	tetgen::apiparam inparam;
 	try {
 		cout << "__________________________________________________" << endl;
 		cout << "Start Voronoi mesh generation for " << nPts 
@@ -1980,9 +2072,16 @@ int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
 		}
 		tecout.OpenFile(tecoutStr, "a");
 
-		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh);
-		tecout.PrintMesh(snakMesh,1,nPts);
-		tecout.PrintMesh(vosMesh,2,nPts);
+		inparam.lowerB= {-0.0, -0.0,-0.0};
+		inparam.upperB= {1.0, 1.0, 1.0};
+		inparam.distanceTol = 1e-3;
+		// inparam.edgelengths = {0.2};
+		inparam.edgelengths = {0.1};
+		inparam.distanceTol = distanceTol;
+
+		RSVSVoronoiMesh(vecPts, vosMesh, snakMesh, inparam);
+		tecout.PrintMesh(snakMesh,1,nPts+distanceTol);
+		tecout.PrintMesh(vosMesh,2,nPts+distanceTol);
 		meshPts.Init(nPts+8,0,0,0);
 		meshPts.PopulateIndices();
 		for (int i = 0; i < nPts+8; ++i)
@@ -1991,7 +2090,7 @@ int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
 				vecPts.begin()+i*4+3);
 		}
 		meshPts.PrepareForUse();
-		tecout.PrintMesh(meshPts,3,nPts,4);
+		tecout.PrintMesh(meshPts,3,nPts+distanceTol,4);
 		cout << "__________________________________________________" << endl;
 
 	} catch (exception const& ex) {
@@ -2000,4 +2099,33 @@ int tetcall_RSVSVOROFunc(int nPts, const char* tecoutStr)
 		return 1;
 	}
 	return 0;
+}
+int tetcall_RSVSVORO_Contain()
+{
+	std::vector<double> vecPts;
+	mesh vosMesh, snakMesh;
+	tecplotfile tecout;
+
+	int nErrors=0;
+	const char* tecoutStr =  "../TESTOUT/rsvs_voro_contain.plt";
+	vector<int> numCells = {
+		0,
+		1,
+		// 2,3,4,5,10,20,100,1000
+	};
+	vector<double> numEdge = {
+		// 0.05,
+		0.1,
+		// 0.3
+	};
+	// std :: cin >> nPts;
+	tecout.OpenFile(tecoutStr);
+
+	for(auto i : numCells){
+		for(auto j : numEdge){
+			nErrors += tetcall_RSVSVOROFunc_containtest(i, j,tecoutStr);
+		}
+	}
+	
+	return nErrors;
 }
