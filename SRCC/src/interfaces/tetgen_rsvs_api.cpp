@@ -733,32 +733,85 @@ void TetgenInput_POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 		// 	For each face place 1 point in the middle.
 		// 	For each edge place 2 points in the middle.
 		// 	For each face place 3 points on the outside.
+		int nVertsAdded = 0;
 		std::vector<double> vertsToAdd;
-		std::array<double, 3> vertModif = {0,0,0};
+		std::array<double, 3> vertModif = {0,0,0}, edgeModif = {0,0,0};
+		tecplotfile  tecout;
+		tecout.OpenFile("../TESTOUT/rsvs_voro.plt", "a");
 		vertsToAdd.reserve(100);
 		// add the points associated with the vertices
 		for (int l = 0; l < 3; ++l)
 		{
 			vertModif = {0,0,0};
-			vertModif[l] = 1.0;
+			vertModif[l] = tetgenParam.distanceTol;
 			for (int i = 0; i < 8; ++i)
 			{	
 				for (int j = 0; j < 3; ++j)
 				{
 					int k = pow(2,j);
-					double delta = (tetgenParam.upperB[j]-tetgenParam.lowerB[j])*vertModif[l];
+					double delta = (tetgenParam.upperB[j]-tetgenParam.lowerB[j])*vertModif[j];
 					vertsToAdd.push_back(
 						(((i/k)%2) ? 
 							tetgenParam.upperB[j]+delta 
 							: tetgenParam.lowerB[j]-delta)
 						);
 				}
+				nVertsAdded++;
 			}
 		}
+
 		// add the points associated with the edges
-
-
-
+		int nEdgeSteps = ceil(1.0/(tetgenParam.distanceTol*2));
+		for (int ll = 1; ll < nEdgeSteps; ++ll)
+		{
+			for (int l = 0; l < 3; ++l)
+			{ // for each direction of the edge (coord = 0.5)
+				edgeModif = {0,0,0};
+				edgeModif[l] = 1.0/double(nEdgeSteps)*ll;
+				for (int j = 0; j < 2; ++j)
+				{ // for each displacement off the edge
+					vertModif = {0,0,0};
+					vertModif[(l+j+1)%3] = tetgenParam.distanceTol;
+					for (int i = 0; i < 4; ++i)
+					{ // each of the edge that make a square
+						
+						for (int m = 0; m < 3; ++m)
+						{
+							if(m==l){ // this is the inactive dimension
+								vertsToAdd.push_back(edgeModif[l]);
+							} else {
+								double delta = (tetgenParam.upperB[m]
+									-tetgenParam.lowerB[m])*vertModif[m];
+								int k = pow(2, (m+3-(l+1))%3);
+								vertsToAdd.push_back(
+									(((i/k)%2) ? 
+								tetgenParam.upperB[m]+delta 
+								: tetgenParam.lowerB[m]-delta)
+							);
+							}
+						}
+						nVertsAdded++;
+					}
+					
+				}
+			}
+		}
+		// add the points associated with the faces
+		// add the points into a mesh
+		meshgeom.Init(nVertsAdded, 0, 0, 0);
+		meshgeom.PopulateIndices();
+		for (int i = 0; i < nVertsAdded; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				meshgeom.verts[i].coord[j] = vertsToAdd[i*3+j];
+			}
+		}
+		if(meshgeom.verts.size()<1){
+			meshgeom.disp();
+		}
+		meshgeom.PrepareForUse();
+		tecout.PrintMesh(meshgeom, 0,0,4);
 	} else{ 
 		meshgeom.Init(0, 0, 0, 0);
 	}
@@ -1394,7 +1447,7 @@ namespace voronoimesh {
 		std::vector<bool> tetSurfInVoro;
 		std::vector<double> lowerB, upperB;
 
-		TetgenInput_POINTGRIDS(ptsMesh, tetinV, inparam);
+		TetgenInput_POINTGRIDS(ptsMesh, tetinV, inparam, true);
 		cmd = "Qv"; 
 		tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
 		voroMesh = TetgenOutput_VORO2MESH(tetoutV);
@@ -1404,8 +1457,8 @@ namespace voronoimesh {
 		for (int i = 0; i < 3; ++i)
 		{
 			double delta = inparam.upperB[i]-inparam.lowerB[i];
-			lowerB[i]=inparam.lowerB[i] + delta/2.0;
-			upperB[i]=inparam.upperB[i] + delta/2.0;
+			lowerB[i]=inparam.lowerB[i] - delta*inparam.distanceTol*0.98;
+			upperB[i]=inparam.upperB[i] + delta*inparam.distanceTol*0.98;
 		}
 		// voroMesh.displight();
 		voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
@@ -1425,7 +1478,7 @@ namespace voronoimesh {
 		mesh meshdomain = BuildCutCellDomain({0,0,0}, {0,0,0}, // upper bounds are not used
 			inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
 
-		TetgenInput_RSVSGRIDS(voroMesh, meshdomain, tetinT, inparam);
+		TetgenInput_RSVSGRIDS(voroMesh, tetinT, inparam);
 		tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
 		tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
 		cmd = "QpqmnnefO9/7"; 
@@ -1535,6 +1588,7 @@ void RSVSVoronoiMesh(const std::vector<double> &vecPts,mesh &vosMesh, mesh &snak
 	inparam.distanceTol = 1e-3;
 	// inparam.edgelengths = {0.2};
 	inparam.edgelengths = {0.1};
+	inparam.distanceTol = 0.05;
 
 	// Step 1 - 2 
 	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh, snakMesh, inparam);
