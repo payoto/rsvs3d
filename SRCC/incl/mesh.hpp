@@ -624,7 +624,8 @@ namespace meshhelp {
 	bool IsVerticesDistance0(const mesh &meshin,
 		const vector<int> &vertind, double eps=__DBL_EPSILON__);
 	int VertexInVolume(const mesh &meshin, 
-		const vector<double> testCoord);
+		const vector<double> testCoord,
+		bool needFlip=false);
 }
 //test functions
 int Test_ArrayStructures();

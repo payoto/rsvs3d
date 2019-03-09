@@ -338,11 +338,15 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert
 	cout << endl << " Number of volumes explored before final "
 		"candidate out of " << this->volus.size() << endl ;
 	#endif
+	// Check orientation (OrientFaces is relative which means it can be facing in or out)
+	// simply test if the 1st one is 0:
+	tempCoord.assign(testVertices.begin(),testVertices.begin()+3);
+	bool needFlip = meshhelp::VertexInVolume(*this, tempCoord)==0;
 	for (size_t i = 0; i < nPts; ++i)
 	{
 		tempCoord.assign(testVertices.begin()+i*sizeVert,
 			testVertices.begin()+(i*sizeVert+3));
-		vertVolumeIndices[i] = meshhelp::VertexInVolume(*this, tempCoord);
+		vertVolumeIndices[i] = meshhelp::VertexInVolume(*this, tempCoord, needFlip);
 	}
 	#ifdef RSVS_DIAGNOSTIC 
 	cout << endl ;
@@ -4785,7 +4789,7 @@ namespace meshhelp {
 		return(edgeList);
 	}
 
-	int VertexInVolume(const mesh &meshin, const vector<double> testCoord){
+	int VertexInVolume(const mesh &meshin, const vector<double> testCoord, bool needFlip){
 		/*
 		 for each point
 		 Start at a surface (any)
@@ -4804,8 +4808,8 @@ namespace meshhelp {
 		bool isInCandidate=false, candidateIsValid;
 		int volumeCandidate=0;
 		int pointInVolu, alternateVolume, nVolusExplored=0, nVolus;
-		double distToPlane;
-
+		double distToPlane, multiplierDist;
+		multiplierDist = needFlip ? -1.0 : 1.0;
 		nVolus=meshin.volus.size();
 		volumeCandidate=meshin.volus(0)->index;
 		do{
@@ -4876,7 +4880,8 @@ namespace meshhelp {
 				if(fabs(distToPlane)<__DBL_EPSILON__){
 					continue;
 				}
-				pointInVolu = meshin.surfs.isearch(surfCurr)->voluind[int(distToPlane>0)];
+				pointInVolu = meshin.surfs.isearch(surfCurr)->
+					voluind[int((distToPlane*multiplierDist)>0)];
 				if(pointInVolu==0){
 					volumeCandidate=pointInVolu;
 					break;
