@@ -82,10 +82,10 @@ int main(){
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
 
-	gridTest.RunSilent(tetcall_CFD,"tegen API testing - CFD meshing"); 
-	gridTest.RunSilent(tetcall,"tegen API testing - RSVS meshing"); 
-	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
-	gridTest.Run(tetcall_RSVSVORO_Contain,"tegen API testing - Voro to RSVS"); // working test
+	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
+	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
+	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
+	gridTest.Run(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS"); // working test
 
 	return(0);
 }

@@ -135,6 +135,8 @@ namespace tetgen {
 	std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts, 
 		mesh &vosMesh, mesh &snakMesh,
 		tetgen::apiparam &inparam);
+	void SnakeToSU2(const snake &snakein, const std::string &fileName,
+		tetgen::apiparam &inparam);
 	namespace input {
 		void POINTGRIDS(const mesh &meshdomain, 
 			tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam,
@@ -160,27 +162,45 @@ namespace tetgen {
 		template<class T, class V>
 		double ProjectRay(int count, const tetgen::dombounds &boundBox,
 			const T &dir, const V &orig, double minDist=0.0);
+		void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
+			int facetOffset, int pointOffset, int pointMarker, 
+			const std::vector<double> &pointMtrList, 
+			const std::vector<double> &facetConstr,
+			int facetConstrOffset);
+		void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
+			tetgen::io_safe &tetin, int numHoles);
+		void Mesh2TetgenioPoints(const mesh &meshgeom, 
+			const mesh &meshdomain,	tetgen::io_safe &tetin);
+	}
+	namespace voronoi {
+		mesh Points2Mesh(const std::vector<double> &vecPts);
+		std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
+			mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam);
+		std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
+			const std::vector<int> &boundaryPts);
+	}
+
+	namespace test {
+		void LoadData(mesh &snakeMesh,
+			mesh &voluMesh, snake &snakein, mesh &triMesh);
+		int api();
+		int call();
+		int CFD();
+		int RSVSVORO();
+		int RSVSVORO_Contain();
+		int RSVSVOROFunc(int nPts=0, double distanceTol=0.26,
+			const char* tecoutStr="../TESTOUT/rsvs_voro.plt");
+		int RSVSVOROFunc_contain(int nPts=0, double distanceTol=0.26, 
+			const char* tecoutStr="../TESTOUT/rsvs_voro_contain.plt");
 	}
 }
 
-namespace voronoimesh {
-	mesh Points2Mesh(const std::vector<double> &vecPts);
-	std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
-		mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam);
-	std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
-		const std::vector<int> &boundaryPts);
-}
+
 
 
 // Test functions
 
-int test_tetgenapi();
-int tetcall();
-int tetcall_CFD();
-int tetcall_RSVSVORO();
-int tetcall_RSVSVORO_Contain();
-int tetcall_RSVSVOROFunc(int nPts=0, double distanceTol=0.26,
-	const char* tecoutStr="../TESTOUT/rsvs_voro.plt");
+
 
 
 /**

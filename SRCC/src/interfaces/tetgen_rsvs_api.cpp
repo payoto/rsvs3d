@@ -16,7 +16,8 @@
 #include "meshprocessing.hpp"
 #include "tetgen_rsvs_api.hpp"
 
-void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh &triMesh){
+void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh, 
+	snake &snakein, mesh &triMesh){
 	/*
 	Loads data for tetgen testing
 	*/
@@ -60,10 +61,10 @@ void load_tetgen_testdata(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mesh 
 	// it is not cleaned up for tiny surfaces
 }
 
-void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
-	int facetOffset, int pointOffset, int pointMarker, 
-	const std::vector<double> &pointMtrList, const std::vector<double> &facetConstr,
-	int facetConstrOffset){
+void tetgen::internal::MeshData2Tetgenio(const mesh &meshgeom, 
+	tetgen::io_safe &tetin,	int facetOffset, int pointOffset, 
+	int pointMarker, const std::vector<double> &pointMtrList,
+	const std::vector<double> &facetConstr,	int facetConstrOffset){
 	/*
 	Writes meshdata into the tetgenio format for a single mesh
 	*/
@@ -120,14 +121,13 @@ void MeshData2Tetgenio(const mesh &meshgeom, tetgen::io_safe &tetin,
 	}
 }
 
-void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
+void tetgen::internal::Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 	tetgen::io_safe &tetin, int numHoles){
 	/*
 	Converts a mesh into the safe allocation tetgenio format.
 	
 	Rules of conversion are: 
-		- volu becomes a facet
-		- surf becomes a polygon in the facet
+		- surfaces become a facet
 		- edges are not logged
 		- points come as a list
 	*/
@@ -145,12 +145,12 @@ void Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomain,
 
 	tetin.allocate();
 
-	MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{0.0},0);
-	MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
+	tetgen::internal::MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{0.0},0);
+	tetgen::internal::MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
 		meshgeom.verts.size(), -1, {-1.0},{0.0},1);
 }
 
-void Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &meshdomain,
+void tetgen::internal::Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &meshdomain,
 	tetgen::io_safe &tetin){
 	/*
 	Converts a mesh into the safe allocation tetgenio format.
@@ -219,7 +219,7 @@ void tetgen::input::RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 		lowerB, upperB, tetgenParam.edgelengths.size(), vertPerSubDomain);
 	
 	nHoles=holeCoords.size()/3;
-	Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
+	tetgen::internal::Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
 	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
@@ -270,7 +270,7 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 	
 
 	nHoles=holeCoords.size()/3;
-	Mesh2Tetgenio(meshboundary, meshdomain, tetin, nHoles);
+	tetgen::internal::Mesh2Tetgenio(meshboundary, meshdomain, tetin, nHoles);
 
 	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
 
@@ -412,7 +412,7 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	}
 	meshgeom.PrepareForUse();
 	
-	Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
+	tetgen::internal::Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
 }
 
 
@@ -899,7 +899,7 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 
 
 	// Step 1 - 2 
-	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,voroMesh,
+	auto boundFaces = tetgen::voronoi::Points2VoroAndTetmesh(vecPts,voroMesh,
 		snakMesh, inparam);
 	// voroMesh = vosMesh;
 
@@ -977,6 +977,22 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 	
 	return vecPtsMapping;
 }
+
+void tetgen::SnakeToSU2(const snake &snakein, const std::string &fileName,
+	tetgen::apiparam &inparam){
+	tetgen::io_safe tetin, tetout;
+
+	tetgen::input::RSVS2CFD(snakein, tetin, inparam);
+
+	// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
+	//   do quality mesh generation (q) with a specified quality bound
+	//   (1.414), and apply a maximum volume constraint (a0.1).
+	inparam.command = "Qpkqm"; 
+	tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
+
+	tetgen::output::SU2(fileName.c_str(),tetout);
+}
+
 mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	/*
 	Translates a tetgen output to the RSVS native mesh format 
@@ -1071,7 +1087,7 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	return meshout;
 }
 
-namespace voronoimesh {
+namespace tetgen::voronoi {
 	mesh Points2Mesh(const std::vector<double> &vecPts){
 		/*
 		Takes in a set of points and returns a mesh of points ready for
@@ -1205,7 +1221,6 @@ namespace voronoimesh {
 		}
 		return boundaryFaces;
 	}
-
 }
 
 
@@ -1390,12 +1405,12 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 }
 
 // Test code
-int test_tetgenapi(){
+int tetgen::test::api(){
 
-	return(tetcall());
+	return(tetgen::test::call());
 }
 
-int tetcall_CFD()
+int tetgen::test::CFD()
 {
 	/*CFD meshing process*/
 	tetgen::io_safe tetin, tetout;
@@ -1410,7 +1425,7 @@ int tetcall_CFD()
 		inparam.upperB= {15.0, 15.0, 15.0};
 		inparam.distanceTol = 1e-3;
 		inparam.edgelengths = {0.06,0.3,1.0,3.0};
-		load_tetgen_testdata(snakeMesh, voluMesh, snakein, triMesh);
+		tetgen::test::LoadData(snakeMesh, voluMesh, snakein, triMesh);
 		tetgen::input::RSVS2CFD(snakein, tetin, inparam);
 
 
@@ -1436,7 +1451,7 @@ int tetcall_CFD()
 	return 0;
 }
 
-int tetcall()
+int tetgen::test::call()
 {
 	/*_RSVSgrid*/
 	tetgen::io_safe tetin, tetin2,tetin3, tetout, tetout2, tetout3;
@@ -1524,7 +1539,7 @@ int tetcall()
 	}
 	return 0;
 }
-int tetcall_RSVSVORO()
+int tetgen::test::RSVSVORO()
 {
 	std::vector<double> vecPts;
 	mesh vosMesh, snakMesh;
@@ -1545,14 +1560,14 @@ int tetcall_RSVSVORO()
 
 	for(auto i : numCells){
 		for(auto j : numEdge){
-			nErrors += tetcall_RSVSVOROFunc(i, j, tecoutStr);
+			nErrors += tetgen::test::RSVSVOROFunc(i, j, tecoutStr);
 		}
 	}
 	
 	return nErrors;
 }
 
-int tetcall_RSVSVOROFunc_containtest(int nPts, double distanceTol, const char* tecoutStr)
+int tetgen::test::RSVSVOROFunc_contain(int nPts, double distanceTol, const char* tecoutStr)
 {
 	std::vector<double> vecPts;
 	mesh vosMesh, snakMesh, meshPts;
@@ -1614,7 +1629,7 @@ int tetcall_RSVSVOROFunc_containtest(int nPts, double distanceTol, const char* t
 	return 0;
 }
 
-int tetcall_RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutStr)
+int tetgen::test::RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutStr)
 {
 	std::vector<double> vecPts;
 	mesh vosMesh, snakMesh, meshPts;
@@ -1666,7 +1681,7 @@ int tetcall_RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutStr)
 	}
 	return 0;
 }
-int tetcall_RSVSVORO_Contain()
+int tetgen::test::RSVSVORO_Contain()
 {
 	std::vector<double> vecPts;
 	mesh vosMesh, snakMesh;
@@ -1689,7 +1704,7 @@ int tetcall_RSVSVORO_Contain()
 
 	for(auto i : numCells){
 		for(auto j : numEdge){
-			nErrors += tetcall_RSVSVOROFunc_containtest(i, j,tecoutStr);
+			nErrors += tetgen::test::RSVSVOROFunc_contain(i, j,tecoutStr);
 		}
 	}
 	
