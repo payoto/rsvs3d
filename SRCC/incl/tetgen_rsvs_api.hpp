@@ -16,27 +16,29 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+
 #include "tetgen.h"
+#include "mesh.hpp"
 
 
 
-//=================================
+//------------------------------------------------------------------------------
 // Code
-// 
-// This file defines parameters to be used in other parts of the 
-// RSVS snaking framework. Default values are defined in "parameters.cpp"
+//
+// This file defines parameters to be used in other parts of the RSVS snaking
+// framework. Default values are defined in "parameters.cpp"
 //
 // Substructure names are all 4-5 letters
 namespace tetgen {
 	typedef std::array<std::array<double, 3>, 2> dombounds;
 
 	/**
-	 * @brief      Class for i/o safe.
+	 * @brief      Class for memory safe interface with tetgen.h 
 	 */
 	class io_safe : public tetgenio {
 		// Adds a semblance of prebuilt allocation functions
 		// to the io class build into tetgen
-	public:
+		public:
 		// REAL *pointlist;
 		// REAL *pointattributelist;
 		// REAL *pointmtrlist;
@@ -103,23 +105,9 @@ namespace tetgen {
 		void allocatefacetpolygon(int fIndex, int pIndex);
 		void allocatefacetpolygon(int fIndex, int pIndex, int numVerts);
 
-		/**
-		 * @brief      { function_description }
-		 *
-		 * @param[in]  startPnt  The start point
-		 * @param[in]  numPnt    The number point
-		 * @param[in]  mtrs      The mtrs
-		 */
 		void SpecifyTetPointMetric(int startPnt, int numPnt, 
 			const std::vector<double> &mtrs);
 
-		/**
-		 * @brief      { function_description }
-		 *
-		 * @param[in]  startPnt  The start point
-		 * @param[in]  numPnt    The number point
-		 * @param[in]  marker    The marker
-		 */
 		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
 			int marker);
 		// void deallocate();
@@ -142,32 +130,46 @@ namespace tetgen {
 		// Commmand line string to be run
 		std::string command;
 	};
-	namespace voronoi {
-		
+
+
+	std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts, 
+		mesh &vosMesh, mesh &snakMesh,
+		tetgen::apiparam &inparam);
+	namespace input {
+		void POINTGRIDS(const mesh &meshdomain, 
+			tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam,
+			bool generateVoroBound=false);
+		void RSVSGRIDS(const mesh &meshdomain,
+			tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam);
+		void RSVSGRIDS(const mesh &meshdomain, 
+			const mesh &meshboundary, tetgen::io_safe &tetin,
+			const tetgen::apiparam &tetgenParam);
+		void RSVS2CFD(const snake &snakein,
+			tetgen::io_safe &tetin,	const tetgen::apiparam &tetgenParam);
+	}
+	namespace output {
+		mesh VORO2MESH(tetgen::io_safe &tetout);
+		void SU2(const char* fileName, const tetgenio &tetout);
+		dombounds GetBoundBox(io_safe &tetout);
+		mesh TET2MESH(tetgen::io_safe &tetout);
+	}
+	namespace internal {
+		void CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
+			std::vector<int> &rayEdges, int DEINCR, 
+			tetgen::dombounds boundBox);
 		template<class T, class V>
 		double ProjectRay(int count, const tetgen::dombounds &boundBox,
-			const T &dir, const V &orig, double minDist=0.0){
-			/*
-			Calculates the distance to project a single ray to reach the bounding box
-
-			It is templated to accept any types of containers with `count` elements, 
-			accessible by operator[];
-			*/
-
-			double l=-INFINITY;
-
-			for (int i = 0; i < count; ++i)
-			{
-				l = std::max(l,
-					std::min(
-						(boundBox[0][i]-orig[i])/dir[i] ,
-					(boundBox[1][i]-orig[i])/dir[i] ));
-			}
-			return std::min(l, minDist);
-		}
+			const T &dir, const V &orig, double minDist=0.0);
 	}
 }
 
+namespace voronoimesh {
+	mesh Points2Mesh(const std::vector<double> &vecPts);
+	std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
+		mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam);
+	std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
+		const std::vector<int> &boundaryPts);
+}
 
 
 // Test functions
@@ -179,5 +181,42 @@ int tetcall_RSVSVORO();
 int tetcall_RSVSVORO_Contain();
 int tetcall_RSVSVOROFunc(int nPts=0, double distanceTol=0.26,
 	const char* tecoutStr="../TESTOUT/rsvs_voro.plt");
+
+
+/**
+ * @brief      Project voronoi diagram rays to the bounding Box
+ *
+ * @param[in]  count     number of coordinates
+ * @param[in]  boundBox  The bounds of the domain (array<array<double,3>,2>)
+ * @param[in]  dir       vector with direction (pointing in)
+ * @param[in]  orig      The origin of the ray
+ * @param[in]  minDist   The minimum allowable stretch distance
+ *
+ * @tparam     T         type of `dir`: an iterable of size `count` 
+ * @tparam     V         type of `orig`: an iterable of size `count`
+ *
+ * @return     Distance along the ray at which the boundBox is encountered.
+ */
+template<class T, class V>
+double tetgen::internal::ProjectRay(int count, const tetgen::dombounds &boundBox,
+	const T &dir, const V &orig, double minDist){
+	/*
+	Calculates the distance to project a single ray to reach the bounding box
+
+	It is templated to accept any types of containers with `count` elements, 
+	accessible by operator[];
+	*/
+
+	double l=-INFINITY;
+
+	for (int i = 0; i < count; ++i)
+	{
+		l = std::max(l,
+			std::min(
+				(boundBox[0][i]-orig[i])/dir[i] ,
+			(boundBox[1][i]-orig[i])/dir[i] ));
+	}
+	return std::min(l, minDist);
+}
 
 #endif
