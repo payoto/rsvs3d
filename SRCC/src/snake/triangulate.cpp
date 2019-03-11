@@ -6,7 +6,7 @@
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp" 
-#include "snakevel.hpp"
+#include "triangulate.hpp"
 #include "RSVSmath.hpp"
 #include "RSVScalc.hpp"
 #include "warning.hpp"
@@ -26,6 +26,7 @@ void CalculateSnakeVel(snake &snakein){
 		snakein.snaxs[ii].v=(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
 	}
 }
+
 void CalculateSnakeVelRand(snake &snakein){
 
 	int ii=0;
@@ -53,6 +54,7 @@ void CalculateSnakeVelUnit(snake &snakein){
 		snakein.snaxs[ii].v=1;//(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
 	}
 }
+
 void CalculateSnakeVelFast(snake &snakein){
 
 	int ii=0;
@@ -66,6 +68,7 @@ void CalculateSnakeVelFast(snake &snakein){
 		snakein.snaxs[ii].v=4;//(0.4*(double(rand()%1001)/1000.0)+0.8)*snakein.snaxs[ii].v;
 	}
 }
+
 void CalculateNoNanSnakeVel(snake &snakein, double deltaStep){
 
 	int ii=0, ll=0;
@@ -100,7 +103,6 @@ void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS){
 
 	TriangulateContainer(meshin,triangleRSVS , 1, subList); 
 	triangleRSVS.meshDep=&meshin;
-
 }
 
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS){
@@ -327,7 +329,8 @@ void TriangulateTriSurface(const trianglesurf &surfin,
 	}
 }
 
-void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin){
+void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin,
+	const mesh& meshin){
 	int ii,n;
 	coordvec edgeCentre;
 	double edgeLength,surfLength=0;
@@ -343,8 +346,8 @@ void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin, const mesh& meshin
 	coord.div(surfLength);
 }
 
-
-void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
+void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin,
+ const mesh& meshin){ 
 	int ii,n;
 	vector<int> vertind;
 	vector<vector<double> const *> veccoord;
@@ -371,7 +374,8 @@ void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& me
 	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
 
-void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin,
+void HybridSurfaceCentroid_fun(coordvec &coord,
+	const trianglesurf &surfin, const mesh& meshin,
 	const mesh& snakeconn){ 
 	int ii,n;
 	vector<int> vertind;
@@ -489,7 +493,6 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 	meshout.PrepareForUse();
 
 	return (meshout);
-
 }
 
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul,
@@ -643,8 +646,9 @@ void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul,
 	//meshout.TestConnectivityBiDir(__PRETTY_FUNCTION__);
 }
 
-
-bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex){
+bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,
+  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone,
+   int & returnIndex){
 	// Snaxel Operation:
 	// *- follow appropriate connection* < HERE
 	// - reverse onto edge
@@ -693,7 +697,8 @@ bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  cons
 	return(isRepeat);
 }
 
-int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge){
+int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex,
+ 	int &returnType, int &actEdge){
 	/*
 	- reverse onto edge
 	-if its the final snaxel on the edge -> Go to Vertex
@@ -752,11 +757,12 @@ int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, 
 
 	}
 	return(0);
-
 }
 
-int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,
-	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,
+int FollowVertexConnection(int actVert, int prevEdge, 
+	const HashedVector<int,int> &edgeSurfInd,
+	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, 
+	const mesh &meshRSVS, int &returnIndex,
 	int &returnType, int &nextEdge){
 	// Vertex Operation
 	// - Find next edge
@@ -939,10 +945,7 @@ void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS){
 	// - if there is a snaxel on that edge 
 	//    -> Goto the first snaxel.
 	//    -> else go to the other vertex.
-
 }
-
-
 
 // Triangulation class Methods
 

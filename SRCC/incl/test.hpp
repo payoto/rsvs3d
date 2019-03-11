@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <ctime>
 #include <fstream>
+#include <string>
 
 //==================================
 // Code
@@ -46,19 +47,21 @@ class customtest {
 		int prevTime;
 		int runTotal;
 		int lastRunTime;
+		std::string testName;
 	public:
-		customtest(){
+		customtest(const char * testNameIn=""){
 			testCount=0;
 			errFlag=0;
 			errCount=0;
 			unhandledError=0;
 			runTotal=0;
 			lastRunTime=0;
+			testName=testNameIn;
 			cout << "-------------------------------------------------------------"
 				"---------------------------" << endl;
 			cout << "-------------------------------------------------------------"
 				"---------------------------" << endl;
-			cout << "      Start testing " << endl;
+			cout << "      Start testing " << testName << endl;
 			cout << "-------------------------------------------------------------"
 				"---------------------------" << endl;
 		}

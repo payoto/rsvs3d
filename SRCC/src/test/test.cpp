@@ -19,7 +19,7 @@
 #include "snake.hpp"
 #include "snakeengine.hpp"
 #include "meshrefinement.hpp"
-#include "snakevel.hpp"
+#include "triangulate.hpp"
 #include "RSVSalgorithm.hpp"
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
@@ -27,7 +27,7 @@
 
 
 int main(){
-	customtest gridTest;
+	customtest gridTest("3-D RSVS tests");
 
 	#ifdef TEST_ALL_WORKING
 	// BASE templatess 
@@ -65,8 +65,10 @@ int main(){
 	gridTest.RunSilent(param::test::base,"parameter implementation");
 	gridTest.RunSilent(param::test::io,"parameter read write");
 	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
-	gridTest.RunSilent(param::test::ipartialread,"parameter partial read write flat format");
-	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic determination of flat json");
+	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
+		" write flat format");
+	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
+		"determination of flat json");
 	// RSVS and integration tests
 	gridTest.RunSilent(integrate::test::Prepare,"Mesh integration function");
 	// Tetgen interface tests
@@ -74,12 +76,15 @@ int main(){
 	gridTest.RunSilent(tetcall,"tegen API testing - RSVS meshing"); 
 	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
 
+
 	#endif //TEST_ALL_WORKING
 	#ifdef TEST_ALL_BREAKING
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
+
+	gridTest.RunSilent(tetcall_CFD,"tegen API testing - CFD meshing"); 
+	gridTest.RunSilent(tetcall,"tegen API testing - RSVS meshing"); 
 	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
-	 
 	gridTest.Run(tetcall_RSVSVORO_Contain,"tegen API testing - Voro to RSVS"); // working test
 
 	return(0);
@@ -175,7 +180,7 @@ void customtest::PrintSummary(){
 		"---------------------------" << endl;
 	cout << "-------------------------------------------------------------"
 		"---------------------------" << endl;
-	cout << "      Summary of Tests:" << endl;
+	cout << "      Summary of Tests: (" << this->testName << ")" << endl;
 	cout << "         " << testCount << " tests completed" << endl;
 	cout << "         " << errCount << "  detected errors  " << endl;
 	cout << "         " << unhandledError << " errors handled by the test class " << endl;

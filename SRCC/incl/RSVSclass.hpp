@@ -18,7 +18,7 @@
 #include "snake.hpp"
 #include "postprocessing.hpp"
 #include "parameters.hpp"
-#include "snakevel.hpp"
+#include "triangulate.hpp"
 #include "RSVScalc.hpp"
 
 //==================================

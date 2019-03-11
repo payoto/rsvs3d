@@ -17,7 +17,7 @@
 #include "RSVSmath.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
-#include "snakevel.hpp"
+#include "triangulate.hpp"
 #include <Eigen>
 
 using namespace std; 

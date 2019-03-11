@@ -315,6 +315,8 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
 
 /**
  * @brief      Finds for each vertex, the volume object containing it.
+ * 
+ * This only works robustly for outside points for convex meshes.
  *
  * @param[in]  testVertices  The test vertices
  * @param[in]  sizeVert      The size of each vertex data

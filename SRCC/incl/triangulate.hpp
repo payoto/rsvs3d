@@ -221,6 +221,7 @@ int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
 bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);
 mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin);
+void FlattenBoundaryFaces(mesh &meshin);
 
 int Test_snakeRSVS();
 int Test_surfcentre();

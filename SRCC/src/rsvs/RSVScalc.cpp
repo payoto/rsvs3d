@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "snake.hpp"
-#include "snakevel.hpp"
+#include "triangulate.hpp"
 #include "vectorarray.hpp"
 #include "RSVScalc.hpp"
 #include "matrixtools.hpp"
