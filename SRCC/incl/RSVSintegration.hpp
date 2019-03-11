@@ -19,6 +19,8 @@ namespace param {
 	class snaking;
 	class parameters;
 	class rsvs;
+	class voxel;
+	class voronoi;
 }
 
 //=================================
@@ -83,6 +85,23 @@ namespace integrate {
 			std::ofstream &coutFile,
 			std::ofstream &cerrFile
 			);
+		namespace grid {
+			void Voxel(
+				const param::grid &gridconf,
+				mesh &snakeMesh,
+				mesh &voluMesh
+			);
+			void Voronoi(
+				const param::grid &gridconf,
+				mesh &snakeMesh,
+				mesh &voluMesh
+			);
+			void Load(
+				const param::grid &gridconf,
+				mesh &snakeMesh,
+				mesh &voluMesh
+			);
+		}
 	}
 
 	namespace execute{

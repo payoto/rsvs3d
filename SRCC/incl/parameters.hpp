@@ -33,7 +33,7 @@ namespace param {
 		bool active=false;
 		T fill;
 	};
-	/*
+	/**
 	Parameters related to the Velocity calculation and VOS steps
 	*/
 	class rsvs
@@ -50,7 +50,7 @@ namespace param {
 		void PrepareForUse();
 	};
 
-	/*
+	/**
 	Parameters controlling tuning parameters for the stepping of
 	the restricted surface.
 	*/
@@ -78,34 +78,50 @@ namespace param {
 		
 	};
 
-	/*
-	Paramters controlling grid properties
+	/**
+	Parameters controlling grid properties
 	*/
 	class voxel
 	{
 	public:
-		std::array<realbounds, 3>  domain;
-		std::array<int, 3>  gridsizebackground;
+		std::array<int, 3> gridsizebackground;
 		std::array<int, 3> gridsizesnake;
 
 		voxel();
 		~voxel();
 		void PrepareForUse();
 	};
+	class voronoi
+	{
+	public:
+		std::vector<double> inputpoints;
+		double distancebox;
+		std::string pointfile;
+
+		voronoi();
+		~voronoi();
+		void PrepareForUse();
+		void ReadPoints();
+	};
+
 
 	class grid
 	{
 	public:
 		voxel voxel;
-		// grid();
-		// ~grid();
+		voronoi voronoi;
+		// Domain size
+		std::array<realbounds, 3> domain;
+		// Internal stretching of the meshes
+		std::array<double, 3> stretch;
+		std::string activegrid;
 		
+		grid();
 		void PrepareForUse();
 	};
 
-	/*
-	Class containing the input configuration 
-	these are files to load etc
+	/**
+	Class containing the input configuration these are files to load etc
 	*/
 	class ioin{
 	public:
@@ -117,9 +133,9 @@ namespace param {
 		ioin();
 		void PrepareForUse();
 	};
-	/*
-	Class containing the output configuration these are files
-	to store and where to store them
+	/**
+	Class containing the output configuration these are files to store and where
+	to store them
 	*/
 	class ioout{
 	private:
@@ -182,7 +198,10 @@ namespace param {
 		int ipartialread();
 		int prepareforuse();
 		int autoflat();
+		int symmetry();
 	}
 }
+
+
 
 #endif

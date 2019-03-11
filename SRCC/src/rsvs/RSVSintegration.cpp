@@ -18,6 +18,7 @@
 #include "RSVSalgorithm.hpp"
 #include "postprocessing.hpp"
 #include "warning.hpp"
+#include "tetgenrsvs.hpp"
 
 #include "filesystem.hpp"
 
@@ -306,10 +307,43 @@ void integrate::prepare::Mesh(
 	){
 	/*prepares the snake and volume meshes gor the RSVS process*/
 	// Local declaration
+	
+	RSVScalc calcVolus, calcSnakVolu;
+
+	if(gridconf.activegrid.compare("voxel")==0){
+		integrate::prepare::grid::Voxel(gridconf, snakeMesh, voluMesh);
+	} else if(gridconf.activegrid.compare("voronoi")==0) {
+		integrate::prepare::grid::Voronoi(gridconf, snakeMesh, voluMesh);
+		RSVS3D_ERROR("Voronoi functionality not implemented.");
+	} else if(gridconf.activegrid.compare("load")==0) {
+		RSVS3D_ERROR("Load functionality not implemented.");
+	} else {
+		RSVS3D_ERROR_ARGUMENT(
+			(gridconf.activegrid + " not recognised. "
+			"Invalid parameter activegrid passed to "
+			"RSVS process.").c_str());
+	}
+
+	snakeMesh.PrepareForUse();
+	snakeMesh.OrientFaces();
+	calcSnakVolu.CalculateMesh(snakeMesh);
+	calcSnakVolu.ReturnConstrToMesh(snakeMesh,&volu::volume);
+
+	voluMesh.PrepareForUse();
+	voluMesh.OrientFaces();
+	calcVolus.CalculateMesh(voluMesh);
+	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
+}
+
+void integrate::prepare::grid::Voxel(
+	const param::grid &gridconf,
+	mesh &snakeMesh,
+	mesh &voluMesh
+	){
+
 	int ii;
 	auto gridSize = gridconf.voxel.gridsizebackground;
 	vector<int> elmMapping, backgroundGrid;
-	RSVScalc calcVolus;
 
 	backgroundGrid.reserve(int(gridSize.size()));
 	for (int i = 0; i < int(gridSize.size()); ++i)
@@ -320,7 +354,7 @@ void integrate::prepare::Mesh(
 
 	// Initial build of the grid
 	BuildBlockGrid(gridSize, snakeMesh);
-	snakeMesh.Scale(gridconf.voxel.domain);
+	snakeMesh.Scale(gridconf.domain);
 	snakeMesh.PrepareForUse();
 	snakeMesh.OrientFaces();
 
@@ -339,11 +373,25 @@ void integrate::prepare::Mesh(
 	CartesianMapping(snakeMesh,  elmMapping, backgroundGrid);
 	CoarsenMesh(snakeMesh,voluMesh,elmMapping);
 	snakeMesh.AddParent(&voluMesh,elmMapping);
+}
 
-	voluMesh.PrepareForUse();
-	voluMesh.OrientFaces();
-	calcVolus.CalculateMesh(voluMesh);
-	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
+void integrate::prepare::grid::Voronoi(
+	const param::grid &gridconf,
+	mesh &snakeMesh,
+	mesh &voluMesh
+	){
+	// Vector points are already loaded
+	tetgen::apiparam inparam;
+
+	inparam.distanceTol = gridconf.voronoi.distancebox;
+	for (int i = 0; i < 3; ++i)
+	{
+		inparam.lowerB[i] = gridconf.domain[0][i];
+		inparam.upperB[i] = gridconf.domain[1][i];
+	}
+	tetgen::RSVSVoronoiMesh(
+		gridconf.voronoi.inputpoints,
+		voluMesh, snakeMesh, inparam);
 }
 
 void integrate::prepare::Snake(

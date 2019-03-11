@@ -41,14 +41,9 @@ void param::from_json(const json& j, filltype<T>& p){
 //===========================================
 
 param::voxel::voxel(){
-	for(int i=0; i<3; ++i){
-		this->domain[i][0]=0.0;
-		this->domain[i][1]=1.0;
-	}
 
 	this->gridsizebackground = {1, 1, 1};
 	this->gridsizesnake = {6, 6, 6};
-
 }
 
 param::voxel::~voxel(){
@@ -57,17 +52,55 @@ void param::voxel::PrepareForUse(){
 }
 void param::to_json(json& j, const voxel& p){
 	j = json{
-		{"domain", p.domain},
 		{"gridsizebackground", p.gridsizebackground},
 		{"gridsizesnake", p.gridsizesnake},
 	};
 }
 void param::from_json(const json& j, voxel& p){
-	j.at("domain").get_to(p.domain);
 	j.at("gridsizebackground").get_to(p.gridsizebackground);
 	j.at("gridsizesnake").get_to(p.gridsizesnake);
 }
 
+//===========================================
+// Voronoi class method definitions
+//===========================================
+
+param::voronoi::voronoi(){
+
+	this->inputpoints={0.0};
+	this->pointfile = "";
+	this->distancebox = 0.1;
+}
+
+param::voronoi::~voronoi(){
+}
+void param::voronoi::PrepareForUse(){
+}
+void param::to_json(json& j, const voronoi& p){
+	j = json{
+		{"inputpoints", p.inputpoints},
+		{"distancebox", p.distancebox},
+		{"pointfile", p.pointfile},
+	};
+}
+void param::from_json(const json& j, voronoi& p){
+	p.inputpoints=j.at("inputpoints").get<std::vector<double>>();
+	// j.at("inputpoints").get_to(p.inputpoints);
+	j.at("distancebox").get_to(p.distancebox);
+	j.at("pointfile").get_to(p.pointfile);
+}
+void param::voronoi::ReadPoints(){
+	ifstream pointstream;
+
+	pointstream.open(this->pointfile, ios::in);
+	CheckFStream(pointstream, __PRETTY_FUNCTION__, this->pointfile);
+
+	double temp;
+	while(pointstream >> temp){
+		this->inputpoints.push_back(temp);
+	}
+	pointstream.close();
+}
 
 //===========================================
 // snaking class method definitions
@@ -145,17 +178,40 @@ void param::rsvs::PrepareForUse(){
 // grid class method definitions
 //===========================================
 
+param::grid::grid(){
+	for(int i=0; i<3; ++i){
+		this->domain[i][0]=0.0;
+		this->domain[i][1]=1.0;
+	}
+
+	this->stretch = {1.0, 1.0, 1.0};
+	this->activegrid = "voxel";
+}
 void param::to_json(json& j, const grid& p){
 	j = json{
+		{"domain", p.domain},
 		{"voxel", p.voxel},
+		{"voronoi", p.voronoi},
+		{"stretch", p.stretch},
+		{"activegrid", p.activegrid},
 	};
 }
 void param::from_json(const json& j, grid& p){
+	j.at("domain").get_to(p.domain);
 	j.at("voxel").get_to(p.voxel);
+	j.at("voronoi").get_to(p.voronoi);
+	j.at("stretch").get_to(p.stretch);
+	j.at("activegrid").get_to(p.activegrid);
 }
 void param::grid::PrepareForUse(){
+	if(this->activegrid.compare("voronoi")==0) {
+		// Load data into this->voronoi
+		if(this->voronoi.inputpoints.size()<=1){
+			this->voronoi.ReadPoints();
+		}
+	}
 	this->voxel.PrepareForUse();
-
+	this->voronoi.PrepareForUse();
 }
 
 //===========================================
@@ -355,7 +411,7 @@ void param::io::read(const std::string &fileName, parameters &p){
 	// Insert values read into the parameter structure
 	param::flatupdate(j_fin,j,false, false);
 	
-	p=j_fin;
+	param::from_json(j_fin,p);
 }
 
 void param::io::write(const std::string &fileName, const parameters &p){
@@ -364,14 +420,6 @@ void param::io::write(const std::string &fileName, const parameters &p){
 
 	file.open(fileName);
 
-	// if (!file.is_open()){
-	// 	std::string errstr;
-	// 	errstr = "Parameter file failed to open ";
-	// 	errstr += "in " ;
-	// 	errstr +=__PRETTY_FUNCTION__  ;
-	// 	errstr += " \n:  " + fileName;
-	// 	RSVS3D_ERROR_ARGUMENT(errstr.c_str());
-	// }
 	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
 	j = p; 
 	file << j.dump(2);
@@ -391,7 +439,9 @@ void param::io::readflat(const std::string &fileName, parameters &p){
 	file >> jnew;
 	file.close();
 	param::flatupdate(jfin,jnew,false, true);
-	p=jfin;
+	// p=jfin;
+	param::from_json(jfin,p);
+
 	// std::cout << "p assigned " << std::endl;
 }
 void param::io::writeflat(const std::string &fileName, const parameters &p){
@@ -414,6 +464,9 @@ void param::io::defaultconf(){
 	param::io::write(fileName, params);
 	param::io::writeflat(fileNameFlat, params);
 
+	json j;
+	j = params;
+	std::cout << j.flatten().dump(2);
 }
 
 int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
@@ -469,7 +522,7 @@ int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
 		}
 	}
 	j=j.unflatten();
-	p = j;
+	param::from_json(j,p);
 	return(numFail);
 }
 
@@ -490,9 +543,11 @@ int param::test::base(){
 	std::cout << "flattened json object" << std::endl;
 	std::cout << j.flatten().dump(2) << std::endl;
 
-	params2 = j;
+	param::from_json(j,params2);
 
 	j2 = params2;
+	std::cout << "j " << j.flatten().dump(2);
+	std::cout << "j2 " << j2.flatten().dump(2);
 
 	if (j!=j2){
 		std::cerr << "Error: Parameter conversion to JSON "
@@ -563,7 +618,8 @@ int param::test::ipartialread(){
 
 	j1 = params; 
 	j2 = params2;
-
+	std::cout << j1.flatten().dump(2);
+	std::cout << j2.flatten().dump(2);
 	if (j1==j2){
 		std::cerr << "Error: Parameter read/write "
 			<<" is not symmetrical" << std::endl;
@@ -627,6 +683,33 @@ int param::test::autoflat(){
 		std::cout << "Dump j2 unflattened" << std::endl << j2.dump(1);
 	}
 
+
+	return(0);
+}
+
+int param::test::symmetry(){
+	json j1, j2;
+	param::parameters v1;
+	// std::vector<double> v1, v2;
+
+	// v2 = v1;
+	v1.grid.voronoi.inputpoints.push_back(1.0);
+	j1=v1;
+	// v2 = j1
+	j1.get_to(v1);
+	j2=v1;
+	
+	std::cout << j1 << endl;
+	std::cout << j2 << endl;
+
+	if (j1!=j2){
+		std::cout << j1 << endl;
+		std::cout << j2 << endl;
+		std::cerr << "Error: Parameter conversion to JSON "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	};
 
 	return(0);
 }

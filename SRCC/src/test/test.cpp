@@ -57,12 +57,9 @@ int main(){
 	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS");
 	gridTest.RunSilent(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
 	gridTest.RunSilent(Test_RSVSalgo_singlevol,"Snake RSVS algorithm single vol");
-	gridTest.RunSilent(integrate::test::All,"Test full integration");
-
-	// Snakstruct 2D tests
-	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	// Parameter and JSON tests
 	gridTest.RunSilent(param::test::base,"parameter implementation");
+	gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
 	gridTest.RunSilent(param::test::io,"parameter read write");
 	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
 	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
@@ -71,21 +68,21 @@ int main(){
 		"determination of flat json");
 	// RSVS and integration tests
 	gridTest.RunSilent(integrate::test::Prepare,"Mesh integration function");
-	// Tetgen interface tests
-	gridTest.RunSilent(tetcall_CFD,"tegen API testing - CFD meshing"); 
-	gridTest.RunSilent(tetcall,"tegen API testing - RSVS meshing"); 
-	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
+	gridTest.RunSilent(integrate::test::All,"Test full integration");
 
+	// Tetgen interface tests
+	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
+	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
+	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
+	gridTest.Run(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
 
 	#endif //TEST_ALL_WORKING
 	#ifdef TEST_ALL_BREAKING
+	// Snakstruct 2D tests
+	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
 
-	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
-	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
-	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
-	gridTest.Run(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS"); // working test
 
 	return(0);
 }

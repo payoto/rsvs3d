@@ -12,6 +12,7 @@ namespace param{
 	class rsvs;
 	class snaking;
 	class voxel;
+	class voronoi;
 	class grid;
 	class parameters;
 	class ioin;
@@ -48,6 +49,9 @@ namespace param {
 
 	void to_json(json& j, const voxel& p);
 	void from_json(const json& j, voxel& p);
+
+	void to_json(json& j, const voronoi& p);
+	void from_json(const json& j, voronoi& p);
 
 	void to_json(json& j, const grid& p);
 	void from_json(const json& j, grid& p); 

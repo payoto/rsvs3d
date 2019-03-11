@@ -21,21 +21,34 @@
     }
   },
   "grid": {
-    "voxel": {
-      "domain": [
-        [
-          0.0,
-          1.0
-        ],
-        [
-          0.0,
-          1.0
-        ],
-        [
-          0.0,
-          1.0
-        ]
+    "activegrid": "voxel",
+    "domain": [
+      [
+        0.0,
+        1.0
       ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "stretch": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "voronoi": {
+      "distancebox": 0.1,
+      "inputpoints": [
+        0.0
+      ],
+      "pointfile": ""
+    },
+    "voxel": {
       "gridsizebackground": [
         1,
         1,

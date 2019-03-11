@@ -34,7 +34,11 @@
 
 using namespace std;
 namespace rsvs3d {
-	template <class E=std::exception>
+	class rsvs_exception : public std::logic_error {
+		using std::logic_error::logic_error;
+	};
+
+	template <class E=rsvs_exception>
 	void error(const char* message="", const char* caller="",
 		const char *file="", int line=0, bool throwError=true);
 }
@@ -46,6 +50,17 @@ namespace rsvs3d {
 #define RSVS3D_ERROR_RANGE(M) (rsvs3d::error<std::range_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 
 void ThrowWarning(const char * message);
+/**
+ * @brief      Checks a file stream
+ *
+ * @param[in]  file      input or output file stream
+ * @param[in]  callerID  the name of the caller function as given by pretty
+ * function
+ * @param[in]  fileName  The name of the file opened in the stream.
+ *
+ * @tparam     T         either ifstream or ofstream, needs to support method
+ * `T::is_open()`
+ */
 template<class T>
 void CheckFStream(const T &file, const char* callerID, 
 	const std::string &fileName){
