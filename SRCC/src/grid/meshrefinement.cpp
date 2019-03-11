@@ -55,6 +55,7 @@ void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmM
 	}
 
 	// Switch element indices according to elmMapping
+	// This is an error here as there can be index collision
 	switch (nDim){
 		case 0:
 		for(ii=0;ii< n ;ii++){newparent.SwitchIndex(nDim+1,newparent.verts(ii)->index,elmMapping[ii]);}

@@ -78,6 +78,7 @@ int main(){
 	#ifdef TEST_ALL_BREAKING
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
+	gridTest.RunSilent(tetcall_RSVSVORO,"tegen API testing - Voro to RSVS"); // working test
 	 
 	gridTest.Run(tetcall_RSVSVORO_Contain,"tegen API testing - Voro to RSVS"); // working test
 

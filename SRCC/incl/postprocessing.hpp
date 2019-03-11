@@ -53,14 +53,16 @@ public:
 		int forceOutType=0, const vector<int> &vertList={});
 	int PrintSnakeInternalPts(const snake &snakein,int strandID=0, double timeStep=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
-		const std::vector<int> &voluList={});
+		const std::vector<int> &voluList={},
+		const std::vector<int> &vertList={});
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
 	int LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVertDat,int nCellDat);
 	int VertDataBlock(const mesh &meshout,int nVert, int nVertDat,int nCellDat,
 		const vector<int> &vertList={});
 	int VolFaceMap(const mesh& meshout,int nSurf);
 	int VolFaceMap(const mesh& meshout, const std::vector<int> &surfList,
-		const std::vector<int> &voluList);
+		const std::vector<int> &voluList,
+		const std::vector<int> &vertList);
 	int SurfFaceMap(const mesh& meshout,int nEdge);
 	int LineFaceMap(const mesh& meshout,int nEdge);
 	// Partial Mesh Out with variable sharing

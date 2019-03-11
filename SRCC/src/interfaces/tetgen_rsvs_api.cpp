@@ -1590,9 +1590,9 @@ std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts,
 
 
 	// Step 1 - 2 
-	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,vosMesh,
+	auto boundFaces = voronoimesh::Points2VoroAndTetmesh(vecPts,voroMesh,
 		snakMesh, inparam);
-	voroMesh = vosMesh;
+	// voroMesh = vosMesh;
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored  "-Wunused-variable"
 	int nBlocks = snakMesh.ConnectedVolumes(elmMapping, boundFaces);
@@ -1605,14 +1605,40 @@ std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts,
 		RSVS3D_ERROR_LOGIC("Voromesh and flooding do not match");
 	}
 	#endif //SAFE_ALGO
-
+	auto elmMappingCopy =elmMapping;
+	for (int i = 0; i < nBlocks; ++i)
+	{
+		int indRep=-1;
+		int jStart = -1;
+		do {
+			jStart++;
+			if(elmMappingCopy[jStart]==i+1){
+				indRep = snakMesh.volus(jStart)->index;
+			}
+		} while(indRep==-1);
+		for (int j = jStart; j < int(elmMapping.size()); ++j)
+		{
+			if(elmMappingCopy[j]==i+1){
+				elmMapping[j]=indRep;
+			}
+		}
+	}
 	CoarsenMesh(snakMesh,vosMesh,elmMapping);
 	snakMesh.AddParent(&vosMesh,elmMapping);
-	vosMesh=voroMesh;
 	snakMesh.PrepareForUse();
 	snakMesh.OrientFaces();
 	vosMesh.PrepareForUse();
-
+	#ifdef SAFE_ALGO
+	if(vosMesh.volus.size()!=voroMesh.volus.size()){
+		std::cerr << "Error : vosMesh (" << vosMesh.volus.size() 
+			<< ")!=nVolus Voromesh (" << voroMesh.volus.size() <<")" 
+			<< std::endl;
+		RSVS3D_ERROR_LOGIC("Voromesh and vosMesh do not match");
+	}
+	vosMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
+	vosMesh.displight();
+	snakMesh.displight();
+	#endif //SAFE_ALGO
 	// Step 6 - Check original points containments
 	std::vector<int> vecPtsMapping = snakMesh.VertexInVolume(vecPts, 4);
 	#ifdef RSVS_DIAGNOSTIC_RESOLVED
@@ -2034,9 +2060,11 @@ int tetcall_RSVSVOROFunc_containtest(int nPts, double distanceTol, const char* t
 		int nVecMap = vecMap.size();
 		for (int i = 0; i < nVecMap; ++i)
 		{
-			tecout.PrintMesh(vosMesh,1,i,5,{snakMesh.ParentElementIndex(vecMap[i])});
-			tecout.PrintMesh(snakMesh,1,i,5,{vecMap[i]});
-			tecout.PrintMesh(meshPts,1,i,4,{i+1});
+			std::cout << snakMesh.ParentElementIndex(vecMap[i]) << " ";
+			tecout.PrintMesh(vosMesh,nPts*3+1,i,5,
+				{snakMesh.ParentElementIndex(vecMap[i])});
+			tecout.PrintMesh(snakMesh,nPts*3+2,i,5,{vecMap[i]});
+			tecout.PrintMesh(meshPts,nPts*3+3,i,4,{i+1});
 		}
 		cout << "__________________________________________________" << endl;
 

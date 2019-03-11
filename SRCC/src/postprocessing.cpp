@@ -22,26 +22,44 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *n
 }
 
 int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
-	const std::vector<int> &voluList){
+	const std::vector<int> &voluList, const std::vector<int> &vertList){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,nCoord;
 	// Print vertex Data
 	nCoord=int(meshout.verts(0)->coord.size());
 	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
-	for (jj=0;jj<nCoord;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+	if(vertList.size()==0){
+		for (jj=0;jj<nCoord;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+			}
+			fprintf(fid,"\n");this->ResetLine();
 		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%lf ",0);
+		for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				this->Print("%lf ",0);
+			}
+			fprintf(fid,"\n");this->ResetLine();
 		}
-		fprintf(fid,"\n");this->ResetLine();
+	} else {
+		for (jj=0;jj<nCoord;++jj){
+			for(auto ii : vertList){
+
+				this->Print("%.16lf ",meshout.verts.isearch(ii)->coord[jj]);
+			}
+			fprintf(fid,"\n");this->ResetLine();
+		}
+		nVert = vertList.size();
+		for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+
+			for(ii = 0; ii<nVert; ++ii){
+				this->Print("%lf ",0);
+			}
+			fprintf(fid,"\n");this->ResetLine();
+		}
 	}
-	// Print Cell Data
+ 	// Print Cell Data
 	if(voluList.size()==0){
 		for ( ii = 0; ii<nVolu; ++ii){
 			this->Print("%.16lf ",meshout.volus(ii)->fill);
@@ -319,29 +337,32 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 	return(0);
 }
 int tecplotfile::VolFaceMap(const mesh &meshout, 
-	const std::vector<int> &surfList,const std::vector<int> &voluList){
+	const std::vector<int> &surfList, const std::vector<int> &voluList,
+	const std::vector<int> &vertList){
 	int jj,actVert,edgeCurr;
 	int verts[2],vertsPast[2];
 	for (auto ii : meshout.surfs.find_list(surfList)){ // Print Number of vertices per face
 		this->Print("%i ",meshout.surfs(ii)->edgeind.size());
 	}
 	fprintf(fid,"\n");this->ResetLine();
-
+	HashedVector<int, int> verthash;
+	verthash.vec=vertList;
+	verthash.GenerateHash();
 	for (auto ii : meshout.surfs.find_list(surfList))
 	{// print ordered  list of vertices in face
 		jj=int(meshout.surfs(ii)->edgeind.size())-1;
 
 		edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
-		verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
-		verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
+		verts[0]=verthash.find(meshout.edges(edgeCurr)->vertind[0]);
+		verts[1]=verthash.find(meshout.edges(edgeCurr)->vertind[1]);
 		vertsPast[0]=verts[0];
 		vertsPast[1]=verts[1];
 
 		for(jj=0;jj<int(meshout.surfs(ii)->edgeind.size());++jj){
 			edgeCurr=meshout.edges.find(meshout.surfs(ii)->edgeind[jj]);
 
-			verts[0]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[0]);
-			verts[1]=meshout.verts.find(meshout.edges(edgeCurr)->vertind[1]);
+			verts[0]=verthash.find(meshout.edges(edgeCurr)->vertind[0]);
+			verts[1]=verthash.find(meshout.edges(edgeCurr)->vertind[1]);
 
 			if ((verts[0]==vertsPast[0]) || (verts[1]==vertsPast[0])){
 				actVert=0;
@@ -377,11 +398,12 @@ int tecplotfile::VolFaceMap(const mesh &meshout,
 			//cout << ii << "," << jj << endl ;
 			actVert=meshout.surfs(ii)->voluind[jj];
 			int k=0;
+			bool notFoundCell=true;
 			for(auto j : voluList){
 				k++;
-				if(j==actVert){}break;
+				if(j==actVert){notFoundCell=false;break;}
 			}
-			if (k==int(voluList.size())){k=0;}
+			if (notFoundCell){k=0;}
 			this->Print("%i ",k);
 		}
 		fprintf(fid,"\n");this->ResetLine();
@@ -466,6 +488,15 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 		sort(surfList);
 		unique(surfList);
 		nSurf = surfList.size();
+		auto surfSubList = meshout.surfs.find_list(surfList);
+		auto edgeList = ConcatenateVectorField(meshout.surfs,
+			&surf::edgeind, surfSubList);
+		auto edgeSubList = meshout.edges.find_list(edgeList);
+		auto actualVert = ConcatenateVectorField(meshout.edges,
+			&edge::vertind, edgeSubList);
+		sort(actualVert);
+		unique(actualVert);
+		nVert = actualVert.size();
 
 		for(auto j : surfList){
 			totNumFaceNode += meshout.surfs.isearch(j)->edgeind.size();
@@ -473,8 +504,8 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
-		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
-		this->VolFaceMap(meshout, surfList,vertList);
+		this->VolDataBlock(meshout,nVert,nVolu, nVertDat,vertList, actualVert);
+		this->VolFaceMap(meshout, surfList,vertList, actualVert);
 	}
 	return(0);
 }
