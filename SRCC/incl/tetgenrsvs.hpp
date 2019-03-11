@@ -21,19 +21,26 @@
 #include "mesh.hpp"
 
 
+//-------------------------------------------------------------------------
+// Tetgen namespace containing the interfacing functions
+//
 
-//------------------------------------------------------------------------------
-// Code
-//
-// This file defines parameters to be used in other parts of the RSVS snaking
-// framework. Default values are defined in "parameters.cpp"
-//
-// Substructure names are all 4-5 letters
 namespace tetgen {
+
+	/**
+	 * Type defining domain boundaries.
+	 * 
+	 * Simple short hand for a matrix of 2*3 doubles.
+	 */	
 	typedef std::array<std::array<double, 3>, 2> dombounds;
 
 	/**
-	 * @brief      Class for memory safe interface with tetgen.h 
+	 * @brief      Class for memory safe interface with tetgen.h
+	 * 
+	 * This class provides a method called `allocate` which allocates the
+	 * memory for the io arrays using the new command. Command `deallocate`
+	 * can be used to free the memory before destruction, or otherwise it is
+	 * called uppon when object goes out of scope.
 	 */
 	class io_safe : public tetgenio {
 		// Adds a semblance of prebuilt allocation functions
@@ -198,13 +205,6 @@ namespace tetgen {
 			const char* tecoutStr="../TESTOUT/rsvs_voro_contain.plt");
 	}
 }
-
-
-
-
-// Test functions
-
-
 
 
 /**

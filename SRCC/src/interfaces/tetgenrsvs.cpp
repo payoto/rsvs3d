@@ -917,6 +917,17 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 	return vecPtsMapping;
 }
 
+/**
+ * @brief      Genrates an SU2 mesh file from a snake.
+ * 
+ * Uses tetgen to generate a volume mesh around a snake and outputs it to
+ * the SU2 format.
+ * 
+ * @param[in]  snakein   A snake which needs to be meshed
+ * @param[in]  fileName  The file name
+ * @param      inparam   tetgen interface parameter object. Used to define boundary
+ *  growth rate and element sizes.
+ */
 void tetgen::SnakeToSU2(const snake &snakein, const std::string &fileName,
 	tetgen::apiparam &inparam){
 	tetgen::io_safe tetin, tetout;
@@ -932,6 +943,17 @@ void tetgen::SnakeToSU2(const snake &snakein, const std::string &fileName,
 	tetgen::output::SU2(fileName.c_str(),tetout);
 }
 
+/**
+ * @brief      Translates a tetgen output to the RSVS native mesh format.
+ *
+ * @param      tetout  the tetgenio object containing a mesh to be translated to
+ *                     the native RSVS mesh format.
+ *
+ * @return     mesh object containing the translated grid.
+ * 
+ * @raises  invalid_argument if tetout was generated without passing the neighbour
+ * flag to tetgen (`-nn`)
+ */
 mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	/*
 	Translates a tetgen output to the RSVS native mesh format 
@@ -951,8 +973,8 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	INCR = tetout.firstnumber ? 0 : 1;
 	DEINCR = tetout.firstnumber ? -1 : 0;
 
-	// if `tetrahedralize` has not been run with the correct flags connectivity is
-	// unavailable, throw an error. (tests for flag -nn)
+	// if `tetrahedralize` has not been run with the correct flags connectivity
+	// is unavailable, throw an error. (tests for flag -nn)
 	if(tetout.tet2facelist == NULL){
 		RSVS3D_ERROR_ARGUMENT("TET2MESH requires flag -nn be passed to tetgen");
 	}
