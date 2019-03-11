@@ -4584,6 +4584,30 @@ void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 	meshin.Crop(vertDel, 1);
 }
 
+mesh Points2Mesh(const std::vector<double> &vecPts, int nProp){
+		/*
+		Takes in a set of points and returns a mesh of points ready for
+		voronisation.
+		*/
+		mesh meshpts;
+
+		if((vecPts.size()%nProp)!=0){
+			std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
+			RSVS3D_ERROR_ARGUMENT("Vector of points is an invalid size");
+		}
+		int nPts = vecPts.size()/nProp;
+		meshpts.Init(nPts, 0, 0, 0);
+		meshpts.PopulateIndices();
+		for (int i = 0; i < nPts; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				meshpts.verts[i].coord[j] = vecPts[i*nProp+j]; 
+			}
+		}
+		meshpts.verts.PrepareForUse();
+		return (meshpts);
+	}
 
 namespace meshhelp {
 	/*

@@ -118,16 +118,18 @@ namespace tetgen {
 
 	class apiparam {
 	public:
-		// Builds a cuboid bound
-		std::array<double,3> lowerB={-3.0,-3.0,-3.0}; // Lower domain bound
-		std::array<double,3> upperB={4.0,4.0,4.0}; // Upper domain bound
-		// Controls the edgelengths 
-		std::vector<double> edgelengths={0.03,1.0}; 
-		double distanceTol = 0.3; // Distance tolerance
+		/// Lower domain bound
+		std::array<double,3> lowerB={-3.0,-3.0,-3.0};
+		/// Upper domain bound 
+		std::array<double,3> upperB={4.0, 4.0, 4.0}; 
+		/// Controls the edgelengths at regular intervals 
+		std::vector<double> edgelengths={0.03, 1.0};
+		/// Distance tolerance 
+		double distanceTol = 0.3; 
 		// mesh the inside of the geometry? (or the outside)
 		bool generateMeshInside = false;
 
-		// Commmand line string to be run
+		// Commmand line string to be passed to tetgen
 		std::string command;
 	};
 
@@ -135,8 +137,10 @@ namespace tetgen {
 	std::vector<int> RSVSVoronoiMesh(const std::vector<double> &vecPts, 
 		mesh &vosMesh, mesh &snakMesh,
 		tetgen::apiparam &inparam);
+	
 	void SnakeToSU2(const snake &snakein, const std::string &fileName,
 		tetgen::apiparam &inparam);
+
 	namespace input {
 		void POINTGRIDS(const mesh &meshdomain, 
 			tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam,
@@ -173,7 +177,7 @@ namespace tetgen {
 			const mesh &meshdomain,	tetgen::io_safe &tetin);
 	}
 	namespace voronoi {
-		mesh Points2Mesh(const std::vector<double> &vecPts);
+
 		std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
 			mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam);
 		std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,

@@ -14,52 +14,7 @@
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp"
 #include "meshprocessing.hpp"
-#include "tetgen_rsvs_api.hpp"
-
-void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh, 
-	snake &snakein, mesh &triMesh){
-	/*
-	Loads data for tetgen testing
-	*/
-
-	triangulation triRSVS;
-
-	snakeMesh.read("../TESTOUT/testtetgen/SnakeMesh_181205T193158_sphere2.msh");
-	voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
-	snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
-	// snakein.snakeconn.read("../TESTOUT/testtetgen/SnakeConn_181205T193158_sphere2.msh");
-	snakein.snakemesh = &snakeMesh;
-	
-	snakeMesh.PrepareForUse();
-	// snakeMesh.displight();
-	
-	voluMesh.PrepareForUse();
-	// voluMesh.displight();
-
-	snakein.PrepareForUse();
-	// snakein.displight();
-	snakein.AssignInternalVerts();
-
-	snakeMesh.AddParent(&voluMesh);
-
-	triRSVS.stattri.clear();
-	triRSVS.trivert.clear();
-	triRSVS.PrepareForUse();
-	TriangulateMesh(snakeMesh,triRSVS);
-	TriangulateSnake(snakein,triRSVS);
-	triRSVS.PrepareForUse();
-	triRSVS.CalcTriVertPos();
-	MaintainTriangulateSnake(triRSVS);
-
-	MeshTriangulation(triMesh,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
-	// triMesh.displight();
-	triMesh.PrepareForUse();
-	triMesh.OrderEdges();
-	triMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
-
-	// triMesh is the triangulation in mesh format
-	// it is not cleaned up for tiny surfaces
-}
+#include "tetgenrsvs.hpp"
 
 void tetgen::internal::MeshData2Tetgenio(const mesh &meshgeom, 
 	tetgen::io_safe &tetin,	int facetOffset, int pointOffset, 
@@ -162,7 +117,6 @@ void tetgen::internal::Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &mes
 		- points come as a list
 	*/
 	
-
 	tetin.firstnumber=0;
 
 	tetin.numberoffacets = 0;
@@ -302,7 +256,6 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain,
 		tetin, tetgenParam);
 }
 
-
 void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	const tetgen::apiparam &tetgenParam, bool generateVoroBound){
 	/*
@@ -391,19 +344,8 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 		}
 		// add the points associated with the faces
 		// add the points into a mesh
-		meshgeom.Init(nVertsAdded, 0, 0, 0);
-		meshgeom.PopulateIndices();
-		for (int i = 0; i < nVertsAdded; ++i)
-		{
-			for (int j = 0; j < 3; ++j)
-			{
-				meshgeom.verts[i].coord[j] = vertsToAdd[i*3+j];
-			}
-		}
-		if(meshgeom.verts.size()<1){
-			meshgeom.disp();
-		}
-		meshgeom.PrepareForUse();
+
+		meshgeom = Points2Mesh(vertsToAdd,3);
 		#ifdef RSVS_DIAGNOSTIC_RESOLVED
 		tecout.PrintMesh(meshgeom, 0,0,4);
 		#endif
@@ -414,7 +356,6 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	
 	tetgen::internal::Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
 }
-
 
 void tetgen::output::SU2(const char* fileName, const tetgenio &tetout){
 	/*
@@ -525,7 +466,6 @@ void tetgen::output::SU2(const char* fileName, const tetgenio &tetout){
 	// 		<< tetout.edgelist[i*2+1] << " " << std::endl;
 	// }
 }
-
 
 void tetgen::internal::CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout, 
 	std::vector<int> &rayEdges, int DEINCR, tetgen::dombounds boundBox){
@@ -682,7 +622,6 @@ void tetgen::internal::CloseVoronoiMesh(mesh &meshout, tetgen::io_safe &tetout,
 		nSurfs++;
 	}
 }
-
 
 tetgen::dombounds tetgen::output::GetBoundBox(tetgen::io_safe &tetout){
 
@@ -1087,143 +1026,115 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	return meshout;
 }
 
-namespace tetgen::voronoi {
-	mesh Points2Mesh(const std::vector<double> &vecPts){
-		/*
-		Takes in a set of points and returns a mesh of points ready for
-		voronisation.
-		*/
-		mesh meshpts;
-		int nProp = 3+1; // Number of properties per point
-		if((vecPts.size()%nProp)!=0){
-			std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
-			RSVS3D_ERROR_ARGUMENT("Vector of points is an invalid size");
-		}
-		int nPts = vecPts.size()/nProp;
-		meshpts.Init(nPts, 0, 0, 0);
+std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<double> &vecPts,
+	mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
+	/*
+	Turns a set of points into the voronisation and tetrahedralisation.
+	*/
+	tetgen::io_safe tetinV, tetoutV, tetinT, tetoutT;
+	mesh ptsMesh = Points2Mesh(vecPts,4);
+	std::string cmd;
+	int INCR;
+	std::vector<int> voroPts;
+	std::vector<bool> tetSurfInVoro;
+	std::vector<double> lowerB, upperB;
 
-		for (int i = 0; i < nPts; ++i)
-		{
+	tetgen::input::POINTGRIDS(ptsMesh, tetinV, inparam, true);
+	cmd = "Qv"; 
+	tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
+	voroMesh = tetgen::output::VORO2MESH(tetoutV);
+	// Crop mesh 
+	lowerB.assign(3, 0.0);
+	upperB.assign(3, 0.0);
+	for (int i = 0; i < 3; ++i)
+	{
+		double delta = inparam.upperB[i]-inparam.lowerB[i];
+		lowerB[i]=inparam.lowerB[i] - delta*inparam.distanceTol*0.999;
+		upperB[i]=inparam.upperB[i] + delta*inparam.distanceTol*0.999;
+	}
+	// voroMesh.displight();
+	voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
+	voroMesh.CropAtBoundary(lowerB, upperB);
+	voroMesh.TightenConnectivity();
+	voroMesh.OrderEdges();
+	voroMesh.SetBorders();
+	// voroMesh.displight();
+	FlattenBoundaryFaces(voroMesh);
+	voroMesh.PrepareForUse();
+	voroMesh.TightenConnectivity(); 
+	voroMesh.OrderEdges();
+	voroMesh.SetBorders();
+	// Input mesh
+	
+	std::vector<int> vertPerSubDomain;
+	mesh meshdomain = BuildCutCellDomain({0,0,0}, {0,0,0}, // upper bounds are not used
+		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
+
+	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
+	tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
+	tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
+	cmd = "QpqmnnefO9/7"; 
+	tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
+	tetMesh = tetgen::output::TET2MESH(tetoutT);
+
+	INCR = tetoutT.firstnumber ? 0 : 1;
+
+	for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
+	{
+		if(tetoutT.trifacemarkerlist[i]!=0){
 			for (int j = 0; j < 3; ++j)
 			{
-				meshpts.verts[i].coord[j] = vecPts[i*nProp+j]; 
+				voroPts.push_back(tetoutT.trifacelist[i*3+j]+INCR);
 			}
 		}
-		meshpts.verts.PrepareForUse();
-		return (meshpts);
+	}
+	sort(voroPts);
+	unique(voroPts);
+	tetSurfInVoro.reserve(tetoutT.numberoftrifaces);
+
+	for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
+	{
+		tetSurfInVoro.push_back(tetoutT.trifacemarkerlist[i]!=0);
 	}
 
-	std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
-		mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
-		/*
-		Turns a set of points into the voronisation and tetrahedralisation.
-		*/
-		tetgen::io_safe tetinV, tetoutV, tetinT, tetoutT;
-		mesh ptsMesh = Points2Mesh(vecPts);
-		std::string cmd;
-		int INCR;
-		std::vector<int> voroPts;
-		std::vector<bool> tetSurfInVoro;
-		std::vector<double> lowerB, upperB;
-
-		tetgen::input::POINTGRIDS(ptsMesh, tetinV, inparam, true);
-		cmd = "Qv"; 
-		tetrahedralize(cmd.c_str(), &tetinV, &tetoutV);
-		voroMesh = tetgen::output::VORO2MESH(tetoutV);
-		// Crop mesh 
-		lowerB.assign(3, 0.0);
-		upperB.assign(3, 0.0);
-		for (int i = 0; i < 3; ++i)
-		{
-			double delta = inparam.upperB[i]-inparam.lowerB[i];
-			lowerB[i]=inparam.lowerB[i] - delta*inparam.distanceTol*0.999;
-			upperB[i]=inparam.upperB[i] + delta*inparam.distanceTol*0.999;
-		}
-		// voroMesh.displight();
-		voroMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
-		voroMesh.CropAtBoundary(lowerB, upperB);
-		voroMesh.TightenConnectivity();
-		voroMesh.OrderEdges();
-		voroMesh.SetBorders();
-		// voroMesh.displight();
-		FlattenBoundaryFaces(voroMesh);
-		voroMesh.PrepareForUse();
-		voroMesh.TightenConnectivity(); 
-		voroMesh.OrderEdges();
-		voroMesh.SetBorders();
-		// Input mesh
-		
-		std::vector<int> vertPerSubDomain;
-		mesh meshdomain = BuildCutCellDomain({0,0,0}, {0,0,0}, // upper bounds are not used
-			inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
-
-		tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
-		tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
-		tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
-		cmd = "QpqmnnefO9/7"; 
-		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
-		tetMesh = tetgen::output::TET2MESH(tetoutT);
-
-		INCR = tetoutT.firstnumber ? 0 : 1;
-
-		for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
-		{
-			if(tetoutT.trifacemarkerlist[i]!=0){
-				for (int j = 0; j < 3; ++j)
-				{
-					voroPts.push_back(tetoutT.trifacelist[i*3+j]+INCR);
-				}
-			}
-		}
-		sort(voroPts);
-		unique(voroPts);
-		tetSurfInVoro.reserve(tetoutT.numberoftrifaces);
-
-		for (int i = 0; i < tetoutT.numberoftrifaces; ++i)
-		{
-			tetSurfInVoro.push_back(tetoutT.trifacemarkerlist[i]!=0);
-		}
-
-		return(tetSurfInVoro);
-	}
-	std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
-		const std::vector<int> &boundaryPts){
-		/*
-		
-		*/
-
-		int nSurfs, nVerts;
-		std::vector<bool> boundaryFaces, boundaryVertsLog;
-		std::vector<int> tempVerts;
-
-		nVerts = meshin.verts.size();
-		nSurfs = meshin.surfs.size();
-
-		boundaryVertsLog.assign(nVerts, false);
-		boundaryFaces.assign(nSurfs, false);
-		int count  = boundaryPts.size();
-		for (int i = 0; i < count; ++i)
-		{
-			boundaryVertsLog[meshin.verts.find(boundaryPts[i])]=true;
-		}
-		for (int i = 0; i < nSurfs; ++i)
-		{
-			tempVerts.clear();
-			meshin.surfs(i)->OrderedVerts(&meshin, tempVerts);
-			bool isBound = true;
-			for (auto j : tempVerts){
-				isBound = isBound && boundaryVertsLog[meshin.verts.find(j)];
-				if(!isBound){
-					break;
-				}
-			}
-			boundaryFaces[i] = isBound;
-		}
-		return boundaryFaces;
-	}
+	return(tetSurfInVoro);
 }
 
+std::vector<bool> tetgen::voronoi::BoundaryFacesFromPoints(const mesh &meshin,
+	const std::vector<int> &boundaryPts){
+	/*
+	
+	*/
 
+	int nSurfs, nVerts;
+	std::vector<bool> boundaryFaces, boundaryVertsLog;
+	std::vector<int> tempVerts;
+
+	nVerts = meshin.verts.size();
+	nSurfs = meshin.surfs.size();
+
+	boundaryVertsLog.assign(nVerts, false);
+	boundaryFaces.assign(nSurfs, false);
+	int count  = boundaryPts.size();
+	for (int i = 0; i < count; ++i)
+	{
+		boundaryVertsLog[meshin.verts.find(boundaryPts[i])]=true;
+	}
+	for (int i = 0; i < nSurfs; ++i)
+	{
+		tempVerts.clear();
+		meshin.surfs(i)->OrderedVerts(&meshin, tempVerts);
+		bool isBound = true;
+		for (auto j : tempVerts){
+			isBound = isBound && boundaryVertsLog[meshin.verts.find(j)];
+			if(!isBound){
+				break;
+			}
+		}
+		boundaryFaces[i] = isBound;
+	}
+	return boundaryFaces;
+}
 
 void tetgen::io_safe::allocate(){
 
@@ -1405,6 +1316,51 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 }
 
 // Test code
+void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh, 
+	snake &snakein, mesh &triMesh){
+	/*
+	Loads data for tetgen testing
+	*/
+
+	triangulation triRSVS;
+
+	snakeMesh.read("../TESTOUT/testtetgen/SnakeMesh_181205T193158_sphere2.msh");
+	voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
+	snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
+	// snakein.snakeconn.read("../TESTOUT/testtetgen/SnakeConn_181205T193158_sphere2.msh");
+	snakein.snakemesh = &snakeMesh;
+	
+	snakeMesh.PrepareForUse();
+	// snakeMesh.displight();
+	
+	voluMesh.PrepareForUse();
+	// voluMesh.displight();
+
+	snakein.PrepareForUse();
+	// snakein.displight();
+	snakein.AssignInternalVerts();
+
+	snakeMesh.AddParent(&voluMesh);
+
+	triRSVS.stattri.clear();
+	triRSVS.trivert.clear();
+	triRSVS.PrepareForUse();
+	TriangulateMesh(snakeMesh,triRSVS);
+	TriangulateSnake(snakein,triRSVS);
+	triRSVS.PrepareForUse();
+	triRSVS.CalcTriVertPos();
+	MaintainTriangulateSnake(triRSVS);
+
+	MeshTriangulation(triMesh,snakein.snakeconn,triRSVS.dynatri, triRSVS.trivert);
+	// triMesh.displight();
+	triMesh.PrepareForUse();
+	triMesh.OrderEdges();
+	triMesh.TestConnectivityBiDir(__PRETTY_FUNCTION__);
+
+	// triMesh is the triangulation in mesh format
+	// it is not cleaned up for tiny surfaces
+}
+
 int tetgen::test::api(){
 
 	return(tetgen::test::call());
@@ -1681,6 +1637,7 @@ int tetgen::test::RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutS
 	}
 	return 0;
 }
+
 int tetgen::test::RSVSVORO_Contain()
 {
 	std::vector<double> vecPts;

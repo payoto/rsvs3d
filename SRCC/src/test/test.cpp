@@ -23,7 +23,7 @@
 #include "RSVSalgorithm.hpp"
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
-#include "tetgen_rsvs_api.hpp"
+#include "tetgenrsvs.hpp"
 
 
 int main(){

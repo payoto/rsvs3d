@@ -591,7 +591,7 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
 	const vector<double> &testVertices);
-
+mesh Points2Mesh(const std::vector<double> &vecPts, int nProp=3);
 namespace meshhelp {
 	template<class T, class V, class W>
 	double ProjectRay(int count, const W &&boundBox,
