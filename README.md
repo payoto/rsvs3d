@@ -1,5 +1,5 @@
 # README #
-Last updated 13/12/2018
+Last updated 12/03/2019
 
 # What is this repository for? #
 
@@ -33,11 +33,26 @@ Required 3rd party open source libraries for compilation:
  + [JSON for Modern C++](https://github.com/nlohmann/json/releases): JSON handling for c++. Used
    for the parameter handling of the RSVS3D framework (single include header).
 
+Optional 3rd party open source library:
+ + [Tetgen](http://tetgen.org) : A Quality Tetrahedral Mesh Generator and a 3D Delaunay
+ Triangulator. Download my modified version for this project 
+ [payoto/tetgen](https://github.com/payoto/tetgen).
+
+# License #
+
+Any code using the Tetgen interface and functionalities is under the GNU Affero GPL license
+which is more restrictive than the LGPL of this project:
+ + LGPL : If you write an interface to this project and use it as a library, you can distribute
+ closed source version.
+ + AGPL : Regardless how you use it and distribute a program you have to open the source.
+
+Refer to the full License terms for more information.
 
 # How do I get set up? #
 
 ## Matlab ##
-Before being able to call the Matlab codes 
+Before being able to call the Matlab codes (these are not necessary for the geometry tool
+execution).
 	
 		>> Init3DMatlab
 		>> Include_3DCheckGrid
@@ -48,12 +63,12 @@ To Compile and test the C++ code:
 
 		cd ./SRCC
 		make testall      
-		bin/testall_RSVS3D
+		testall_RSVS3D
 
-If the tests run;
+If the tests run (they should), to see some example usages;
 
 		make
-		bin/RSVS3D.exe
+		RSVS3D.exe -h 
 
 
 ## Note on using git to update a private copy of the code. ##
@@ -216,9 +231,14 @@ Controls the file interaction of the program including the naming of output fold
 Control the underlying grid if it is generated. It can also be loaded if `"/files/ioin/snakemeshname"`
 is specified.
 
+ + `activegrid` : The type of grid to build (`"voxel"`, `"voronoi"` or `"load"`).
  + `domain`: Domain dimensions, each of x, y and z are represented by a lower and upprt bound.
  + `gridsizebackground`: Design grid size on which the volume fractions are specified.
  + `gridsizesnake`: Snaking mesh as a refinement of the background mesh.
+ + `distancebox` : for a voronoi VOS mesh the distance outside `domain` at which the
+ bounding points will be placed.
+ + `inputpoints` : A vector of data containing coordinates used for the Voronoi process.
+ + `pointfile` : The file from which these are loaded.
 
 Examples:
 	`gridsizebackground=[2, 3, 4]` and `gridsizesnake=[4, 4, 4]` will leed to an actual snaking mesh
@@ -226,12 +246,19 @@ Examples:
 
 Parameters:
 ```json
-	"/grid/voxel/domain/0/0": 0.0,
-	"/grid/voxel/domain/0/1": 1.0,
-	"/grid/voxel/domain/1/0": 0.0,
-	"/grid/voxel/domain/1/1": 1.0,
-	"/grid/voxel/domain/2/0": 0.0,
-	"/grid/voxel/domain/2/1": 1.0,
+    "/grid/activegrid": "voxel",
+	"/grid/domain/0/0": 0.0,
+	"/grid/domain/0/1": 1.0,
+	"/grid/domain/1/0": 0.0,
+	"/grid/domain/1/1": 1.0,
+	"/grid/domain/2/0": 0.0,
+	"/grid/domain/2/1": 1.0,
+  	"/grid/stretch/0": 1.0,
+ 	"/grid/stretch/1": 1.0,
+ 	"/grid/stretch/2": 1.0,
+    "/grid/voronoi/distancebox": 0.1,
+    "/grid/voronoi/inputpoints/0": 0.0,
+    "/grid/voronoi/pointfile": "",
 	"/grid/voxel/gridsizebackground/0": 1,
 	"/grid/voxel/gridsizebackground/1": 1,
 	"/grid/voxel/gridsizebackground/2": 1,
