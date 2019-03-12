@@ -43,7 +43,7 @@ namespace rsvs3d {
 		const char *file="", int line=0, bool throwError=true);
 }
 #define RSVS3D_ERROR(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
-
+#define RSVS3D_ERROR_NOTHROW(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, false))
 #define RSVS3D_ERROR_TYPE(M, T) (rsvs3d::error<T>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 #define RSVS3D_ERROR_LOGIC(M) (rsvs3d::error<std::logic_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 #define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))

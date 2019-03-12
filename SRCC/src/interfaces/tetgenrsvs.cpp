@@ -286,10 +286,12 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 		#endif
 		vertsToAdd.reserve(100);
 		// add the points associated with the vertices
-		for (int l = 0; l < 3; ++l)
+		for (int l = 0; l < 4; ++l)
 		{
 			vertModif = {0,0,0};
-			vertModif[l] = tetgenParam.distanceTol;
+			if (l<3){
+				vertModif[l] = tetgenParam.distanceTol;
+			}
 			for (int i = 0; i < 8; ++i)
 			{	
 				for (int j = 0; j < 3; ++j)
@@ -912,7 +914,9 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 		vosMesh.volus[i].error = 0.0;
 	}
 	vosMesh.PrepareForUse();
-
+	vosMesh.OrientFaces();
+	vosMesh.SetBorders();
+	snakMesh.SetBorders();
 	
 	return vecPtsMapping;
 }
@@ -1093,10 +1097,18 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
 
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
-	tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
-	tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
+	// tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
+	// tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
 	cmd = "QpqmnnefO9/7"; 
-	tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
+	try{
+		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
+	} catch (exception const& ex) {
+		std::cerr <<  std::endl << "Input points: ";
+		DisplayVector(vecPts);
+		std::cerr << std::endl;
+		voroMesh.displight();
+		throw ex;
+	}
 	tetMesh = tetgen::output::TET2MESH(tetoutT);
 
 	INCR = tetoutT.firstnumber ? 0 : 1;

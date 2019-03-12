@@ -126,9 +126,9 @@ namespace tetgen {
 	class apiparam {
 	public:
 		/// Lower domain bound
-		std::array<double,3> lowerB={-3.0,-3.0,-3.0};
+		std::array<double,3> lowerB={0.0,0.0,0.0};
 		/// Upper domain bound 
-		std::array<double,3> upperB={4.0, 4.0, 4.0}; 
+		std::array<double,3> upperB={1.0, 1.0, 1.0}; 
 		/// Controls the edgelengths at regular intervals 
 		std::vector<double> edgelengths={0.03, 1.0};
 		/// Distance tolerance 
@@ -242,5 +242,5 @@ double tetgen::internal::ProjectRay(int count, const tetgen::dombounds &boundBox
 	}
 	return std::min(l, minDist);
 }
-
+int Test_RSVSvoro_init();
 #endif

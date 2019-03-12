@@ -95,11 +95,16 @@ void param::voronoi::ReadPoints(){
 	pointstream.open(this->pointfile, ios::in);
 	CheckFStream(pointstream, __PRETTY_FUNCTION__, this->pointfile);
 
+	this->inputpoints.clear();
+
 	double temp;
 	while(pointstream >> temp){
 		this->inputpoints.push_back(temp);
+		std::cout << temp << " ";
 	}
 	pointstream.close();
+	std::cout << std::endl;
+
 }
 
 //===========================================

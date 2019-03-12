@@ -41,26 +41,19 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 
 	start_s=clock();
 
-	
-
 	start_s=TimeStamp("position: ", start_s);
 
 	snakein.SnaxImpactDetection(isImpact);
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
 
-
 	start_s=TimeStamp("Merge: ", start_s);
 
 	CleanupSnakeConnec(snakein);
 	
-
 	start_s=TimeStamp("Clean: ", start_s);
 	snakein.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(snakein,isImpact);
-
-
-	
 
 	start_s=TimeStamp("Spawn: ", start_s);
 
@@ -72,7 +65,6 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	
-
 	start_s=TimeStamp("Impact: ", start_s);
 
 	CleanupSnakeConnec(snakein);
@@ -314,7 +306,6 @@ void integrate::prepare::Mesh(
 		integrate::prepare::grid::Voxel(gridconf, snakeMesh, voluMesh);
 	} else if(gridconf.activegrid.compare("voronoi")==0) {
 		integrate::prepare::grid::Voronoi(gridconf, snakeMesh, voluMesh);
-		RSVS3D_ERROR("Voronoi functionality not implemented.");
 	} else if(gridconf.activegrid.compare("load")==0) {
 		RSVS3D_ERROR("Load functionality not implemented.");
 	} else {
@@ -333,6 +324,8 @@ void integrate::prepare::Mesh(
 	voluMesh.OrientFaces();
 	calcVolus.CalculateMesh(voluMesh);
 	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
+
+	std::cout << "Meshes prepared..." << std::endl;
 }
 
 void integrate::prepare::grid::Voxel(
@@ -382,12 +375,12 @@ void integrate::prepare::grid::Voronoi(
 	){
 	// Vector points are already loaded
 	tetgen::apiparam inparam;
-
+	inparam.edgelengths={0.1};
 	inparam.distanceTol = gridconf.voronoi.distancebox;
 	for (int i = 0; i < 3; ++i)
 	{
-		inparam.lowerB[i] = gridconf.domain[0][i];
-		inparam.upperB[i] = gridconf.domain[1][i];
+		inparam.lowerB[i] = gridconf.domain[i][0];
+		inparam.upperB[i] = gridconf.domain[i][1];
 	}
 	tetgen::RSVSVoronoiMesh(
 		gridconf.voronoi.inputpoints,
@@ -414,6 +407,10 @@ void integrate::prepare::Snake(
 			for(int i=0; i< nElms; ++i){
 				voluMesh.volus[i].target=rsvsconf.cstfill.fill;
 			}
+		} else {
+			for(int i=0; i< nElms; ++i){
+				voluMesh.volus[i].target=voluMesh.volus[i].target;
+			}
 		}
 	} else if(voluMesh.WhatDim()==2){
 		nElms = voluMesh.surfs.size();
@@ -424,6 +421,10 @@ void integrate::prepare::Snake(
 		} else if(rsvsconf.cstfill.active){
 			for(int i=0; i< nElms; ++i){
 				voluMesh.surfs[i].target=rsvsconf.cstfill.fill;
+			}
+		} else {
+			for(int i=0; i< nElms; ++i){
+				voluMesh.surfs[i].target=voluMesh.surfs[i].target;
 			}
 		}
 	}
@@ -543,7 +544,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
 	RSVSobj.outSnake.PrintMesh(RSVSobj.snakeMesh);
 	RSVSobj.outSnake.PrintMesh(RSVSobj.voluMesh);
 	nVoluZone=RSVSobj.outSnake.ZoneNum();
-
+	RSVSobj.rsvsSnake.displight();
 	maxStep = RSVSobj.paramconf.snak.maxsteps;
 	for(stepNum=0; stepNum<maxStep; ++stepNum){
 		start_s=clock(); 
@@ -613,6 +614,13 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 
+	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::postprocess::Snake(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.voluMesh, totT, nVoluZone,
+			RSVSobj.paramconf);
+	}
+
 	if (0 < RSVSobj.paramconf.files.ioout.outputlvl){
 		RSVSobj.logFile << "> final step" << stepNum << " :," ;
 			RSVSobj.logFile << totT << endl;
@@ -620,13 +628,6 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 			RSVSobj.logFile, RSVSobj.calcObj,
 			RSVSobj.paramconf.files.ioout.logginglvl
 			);
-	}
-
-	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
-		integrate::execute::postprocess::Snake(
-			RSVSobj.outSnake, RSVSobj.rsvsSnake,
-			RSVSobj.voluMesh, totT, nVoluZone,
-			RSVSobj.paramconf);
 	}
 
 	if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
