@@ -2901,9 +2901,9 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 	0 return vertices where the target volume is 1.0
 	1 return vertices where the target volume is >0.0
 	*/
-	int ii, ni, jj, nj,kk,nk,ll,nl, vertTemp, edgeSub,surfSub;
+	int ii, ni, jj, nj;
 	vector<double> vals;
-	bool surfCond;
+	bool voluOnBoundary;
 
 	ni=volus.size();
 	nj=verts.size();
@@ -2913,22 +2913,22 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 	voluInd.reserve(ni);
 
 	for (ii=0; ii<ni; ++ii){
-		surfCond=volus(ii)->isBorder;
-		if(surfCond){
+		voluOnBoundary=volus(ii)->isBorder;
+		if(voluOnBoundary){
 			if(outerVolume==0){
 				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
-				surfCond=false;
+				voluOnBoundary=false;
 				jj=0;
-				while (!surfCond && jj<meshtree.nParents){
-					surfCond=vals[jj]==1.0;
+				while (!voluOnBoundary && jj<meshtree.nParents){
+					voluOnBoundary=vals[jj]==1.0;
 					++jj;
 				}
 			} else if(outerVolume==1){
 				this->VoluValuesofParents(volus(ii)->index,vals, &volu::target);
-				surfCond=false;
+				voluOnBoundary=false;
 				jj=0;
-				while (!surfCond && jj<meshtree.nParents){
-					surfCond=vals[jj]>0.0;
+				while (!voluOnBoundary && jj<meshtree.nParents){
+					voluOnBoundary=vals[jj]>0.0;
 					++jj;
 				}
 			} else if(outerVolume!=-1){
@@ -2936,34 +2936,24 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 			}
 		} 
 		// THIS IS DODGY HOW to pick the side to delete can fail
-		if(surfCond){
+		if(voluOnBoundary){
 			// Pick one of the volumes to delete
 			if(outerVolume==0){
-				nj = volus(ii)->surfind.size();
-				for(jj=0;jj<nj;++jj){
-					surfSub = surfs.find(volus(ii)->surfind[jj]);
-					for(kk=0;kk<2;++kk){
-						if(surfs(surfSub)->voluind[kk]!=0){
-							if(!(volus.isearch(surfs(surfSub)->voluind[kk])->isBorder)){
-								voluInd.push_back(surfs(surfSub)->voluind[kk]);
-							}
+				for(auto surfAct : volus(ii)->surfind){
+					for(auto voluAct : surfs.isearch(surfAct)->voluind){
+						if(voluAct!=0 && !(volus.isearch(voluAct)->isBorder)){
+							voluInd.push_back(voluAct);
 						}
 					}
 				}
 			} else {
 				voluInd.push_back(volus(ii)->index);
 			}
-			nl=volus(ii)->surfind.size();
-			for(ll=0; ll<nl; ++ll){
-				surfSub=surfs.find(volus(ii)->surfind[ll]);
-				nj=surfs(surfSub)->edgeind.size();
-				for(jj=0; jj<nj; ++jj){
-					edgeSub=edges.find(surfs(surfSub)->edgeind[jj]);
-					nk=edges(edgeSub)->vertind.size();
-					for (kk=0; kk<nk; ++kk){
-						vertTemp=edges(edgeSub)->vertind[kk];
-						if (!verts.isearch(vertTemp)->isBorder){
-							vertInd.push_back(vertTemp);
+			for(auto surfAct : volus(ii)->surfind){
+				for(auto edgeAct : surfs.isearch(surfAct)->edgeind){
+					for (auto vertAct : edges.isearch(edgeAct)->vertind){
+						if (!verts.isearch(vertAct)->isBorder){
+							vertInd.push_back(vertAct);
 						}
 					}
 				}
