@@ -52,6 +52,7 @@ int main(){
 	gridTest.RunSilent(Test_Crop,"test cropping of meshes"); 
 	// Snakstruct 3D tests
 	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
 	gridTest.RunSilent(Test_snakeinit,"Snake rand velocity"); 
 	gridTest.RunSilent(Test_RSVSalgo,"Snake RSVS from spawn");
 	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS");
@@ -83,6 +84,9 @@ int main(){
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
 
+
+	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
 
 	return(0);
 }

@@ -110,12 +110,14 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	snakein.UpdateDistance(dt);
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
+	snakein.displight();
 	// detect and remove impacts
 	snakein.SnaxImpactDetection(isImpact);
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
+	snakein.displight();
 	// Remove one of the 'snakes'
 	if (snakein.Check3D()){
 		RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
@@ -124,6 +126,8 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	}
 	snakein.PrepareForUse();
 	snakein.OrientFaces();
+	snakein.displight();
+	
 	cout << "Initialisation DONE!" << endl;
 }
 
@@ -156,10 +160,11 @@ void RemoveSnakeInVolu(snake &snakein, vector<int> &voluInd, int outerBorder){
 	// cout << "Find snax to del" << endl;
 	vertBlocks.clear();
 	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
-	isBlockDel.assign(nBlocks,false);
+	bool delVertInVolu = outerBorder>0;
+	isBlockDel.assign(nBlocks,!delVertInVolu);
 	ni=delSnax.size();
 	for(ii=0; ii<ni; ++ii){
-		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=true;
+		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=delVertInVolu;
 	}
 	// cout << "Find All snax to del" << endl;
 	delSnax.clear();
@@ -251,10 +256,11 @@ void RemoveSnakeInSurf(snake &snakein, vector<int> &voluInd, int outerBorder){
 	// cout << "Find snax to del" << endl;
 	vertBlocks.clear();
 	nBlocks=snakein.snakeconn.ConnectedVertex(vertBlocks);
-	isBlockDel.assign(nBlocks,false);
+	bool delVertInVolu = outerBorder>0;
+	isBlockDel.assign(nBlocks,!delVertInVolu);
 	ni=delSnax.size();
 	for(ii=0; ii<ni; ++ii){
-		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=true;
+		isBlockDel[vertBlocks[snakein.snakeconn.verts.find(delSnax[ii])]-1]=delVertInVolu;
 	}
 	// cout << "Find All snax to del" << endl;
 	delSnax.clear();

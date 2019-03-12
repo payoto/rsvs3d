@@ -749,22 +749,18 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 			// DisplayVector(vals0);
 			// DisplayVector(vals1);
 			while(!isOnBound && jj< meshtree.nParents){
-
-				isOnBound = (vals0[jj]!=vals1[jj]) 
-				&& ((vals0[jj]==boundVolume) || (vals1[jj]==boundVolume));
+				// To be on bound the left and right values must be differebt and
+				// one must be equal to the target boundary Value
+				isOnBound =  (fabs(vals0[jj]-boundVolume)<__DBL_EPSILON__)
+					^ (fabs(vals1[jj]-boundVolume)<__DBL_EPSILON__);
 				++jj;
 			}
 			
-			if(isOnBound && (vals1[jj-1]==boundVolume)){
-				voluInd.push_back(surfs(ii)->voluind[1]);
-				if(boundVolume==1.0 && volus.isearch(voluInd.back())->isBorder){
-					voluInd.pop_back();
-				}
-			}
-			if(isOnBound && (vals0[jj-1]==boundVolume)){
-				voluInd.push_back(surfs(ii)->voluind[0]);
-				if(boundVolume==1.0 && volus.isearch(voluInd.back())->isBorder){
-					voluInd.pop_back();
+			if(isOnBound){
+				if((fabs(vals1[jj-1]-boundVolume)<__DBL_EPSILON__)){
+					voluInd.push_back(surfs(ii)->voluind[1]);
+				} else if((fabs(vals0[jj-1]-boundVolume)<__DBL_EPSILON__)){
+					voluInd.push_back(surfs(ii)->voluind[0]);
 				}
 			}
 			
@@ -2892,7 +2888,7 @@ void mesh::GetOffBorderVert(vector<int> &vertInd, vector<int> &voluInd,
 void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 	int outerVolume) const{
 	/*
-	Gets vertices that are in a vlume that is on the edge of the design
+	Gets vertices that are in a volume that is on the edge of the design
 	space but off th eedge themselves
 
 	outerVolume indicates the additional condition of the volume needing 
@@ -2920,7 +2916,7 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 				voluOnBoundary=false;
 				jj=0;
 				while (!voluOnBoundary && jj<meshtree.nParents){
-					voluOnBoundary=vals[jj]==1.0;
+					voluOnBoundary=fabs(vals[jj]-1.0)<__DBL_EPSILON__;
 					++jj;
 				}
 			} else if(outerVolume==1){
@@ -2928,27 +2924,18 @@ void mesh::GetOffBorderVert3D(vector<int> &vertInd, vector<int> &voluInd,
 				voluOnBoundary=false;
 				jj=0;
 				while (!voluOnBoundary && jj<meshtree.nParents){
-					voluOnBoundary=vals[jj]>0.0;
+					voluOnBoundary=fabs(vals[jj])>__DBL_EPSILON__;
 					++jj;
 				}
 			} else if(outerVolume!=-1){
-				RSVS3D_ERROR_ARGUMENT("Unkownn value of outerVolume -1,0, or 1");
+				RSVS3D_ERROR_ARGUMENT("Unkown value of outerVolume -1,0, or 1");
 			}
 		} 
 		// THIS IS DODGY HOW to pick the side to delete can fail
 		if(voluOnBoundary){
 			// Pick one of the volumes to delete
-			if(outerVolume==0){
-				for(auto surfAct : volus(ii)->surfind){
-					for(auto voluAct : surfs.isearch(surfAct)->voluind){
-						if(voluAct!=0 && !(volus.isearch(voluAct)->isBorder)){
-							voluInd.push_back(voluAct);
-						}
-					}
-				}
-			} else {
-				voluInd.push_back(volus(ii)->index);
-			}
+			voluInd.push_back(volus(ii)->index);
+			
 			for(auto surfAct : volus(ii)->surfind){
 				for(auto edgeAct : surfs.isearch(surfAct)->edgeind){
 					for (auto vertAct : edges.isearch(edgeAct)->vertind){
@@ -3119,6 +3106,44 @@ void mesh::SetBorders(){
 	}
 	verts.ForceArrayReady();
 
+	if (int(volus.size())>0){
+		// in 3D volume is on the border if any part of it is out (incl 1 vert)
+		int nVolu = volus.size();
+		for (ii=0; ii<nVolu; ++ii){
+			if(!volus(ii)->isBorder){
+				for(auto surfAct : volus(ii)->surfind){
+					for(auto edgeAct : surfs.isearch(surfAct)->edgeind){
+						for (auto vertAct : edges.isearch(edgeAct)->vertind){
+							if (verts.isearch(vertAct)->isBorder){
+								volus[ii].isBorder=true;
+								break;
+							}
+						}
+						if(volus[ii].isBorder){break;}
+					}
+					if(volus[ii].isBorder){break;}
+				}
+			}
+		}
+		volus.ForceArrayReady();
+	} else {
+		// in 2D a surface is on the border if any part of it is out (incl 1 vert)
+		int nSurf = surfs.size();
+		for (ii=0; ii<nSurf; ++ii){
+			if(!surfs(ii)->isBorder){
+				for(auto edgeAct : surfs(ii)->edgeind){
+					for (auto vertAct : edges.isearch(edgeAct)->vertind){
+						if (verts.isearch(vertAct)->isBorder){
+							surfs[ii].isBorder=true;
+							break;
+						}
+					}
+					if(surfs[ii].isBorder){break;}
+				}
+			}
+		}
+		surfs.ForceArrayReady();
+	}
 	borderIsSet=true;
 }
 
@@ -4841,6 +4866,8 @@ namespace meshhelp {
 		coordvec temp1, temp2;
 		std::array<int, 3> surfacePoints = {0,0,0};
 		bool isInCandidate=false, candidateIsValid;
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		int volumeCandidate=0;
 		int pointInVolu, alternateVolume, nVolusExplored=0, nVolus;
 		double distToPlane, multiplierDist;
@@ -4853,6 +4880,7 @@ namespace meshhelp {
 			candidateIsValid=false;
 			// for each face of the candidate volume
 			for(auto surfCurr : meshin.volus.isearch(volumeCandidate)->surfind){
+			#pragma GCC diagnostic pop
 				#ifdef SAFE_ALGO
 				// Checks that ordering and edgeind are correct
 				if(!meshin.surfs.isearch(surfCurr)->isready(true)){

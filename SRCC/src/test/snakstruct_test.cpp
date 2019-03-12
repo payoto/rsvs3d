@@ -13,6 +13,7 @@
 #include "RSVSalgorithm.hpp"
 #include "RSVSintegration.hpp"
 #include "warning.hpp"
+#include "tetgenrsvs.hpp"
 
 using namespace std;
 
@@ -116,7 +117,6 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
 	}
 }
 
-
 void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	vector<int> &dims, triangulation &triRSVS){
 	vector<int> elmMapping;
@@ -163,6 +163,31 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	testSnake.PrepareForUse();
 }
 
+void PrepareMultiLvlSnakeNoVoluGen(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
+	triangulation &triRSVS){
+
+	RSVScalc calcVolus;
+
+
+	snakeMesh.PrepareForUse();
+	snakeMesh.OrientFaces();
+	///// Generate Coarser Volume Mesh
+	testSnake.snakemesh=&snakeMesh;
+	//testSnake.disp();
+
+	voluMesh.PrepareForUse();
+	voluMesh.OrientFaces();
+
+	calcVolus.CalculateMesh(voluMesh);
+	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
+
+	triRSVS.stattri.clear();
+	triRSVS.trivert.clear();
+	triRSVS.PrepareForUse();
+	TriangulateMesh(snakeMesh,triRSVS);
+
+	testSnake.PrepareForUse();
+}
 
 void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> &isImpact){
 	CalculateSnakeVelRand(testSnake);
@@ -854,6 +879,97 @@ int Test_RSVSalgo_init(){
 		outSnake.PrintMesh(testSnake2.snakeconn);
 		outSnake.PrintSnakeInternalPts(testSnake2);
 
+		if(testSnake.snaxs.size()==0 && testSnake2.snaxs.size()==0){
+			errTest=3;
+			RSVS3D_ERROR_NOTHROW("Both test snakes had no snaxels.");
+		} else if( testSnake2.snaxs.size()==0){
+			errTest=2;
+			RSVS3D_ERROR_NOTHROW("test snake 2 had no snaxels.");
+		} else if(testSnake.snaxs.size()==0 ){
+			errTest=1;
+			RSVS3D_ERROR_NOTHROW("test snake 1 had no snaxels.");
+		} 
+
+	} catch (exception const& ex) { 
+		cerr << "Exception: " << ex.what() <<endl; 
+		return -1;
+	} 
+	return(errTest);
+}
+
+int Test_RSVSvoro_init(){
+	// int nVoluZone, ii;
+
+	snake testSnake, testSnake2;
+	mesh snakeMesh,  voluMesh;
+	// mesh triMesh;
+	triangulation testTriangle,triRSVS,triRSVS2;
+	vector<int> dims;
+	vector<double> vecPts;
+	const char *fileToOpen;
+	tecplotfile outSnake;
+	tetgen::apiparam voroparam;
+	// double totT=0.0;
+	// vector<double> dt;
+	// vector<int> isImpact;
+	int start_s,stop_s;
+	//bool errFlag;
+	int errTest=0;
+	
+
+	dims.assign(3,0);
+	dims[0]=2;dims[1]=3;dims[2]=1;
+	try {
+		fileToOpen="../TESTOUT/TestVoroRSVS.plt";
+		outSnake.OpenFile(fileToOpen);
+
+		voroparam.edgelengths={0.1};
+		voroparam.distanceTol=0.1;
+		vecPts.assign(4, 0.66);
+		vecPts.insert(vecPts.end(), 4,0.33);
+		tetgen::RSVSVoronoiMesh(vecPts, voluMesh, snakeMesh, voroparam);
+		PrepareMultiLvlSnakeNoVoluGen(snakeMesh, voluMesh, testSnake, triRSVS);
+		PrepareMultiLvlSnakeNoVoluGen(snakeMesh, voluMesh, testSnake2, triRSVS2);
+		// for (int i = 0; i < voluMesh.volus.size(); ++i)
+		// {
+		// 	voluMesh.volus[i].target = 0.5;
+		// }
+		int i1 =1;
+		for (int i = 0; i < 5; ++i)
+		{
+			voluMesh.volus[i1++].target=1.0;
+		}
+		// voluMesh.volus[3].target=0.0;
+		voluMesh.PrepareForUse();
+		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(voluMesh);
+		// nVoluZone=outSnake.ZoneNum();
+		
+		start_s=clock();
+		SpawnRSVS(testSnake2,1);
+		SpawnRSVS(testSnake,0);
+		testSnake.PrepareForUse();
+
+
+		stop_s=clock();
+		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+		testSnake.displight();
+		outSnake.PrintMesh(testSnake.snakeconn);
+		outSnake.PrintSnakeInternalPts(testSnake);
+		outSnake.PrintMesh(testSnake2.snakeconn);
+		outSnake.PrintSnakeInternalPts(testSnake2);
+
+		if(testSnake.snaxs.size()==0 && testSnake2.snaxs.size()==0){
+			errTest=3;
+			RSVS3D_ERROR_NOTHROW("Both test snakes had no snaxels.");
+		} else if( testSnake2.snaxs.size()==0){
+			errTest=2;
+			RSVS3D_ERROR_NOTHROW("test snake 2 had no snaxels.");
+		} else if(testSnake.snaxs.size()==0 ){
+			errTest=1;
+			RSVS3D_ERROR_NOTHROW("test snake 1 had no snaxels.");
+		} 
+
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
@@ -944,7 +1060,6 @@ int Test_RSVSalgo(){
 	} 
 	return(errTest);
 }
-
 
 int Test_RSVSalgoflat(){
 	// int nVoluZone, ii;
