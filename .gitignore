@@ -18,10 +18,19 @@ out/*
 *.exe
 *.s
 *.o
+*.f
 SRCC/obj/*.o
 SRCC/.d/*
+SRCC/dbg*
+SRCC/obj*
+SRCC/matrices*
+SRCC/modules/external*
 
 SRCC/gch/*
+SRCC/config/*
+
+# files which are of no relevance
+SRCC/noexec_rsvsconfig.json
 
 # Sublime text 
 *.sublime-workspace
@@ -30,5 +39,6 @@ SRCC/gch/*
 # Profilers
 *test-cppcheck-build-dir*
 *.cppcheck
+
 
 
