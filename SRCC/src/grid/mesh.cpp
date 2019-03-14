@@ -3733,8 +3733,8 @@ void mesh::OrientSurfaceVolume(){
 			|| (fabs(dotProd)<numeric_limits<double>::epsilon()));
 
 
-		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) |
-			| ((dotProd>0.0) && (kk==1)));
+		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) 
+			|| ((dotProd>0.0) && (kk==1)));
 	}
 	ni=surfOrient.size();
 	for(ii=0; ii< ni; ++ii){
@@ -3892,14 +3892,7 @@ grid::transformation mesh::Scale(const grid::limits &domain){
 	// ``transformation`` stores for each dimension:
 	// {new min, old min, multiplier}
 	grid::transformation transformation;
-	int nVerts, ii, jj;
-
 	grid::limits currDomain = this->BoundingBox();
-
-	nVerts = int(this->verts.size());
-
-	// Find the current range of values of the grid
-
 
 	// Calculate modification parameters
 	for (int i = 0; i < 3; ++i)
@@ -3915,14 +3908,52 @@ grid::transformation mesh::Scale(const grid::limits &domain){
 	}
 
 	// Recalculate grid vertex positions
-	for(ii=0; ii<nVerts; ++ii){
-		for(jj=0; jj<3; ++jj){
-			this->verts.elems[ii].coord[jj]=transformation[jj][0]
-				+((this->verts(ii)->coord[jj]-transformation[jj][1])
-				*transformation[jj][2]);
+	this->LinearTransform(transformation);
+	return transformation;
+}
+
+/**
+ * @brief      Applies a linear transformation to the points on a grid.
+ *
+ * @param[in]  transform  The transform to apply.
+ */
+void mesh::LinearTransform(const grid::transformation &transform){
+	int nVerts = int(this->verts.size());
+
+	for(int ii=0; ii<nVerts; ++ii){
+		for(int jj=0; jj<3; ++jj){
+			this->verts.elems[ii].coord[jj]=transform[jj][0]
+				+((this->verts(ii)->coord[jj]-transform[jj][1])
+				*transform[jj][2]);
 		}
 	}
-	return transformation;
+}
+/**
+ * @brief      Applies a linear transform to child and parent meshes
+ *
+ * @param[in]  transform  The transform
+ */
+void mesh::LinearTransformFamily(const grid::transformation &transform){
+
+	this->_LinearTransformGeneration(transform, &meshdependence::parentmesh);
+	this->_LinearTransformGeneration(transform, &meshdependence::childmesh);
+	
+}
+
+/**
+ * @brief      Applies reccursively linear transforms to a tree of meshes.
+ *
+ * @param[in]  transform       The transform
+ * @param[in]  meshdependence  A member pointer to either the parent meshes or
+ *                             the child meshes of the meshtree.
+ */
+void mesh::_LinearTransformGeneration(const grid::transformation &transform,
+	vector<mesh*> meshdependence::*mp){
+
+	for (mesh* famMember : this->meshtree.*mp){
+		famMember->LinearTransform(transform);
+		famMember->_LinearTransformGeneration(transform, mp);
+	}
 }
 
 grid::limits mesh::BoundingBox() const{
@@ -4577,19 +4608,20 @@ void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
 }
 
 
+/**
+ Crops a mesh to only the elements inside the cropBox
+
+ Anything impinging on the cropBox is deleted. Steps: 1 - Find vertices out of
+ the box 2 - Delete those vertices 3 - Propagate the deletion to the higher
+ level containers 4 - Propagate back to the lower level containers removing
+ empty connectors.
+
+ @param      meshin  Input mesh
+ @param[in]  lb      lower bound vector
+ @param[in]  ub      upper bound vector
+*/
 void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 		const std::vector<double> &ub){
-	/*
-	Crops a mesh to only the elements inside the cropBox
-
-	Anything impinging on the cropBox is deleted.
-	Steps:
-		1 - Find vertices out of the box
-		2 - Delete those vertices
-		3 - Propagate the deletion to the higher level containers
-		4 - Propagate back to the lower level containers removing empty
-			connectors.
-	*/
 	int nVerts;
 	std::vector<int> vertDel;
 	
@@ -4609,30 +4641,34 @@ void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 	meshin.Crop(vertDel, 1);
 }
 
-mesh Points2Mesh(const std::vector<double> &vecPts, int nProp){
-		/*
-		Takes in a set of points and returns a mesh of points ready for
-		voronisation.
-		*/
-		mesh meshpts;
+/**
+Takes in a set of points and returns a mesh of points ready for voronisation.
 
-		if((vecPts.size()%nProp)!=0){
-			std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
-			RSVS3D_ERROR_ARGUMENT("Vector of points is an invalid size");
-		}
-		int nPts = vecPts.size()/nProp;
-		meshpts.Init(nPts, 0, 0, 0);
-		meshpts.PopulateIndices();
-		for (int i = 0; i < nPts; ++i)
-		{
-			for (int j = 0; j < 3; ++j)
-			{
-				meshpts.verts[i].coord[j] = vecPts[i*nProp+j]; 
-			}
-		}
-		meshpts.verts.PrepareForUse();
-		return (meshpts);
+@param[in]  vecPts  The vector of points
+@param[in]  nProp   number of properties per point
+
+@return     The points in the mesh format
+*/
+mesh Points2Mesh(const std::vector<double> &vecPts, int nProp){
+	mesh meshpts;
+
+	if((vecPts.size()%nProp)!=0){
+		std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
+		RSVS3D_ERROR_ARGUMENT("Vector of points is an invalid size");
 	}
+	int nPts = vecPts.size()/nProp;
+	meshpts.Init(nPts, 0, 0, 0);
+	meshpts.PopulateIndices();
+	for (int i = 0; i < nPts; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			meshpts.verts[i].coord[j] = vecPts[i*nProp+j]; 
+		}
+	}
+	meshpts.verts.PrepareForUse();
+	return (meshpts);
+}
 
 namespace meshhelp {
 	/*

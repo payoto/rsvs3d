@@ -50,6 +50,7 @@ typedef SnakStruct<snaxsurf> snaxsurfarray;
 class snaxarray : public SnakStruct<snax> 
 {
 protected:
+	using SnakStruct<snax>::readyforuse;
 	int isOrderedOnEdge=0;
 
 public: 
@@ -70,8 +71,7 @@ public:
 	void Concatenate(const snaxarray &other);
 	snax& operator[](const int a){ 
 		isOrderedOnEdge=0;
-
-		return(SnakStruct<snax>::operator[](a));
+		return(this->SnakStruct<snax>::operator[](a));
 	}
 
 };
@@ -125,7 +125,7 @@ public:
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
-	void Scale(const grid::limits &newSize);
+	grid::limits Scale(const grid::limits &newSize);
 	// Snake connectivity operations
 	void OrderEdges();
 	void SetSnaxSurfs() {}

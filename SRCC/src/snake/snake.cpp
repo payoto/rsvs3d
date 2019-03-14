@@ -150,9 +150,8 @@ void snaxsurf::disptree(const snake &snakein, int n) const{
 				)->disptree(snakein,n-1);
 		}
 	}
-
-
 }
+
 void snax::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
 	index+=nVert;
 }
@@ -182,9 +181,9 @@ void snaxsurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 
 bool snaxarray::checkready() 
 {	
-	readyforuse=SnakStruct<snax>::checkready();
-	readyforuse=(readyforuse && isOrderedOnEdge);
-	return(readyforuse);
+	this->readyforuse=SnakStruct<snax>::checkready();
+	this->readyforuse=(this->readyforuse && this->isOrderedOnEdge);
+	return(this->readyforuse);
 }
 void snaxarray::PrepareForUse()
 {
@@ -1305,10 +1304,18 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 	}
 	return(nBlocks);
 }
-void snake::Scale(const meshlimits &newSize){
+grid::limits snake::Scale(const grid::limits &newSize){
 
-	this->snakemesh->Scale(newSize);
-	this->UpdateCoord();
+	auto boundBox = this->snakemesh->BoundingBox();
+	// Scales the snakemesh to the correct size
+	auto transformation = this->snakemesh->Scale(newSize);
+	// Uses the same transformation on the snakeconn
+	this->snakeconn.LinearTransform(transformation);
+	// Applies the transformation to the family of the snakemesh
+	// ie: the VOS mesh. 
+	this->snakemesh->LinearTransformFamily(transformation);
+
+	return boundBox;
 }
 
 
