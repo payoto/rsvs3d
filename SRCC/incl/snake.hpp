@@ -54,12 +54,15 @@ protected:
 
 public: 
 	friend class snake;
-	friend void SpawnArrivedSnaxelsDir(snake &fullsnake, snake &partSnake, const vector<int> &isImpact, int dir);
+	friend void SpawnArrivedSnaxelsDir(snake &fullsnake, snake &partSnake,
+		const vector<int> &isImpact, int dir);
 
 	void ReorderOnEdge();
 	void OrderOnEdge();
-	void CalculateTimeStepOnEdge(vector<double> &dt, 	vector<bool> &isSnaxDone, int edgeInd);
-	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone, int edgeInd);
+	void CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnaxDone,
+		int edgeInd);
+	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone,
+		int edgeInd);
 	// Functions that need modification
 	bool checkready();
 	void ForceArrayReady();
@@ -122,7 +125,7 @@ public:
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
-	void Scale(const meshlimits &newSize);
+	void Scale(const grid::limits &newSize);
 	// Snake connectivity operations
 	void OrderEdges();
 	void SetSnaxSurfs() {}
@@ -246,8 +249,8 @@ void Test_stepalgo_mergeclean(snake &testSnake,  vector<int> &isImpact);
 
 // set constructors (used to avoid a variable being unknowingly forgotten)
 
-inline void snax::set(int indexin, double din,double vin,int fromvertin,int tovertin,
-	int edgeindin,int isfreezein,int orderedgein)
+inline void snax::set(int indexin, double din, double vin, int fromvertin,
+	int tovertin, int edgeindin, int isfreezein, int orderedgein)
 {
 	index=indexin;
 	d=din;

@@ -18,46 +18,54 @@ using namespace std;
 // Implementatation of snax - snaxedge - snaxsurf 
 // --------------------------------------------------------------------------
 void snax::disp() const{
-	cout << "snax #" << index << "; d " << d  << "; v " << v  << "; edgeind " << edgeind <<
-	"; fromvert " << fromvert  << "; tovert " << tovert  << "; isfreeze " << isfreeze << "; orderedge " << orderedge << " | isBorder " << isBorder << endl;
+	cout << "snax #" << index << "; d " << d  << "; v " << v  
+		<< "; edgeind " << edgeind << "; fromvert " << fromvert  
+		<< "; tovert " << tovert  << "; isfreeze " << isfreeze 
+		<< "; orderedge " << orderedge << " | isBorder " << isBorder << endl;
 }
 
 void snaxedge::disp() const{
-	cout << "snaxedge #" << index << " | surfind " << surfind << " " << " | isBorder " << isBorder << " " ;
+	cout << "snaxedge #" << index << " | surfind " << surfind 
+		<< " " << " | isBorder " << isBorder << " " ;
 	normvector.disp();
 }
 
 void snaxsurf::disp() const{
-	cout << "snaxsurf #" << index << index << " | voluind " << voluind << " " << " | isBorder " << isBorder << " ";
+		cout << "snaxsurf #" << index << index << " | voluind "
+		<< voluind << " " << " | isBorder " << isBorder << " ";
 	normvector.disp();
 }
 
 // file i/o
 void snax::write(FILE *fid) const{
 
-	fprintf(fid, "%i %lf %lf %i %i %i %i %i \n",index,d,v,edgeind, fromvert, tovert, 
-		isfreeze, orderedge);
+	fprintf(fid, "%i %lf %lf %i %i %i %i %i \n",index,d,v,edgeind, fromvert,
+		tovert,isfreeze, orderedge);
 }
 
 void snaxedge::write(FILE *fid) const{
-	fprintf(fid, "%i %i %lf %lf %lf \n",index,surfind,normvector(0),normvector(1),normvector(2));
+	fprintf(fid, "%i %i %lf %lf %lf \n",index,surfind,normvector(0),
+		normvector(1),normvector(2));
 }
 
 void snaxsurf::write(FILE *fid) const{
-	fprintf(fid, "%i %i %lf %lf %lf \n",index,voluind,normvector(0),normvector(1),normvector(2));
+	fprintf(fid, "%i %i %lf %lf %lf \n",index,voluind,normvector(0),
+		normvector(1),normvector(2));
 }
 void snax::read(FILE *fid) {
 
-	fscanf(fid,"%i %lf %lf %i %i %i %i %i ", &index, &d, &v, &edgeind, &fromvert, &tovert,
-		&isfreeze, &orderedge);
+	fscanf(fid,"%i %lf %lf %i %i %i %i %i ", &index, &d, &v, &edgeind, 
+		&fromvert, &tovert,	&isfreeze, &orderedge);
 }
 
 void snaxedge::read(FILE *fid) {
-	fscanf(fid,"%i %i %lf %lf %lf ",&index,&surfind,&normvector[0],&normvector[1],&normvector[2]);
+	fscanf(fid,"%i %i %lf %lf %lf ",&index,&surfind,&normvector[0],
+		&normvector[1],&normvector[2]);
 }
 
 void snaxsurf::read(FILE *fid) {
-	fscanf(fid,"%i %i %lf %lf %lf ",&index,&voluind,&normvector[0],&normvector[1],&normvector[2]);
+	fscanf(fid,"%i %i %lf %lf %lf ",&index,&voluind,&normvector[0],
+		&normvector[1],&normvector[2]);
 }
 
 void snaxedge::PrepareForUse() {
