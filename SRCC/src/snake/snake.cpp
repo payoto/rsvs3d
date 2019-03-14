@@ -167,45 +167,33 @@ void snaxsurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){
 }
 #pragma GCC diagnostic pop
 
-// -------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // Extensions of SnakStruct for snaxarray
-// -------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 
 bool snaxarray::checkready() 
 {	
 	readyforuse=SnakStruct<snax>::checkready();
-	
 	readyforuse=(readyforuse && isOrderedOnEdge);
-
 	return(readyforuse);
-	
 }
-
 void snaxarray::PrepareForUse()
 {
-
 	SnakStruct<snax>::PrepareForUse();
-
-
 	if (isOrderedOnEdge==0){
-
 		this->ReorderOnEdge();
 	}
 	readyforuse=true;
 }
-
 void snaxarray::Concatenate(const snaxarray &other)
 {
 	SnakStruct<snax>::Concatenate(other);
-
 	isOrderedOnEdge=0;
 }
-
 void snaxarray::ForceArrayReady()
 {
 	SnakStruct<snax>::ForceArrayReady();
-
 	isOrderedOnEdge=1;
 }
 
@@ -214,7 +202,6 @@ void snaxarray::ForceArrayReady()
 // -------------------------------------------------------------------------------------------
 
 void snake::disp() const{
-
 	snaxs.disp();
 	snaxedges.disp();
 	snaxsurfs.disp();
@@ -223,7 +210,6 @@ void snake::disp() const{
 	snakemesh->displight();
 }
 void snake::displight() const{
-
 
 	cout << "snake: snax " << snaxs.size();
 	cout << "; snaxedges " << snaxedges.size();
@@ -948,8 +934,6 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 			}
 		}
 	}
-
-
 }
 
 void snake::Flip(){
@@ -965,7 +949,6 @@ void snake::Flip(){
 	isFlipped= !isFlipped;
 	snaxs.ForceArrayReady();
 }
-
 
 double SnaxImpactDt(const snax &snax1,const snax &snax2){
 
@@ -986,8 +969,6 @@ double SnaxImpactDt(const snax &snax1,const snax &snax2){
 
 	return(-dD/dV);
 }
-
-
 
 void snake::SnaxImpactDetection(vector<int> &isImpact){
 	// TODO make an approximate arrival 
@@ -1026,7 +1007,6 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 			}
 		}
 	}
-
 }
 void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
 
@@ -1090,11 +1070,10 @@ void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
 		}
 	}
 	snaxs.PrepareForUse();
-
 }
 
-void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone,
-								   int edgeInd){
+void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, 
+	vector<bool> &isSnaxDone, int edgeInd){
 	int nSnax,ii,jj, dOrd;
 	vector<int> snaxSubs;
 	double impactTime;
@@ -1134,8 +1113,8 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDo
 
 		}
 	}
-
 }
+
 void snake::OrientFaces(){
 	/*
 	Orients either surfaces or edges depending. 
@@ -1145,14 +1124,10 @@ void snake::OrientFaces(){
 	} else {
 		this->OrientEdgeSurface();
 	}
-
-
 }
 void snake::OrientEdgeSurface(){
 	cerr << "Warning: not coded yet in " << __PRETTY_FUNCTION__ << endl;
 }
-
-
 void snake::OrientSurfaceVolume(){ 
 	// Orders the surf.voluind [c0 c1] such that the surface normal vector points
 	// from c0 to c1
@@ -1207,10 +1182,7 @@ void snake::OrientSurfaceVolume(){
 			}
 		}
 	}
-
 }
-
-
 void snake::AssignInternalVerts() {
 	/*
 	Assigns internal vertices to the snake based on the snakemesh connectivity.
@@ -1225,7 +1197,6 @@ void snake::AssignInternalVerts() {
 		isMeshVertIn[ii] = vertBlock[ii]>0;
 	}
 }
-
 int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 	// int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	// Fills a vector with a number for each vertex corresponding to a

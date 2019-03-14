@@ -15,9 +15,9 @@
 using namespace std;
 
 
-// -------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 // Implementatation of coordvec 
-// -------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 double& coordvec::operator[](int a)
 {
 	// returns a reference to the value and can be used to set a value
@@ -61,7 +61,8 @@ double coordvec::Unit(const int a) const
 	if (isuptodate==0){
 		cerr << "Warning: NORM of coordvec potentially obsolete " << endl;
 		cerr << "		  in coordvec::Unit(const int a) const" << endl; 
-		cerr << "		  To avoid this message perform read operations on coordvec using the () operator" << endl; 
+		cerr << "		  To avoid this message perform read operations"
+		" on coordvec using the () operator" << endl; 
 	}
 	return(elems[a]/norm);
 }
@@ -99,8 +100,8 @@ void coordvec::assign(double a,double b,double c){
 }	
 
 void coordvec::disp() const{
-	cout << "coordvec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] << "] norm "
-	<< norm << " utd " << isuptodate <<endl;
+	cout << "coordvec [" << elems[0] << ","<< elems[1]<< ","<< elems[2] 
+	 << "] norm " << norm << " utd " << isuptodate <<endl;
 }
 
 // Math implementations
@@ -324,12 +325,14 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
  * @return     returns a list of indices containing the same number of
  * 	values as there are input vertices (testVertices/sizeVert) 
  */
-vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert) const {
+vector<int> mesh::VertexInVolume(const vector<double> testVertices,
+	int sizeVert) const {
 	if(sizeVert<3){
 		RSVS3D_ERROR_ARGUMENT("sizeVert must be at least 3.");
 	}
 	if(testVertices.size()%sizeVert != 0){
-		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be a multiple of sizeVert.");
+		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be a multiple"
+			" of sizeVert.");
 	}
 
 	vector<int> vertVolumeIndices;
@@ -340,7 +343,8 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert
 	cout << endl << " Number of volumes explored before final "
 		"candidate out of " << this->volus.size() << endl ;
 	#endif
-	// Check orientation (OrientFaces is relative which means it can be facing in or out)
+	// Check orientation (OrientFaces is relative which means it can be
+	//  facing in or out)
 	// simply test if the 1st one is 0:
 	tempCoord.assign(testVertices.begin(),testVertices.begin()+3);
 	bool needFlip = meshhelp::VertexInVolume(*this, tempCoord)==0;
@@ -348,7 +352,8 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices, int sizeVert
 	{
 		tempCoord.assign(testVertices.begin()+i*sizeVert,
 			testVertices.begin()+(i*sizeVert+3));
-		vertVolumeIndices[i] = meshhelp::VertexInVolume(*this, tempCoord, needFlip);
+		vertVolumeIndices[i] = meshhelp::VertexInVolume(
+			*this, tempCoord, needFlip);
 	}
 	#ifdef RSVS_DIAGNOSTIC_RESOLVED 
 	cout << endl ;
@@ -406,7 +411,8 @@ void meshdependence::AddParent(mesh* meshin, vector<int> &parentind){
 	HashedVectorSafe<int,int> temp;
 
 	if (parentind.size()!=elemind.size()){
-		RSVS3D_ERROR_ARGUMENT("parent and child index list must be the same size.");
+		RSVS3D_ERROR_ARGUMENT("parent and child index list must be"
+			" the same size.");
 	}
 
 	temp=parentind;
@@ -526,8 +532,9 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 	}
 }
 
-void mesh::MapVolu2Parent(const vector<double> &fillIn, const vector<pair<int,int>> &parentcases,
-	double volu::*mp){
+void mesh::MapVolu2Parent(const vector<double> &fillIn, 
+	const vector<pair<int,int>> &parentcases, double volu::*mp)
+{
 	int ii, ni, sub, sub2; 
 
 	ni=parentcases.size();
@@ -565,10 +572,10 @@ void mesh::MapVolu2Self(const vector<double> &fillIn, const vector<int> &elms,
 }
 
 void mesh::MaintainLineage(){
-	// Method not implemented yet, features:
-	//	- recognise the modifications needed depending on child and parent dimensionality 
+	// \TODO Method not implemented yet, features:
+	//	- recognise the modifications needed depending on child and 
+	//	parent dimensionality 
 	//	- Modify the parentconn vec 
-
 }
 int mesh::CountParents() const {
 	return(meshtree.parentmesh.size());
@@ -581,12 +588,14 @@ int mesh::SurfInParent(int surfind) const{
 	if(ii>=0){
 		kk1=volus.find(surfs(ii)->voluind[0]);
 		kk2=volus.find(surfs(ii)->voluind[1]);
-		while(!isParentSurf && jj<meshtree.nParents-1){
+		while(!isParentSurf && jj<meshtree.nParents-1)
+		{
 			++jj;
 			if((kk1!=-1) ^ (kk2!=-1)){
 				isParentSurf=true;
 			} else if (kk1!=-1){
-				isParentSurf= meshtree.parentconn[jj][kk1] != meshtree.parentconn[jj][kk2];
+				isParentSurf = meshtree.parentconn[jj][kk1] 
+					!= meshtree.parentconn[jj][kk2];
 			}
 		}
 	}
@@ -607,7 +616,8 @@ void mesh::SurfInParent(vector<int> &listInParent) const{
 	} 
 }
 
-void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, int volType) const{
+void mesh::SurfValuesofParents(int elmInd, vector<double> &vals,
+	int volType) const{
 		/*
 	Extracts the surfaces in the parents corresponding to element elmInd
 	volType is a selector for which value to extract
@@ -632,7 +642,8 @@ void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, int volType) co
 	this->SurfValuesofParents(elmInd, vals, mp);
 }
 
-void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, double surf::*mp) const{
+void mesh::SurfValuesofParents(int elmInd, vector<double> &vals,
+	double surf::*mp) const{
 	/*
 	Extracts the volumes in the parents corresponding to element elmInd
 	volType is a selector for which value to extract
@@ -650,7 +661,8 @@ void mesh::SurfValuesofParents(int elmInd, vector<double> &vals, double surf::*m
 
 }
 
-void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, int volType) const{
+void mesh::VoluValuesofParents(int elmInd, vector<double> &vals,
+	int volType) const{
 		/*
 	Extracts the volumes in the parents corresponding to element elmInd
 	volType is a selector for which value to extract
@@ -676,7 +688,8 @@ void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, int volType) co
 	this->VoluValuesofParents(elmInd, vals, mp);
 }
 
-void mesh::VoluValuesofParents(int elmInd, vector<double> &vals, double volu::*mp) const{
+void mesh::VoluValuesofParents(int elmInd, vector<double> &vals,
+	double volu::*mp) const{
 	/*
 	Extracts the volumes in the parents corresponding to element elmInd
 	volType is a selector for which value to extract
@@ -733,7 +746,9 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 
 	for (ii=0; ii< nSurf; ++ii){
 		isOnBound=false;
-		if (surfs(ii)->voluind[0]==0 || surfs(ii)->voluind[1]==0){
+		if (surfs(ii)->voluind[0]==0 
+			|| surfs(ii)->voluind[1]==0)
+		{
 			isOnBound=isBorderBound;
 			if(isOnBound && (surfs(ii)->voluind[0]!=0)){
 				voluInd.push_back(surfs(ii)->voluind[0]);
@@ -743,14 +758,17 @@ void mesh::SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
 			}
 		} else if (SurfInParent(surfs(ii)->index)>=0){
 			// Check parent volume values
-			this->VoluValuesofParents(surfs(ii)->voluind[0],vals0, &volu::target);
-			this->VoluValuesofParents(surfs(ii)->voluind[1],vals1, &volu::target);
+			this->VoluValuesofParents(surfs(ii)->voluind[0],vals0,
+				&volu::target);
+			this->VoluValuesofParents(surfs(ii)->voluind[1],vals1,
+				&volu::target);
 			jj=0;
 			// DisplayVector(vals0);
 			// DisplayVector(vals1);
 			while(!isOnBound && jj< meshtree.nParents){
-				// To be on bound the left and right values must be differebt and
-				// one must be equal to the target boundary Value
+				// To be on bound the left and right values must 
+				// be different and one must be equal to the target
+				// boundary Value
 				isOnBound =  (fabs(vals0[jj]-boundVolume)<__DBL_EPSILON__)
 					^ (fabs(vals1[jj]-boundVolume)<__DBL_EPSILON__);
 				++jj;
@@ -798,18 +816,24 @@ void mesh::EdgeOnParentBound(vector<int> &listInParent, vector<int> &surfInd,
 
 	for (ii=0; ii< nSurf; ++ii){
 		isOnBound=false;
-		if (edges(ii)->surfind[0]==0 || edges(ii)->surfind[1]==0){
+		if (edges(ii)->surfind[0]==0 
+			|| edges(ii)->surfind[1]==0)
+		{
 			isOnBound=isBorderBound;
 			if(isOnBound && (edges(ii)->surfind[0]!=0)){
 				surfInd.push_back(edges(ii)->surfind[0]);
 			}
-			if(isOnBound && (edges(ii)->surfind[1]!=0)){
+			if(isOnBound && (edges(ii)->surfind[1]!=0))
+			{
 				surfInd.push_back(edges(ii)->surfind[1]);
 			}
-		} else if (SurfInParent(edges(ii)->index)>=0){
+		} else if (SurfInParent(edges(ii)->index)>=0)
+		{
 			// Check parent surfme values
-			this->SurfValuesofParents(edges(ii)->surfind[0],vals0, &surf::target);
-			this->SurfValuesofParents(edges(ii)->surfind[1],vals1, &surf::target);
+			this->SurfValuesofParents(edges(ii)->surfind[0],vals0,
+				&surf::target);
+			this->SurfValuesofParents(edges(ii)->surfind[1],vals1,
+				&surf::target);
 			jj=0;
 			// DisplayVector(vals0);
 			// DisplayVector(vals1);
@@ -822,13 +846,17 @@ void mesh::EdgeOnParentBound(vector<int> &listInParent, vector<int> &surfInd,
 			
 			if(isOnBound && (vals1[jj-1]==boundVolume)){
 				surfInd.push_back(edges(ii)->surfind[1]);
-				if(boundVolume==1.0 && surfs.isearch(surfInd.back())->isBorder){
+				if(boundVolume==1.0 
+					&& surfs.isearch(surfInd.back())->isBorder)
+				{
 					surfInd.pop_back();
 				}
 			}
 			if(isOnBound && (vals0[jj-1]==boundVolume)){
 				surfInd.push_back(edges(ii)->surfind[0]);
-				if(boundVolume==1.0 && surfs.isearch(surfInd.back())->isBorder){
+				if(boundVolume==1.0 
+					&& surfs.isearch(surfInd.back())->isBorder)
+				{
 					surfInd.pop_back();
 				}
 			}
@@ -857,21 +885,26 @@ int mesh::ParentElementIndex(int childElmInd, int parentInd) const{
 	 */
 	if(parentInd>=int(this->meshtree.parentconn.size())
 		|| parentInd<0){
-		RSVS3D_ERROR_ARGUMENT("parentInd is larger than the number of mesh parents");
+		RSVS3D_ERROR_ARGUMENT("parentInd is larger than the number"
+			" of mesh parents");
 	}
 	if (this->WhatDim()==3){
-		return (this->meshtree.parentconn[parentInd][this->volus.find(childElmInd)]);
+		return (this->meshtree.parentconn[parentInd][
+			this->volus.find(childElmInd)]);
 	} else if (this->WhatDim()==2){
-		return (this->meshtree.parentconn[parentInd][this->surfs.find(childElmInd)]);
+		return (this->meshtree.parentconn[parentInd][
+			this->surfs.find(childElmInd)]);
 	} else {
-		RSVS3D_ERROR_ARGUMENT("Dimensionality other than 2 or 3 not supported yet");
+		RSVS3D_ERROR_ARGUMENT("Dimensionality other than 2 or"
+			" 3 not supported yet");
 		return(-1);
 	}
 
 }
 
 /// MAth operations in mesh
-void edge::GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const {
+void edge::GeometricProperties(const mesh *meshin, coordvec &centre,
+	double &length) const {
 
 	int sub;
 	centre.assign(0,0,0);
@@ -932,7 +965,8 @@ bool edge::IsLength0(const mesh &meshin, double eps) const {
 void volu::disp() const{
 	int i;
 	cout << "volu : index " << index << " | fill " << fill << ", "  <<
-	target << ", "<< error << " | isBorder " << isBorder << " | surfind " << surfind.size();
+	target << ", "<< error << " | isBorder " << isBorder 
+		<< " | surfind " << surfind.size();
 	if (surfind.size()<30){
 		for (i=0; unsigned_int(i)<surfind.size();i++){
 			cout << "-" << surfind[i];
@@ -944,7 +978,8 @@ void volu::disp() const{
 void surf::disp() const{
 	int i;
 	cout << "surf : index " << index << " | fill " << fill  << ", " << 
-	target << ", "<< error << " | isBorder " << isBorder << " | voluind " << voluind.size();
+	target << ", "<< error << " | isBorder " << isBorder 
+		<< " | voluind " << voluind.size();
 	for (i=0; unsigned_int(i)<voluind.size();i++){
 		cout << "-" << voluind[i];
 	}
@@ -957,7 +992,8 @@ void surf::disp() const{
 
 void edge::disp() const{
 	int i;
-	cout << "edge : index " << index << " | isBorder " << isBorder << " | vertind " << vertind.size();
+	cout << "edge : index " << index << " | isBorder " << isBorder 
+		<< " | vertind " << vertind.size();
 	for (i=0; unsigned_int(i)<vertind.size();i++){
 		cout << "-" << vertind[i];
 	}
@@ -970,7 +1006,8 @@ void edge::disp() const{
 
 void vert::disp() const{
 	int i;
-	cout << "vert : index " << index << " | isBorder " << isBorder << " | edgeind " << edgeind.size();
+	cout << "vert : index " << index << " | isBorder " << isBorder 
+		<< " | edgeind " << edgeind.size();
 	for (i=0; unsigned_int(i)<edgeind.size();i++){
 		cout << "-" << edgeind[i];
 	}
@@ -1040,7 +1077,8 @@ void volu::write(FILE *fid) const{
 
 	int i;
 
-	fprintf(fid, "%i %.16lf %.16lf %.16lf %i ",index,fill,target, error,int(isBorder));
+	fprintf(fid, "%i %.16lf %.16lf %.16lf %i ",index,fill,target,
+		error,int(isBorder));
 	fprintf(fid, "%i ",int(surfind.size()));
 	for (i=0; unsigned_int(i)<surfind.size();i++){
 		fprintf(fid, "%i ",surfind[i]);
@@ -1051,7 +1089,8 @@ void volu::write(FILE *fid) const{
 void surf::write(FILE * fid) const{
 	int i;
 
-	fprintf(fid, "%i %.16lf %.16lf %.16lf %i ",index,fill,target, error,int(isBorder));
+	fprintf(fid, "%i %.16lf %.16lf %.16lf %i ", index, fill, target,
+		error, int(isBorder));
 	fprintf(fid, "%i ",int(voluind.size()));
 	for (i=0; unsigned_int(i)<voluind.size();i++){
 		fprintf(fid, "%i ",voluind[i]);
@@ -1206,8 +1245,8 @@ void mesh::TightenConnectivity(){
 	volus.TightenConnectivity();
 }
 
-void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &scopeInd)
-{
+void mesh::SwitchIndex(int typeInd, int oldInd, int newInd,
+	const vector<int> &scopeInd){
 	/*Switch the indices of an element for another in all the appropriate
 	connectivity lists.
 
@@ -1225,8 +1264,8 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		for (ii=0;ii<int(subList.size());++ii){ // update vertind
 			jj=edges(subList[ii])->vertind[1]==oldInd;
 			edges[subList[ii]].vertind[jj]=newInd;
-			verts[newSub].edgeind.push_back(edges[subList[ii]].index); // update vertex edgeind
-			//cout << " " << edges[subList[ii]].index <<  " ";
+			// update vertex edgeind
+			verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
 			for (jj=0;jj<int(verts(oldSub)->edgeind.size());++jj){
 				if(verts(oldSub)->edgeind[jj]==edges[subList[ii]].index){
 					verts[oldSub].edgeind.erase(
@@ -1238,9 +1277,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		sort(verts[newSub].edgeind);
 		unique(verts[newSub].edgeind);
 		if(meshDepIsSet && meshDim==0){
-			// for (ii=0;ii<int(oldSub.size());++ii){
-			// 	meshtree.elemind[oldSub[ii]]=newInd;
-			// }
 			meshtree.elemind[oldSub]=newInd;
 		}
 		// Hashing has not been invalidated
@@ -1254,10 +1290,7 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		for (ii=0;ii<int(subList.size());++ii){
 			for (jj=0;jj<int(verts(subList[ii])->edgeind.size());++jj){
 				if(verts(subList[ii])->edgeind[jj]==oldInd){
-			   //cout << " " << verts(subList[ii])->index << " " << endl;DisplayVector(verts[subList[ii]].edgeind);cout << endl;
 					verts[subList[ii]].edgeind[jj]=newInd;
-			   //DisplayVector(verts[subList[ii]].edgeind);cout << endl;
-
 				}
 			}  
 		}
@@ -1268,7 +1301,8 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 				for (jj=0;jj<int(surfs(subList[ii])->edgeind.size());++jj){
 					if(surfs(subList[ii])->edgeind[jj]==oldInd){
 						surfs[subList[ii]].edgeind[jj]=newInd;
-						edges[newSub].surfind.push_back(surfs[subList[ii]].index);
+						edges[newSub].surfind.push_back(
+							surfs[subList[ii]].index);
 						surfs[subList[ii]].isordered=false;
 					}
 				}
@@ -1276,9 +1310,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		}
 
 		if(meshDepIsSet && meshDim==1){
-	  	// for (ii=0;ii<int(oldSub.size());++ii){
-	  	// 	meshtree.elemind[oldSub[ii]]=newInd;
-	  	// }
 			meshtree.elemind[oldSub]=newInd;
 		}
 
@@ -1310,7 +1341,8 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 				for (jj=0;jj<int(volus(subList[ii])->surfind.size());++jj){
 					if(volus(subList[ii])->surfind[jj]==oldInd){
 						volus[subList[ii]].surfind[jj]=newInd;
-						surfs[newSub].voluind.push_back(volus[subList[ii]].index);
+						surfs[newSub].voluind.push_back(
+							volus[subList[ii]].index);
 					}
 				}
 			}  
@@ -1336,12 +1368,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		oldSub=volus.find(oldInd);
 		subList=surfs.find_list(volus[volus.find(oldInd)].surfind);
 	  for (ii=0;ii<int(subList.size());++ii){ // update vertind
-		 //jj=surfs(subList[ii])->voluind[1]==oldInd;
-		 //surfs[subList[ii]].voluind[jj]=newInd;
 	  	for (jj=0;jj<int(surfs(subList[ii])->voluind.size());++jj){
 	  		if(surfs[subList[ii]].voluind[jj]==oldInd){
 	  			surfs[subList[ii]].voluind[jj]=newInd; 
-				  volus[newSub].surfind.push_back(surfs[subList[ii]].index); // update vertex edgeind
+	  				// update vertex edgeind
+					volus[newSub].surfind.push_back(surfs[subList[ii]].index);
 				}
 			}
 
@@ -1370,11 +1401,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 				for (jj=0;jj<int(edges(subList[ii])->vertind.size());++jj){
 					if(edges(subList[ii])->vertind[jj]==oldInd){
 						edges[subList[ii]].vertind[jj]=newInd;
-						verts[newSub].edgeind.push_back(edges[subList[ii]].index); 
-
-				  //cout << " " << edges[subList[ii]].index <<  " ";
+						verts[newSub].edgeind.push_back(
+							edges[subList[ii]].index); 
 						for (kk=0;kk<int(verts(oldSub)->edgeind.size());++kk){
-							if(verts(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+							if(verts(oldSub)->edgeind[kk]
+								==edges[subList[ii]].index){
 								verts[oldSub].edgeind.erase(
 									verts[oldSub].edgeind.begin()+kk);
 								kk--;
@@ -1385,9 +1416,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 			}  
 		}
 		if(meshDepIsSet && meshDim==0){
-			// for (ii=0;ii<int(oldSub.size());++ii){
-			// 	meshtree.elemind[oldSub[ii]]=newInd;
-			// }
 			meshtree.elemind[oldSub]=newInd;
 		}
 		edges.isHash=1;
@@ -1405,10 +1433,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 				if(edges(subList[ii])->surfind[jj]==oldInd){
 					edges[subList[ii]].surfind[jj]=newInd;
 					surfs[newSub].edgeind.push_back(edges[subList[ii]].index); 
-
-			   //cout << " " << edges[subList[ii]].index <<  " ";
 					for (kk=0;kk<int(surfs(oldSub)->edgeind.size());++kk){
-						if(surfs(oldSub)->edgeind[kk]==edges[subList[ii]].index){
+						if(surfs(oldSub)->edgeind[kk]
+							==edges[subList[ii]].index){
 							surfs[oldSub].edgeind.erase(
 								surfs[oldSub].edgeind.begin()+kk);
 							kk--;
@@ -1419,13 +1446,11 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		}
 		for(ii=0;ii<int(surfs(newSub)->voluind.size());ii++){
 			if(surfs(newSub)->voluind[ii]>0){
-				volus.elems[volus.find(surfs(newSub)->voluind[ii])].surfind.push_back(newInd);
+				volus.elems[volus.find(surfs(newSub)->voluind[ii])]
+					.surfind.push_back(newInd);
 			}
 		}
 		if(meshDepIsSet && meshDim==2){
-			// for (ii=0;ii<int(oldSub.size());++ii){
-			// 	meshtree.elemind[oldSub[ii]]=newInd;
-			// }
 			meshtree.elemind[oldSub]=newInd;
 		}
 		edges.isHash=1;
@@ -1443,10 +1468,9 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 				if(surfs(subList[ii])->voluind[jj]==oldInd){
 					surfs[subList[ii]].voluind[jj]=newInd;
 					volus[newSub].surfind.push_back(surfs[subList[ii]].index); 
-
-			   //cout << " " << surfs[subList[ii]].index <<  " ";
 					for (kk=0;kk<int(volus(oldSub)->surfind.size());++kk){
-						if(volus(oldSub)->surfind[kk]==surfs[subList[ii]].index){
+						if(volus(oldSub)->surfind[kk]
+							==surfs[subList[ii]].index){
 							volus[oldSub].surfind.erase(
 								volus[oldSub].surfind.begin()+kk);
 							kk--;
@@ -1457,9 +1481,6 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		}
 
 		if(meshDepIsSet && meshDim==3){
-			// for (ii=0;ii<int(oldSub.size());++ii){
-			// 	meshtree.elemind[oldSub[ii]]=newInd;
-			// }
 			meshtree.elemind[oldSub]=newInd;
 		}
 		surfs.isHash=1;
@@ -1468,7 +1489,8 @@ void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, const vector<int> &s
 		volus.isSetMI=1;
    	} else {
 
-		cerr << "Error unknown type " << typeInd << " of object for index switching" <<endl;
+		cerr << "Error unknown type " << typeInd << " of object for "
+			"index switching" <<endl;
 		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 		RSVS3D_ERROR_ARGUMENT(" Type is out of range");
 	}
@@ -1618,7 +1640,8 @@ int mesh::TestConnectivity(const char *strRoot) const{
 	for (ii=0; ii<kk;++ii){
 		if(verts(ii)->edgeind.size()==0){
 			errCount++;
-			cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
+			cerr << " Test Connectivity Error :" << errCount 
+				<< " vertex " << verts(ii)->index
 				<< " Has empty connectivity list "; 
 			cerr << endl;
 
@@ -1627,7 +1650,8 @@ int mesh::TestConnectivity(const char *strRoot) const{
 			if (verts(ii)->edgeind.size()==2) {
 				errCount++;
 				cerr << " Test Connectivity Error :" << errCount << " vertex " 
-					<< verts(ii)->index << " Has connectivity list of length 2 ";
+					<< verts(ii)->index << " Has connectivity "
+					"list of length 2 ";
 				DisplayVector(verts(ii)->edgeind); 
 				cerr << endl;
 			}
@@ -1637,8 +1661,10 @@ int mesh::TestConnectivity(const char *strRoot) const{
 			for(jj=0;jj< kk2; ++jj){
 				if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
 					errCount++;
-					cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-					<< " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+					cerr << " Test Connectivity Error :" << errCount 
+						<< " vertex " << verts(ii)->index
+						<< " makes unknown reference to edge " 
+						<< verts(ii)->edgeind[jj] << " list: " ; 
 					DisplayVector(verts(ii)->edgeind);
 					cerr << endl;
 				}
@@ -1646,7 +1672,8 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity vertex (edgeind) Errors :" 
+			<< errCount << endl;
 	}
 
 
@@ -1659,14 +1686,18 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && edges(ii)->vertind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
-				<< " makes unknown reference to vertex " << edges(ii)->vertind[jj] << " list: " ; DisplayVector(edges(ii)->vertind); 
+				cerr << " Test Connectivity Error :" << errCount 
+					<< " edge " << edges(ii)->index
+					<< " makes unknown reference to vertex " 
+					<< edges(ii)->vertind[jj] << " list: " ;
+				DisplayVector(edges(ii)->vertind); 
 				cerr << endl;
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity edges (vertind) Errors :" 
+			<< errCount << endl;
 	}
 
 
@@ -1678,13 +1709,16 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && edges(ii)->surfind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
-				<< " makes unknown reference to surface " << edges(ii)->surfind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount 
+					<< " edge " << edges(ii)->index
+					<< " makes unknown reference to surface " 
+					<< edges(ii)->surfind[jj] << endl;
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity edges (surfind) Errors :" 
+			<< errCount << endl;
 	}
 
 
@@ -1698,18 +1732,22 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-				<< " makes unknown reference to edge " << surfs(ii)->edgeind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount << " surf "
+					<< surfs(ii)->index
+					<< " makes unknown reference to edge " 
+					<< surfs(ii)->edgeind[jj] << endl;
 			}
 		}
 		if (int(testSub.size())==0){
 			errCount++;
-			cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-			<< " has empty edgeind " <<  endl;
+			cerr << " Test Connectivity Error :" << errCount 
+				<< " surf " << surfs(ii)->index
+				<< " has empty edgeind " <<  endl;
 		}
 	}
 	if (errCount>0) {
-		cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity surfs (edgeind) Errors :" 
+			<< errCount << endl;
 	}
 
 	errTot+=errCount;
@@ -1721,13 +1759,16 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && surfs(ii)->voluind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-				<< " makes unknown reference to volu " << surfs(ii)->voluind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount << " surf " 
+					<< surfs(ii)->index
+					<< " makes unknown reference to volu " 
+					<< surfs(ii)->voluind[jj] << endl;
 			}
 		}
 	}
 	if (errCount>0) {
-		cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity surfs (voluind) Errors :" 
+			<< errCount << endl;
 	}
 
 
@@ -1740,13 +1781,16 @@ int mesh::TestConnectivity(const char *strRoot) const{
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && volus(ii)->surfind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " volu " << volus(ii)->index
-				<< " makes unknown reference to surface " << volus(ii)->surfind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount 
+					<< " volu " << volus(ii)->index
+					<< " makes unknown reference to surface " 
+					<< volus(ii)->surfind[jj] << endl;
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity volus (surfind) Errors :" 
+			<< errCount << endl;
 	}
 	errTot+=errCount;
 	if (errTot>0){
@@ -1770,8 +1814,9 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 	for (ii=0; ii<kk;++ii){
 		if(emptyIsErr && verts(ii)->edgeind.size()==0){
 			errCount++;
-			cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-			<< " Has empty connectivity list "; 
+			cerr << " Test Connectivity Error :" << errCount 
+				<< " vertex " << verts(ii)->index
+				<< " Has empty connectivity list "; 
 			cerr << endl;
 
 		} else {
@@ -1780,32 +1825,41 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 			for(jj=0;jj< kk2; ++jj){
 				if (testSub[jj]<0 && verts(ii)->edgeind[jj]!=0){
 					errCount++;
-					cerr << " Test Connectivity Error :" << errCount << " vertex " << verts(ii)->index
-					<< " makes unknown reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
+					cerr << " Test Connectivity Error :" << errCount 
+						<< " vertex " << verts(ii)->index
+						<< " makes unknown reference to edge " 
+						<< verts(ii)->edgeind[jj] << " list: " ; 
 					DisplayVector(verts(ii)->edgeind);
 					cerr << endl;
 				} else if (verts(ii)->edgeind[jj]!=0){
 					ll2=edges(testSub[jj])->vertind.size();
 					flag=false;
 					for(ll=0;ll<ll2;ll++){
-						flag=flag || (edges(testSub[jj])->vertind[ll]==verts(ii)->index);
+						flag=flag || (edges(testSub[jj])->vertind[ll]
+							==verts(ii)->index);
 					}
 					if (!flag){
 						errCountBiDir++;
-						cerr << " Test Connectivity Error :" << errCountBiDir << " vertex " << verts(ii)->index
-						<< " makes uni-directional reference to edge " << verts(ii)->edgeind[jj] << " list: " ; 
-						DisplayVector(verts(ii)->edgeind); cout << " list (edge.vertind): " ; 
-						DisplayVector(edges(jj)->vertind);cerr << endl;
+						cerr << " Test Connectivity Error :" 
+							<< errCountBiDir << " vertex " << verts(ii)->index
+							<< " makes uni-directional reference to edge " 
+							<< verts(ii)->edgeind[jj] << " list: " ; 
+						DisplayVector(verts(ii)->edgeind);
+						cout << " list (edge.vertind): " ; 
+						DisplayVector(edges(jj)->vertind);
+						cerr << endl;
 					}
 				}
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity vertex (edgeind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity vertex (edgeind) Errors :" 
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0){
-		cerr << "Test Connectivity vertex (edgeind) uni-directional Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity vertex (edgeind) uni-directional Errors :" 
+			<< errCountBiDir << endl;
 	}
 
 
@@ -1819,38 +1873,50 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 		kk2=testSub.size();
 		if(emptyIsErr && testSub.size()!=2){ // Vertind should be of size 2
 			errCount++;
-			cerr <<  " Test Connectivity Error :"  << errCount << " edge " << edges(ii)->index
-				<< " has vertind of length " << testSub.size() << " list (edge::vertind): " ;
+			cerr <<  " Test Connectivity Error :"  << errCount 
+				<< " edge " << edges(ii)->index
+				<< " has vertind of length " << testSub.size() 
+					<< " list (edge::vertind): " ;
 			DisplayVector(edges(ii)->vertind); 
 			cerr << endl;
 		}
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && edges(ii)->vertind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
-				<< " makes unknown reference to vertex " << edges(ii)->vertind[jj] << " list: " ; DisplayVector(edges(ii)->vertind); 
+				cerr << " Test Connectivity Error :" << errCount 
+					<< " edge " << edges(ii)->index
+					<< " makes unknown reference to vertex " 
+					<< edges(ii)->vertind[jj] << " list: " ;
+					DisplayVector(edges(ii)->vertind); 
 				cerr << endl;
 			} else if (edges(ii)->vertind[jj]!=0){
 				ll2=verts(testSub[jj])->edgeind.size();
 				flag=false;
 				for(ll=0;ll<ll2;ll++){
-					flag=flag || (verts(testSub[jj])->edgeind[ll]==edges(ii)->index);
+					flag=flag || (verts(testSub[jj])->edgeind[ll]
+						==edges(ii)->index);
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
-					<< " makes uni-directional reference to vertex " << edges(ii)->vertind[jj] << " list: " ; 
-					DisplayVector(edges(ii)->vertind); cout << " list (vert.edgeind): " ; 
-					DisplayVector(verts(jj)->edgeind);cerr << endl;
+					cerr << " Test Connectivity Error :" << errCountBiDir 
+						<< " edge " << edges(ii)->index
+						<< " makes uni-directional reference to vertex " 
+						<< edges(ii)->vertind[jj] << " list: " ; 
+					DisplayVector(edges(ii)->vertind);
+					cout << " list (vert.edgeind): " ; 
+					DisplayVector(verts(jj)->edgeind);
+					cerr << endl;
 				}
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity edges (vertind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity edges (vertind) Errors :" 
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0){
-		cerr << "Test Connectivity edges (vertind) uni-directional  Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity edges (vertind) uni-directional  Errors :"
+			<< errCountBiDir << endl;
 	}
 
 
@@ -1864,29 +1930,38 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && edges(ii)->surfind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " edge " << edges(ii)->index
-				<< " makes unknown reference to surface " << edges(ii)->surfind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount << " edge "
+					<< edges(ii)->index
+					<< " makes unknown reference to surface " 
+					<< edges(ii)->surfind[jj] << endl;
 			} else if (edges(ii)->surfind[jj]!=0){
 				ll2=surfs(testSub[jj])->edgeind.size();
 				flag=false;
 				for(ll=0;ll<ll2;ll++){
-					flag=flag || (surfs(testSub[jj])->edgeind[ll]==edges(ii)->index);
+					flag=flag || (surfs(testSub[jj])->edgeind[ll]
+						==edges(ii)->index);
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " edge " << edges(ii)->index
-					<< " makes uni-directional reference to surface " << edges(ii)->surfind[jj] << " list: " ; 
-					DisplayVector(edges(ii)->surfind); cout << " list (surf.edgeind): " ; 
-					DisplayVector(surfs(jj)->edgeind);cerr << endl;
+					cerr << " Test Connectivity Error :" << errCountBiDir 
+						<< " edge " << edges(ii)->index
+						<< " makes uni-directional reference to surface " 
+						<< edges(ii)->surfind[jj] << " list: " ; 
+					DisplayVector(edges(ii)->surfind);
+					cout << " list (surf.edgeind): " ; 
+					DisplayVector(surfs(jj)->edgeind);
+					cerr << endl;
 				}
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity edges (surfind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity edges (surfind) Errors :"
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0){
-		cerr << "Test Connectivity edges (surfind) uni-directional  Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity edges (surfind) uni-directional  Errors :"
+			<< errCountBiDir << endl;
 	}
 
 
@@ -1901,35 +1976,45 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 		kk2=testSub.size();
 		if (int(testSub.size())==0){
 			errCount++;
-			cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-			<< " has empty edgeind " <<  endl;
+			cerr << " Test Connectivity Error :" << errCount << " surf " 
+				<< surfs(ii)->index
+				<< " has empty edgeind " <<  endl;
 		}
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-				<< " makes unknown reference to edge " << surfs(ii)->edgeind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount << " surf " 
+					<< surfs(ii)->index
+					<< " makes unknown reference to edge " 
+					<< surfs(ii)->edgeind[jj] << endl;
 			} else if (surfs(ii)->edgeind[jj]!=0){
 				ll2=edges(testSub[jj])->surfind.size();
 				flag=false;
 				for(ll=0;ll<ll2;ll++){
-					flag=flag || (edges(testSub[jj])->surfind[ll]==surfs(ii)->index);
+					flag=flag || (edges(testSub[jj])->surfind[ll]
+						==surfs(ii)->index);
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
-					<< " makes uni-directional reference to edge " << surfs(ii)->edgeind[jj] << " list: " ; 
-					DisplayVector(surfs(ii)->edgeind); cout << " list (edge.surfind): " ; 
-					DisplayVector(edges(jj)->surfind);cerr << endl;
+					cerr << " Test Connectivity Error :" << errCountBiDir 
+						<< " surf " << surfs(ii)->index
+						<< " makes uni-directional reference to edge " 
+						<< surfs(ii)->edgeind[jj] << " list: " ; 
+					DisplayVector(surfs(ii)->edgeind);
+					cout << " list (edge.surfind): " ; 
+					DisplayVector(edges(jj)->surfind);
+					cerr << endl;
 				}
 			}
 		}
 	}
 	if (errCount>0) {
-		cerr << "Test Connectivity surfs (edgeind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity surfs (edgeind) Errors :"
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0) {
-		cerr << "Test Connectivity surfs (edgeind) uni-directional Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity surfs (edgeind) uni-directional Errors :"
+			<< errCountBiDir << endl;
 	}
 
 	errTot+=errCount;
@@ -1942,37 +2027,48 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 		kk2=testSub.size();
 		if(emptyIsErr && kk2!=2){ // voluind should be of size 2
 			errCount++;
-			cerr <<  " Test Connectivity Error :"  << errCount << " surf " << surfs(ii)->index
-				<< " has voluind of length " <<kk2 << " list (surf::voluind): " ;
+			cerr <<  " Test Connectivity Error :"  << errCount 
+				<< " surf " << surfs(ii)->index
+				<< " has voluind of length " << kk2 
+				<< " list (surf::voluind): " ;
 			DisplayVector(surfs(ii)->voluind); 
 			cerr << endl;
 		}
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && surfs(ii)->voluind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " surf " << surfs(ii)->index
-				<< " makes unknown reference to volu " << surfs(ii)->voluind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount 
+				<< " surf " << surfs(ii)->index
+				<< " makes unknown reference to volu " 
+				<< surfs(ii)->voluind[jj] << endl;
 			} else if (surfs(ii)->voluind[jj]!=0){
 				ll2=volus(testSub[jj])->surfind.size();
 				flag=false;
 				for(ll=0;ll<ll2;ll++){
-					flag=flag || (volus(testSub[jj])->surfind[ll]==surfs(ii)->index);
+					flag=flag || (volus(testSub[jj])->surfind[ll]
+						==surfs(ii)->index);
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " surf " << surfs(ii)->index
-					<< " makes uni-directional reference to volume " << surfs(ii)->voluind[jj] << " list: " ; 
-					DisplayVector(surfs(ii)->voluind); cout << " list (volu.surfind): " ; 
-					DisplayVector(volus(jj)->surfind);cerr << endl;
+					cerr << " Test Connectivity Error :" << errCountBiDir 
+						<< " surf " << surfs(ii)->index
+						<< " makes uni-directional reference to volume " 
+						<< surfs(ii)->voluind[jj] << " list: " ; 
+					DisplayVector(surfs(ii)->voluind);
+					cout << " list (volu.surfind): " ; 
+					DisplayVector(volus(jj)->surfind);
+					cerr << endl;
 				}
 			}
 		}
 	}
 	if (errCount>0) {
-		cerr << "Test Connectivity surfs (voluind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity surfs (voluind) Errors :" 
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0) {
-		cerr << "Test Connectivity surfs (voluind) uni-directional Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity surfs (voluind) uni-directional Errors :" 
+			<< errCountBiDir << endl;
 	}
 
 
@@ -1987,38 +2083,49 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 		for(jj=0;jj< kk2; ++jj){
 			if (testSub[jj]<0 && volus(ii)->surfind[jj]!=0){
 				errCount++;
-				cerr << " Test Connectivity Error :" << errCount << " volu " << volus(ii)->index
-				<< " makes unknown reference to surface " << volus(ii)->surfind[jj] << endl;
+				cerr << " Test Connectivity Error :" << errCount 
+					<< " volu " << volus(ii)->index
+					<< " makes unknown reference to surface "
+					<< volus(ii)->surfind[jj] << endl;
 			} else if (volus(ii)->surfind[jj]!=0){
 				ll2=surfs(testSub[jj])->voluind.size();
 				flag=false;
 				for(ll=0;ll<ll2;ll++){
-					flag=flag || (surfs(testSub[jj])->voluind[ll]==volus(ii)->index);
+					flag=flag || (surfs(testSub[jj])->voluind[ll]
+						==volus(ii)->index);
 				}
 				if (!flag){
 					errCountBiDir++;
-					cerr << " Test Connectivity Error :" << errCountBiDir << " volu " << volus(ii)->index
-					<< " makes uni-directional reference to surface " << volus(ii)->surfind[jj] << " list: " ; 
-					DisplayVector(volus(ii)->surfind); cout << " list (surfs.voluind): " ; 
-					DisplayVector(surfs(testSub[jj])->voluind);cerr << endl;
+					cerr << " Test Connectivity Error :" << errCountBiDir 
+						<< " volu " << volus(ii)->index
+						<< " makes uni-directional reference to surface " 
+						<< volus(ii)->surfind[jj] << " list: " ; 
+					DisplayVector(volus(ii)->surfind);
+					cout << " list (surfs.voluind): " ; 
+					DisplayVector(surfs(testSub[jj])->voluind);
+					cerr << endl;
 				}
 			}
 		}
 	}
 	if (errCount>0){
-		cerr << "Test Connectivity volus (surfind) Errors :" << errCount << endl;
+		cerr << "Test Connectivity volus (surfind) Errors :" 
+			<< errCount << endl;
 	}
 	if (errCountBiDir>0){
-		cerr << "Test Connectivity volus (surfind) uni-directional Errors :" << errCountBiDir << endl;
+		cerr << "Test Connectivity volus (surfind) uni-directional Errors :" 
+			<< errCountBiDir << endl;
 	}
 	errTot+=errCount;
 	errTotBiDir+=errCountBiDir;
 	if (errTot>0){
-		cerr << errTot << "  Total errors were detected in the connectivity list "
-			" in: " << endl << strRoot <<endl;
+		cerr << errTot << "  Total errors were detected in the "
+			"connectivity list in: " << endl << strRoot <<endl;
 	}
 	if (errTotBiDir>0){
-		cerr << errTotBiDir << "  Total errors were detected in the bi-directionality of the connectivity  list in: " << endl << strRoot <<endl;
+		cerr << errTotBiDir << "  Total errors were detected in "
+			"the bi-directionality of the connectivity  list in: " 
+			<< endl << strRoot <<endl;
 	}
 	return(errTot);
 }
@@ -2347,7 +2454,8 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 			meshin.verts.isearch(vertCurr)->disp();
 			cout << it->second << " " << 1/2 << 2/3 <<  endl;
 			cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-			RSVS3D_ERROR_RANGE("unordered_multimap went beyond its range in OrderEdges");
+			RSVS3D_ERROR_RANGE("unordered_multimap went beyond its "
+				"range in OrderEdges");
 		}
 	 	#ifdef RSVS_DIAGNOSTIC
 		if (vert2Edge.count(vertCurr)!=2){
@@ -2375,7 +2483,8 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 		} else {
 		 	#ifdef RSVS_DIAGNOSTIC_FIXED
 			cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
-				<< " surface about to be truncated, if this should not be the case"
+				<< " surface about to be truncated, if "
+				"this should not be the case"
 				" this can be due to duplicates in the edgeind list" << endl;
 			cerr << "edgeind : "; DisplayVector(edgeind);
 			cerr << endl << "edgeIndOrig : "; DisplayVector((*edgeIndOrigPtr));
@@ -2401,190 +2510,6 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 }
 
 
-/**
- * @brief      { function_description }
- *
- * @param      meshin  The meshin
- *
- * @return     { description_of_the_return_value }
- */
-/*
-int surf::OrderEdges(mesh *meshin)
-{
-	unordered_multimap<int,int> vert2Edge;
-	vector<int> edge2Vert,edgeSub,edgeIndOrig;
-	vector<bool> isDone;
-	bool isTruncated;
-	int vertCurr,edgeCurr;
-	int ii,jj, newSurfInd, kk, prevHash;
-	// std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
-	unordered_multimap<int,int>::iterator it;
-	isTruncated=false;
-	newSurfInd=-1; 
-	if (edgeind.size()>0){
-		// edgeIndOrig2=edgeind;
-		sort(edgeind);
-		unique(edgeind);
-
-		edgeIndOrig=edgeind;
-		isDone.assign(edgeIndOrig.size(),false);
-		edgeSub=meshin->edges.find_list(edgeind);
-		edge2Vert=ConcatenateVectorField(meshin->edges,&edge::vertind,edgeSub);
-
-		HashVector(edge2Vert, vert2Edge);
-
-		vertCurr=edge2Vert[0];
-		edgeCurr=edgeind[0];
-		isDone[0]=true;
-		it=vert2Edge.end();
-		for(ii=1;ii<int(edgeind.size());++ii){
-			auto range=vert2Edge.equal_range(vertCurr);
-		 	#ifdef SAFE_ACCESS
-			if (range.first==vert2Edge.end()){
-				disptree((*meshin),0);
-
-				cerr << ii << " vert " << vertCurr << "  ";
-				DisplayVector(edge2Vert);
-				DisplayVector(edgeind);
-				meshin->verts.isearch(vertCurr)->disp();
-				cout << it->second << " " << 1/2 << 2/3 <<  endl;
-				cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
-				RSVS3D_ERROR_RANGE("unordered_multimap went beyond its range in OrderEdges");
-			}
-			if (vert2Edge.count(vertCurr)==1){
-				// cerr << "ERROR : Surface does not form closed loop" << endl;
-				// disptree((*meshin),0);
-
-				// jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
-				// DisplayVector(edge2Vert);
-				// DisplayVector(edgeind);
-				// cerr <<endl;
-
-				// meshin->verts.isearch(vertCurr)->disp();
-				// cerr << "ii is : " << ii << " jj is : " << jj << " count is : " ;
-				// jj=vert2Edge.count(vertCurr);
-				// cerr << jj  <<  endl; 
-				cerr << "Error in :" << __PRETTY_FUNCTION__ ;
-				//RSVS3D_ERROR_RANGE("Found a single vertex - surface is not closed");
-				cerr << " - surface "<< index <<" is not closed (single vertex "<<
-					 vertCurr <<")" << endl;
-				this->edgeind = edgeIndOrig;
-			 	this->disp();
-			 	#ifdef RSVS_DIAGNOSTIC
-			 	isordered=true; // uncomment these two to allow run through for diagnostic
-				return(newSurfInd);
-				#endif //RSVS_DIAGNOSTIC
-				RSVS3D_ERROR_ARGUMENT("Surface is not closed");
-			}
-		 	#ifdef RSVS_DIAGNOSTIC
-			if (vert2Edge.count(vertCurr)!=2){
-				cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ << endl;
-				cerr << " current vertex " << vertCurr << " appears " 
-					<< vert2Edge.count(vertCurr) 
-					<< " in the surf::edgeind ...->vertind" << endl;
-			}
-			#endif //RSVS_DIAGNOSTIC
-		 	#endif // SAFE_ACCESS
-			jj=edgeIndOrig[(range.first->second)/2]==edgeCurr;
-
-			it=range.first;
-			if (jj){++it;}
-			if (!isDone[(it->second)/2]){
-				isDone[(it->second)/2]=true;
-				edgeCurr=edgeIndOrig[(it->second)/2];
-				// Warning ((x/2)*2) not necessarily equal x
-				// Done to round down to the nearest even
-				jj=edge2Vert[((it->second)/2)*2]==vertCurr; 
-				vertCurr=edge2Vert[((it->second)/2)*2+jj];
-				edgeind[ii]=edgeCurr;
-			} else {
-			 	#ifdef RSVS_DIAGNOSTIC_FIXED
-				cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
-					<< " surface about to be truncated, if this should not be the case"
-					" this can be due to duplicates in the edgeind list" << endl;
-				cerr << "edgeind : "; DisplayVector(edgeind);
-				cerr << endl << "edgeIndOrig : "; DisplayVector(edgeIndOrig);
-				cerr << endl << "Original connectivity setup:" << endl;
-				auto temp = edgeind;
-				edgeind=edgeIndOrig;
-				disptree((*meshin),1);
-				edgeind = temp;
-				#endif //RSVS_DIAGNOSTIC
-
-				edgeind.erase(edgeind.begin()+ii, edgeind.end());
-
-			 	#ifdef RSVS_DIAGNOSTIC_FIXED
-				cerr << endl << "New connectivity setup:" << endl;
-				disptree((*meshin),1);
-				#endif //RSVS_DIAGNOSTIC
-
-				isTruncated=true;
-				if ((meshin->surfs.capacity()-meshin->surfs.size())==0){
-					// Checks that there is space to add a new face if truncation
-					// is in order
-			 		#ifdef RSVS_DIAGNOSTIC
-			 		cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
-			 			<< " reallocation necessary."
-			 			<< endl; 
-					#endif //RSVS_DIAGNOSTIC
-					this->edgeind = edgeIndOrig;
-					this->isordered = false;
-					meshin->surfs.reserve(meshin->surfs.capacity() 
-						+ meshin->surfs.capacity() / 2);
-					return(newSurfInd);
-				}
-				break;
-			}
-		}
-		if (isTruncated){ 
-			// This adds a second surface if the surface closes early
-			vector<int> newSurfedgeind;
-			surf newSurf=*this;
-			meshin->surfs.SetMaxIndex();
-			newSurf.index=meshin->surfs.GetMaxIndex()+1;
-			// newSurf.voluind=voluind;
-			// gets added to newSurf.edgeind in SwitchIndex
-			newSurf.edgeind.clear();
-			newSurfedgeind.clear(); 
-			for (ii=0;ii<int(edgeIndOrig.size());++ii){
-				if(!isDone[ii]){
-					newSurfedgeind.push_back(edgeIndOrig[ii]);
-				}
-			}
-
-			// triggers a reallocation invalidating the this pointer			
-			meshin->surfs.push_back(newSurf); 
-			// meshin->surfs(meshin->surfs.size()-1)->disp();
-			prevHash = meshin->surfs.isHash;
-			meshin->surfs.isHash=1;
-			meshin->SwitchIndex(6,this->index,newSurf.index,newSurfedgeind);
-			meshin->surfs[meshin->surfs.size()-1].OrderEdges(meshin);
-
-			meshin->surfs.isHash=prevHash;
-			prevHash = meshin->volus.isHash;
-		 	#ifdef SAFE_ACCESS
-			if (this->voluind.size()<2){
-				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-				cerr << " voluind is of size " << this->voluind.size() << endl;
-				RSVS3D_ERROR_LOGIC("surf::voluind should be size 2");
-			}
-		 	#endif // SAFE_ACCESS
-			for (int i = 0; i < 2; ++i)
-			{
-				kk=meshin->volus.find(voluind[i]);
-				if(kk!=-1){
-					meshin->volus[kk].surfind.push_back(newSurf.index);
-				}
-				meshin->volus.isHash=prevHash;
-			}
-			
-			newSurfInd = newSurf.index;
-		}
-		isordered=true;
-	}
-	return(newSurfInd);
-}*/
-
 int surf::OrderEdges(mesh *meshin)
 {
 	unordered_multimap<int,int> vert2Edge;
@@ -2592,7 +2517,7 @@ int surf::OrderEdges(mesh *meshin)
 	vector<bool> isDone;
 	bool isTruncated;
 	int  newSurfInd;
-	// std::pair<unordered_multimap<int,int>::iterator,unordered_multimap<int,int>::iterator> range;
+
 	unordered_multimap<int,int>::iterator it;
 	isTruncated=false;
 	newSurfInd=-1; 
@@ -2673,7 +2598,8 @@ int surf::SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd){
 			<< ") !=  fullEdgeInd (" << fullEdgeInd.size()
 			<< ")-this::edgeind(" << this->edgeind.size()
 			<< ")" << endl;
-		RSVS3D_ERROR_ARGUMENT("Size of edgeind of truncated surface is incorrect.");
+		RSVS3D_ERROR_ARGUMENT("Size of edgeind of truncated "
+			"surface is incorrect.");
 	}
 	#endif
 	#ifdef RSVS_DIAGNOSTIC_FIXED
@@ -2848,7 +2774,8 @@ vector<int> mesh::OrderEdges(){
 		for (ii = 0; ii < surfs.size(); ++ii)
 		{
 			if (!surfs(ii)->isready(true)){
-				RSVS3D_ERROR_LOGIC("After ordering edges a surface is not ordered.");
+				RSVS3D_ERROR_LOGIC("After ordering edges a surface"
+					" is not ordered.");
 			}
 		}
 		#endif //SAFE_ALGO
@@ -2976,7 +2903,8 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 		surfCond=surfs(ii)->isBorder;
 		if(surfCond){
 			if(outerVolume==0){
-				this->SurfValuesofParents(surfs(ii)->index,vals, &surf::target);
+				this->SurfValuesofParents(surfs(ii)->index,vals,
+					&surf::target);
 				surfCond=false;
 				jj=0;
 				while (!surfCond && jj<meshtree.nParents){
@@ -2984,7 +2912,8 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 					++jj;
 				}
 			} else if(outerVolume==1){
-				this->SurfValuesofParents(surfs(ii)->index,vals, &surf::target);
+				this->SurfValuesofParents(surfs(ii)->index,vals,
+					&surf::target);
 				surfCond=false;
 				jj=0;
 				while (!surfCond && jj<meshtree.nParents){
@@ -2992,7 +2921,8 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 					++jj;
 				}
 			} else if(outerVolume!=-1){
-				RSVS3D_ERROR_ARGUMENT("Unkownn value of outerVolume -1,0, or 1");
+				RSVS3D_ERROR_ARGUMENT("Unkownn value of "
+					"outerVolume -1,0, or 1");
 			}
 		} 
 		// THIS IS DODGY HOW to pick the side to delete can fail
@@ -3004,7 +2934,8 @@ void mesh::GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
 					surfSub = edges.find(surfs(ii)->edgeind[jj]);
 					for(kk=0;kk<2;++kk){
 						if(edges(surfSub)->surfind[kk]!=0){
-							if(!(surfs.isearch(edges(surfSub)->surfind[kk])->isBorder)){
+							if(!(surfs.isearch(edges(surfSub)
+									->surfind[kk])->isBorder)){
 								surfind.push_back(edges(surfSub)->surfind[kk]);
 							}
 						}
@@ -3051,7 +2982,8 @@ void mesh::SetBorders(){
 			nT=volus(ii)->surfind.size();
 			volus[ii].isBorder=false;
 			while(jj<nT && !volus(ii)->isBorder){
-				volus[ii].isBorder=surfs(surfs.find(volus[ii].surfind[jj]))->isBorder;
+				volus[ii].isBorder=surfs(surfs.find(
+					volus[ii].surfind[jj]))->isBorder;
 				jj++;
 			}
 		}
@@ -3063,7 +2995,8 @@ void mesh::SetBorders(){
 			nT=edges(ii)->surfind.size();
 			edges[ii].isBorder=false;
 			while(jj<nT && !edges(ii)->isBorder){
-				edges[ii].isBorder=surfs(surfs.find(edges[ii].surfind[jj]))->isBorder;
+				edges[ii].isBorder=surfs(surfs.find(
+					edges[ii].surfind[jj]))->isBorder;
 				jj++;
 			}
 		}
@@ -3086,7 +3019,8 @@ void mesh::SetBorders(){
 			nT=surfs(ii)->edgeind.size();
 			surfs[ii].isBorder=false;
 			while(jj<nT && !surfs(ii)->isBorder){
-				surfs[ii].isBorder=edges(edges.find(surfs[ii].edgeind[jj]))->isBorder;
+				surfs[ii].isBorder=edges(edges.find(
+					surfs[ii].edgeind[jj]))->isBorder;
 				jj++;
 			}
 		}
@@ -3100,14 +3034,16 @@ void mesh::SetBorders(){
 		nT=verts(ii)->edgeind.size();
 		verts[ii].isBorder=false;
 		while(jj<nT && !verts(ii)->isBorder){
-			verts[ii].isBorder=edges(edges.find(verts[ii].edgeind[jj]))->isBorder;
+			verts[ii].isBorder=edges(edges.find(
+				verts[ii].edgeind[jj]))->isBorder;
 			jj++;
 		}
 	}
 	verts.ForceArrayReady();
 
 	if (int(volus.size())>0){
-		// in 3D volume is on the border if any part of it is out (incl 1 vert)
+		// in 3D volume is on the border if any part of it 
+		// is out (incl 1 vert)
 		int nVolu = volus.size();
 		for (ii=0; ii<nVolu; ++ii){
 			if(!volus(ii)->isBorder){
@@ -3127,7 +3063,8 @@ void mesh::SetBorders(){
 		}
 		volus.ForceArrayReady();
 	} else {
-		// in 2D a surface is on the border if any part of it is out (incl 1 vert)
+		// in 2D a surface is on the border if any part of it 
+		// is out (incl 1 vert)
 		int nSurf = surfs.size();
 		for (ii=0; ii<nSurf; ++ii){
 			if(!surfs(ii)->isBorder){
@@ -3172,8 +3109,9 @@ void mesh::ForceCloseContainers(){
 				#ifdef SAFE_ALGO
 				if(vertBlock[verts.find(edges(iEdge)->vertind[0])] 
 					!= vertBlock[verts.find(edges(iEdge)->vertind[1])]){
-					cerr << endl <<"An edge has connections in 2 vertBlocks:" << endl;
-							cerr << __PRETTY_FUNCTION__ << endl;
+					cerr << endl <<"An edge has connections "
+						"in 2 vertBlocks:" << endl;
+					cerr << __PRETTY_FUNCTION__ << endl;
 				}
 				#endif //SAFE_ALGO
 				nSurf=edges(iEdge)->surfind.size();
@@ -3182,12 +3120,14 @@ void mesh::ForceCloseContainers(){
 					if (surfsIsDone[iSurf]){
 						#ifdef SAFE_ALGO
 						if(surfs.elems[iSurf].voluind[0]!=vertBlock[ii]){
-							cerr << endl <<"Surf voluind assignement performed twice during:" << endl;
+							cerr << endl <<"Surf voluind assignement "
+								"performed twice during:" << endl;
 							cerr << __PRETTY_FUNCTION__ << endl;
 						}
 						#endif // SAFE_ALGO
 					}
-					volus.elems[volus.find(vertBlock[ii])].surfind.push_back(edges(iEdge)->surfind[kk]);
+					volus.elems[volus.find(vertBlock[ii])
+						].surfind.push_back(edges(iEdge)->surfind[kk]);
 					surfs.elems[iSurf].voluind.clear();
 					surfs.elems[iSurf].voluind.push_back(vertBlock[ii]);
 					surfs.elems[iSurf].voluind.push_back(0);
@@ -3206,7 +3146,8 @@ void mesh::ForceCloseContainers(){
 			nEdge=verts(ii)->edgeind.size();
 			for(jj=0;jj<nEdge;++jj){
 				iEdge=edges.find(verts(ii)->edgeind[jj]);
-				surfs.elems[surfs.find(vertBlock[ii])].edgeind.push_back(verts(ii)->edgeind[jj]);
+				surfs.elems[surfs.find(vertBlock[ii])
+					].edgeind.push_back(verts(ii)->edgeind[jj]);
 				edges.elems[iEdge].surfind.clear();
 				edges.elems[iEdge].surfind.push_back(vertBlock[ii]);
 				edges.elems[iEdge].surfind.push_back(0);
@@ -3273,12 +3214,14 @@ std::vector<int> mesh::MergeGroupedVertices(HashedVector<int, int> &closeVert,
 	return(rmvInds);
 }
 
-void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool voidError){
+void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds,
+	bool voidError){
 	/*
 	Removes degenerate connectors.
 
 	This removes edges, surfaces and volumes which do not have enough
-	children (ie connector elements of lower dimensionality) to be a closed container.
+	children (ie connector elements of lower dimensionality) 
+	to be a closed container.
 	Edges < 2 vertices
 	Surfaces < 3 edges
 	Volumes < 4 Surfaces
@@ -3298,7 +3241,8 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 		this->verts.remove(rmvInds);
 		this->verts.PrepareForUse();
 		#ifdef RSVS_VERBOSE
-		std::cout << "Number of removed vertices " << rmvInds.size() << std::endl;
+		std::cout << "Number of removed vertices " 
+			<< rmvInds.size() << std::endl;
 		#endif //RSVS_VERBOSE
 		rmvInds.clear();
 	}
@@ -3308,7 +3252,8 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	countRep= 0;
 	for (int i = 0; i < count; ++i)
 	{
-		if(this->edges(i)->vertind[0]==this->edges(i)->vertind[1]){
+		if(this->edges(i)->vertind[0]==this->edges(i)->vertind[1])
+		{
 			this->RemoveIndex(2, this->edges(i)->index);
 			rmvInds.push_back(this->edges(i)->index);
 			countRep++;
@@ -3332,8 +3277,11 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 		nEdgeSurf = this->surfs(i)->edgeind.size();
 		if (nEdgeSurf==2){
 			bool edgeConnEq = this->edges.isearch(this->surfs(i)->edgeind[0])
-				->vertconneq(*(this->edges.isearch(this->surfs(i)->edgeind[1])));
-			if (edgeConnEq && (this->surfs(i)->edgeind[1]!=this->surfs(i)->edgeind[0])){
+				->vertconneq(
+					*(this->edges.isearch(this->surfs(i)->edgeind[1])));
+			if (edgeConnEq 
+				&& (this->surfs(i)->edgeind[1]!=this->surfs(i)->edgeind[0]))
+			{
 				rmvInds2.push_back(this->surfs(i)->edgeind[1]);
 				this->SwitchIndex(2, this->surfs(i)->edgeind[1], 
 					this->surfs(i)->edgeind[0]);
@@ -3356,7 +3304,8 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	sort(rmvInds2);
 	unique(rmvInds2);
 	#ifdef RSVS_VERBOSE
-	std::cout << "Number of removed edges (duplicates) " << rmvInds2.size() << std::endl;
+	std::cout << "Number of removed edges (duplicates) " 
+		<< rmvInds2.size() << std::endl;
 	#endif //RSVS_VERBOSE
 	this->edges.remove(rmvInds2);
 	this->edges.PrepareForUse();
@@ -3370,20 +3319,22 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	{
 		nEdgeSurf = this->volus(i)->surfind.size();
 		if(nEdgeSurf==2){
-			// std::cout << i << " " << this->surfs.isHash <<  " | ";
 			bool surfConnEq = this->surfs.isearch(this->volus(i)->surfind[0])
-				->edgeconneq(*(this->surfs.isearch(this->volus(i)->surfind[1])));
-			// if the surfaces have the same edge connectivities and different indices
-			if(surfConnEq && (this->volus(i)->surfind[0]!=this->volus(i)->surfind[1])){
+				->edgeconneq(
+					*(this->surfs.isearch(this->volus(i)->surfind[1])));
+			// if the surfaces have the same edge connectivities and 
+			// different indices
+			if((this->volus(i)->surfind[0]!=this->volus(i)->surfind[1]) 
+				&& surfConnEq)
+			{
 				rmvInds2.push_back(this->volus(i)->surfind[1]);
 				this->SwitchIndex(3, this->volus(i)->surfind[1], 
 					this->volus(i)->surfind[0]);
-				// std::cout << i << " " << this->surfs.isHash <<  " | ";
 			}
 		} else if (nEdgeSurf==3 && voidError){
-			// This case is unhandled as either there is still a degenerate face
-			// which should not be the case or a void is being created which should not
-			// be the case either.
+			// This case is unhandled as either there is still a degenerate 
+			// face which should not be the case or a void is being created
+			// which should not be the case either.
 			RSVS3D_ERROR_LOGIC("Unhandled case - Degenerate face or "
 				"unwanted Void creation");
 		}
@@ -3404,20 +3355,28 @@ void mesh::RemoveSingularConnectors(const std::vector<int> &rmvVertInds, bool vo
 	sort(rmvInds2);
 	unique(rmvInds2);
 	#ifdef RSVS_VERBOSE
-	std::cout << "Number of removed surfs (duplicates) " << rmvInds2.size() << std::endl;
+	std::cout << "Number of removed surfs (duplicates) " 
+		<< rmvInds2.size() << std::endl;
 	#endif //RSVS_VERBOSE
 	this->surfs.remove(rmvInds2);
 	this->surfs.PrepareForUse();
 	rmvInds2.clear();
-
 }
 
+/** Return in a vector for each vertex a block number which it is part of.
+ *
+ *
+ * Fills a vector with a number for each vertex corresponding to a group of
+ * connected edges it is part of , can be used close surfaces in 2D or   volumes
+ * in 3D. Uses a flood fill with queue method.
+ *
+ * @param[in/out] vertBlock  Either a vector of the same size contaigning 0 for
+ *                           vertices which need to be labelled and some other
+ *                           integers in other positions. OR an empty vector.
+ *
+ * @return        The total number of blocks of vertices identified.
+ */
 int mesh::ConnectedVertex(vector<int> &vertBlock) const{
-   // Fills a vector with a number for each vertex corresponding to a
-   // group of connected edges it is part of , can be used close surfaces in 2D or volumes
-   // in 3D.
-   // Uses a flood fill with queue method
-
 
 	int nVertExplored,nVerts,nBlocks,nCurr,nEdgesCurr,ii,jj,kk;
 	vector<bool> vertStatus; // 1 explored 0 not explored
@@ -3461,14 +3420,13 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 
 	  	// if currQueue is empty start new block
 		if(currQueue.size()<1){
-
-			 //cout << "Block " << nBlocks << " - " << nVertExplored << " - " << nVerts << endl;
 	   		ii=0;
 	   		while(ii<nVerts && vertStatus[ii]){
 	   			ii++;
 	   		}
 	   		if (vertStatus[ii]){
-	   			cerr << "Error starting point for loop not found despite max number of vertex not reached" <<endl;
+	   			cerr << "Error starting point for loop not found despite "
+	   				"max number of vertex not reached" <<endl;
 	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 	   			RSVS3D_ERROR_RANGE(" : Starting point for block not found");
 	   		}
@@ -3512,13 +3470,12 @@ int mesh::ConnectedVertex(vector<int> &vertBlock) const{
 	return(nBlocks);
 }
 
-int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryFaces) const {
-	// Fills a vector with a number for each volume corresponding to a
-	// group of connected edges it is part of , can be used close surfaces in 2D or volumes
-	// in 3D.
-	// Uses a flood fill with queue method
-	// Boundary faces are faces which stop the the flood exploring through them
-	// it is a boolean 
+int mesh::ConnectedVolumes(vector<int> &voluBlock,
+	const vector<bool> &boundaryFaces) const {
+	// Fills a vector with a number for each volume corresponding to a group of
+	// connected edges it is part of , can be used close surfaces in 2D or
+	// volumes in 3D. Uses a flood fill with queue method Boundary faces are
+	// faces which stop the the flood exploring through them it is a boolean
 
 	int nVoluExplored,nVolus, nSurfs,nBlocks,nCurr,nSurfsCurr,ii,jj,kk;
 	vector<bool> volStatus; // 1 explored 0 not explored
@@ -3573,13 +3530,14 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
 	  	// if currQueue is empty start new block
 		if(currQueue.size()<1){
 
-			 //cout << "Block " << nBlocks << " - " << nVoluExplored << " - " << nVolus << endl;
+
 	   		ii=0;
 	   		while(ii<nVolus && volStatus[ii]){
 	   			ii++;
 	   		}
 	   		if (volStatus[ii]){
-	   			cerr << "Error starting point for loop not found despite max number of volume not reached" <<endl;
+	   			cerr << "Error starting point for loop not found despite"
+	   			" max number of volume not reached" <<endl;
 	   			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 	   			RSVS3D_ERROR_RANGE(" : Starting point for block not found");
 	   		}
@@ -3602,7 +3560,8 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
    					// If a boundary has been provided and this face is one
    					continue;
    				}
-   				kk=int(surfs(sTempInd)->voluind[0]==volus(currQueue[ii])->index);
+   				kk=int(surfs(sTempInd)->voluind[0]
+   					==volus(currQueue[ii])->index);
    				if(surfs(sTempInd)->voluind[kk]==0){
    					// if volume index is 0 skip this
    					continue;
@@ -3610,8 +3569,9 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock, const vector<bool> &boundaryF
    				nextQueue.push_back(volus.find(surfs(sTempInd)->voluind[kk]));
 			   	#ifdef SAFE_ALGO
    				if (volus.find(surfs(sTempInd)->voluind[kk])==-1){
-   					cerr << "Surf index: " << volus(currQueue[ii])->surfind[jj] << " volume index:" <<  
-	   				surfs(sTempInd)->voluind[kk] << endl;
+   					cerr << "Surf index: " << volus(currQueue[ii])->surfind[jj]
+   						<< " volume index:" <<  
+	   					surfs(sTempInd)->voluind[kk] << endl;
 	   				cerr << "Surf connected to non existant volume" <<endl;
 	   				cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
    					RSVS3D_ERROR_RANGE(" : Volume not found");
@@ -3650,14 +3610,22 @@ coordvec mesh::CalcCentreVolu(int ind) const{
 		nj=surfs(cSurf)->edgeind.size();
 		for(jj=0; jj<nj ; ++jj){
 			temp.assign(0,0,0);
-			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[0])->coord);
-			temp.substract(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
+			temp.add(verts.isearch(edges.isearch(
+				surfs(cSurf)->edgeind[jj]
+				)->vertind[0])->coord);
+			temp.substract(verts.isearch(edges.isearch(
+				surfs(cSurf)->edgeind[jj]
+				)->vertind[1])->coord);
 
 			edgeLength=temp.CalcNorm();
 			voluLength+=edgeLength;
 
-			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
-			temp.add(verts.isearch(edges.isearch(surfs(cSurf)->edgeind[jj])->vertind[1])->coord);
+			temp.add(verts.isearch(edges.isearch(
+				surfs(cSurf)->edgeind[jj]
+				)->vertind[1])->coord);
+			temp.add(verts.isearch(edges.isearch(
+				surfs(cSurf)->edgeind[jj]
+				)->vertind[1])->coord);
 			temp.mult(edgeLength);
 
 			ret.add(temp.usedata());
@@ -3720,7 +3688,8 @@ void mesh::OrientEdgeSurface(){
 }
 
 void mesh::OrientSurfaceVolume(){
-	// Orders the surf.voluind [c0 c1] such that the surface normal vector points
+	// Orders the surf.voluind [c0 c1] such that the surface normal
+	//  vector points
 	// from c0 to c1
 	// This is done by using the surface normals and checking they go towards
 	// the centre of the cell
@@ -3747,7 +3716,8 @@ void mesh::OrientSurfaceVolume(){
 			if(jj==nj){ // if the orientation cannot be defined
 				dotProd=1.0;
 				kk=0;
-				cerr << "Warning: Cell orientations could not be computed " << endl;
+				cerr << "Warning: Cell orientations could not "
+					"be computed " << endl;
 				cerr << "			in " << __PRETTY_FUNCTION__ << endl;
 				break;
 			}
@@ -3759,10 +3729,12 @@ void mesh::OrientSurfaceVolume(){
 				edges.isearch(surfs(jj)->edgeind[0])->vertind[0]
 				)->coord);
 			dotProd=centreVolu.dot(normalVec.usedata());
-		} while (!isfinite(dotProd) || (fabs(dotProd)<numeric_limits<double>::epsilon()));
+		} while (!isfinite(dotProd) 
+			|| (fabs(dotProd)<numeric_limits<double>::epsilon()));
 
 
-		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) || ((dotProd>0.0) && (kk==1)));
+		isFlip[ii-1]= (((dotProd<0.0) && (kk==0)) |
+			| ((dotProd>0.0) && (kk==1)));
 	}
 	ni=surfOrient.size();
 	for(ii=0; ii< ni; ++ii){
@@ -3779,7 +3751,8 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	vector<bool> surfStatus; // 1 explored 0 not explored
 	vector<vector<int>> orderVert;
 	bool isConnec, t0,t1,t3,t4,isFlip;
-	vector<int> currQueue, nextQueue, emptVert; // Current and next queues of indices
+	// Current and next queues of indices
+	vector<int> currQueue, nextQueue, emptVert; 
 
 	// Preparation of the arrays;
 	nSurfs=surfs.size();
@@ -3804,7 +3777,8 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	// Start from a surf that is in no list, 
 	//		look at each its edges 
 	//		find adjacent surfaces(checking they share a cell)
-	//			-> compute relative orientation (using idea of contra-rotating adjacent surfs) 
+	//			-> compute relative orientation (using idea of 
+	//			contra-rotating adjacent surfs) 
 	//			-> add surface to queue
 	nBlocks=0;
 	nSurfExplored=0;
@@ -3847,32 +3821,41 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 				for (kk=0; kk < nk; ++kk){
 					// tN -> volu[N] is shared 
 					testSurf=surfs.find(edges(currEdge)->surfind[kk]);
-					t0 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0] ||
-						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[0]) && 
+					t0 = (surfs(testSurf)->voluind[0]
+						==surfs(currQueue[ii])->voluind[0] ||
+						surfs(testSurf)->voluind[1]
+						==surfs(currQueue[ii])->voluind[0]) && 
 					(surfs(currQueue[ii])->voluind[0]!=0);
 
-					t1 = (surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[1] ||
-						surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]) && 
+					t1 = (surfs(testSurf)->voluind[0]
+						==surfs(currQueue[ii])->voluind[1] ||
+						surfs(testSurf)->voluind[1]
+						==surfs(currQueue[ii])->voluind[1]) && 
 					(surfs(currQueue[ii])->voluind[1]!=0);
 					// if either volume is shared surface is to be flooded
-					isConnec = (edges(currEdge)->surfind[kk]!=surfs(currQueue[ii])->index) 
-					&& (t0 || t1) && (!surfStatus[testSurf]);
+					isConnec = (edges(currEdge)->surfind[kk]
+						!=surfs(currQueue[ii])->index) 
+						&& (t0 || t1) && (!surfStatus[testSurf]);
 
 					if(isConnec){
 						// Test rotation
-						relOrient=OrderMatchLists(orderVert[currQueue[ii]], orderVert[testSurf], 
-							edges(currEdge)->vertind[0],edges(currEdge)->vertind[1]);
+						relOrient=OrderMatchLists(orderVert[currQueue[ii]],
+							orderVert[testSurf], edges(currEdge)->vertind[0],
+							edges(currEdge)->vertind[1]);
 						// Add to the next queue
 						nextQueue.push_back(testSurf);
 						nSurfExplored++;
 						surfStatus[testSurf]=true;
-						surfOrient[testSurf]=-1*relOrient*surfOrient[currQueue[ii]];
+						surfOrient[testSurf]=-1*relOrient
+							*surfOrient[currQueue[ii]];
 
 						// Flip volumes to match
-						t3=(surfs(testSurf)->voluind[0]==surfs(currQueue[ii])->voluind[0]);
-						t4=(surfs(testSurf)->voluind[1]==surfs(currQueue[ii])->voluind[1]);
+						t3=(surfs(testSurf)->voluind[0]
+							==surfs(currQueue[ii])->voluind[0]);
+						t4=(surfs(testSurf)->voluind[1]
+							==surfs(currQueue[ii])->voluind[1]);
 						isFlip=((relOrient==-1) && ((t0 && !t3) || (t1 && !t4))) 
-						|| ((relOrient==1) && ((t0 && t3) || (t1 && t4)));
+							|| ((relOrient==1) && ((t0 && t3) || (t1 && t4)));
 						if(isFlip){
 							surfs.elems[testSurf].FlipVolus();
 						}
@@ -4154,7 +4137,9 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		auto tempInd = this->edges[i+edgeSize].index;
 		this->edges[i+edgeSize] = this->edges[tempVec[i]];
 		this->edges[i+edgeSize].index = tempInd;
-		for (auto temp : this->surfs.find_list(this->edges[i+edgeSize].surfind)){
+		for (auto temp : this->surfs.find_list(
+			this->edges[i+edgeSize].surfind))
+		{
 			this->surfs[temp].edgeind.push_back(tempInd);
 		}
 		// Compute vertex position
@@ -4163,12 +4148,16 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		iIn += vertOut[this->verts.find(this->edges[tempVec[i]].vertind[0])];
 		#ifdef SAFE_ALGO
 		if (!(vertOut[this->verts.find(this->edges[tempVec[i]].vertind[0])]
-				^ vertOut[this->verts.find(this->edges[tempVec[i]].vertind[1])])){
-			RSVS3D_ERROR_LOGIC("Edge Should be connected to one inner and one outer"
-				"vertex, this is not the case.");
+				^ vertOut[this->verts.find(
+					this->edges[tempVec[i]].vertind[1])]))
+		{
+			RSVS3D_ERROR_LOGIC("Edge Should be connected to one inner and"
+				" one outer vertex, this is not the case.");
 		}
-		flagErr1 = vertOut[this->verts.find(this->edges[tempVec[i]].vertind[iIn])];
-		flagErr2 = !vertOut[this->verts.find(this->edges[tempVec[i]].vertind[iOut])];
+		flagErr1 = vertOut[this->verts.find(
+			this->edges[tempVec[i]].vertind[iIn])];
+		flagErr2 = !vertOut[this->verts.find(
+			this->edges[tempVec[i]].vertind[iOut])];
 		if (flagErr1 && flagErr2) {
 			RSVS3D_ERROR_LOGIC("Coord In is Out and Coord out is in");
 		} else if(flagErr1){
@@ -4194,8 +4183,10 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 
 		this->edges[i+edgeSize].vertind[iIn]=this->verts[i+vertSize].index;
 		this->edges[tempVec[i]].vertind[iOut]=this->verts[i+vertSize].index;
-		this->verts[i+vertSize].edgeind.push_back(this->edges[tempVec[i]].index);
-		this->verts[i+vertSize].edgeind.push_back(this->edges[i+edgeSize].index);
+		this->verts[i+vertSize].edgeind.push_back(
+			this->edges[tempVec[i]].index);
+		this->verts[i+vertSize].edgeind.push_back(
+			this->edges[i+edgeSize].index);
 		vertOut.push_back(false); // Add new vertex as an inside vertex
 		this->ArraysAreHashed();
 	}
@@ -4226,7 +4217,8 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 			this->surfs[i+surfSize].index = tempInd;
 
 			meshhelp::SplitBorderSurfaceEdgeind(*this, edgeOut, 
-				this->surfs[tempVec[i]].edgeind, this->surfs[i+surfSize].edgeind);
+				this->surfs[tempVec[i]].edgeind,
+				this->surfs[i+surfSize].edgeind);
 
 			// Find the vertind connectivity of the new edge.
 			this->edges[edgeSize2+i].vertind = 
@@ -4245,17 +4237,23 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 			// Switch the edge connectivity of certain edges in scoped mode
 			this->ArraysAreHashed();
 			this->SwitchIndex(6, this->surfs(tempVec[i])->index,
-				this->surfs(i+surfSize)->index,this->surfs(i+surfSize)->edgeind);
+				this->surfs(i+surfSize)->index,
+				this->surfs(i+surfSize)->edgeind);
 			// assign new edge.surfind and surf.edgeind connectivity
-			this->edges[edgeSize2+i].surfind.push_back(this->surfs[i+surfSize].index);
-			this->edges[edgeSize2+i].surfind.push_back(this->surfs[tempVec[i]].index);
-			this->surfs[i+surfSize].edgeind.push_back(this->edges[edgeSize2+i].index);
-			this->surfs[tempVec[i]].edgeind.push_back(this->edges[edgeSize2+i].index);
+			this->edges[edgeSize2+i].surfind.push_back(
+				this->surfs[i+surfSize].index);
+			this->edges[edgeSize2+i].surfind.push_back(
+				this->surfs[tempVec[i]].index);
+			this->surfs[i+surfSize].edgeind.push_back(
+				this->edges[edgeSize2+i].index);
+			this->surfs[tempVec[i]].edgeind.push_back(
+				this->edges[edgeSize2+i].index);
 			// Assign the vertices edgeind connectivity
 			int count2 = this->edges[edgeSize2+i].vertind.size();
 			for (int j = 0; j < count2; ++j)
 			{
-				this->verts.elems[this->verts.find(this->edges[edgeSize2+i].vertind[j])]
+				this->verts.elems[this->verts.find(
+					this->edges[edgeSize2+i].vertind[j])]
 					.edgeind.push_back(this->edges[edgeSize2+i].index);
 			}
 			edgeOut.push_back(false); // New edge is inside
@@ -4318,14 +4316,17 @@ std::vector<int> mesh::AddBoundary(const std::vector<double> &lb,
 		// Connect the new surface to the two volumes which were split
 		this->surfs[surfSize2+i].voluind[0] = this->volus[i+voluSize].index; 
 		this->surfs[surfSize2+i].voluind[1] = this->volus[tempVec[i]].index;
-		this->volus[tempVec[i]].surfind.push_back(this->surfs[surfSize2+i].index);
-		this->volus[i+voluSize].surfind.push_back(this->surfs[surfSize2+i].index);
+		this->volus[tempVec[i]].surfind.push_back(
+			this->surfs[surfSize2+i].index);
+		this->volus[i+voluSize].surfind.push_back(
+			this->surfs[surfSize2+i].index);
 		// Assign the edges surfind connectivity
 		int count2 = this->surfs(surfSize2+i)->edgeind.size();
 		this->ArraysAreHashed();
 		for (int j = 0; j < count2; ++j)
 		{
-			this->edges.elems[this->edges.find(this->surfs[surfSize2+i].edgeind[j])]
+			this->edges.elems[this->edges.find(
+				this->surfs[surfSize2+i].edgeind[j])]
 				.surfind.push_back(this->surfs[surfSize2+i].index);
 		}
 		surfOut.push_back(false); // New edge is inside
@@ -4402,20 +4403,24 @@ void mesh::Crop(vector<int> indList, int indType){
 	switch(indType){
 		case 1:{
 			auto vertSub = this->verts.find_list(vertDel);
-			edgeDel = ConcatenateVectorField(this->verts, &vert::edgeind, vertSub);
+			edgeDel = ConcatenateVectorField(this->verts,
+				&vert::edgeind, vertSub);
 			[[gnu::fallthrough]];
 		}
 		case 2:{
 			auto edgeSub = this->edges.find_list(edgeDel);
-			surfDel = ConcatenateVectorField(this->edges, &edge::surfind, edgeSub);
+			surfDel = ConcatenateVectorField(this->edges,
+				&edge::surfind, edgeSub);
 			[[gnu::fallthrough]];
 		}
 		case 3:{
 			auto surfSub = this->surfs.find_list(surfDel);
-			voluDel = ConcatenateVectorField(this->surfs, &surf::voluind, surfSub);
+			voluDel = ConcatenateVectorField(this->surfs,
+				&surf::voluind, surfSub);
 		}
 	}
-	// Remove indices from connectivity and propagate downwards from the volumes.
+	// Remove indices from connectivity and propagate downwards 
+	// from the volumes.
 	// Remove volumes
 	sort(voluDel);
 	unique(voluDel);
@@ -4488,7 +4493,8 @@ void mesh::CropAtBoundary(const vector<double> &lb, const vector<double> &ub){
 }
 
 
-int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, int p2){
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+	int p1, int p2){
 	// compares the list vec1 and vec2 returning 
 	// 1 if indices p1 and p2 appear in the same order 
 	// -1 if indices p1 and p2 appear in opposite orders
@@ -4540,7 +4546,8 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2, int p1, in
 	return(retVal);
 }
 
-void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind, vector<int> &vertind){
+void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
+	vector<int> &vertind){
 	// Returns a list of connected vertices matching a list of connected edges
 	bool flag;
 	int kk,ll,nEdge; 
@@ -4648,7 +4655,8 @@ namespace meshhelp {
 
 		#ifdef SAFE_ALGO
 		if(lStep>+0.0 || lStep<-1.001){
-			cout << "Error in: " << __PRETTY_FUNCTION__ << endl << " coordIn : ";
+			cout << "Error in: " << __PRETTY_FUNCTION__ 
+				<< endl << " coordIn : ";
 			DisplayVector(coordIn);
 			cout << " coordOut : ";
 			DisplayVector(coordOut);
@@ -4668,8 +4676,9 @@ namespace meshhelp {
 
 	}
 
-	void SplitBorderSurfaceEdgeind(const mesh &meshin, const std::vector<bool> &edgeOut, 
-		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut){
+	void SplitBorderSurfaceEdgeind(const mesh &meshin, 
+		const std::vector<bool> &edgeOut, std::vector<int> &vecconnIn, 
+		std::vector<int> &vecconnOut){
 		/*
 		Splits the connectivity of a surface lying on the border into 
 		those edges lying inside and outside of the new forming boundary
@@ -4685,7 +4694,8 @@ namespace meshhelp {
 		{
 			if(temp[i]==-1){
 				std::cerr << "Error in : " << __PRETTY_FUNCTION__ << std::endl;
-				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list not found");
+				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list"
+					" not found");
 			}
 			if(edgeOut[temp[i]]){
 				vecconnOut.push_back(meshin.edges(temp[i])->index);
@@ -4696,12 +4706,15 @@ namespace meshhelp {
 	}
 
 	/**
-	 * @brief      Handles case for AddBoundary where a surface more than one split. 
+	 * @brief      Handles case for AddBoundary where a surface more than one
+	 *             split.
 	 *
 	 * @param      meshin      The mesh
 	 * @param      edgeindOld  the edgeind internal
-	 * @param      edgeindNew  the edgeind out of the boundary (that will be split)
-	 * @param      vertindNew  the vertex index that must be trimmed to be of size 2
+	 * @param      edgeindNew  the edgeind out of the boundary (that will be
+	 *                         split)
+	 * @param      vertindNew  the vertex index that must be trimmed to be of
+	 *                         size 2
 	 */
 	void HandleMultiSurfaceSplit(mesh &meshin, 
 		vector<int> &edgeindOld, vector<int> &edgeindNew,
@@ -4757,8 +4770,9 @@ namespace meshhelp {
 
 	}
 
-	void SplitBorderVolumeSurfind(const mesh &meshin, const std::vector<bool> &edgeOut, 
-		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut){
+	void SplitBorderVolumeSurfind(const mesh &meshin, 
+		const std::vector<bool> &edgeOut, std::vector<int> &vecconnIn,
+		std::vector<int> &vecconnOut){
 		/*
 		Splits the connectivity of a volume lying on the border into 
 		those surfs lying inside and outside of the new forming boundary
@@ -4774,7 +4788,8 @@ namespace meshhelp {
 		{
 			if(temp[i]==-1){
 				std::cerr << "Error in : " << __PRETTY_FUNCTION__ << std::endl;
-				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list not found");
+				RSVS3D_ERROR_ARGUMENT("Edge index in connectivity list "
+					"not found");
 			}
 			if(edgeOut[temp[i]]){
 				vecconnOut.push_back(meshin.surfs(temp[i])->index);
@@ -4784,14 +4799,15 @@ namespace meshhelp {
 		}
 	}
 
-	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, const std::vector<bool> &vertOut,
-		const std::vector<int> &edgeList, const std::vector<int> &edgeListCheck){
+	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin,
+		const std::vector<bool> &vertOut, const std::vector<int> &edgeList, 
+		const std::vector<int> &edgeListCheck){
 		/*
-		Returns the vertices which are in (false in vertOut) from a list of edges
-		 which are outside.
-
-		 This may be larger than two as edgeList are not guaranteed to be part of
-		 a single surface. If there are two cuts this would yield 4 vertices.
+		 Returns the vertices which are in (false in vertOut) from a list of
+		 edges which are outside.
+		
+		 This may be larger than two as edgeList are not guaranteed to be part
+		 of a single surface. If there are two cuts this would yield 4 vertices.
 		*/
 		std::vector<int> vertList;
 		int count = edgeList.size();
@@ -4829,13 +4845,13 @@ namespace meshhelp {
 
 		return(vertList);
 	}
-	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, const std::vector<bool> &edgeOut,
-		std::vector<int> surfList){
+	std::vector<int> FindEdgeInFromSurfOut(const mesh &meshin, 
+		const std::vector<bool> &edgeOut, std::vector<int> surfList){
 		/*
-		Returns the edgeices which are in (false in edgeOut) from a list of surfs
-		 which are outside.
-
-		 Needs to be templated
+		Returns the edgeices which are in (false in edgeOut) from a list of
+		surfs which are outside.
+		
+		Needs to be templated
 		*/
 		std::vector<int> edgeList;
 		int count = surfList.size();
@@ -4852,7 +4868,8 @@ namespace meshhelp {
 		return(edgeList);
 	}
 
-	int VertexInVolume(const mesh &meshin, const vector<double> testCoord, bool needFlip){
+	int VertexInVolume(const mesh &meshin, const vector<double> testCoord,
+		bool needFlip){
 		/*
 		 for each point
 		 Start at a surface (any)
@@ -4887,18 +4904,19 @@ namespace meshhelp {
 				#ifdef SAFE_ALGO
 				// Checks that ordering and edgeind are correct
 				if(!meshin.surfs.isearch(surfCurr)->isready(true)){
-					RSVS3D_ERROR_ARGUMENT("Surfaces of `meshin` need to be ordered."
-						" Run meshin.OrderEdges() before calling");
+					RSVS3D_ERROR_ARGUMENT("Surfaces of `meshin` need to be "
+						"ordered. Run meshin.OrderEdges() before calling");
 				}
 				if(meshin.surfs.isearch(surfCurr)->edgeind.size()<3){
 					std::string strErr;
-					strErr = "Surface "+to_string(surfCurr)+" has less than 3 edges.";
+					strErr = "Surface " + to_string(surfCurr) 
+						+ " has less than 3 edges.";
 					RSVS3D_ERROR_ARGUMENT(strErr.c_str());
 				}
 				#endif
 
-				// assign surfacePoints the indices of 3 non coincident points appearing
-				// in the surface
+				// assign surfacePoints the indices of 3 non coincident
+				// points appearing in the surface
 				int surfacePointsIdentified = 0;
 				for (auto edgeCurr : meshin.surfs.isearch(surfCurr)->edgeind)
 				{
@@ -4906,11 +4924,15 @@ namespace meshhelp {
 						continue;
 					}
 					if(surfacePointsIdentified==0){
-						surfacePoints[0] = meshin.edges.isearch(edgeCurr)->vertind[0];
-						surfacePoints[1] = meshin.edges.isearch(edgeCurr)->vertind[1];
+						surfacePoints[0] = meshin.edges.isearch(edgeCurr)
+							->vertind[0];
+						surfacePoints[1] = meshin.edges.isearch(edgeCurr)
+							->vertind[1];
 						surfacePointsIdentified=2;
 					} else {
-						for (auto vertCurr : meshin.edges.isearch(edgeCurr)->vertind){
+						for (auto vertCurr : meshin.edges.isearch(edgeCurr)
+							->vertind)
+						{
 							if(vertCurr!=surfacePoints[0] 
 								&& vertCurr!=surfacePoints[1]
 								&& !(meshhelp::IsVerticesDistance0(meshin, 
@@ -4929,11 +4951,13 @@ namespace meshhelp {
 					}
 				}
 				if(surfacePointsIdentified!=3){
-					// if the surface has less than 3 non-coincident points it is 
-					// degenerate and equivalent to an edge. It does not invalidate or
-					// validate the candidate
-					int jj=meshin.surfs.isearch(surfCurr)->voluind[0]==volumeCandidate;
-					alternateVolume = meshin.surfs.isearch(surfCurr)->voluind[jj];
+					// if the surface has less than 3 non-coincident points it 
+					// is degenerate and equivalent to an edge. It does not 
+					// invalidate or validate the candidate
+					int jj=meshin.surfs.isearch(surfCurr)->voluind[0]
+						==volumeCandidate;
+					alternateVolume = meshin.surfs.isearch(surfCurr)
+						->voluind[jj];
 					continue;
 				}
 				// candidate is valid if it has one non-degenerate face
@@ -4964,7 +4988,8 @@ namespace meshhelp {
 			nVolusExplored++;
 		} while (!isInCandidate && nVolusExplored<nVolus);
 		if (!isInCandidate){
-			RSVS3D_ERROR_LOGIC("Algorithm did not find the cell in which the vertex lies.");
+			RSVS3D_ERROR_LOGIC("Algorithm did not find the cell in which the"
+				" vertex lies.");
 		}
 		#ifdef RSVS_DIAGNOSTIC_RESOLVED
 		cout << nVolusExplored << " ";

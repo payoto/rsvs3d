@@ -7,7 +7,8 @@
 
 
 // Functions
-void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge,
+	int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 	int ii;
 
@@ -21,8 +22,9 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge, int *nVolu, int *n
 	}
 }
 
-int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
-	const std::vector<int> &voluList, const std::vector<int> &vertList){
+int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
+		int nVertDat, const std::vector<int> &voluList,
+		const std::vector<int> &vertList){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,nCoord;

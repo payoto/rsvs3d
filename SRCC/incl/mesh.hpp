@@ -19,13 +19,12 @@
 #endif
 #endif
 
-//=================================
-// forward declared dependencies
-// 		class foo; //when you only need a pointer not the actual object
-// 		and to avoid circular dependencies
+//------------------------------------------------------------------------------
+// forward declared dependencies class foo; //when you only need a pointer not
+// the actual object and to avoid circular dependencies
 
 
-//=================================
+//------------------------------------------------------------------------------
 // included dependencies
 #ifdef DBG_MEMLEAK
 #define _CRTDBG_MAP_ALLOC  
@@ -47,10 +46,9 @@
 
 #include "arraystructures.hpp"
 
-//==================================
-// Code
-// NOTE: function in a class definition are IMPLICITELY INLINED 
-//       ie replaced by their code at compile time
+//------------------------------------------------------------------------------
+// Code NOTE: function in a class definition are IMPLICITELY INLINED ie replaced
+// by their code at compile time
 using namespace std;
 
 
@@ -81,7 +79,7 @@ namespace grid {
 
 
 class coordvec {
-	// Handles the use and norm of a vector for which the norm and the unit 
+	// Handles the use and norm of a vector for which the norm and the unit
 	// value might be needed
 protected:
 	vector<double> elems;
@@ -137,8 +135,11 @@ public:
 };
 
 
-class meshpart : public ArrayStructpart { // Abstract class to ensure interface is correct
-	public : 
+/**
+ * @brief      /Abstract class to ensure interface is correct
+ */
+class meshpart : public ArrayStructpart { 
+public : 
 	virtual void disptree(const mesh &meshin, int n) const =0 ;
 
 };
@@ -216,8 +217,9 @@ protected:
 public:
 	friend class mesh;
 	friend surfarray;
-	//friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd, vector<int> scopeInd);
-	//friend void mesh::RemoveIndex(int typeInd, int oldInd);
+	// friend void mesh::SwitchIndex(int typeInd, int oldInd, int newInd,
+	// vector<int> scopeInd); friend void mesh::RemoveIndex(int typeInd, int
+	// oldInd);
 
 	double fill,target,error,area;
 	vector<int> edgeind;
@@ -305,7 +307,8 @@ public:
 		}
 		sort(surfind);unique(surfind);
 	};
-	void GeometricProperties(const mesh *meshin, coordvec &centre, double &length) const;
+	void GeometricProperties(const mesh *meshin, coordvec &centre,
+		double &length) const;
 	double Length(const mesh &meshin) const;
 	double LengthSquared(const mesh &meshin) const;
 	bool IsLength0(const mesh &meshin, double eps=__DBL_EPSILON__) const;
@@ -426,7 +429,8 @@ protected:
 	vector<mesh*> parentmesh; // use references as cannot be null
 	vector<mesh*> childmesh;
 	vector<HashedVectorSafe<int,int>> parentconn;
-	// These methods are protected to avoid broken/uni-directional connectivities being generated
+	// These methods are protected to avoid broken/uni-directional
+	// connectivities being generated
 	int AddParent(mesh* meshin);
 	int AddChild(mesh* meshin);
 	void AddParent(mesh* meshin, vector<int> &parentind);
@@ -464,7 +468,8 @@ public:
 	void AddParent(mesh* meshin, vector<int> &parentind);
 	void AddChild(mesh* meshin, vector<int> &parentind);
 	void SetMeshDepElm();
-	void MaintainLineage();// Method needed to robustly maintain lineage through the family.
+	// Method needed to robustly maintain lineage through the family.
+	void MaintainLineage();
 	int CountParents() const;
 	int SurfInParent(int surfind) const;
 	void SurfInParent(vector<int> &listInParent) const;
