@@ -20,6 +20,10 @@ namespace param{
 	class files;
 }
 
+namespace tetgen{
+	class apiparam;
+}
+
 //=================================
 // included dependencies
 
@@ -32,9 +36,10 @@ namespace param{
 // Code
 // 
 // This file defines the functions required to convert the
-// parameter structure to json
+// various classes to json
 
-using nlohmann::json;
+
+using json = nlohmann::json;
 namespace param {
 	template<class T>
 	void to_json(json& j, const filltype<T>& p);
@@ -67,9 +72,15 @@ namespace param {
 
 	void to_json(json& j, const files& p);
 	void from_json(const json& j, files& p); 
-
+}
+namespace rsvsjson {
 	void flatupdate(json& jfin, json& jnew,
 		bool isFlatFin, bool isFlatNew);
 }
+namespace tetgen {
+	void to_json(json& j, const apiparam& p);
+	void from_json(const json& j, apiparam& p); 
+}
+
 
 #endif

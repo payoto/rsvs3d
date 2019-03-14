@@ -138,6 +138,17 @@ namespace tetgen {
 
 		// Commmand line string to be passed to tetgen
 		std::string command;
+
+		void ReadJsonString(const std::string &jsonStr);
+
+		/**
+		 * @brief      Constructs the object from a json string.
+		 *
+		 * @param[in]  jsonStr  The json string
+		 */
+		apiparam(const std::string &jsonStr) {
+			this->ReadJsonString(jsonStr);
+		}
 	};
 
 

@@ -11,11 +11,9 @@
 
 #include "json.hpp"
 #include "parameters.hpp"
-#include "parameters2json.hpp"
+#include "rsvsjson.hpp"
 #include "warning.hpp"
-
-
-using nlohmann::json;
+#include "tetgenrsvs.hpp"
 
 
 //===========================================
@@ -318,6 +316,7 @@ void param::from_json(const json& j, ioout& p){
 
 param::files::files(){
 	this->appcasename2outdir=true;
+	this->exportconfig = {{"", ""}};
 }
 void param::files::PrepareForUse(){
 	this->ioout.PrepareForUse();
@@ -334,12 +333,14 @@ void param::to_json(json& j, const files& p){
 		{"ioin", p.ioin},
 		{"ioout", p.ioout},
 		{"appcasename2outdir", p.appcasename2outdir},
+		{"exportconfig", p.exportconfig},
 	};
 }
 void param::from_json(const json& j, files& p){
 	j.at("ioin").get_to(p.ioin);
 	j.at("ioout").get_to(p.ioout);
 	j.at("appcasename2outdir").get_to(p.appcasename2outdir);
+	p.exportconfig=j.at("exportconfig").get<param::exports>();
 }
 
 //===========================================
@@ -372,29 +373,6 @@ void param::from_json(const json& j, parameters& p){
 // io
 //================================
 
-void param::flatupdate(json& jfin, json& jnew,
-	bool isFlatFin, bool isFlatNew){
-	/*
-	Allows recursing updae into sub fields
-	*/
-	// std::cout << "file read " << std::endl;
-	if(!isFlatNew){
-		jnew = jnew.flatten();
-	}
-	if(!isFlatFin){
-		jfin = jfin.flatten();
-	}
-		// std::cout << "j unflattened " << std::endl;
-		// std::cout << jnew.dump(1) << std::endl;
-		// std::cout << jfin.dump(1) << std::endl;
-	// Insert values read into the parameter structure
-	jfin.update(jnew);
-		// std::cout << "jfin updated " << std::endl;
-		// std::cout << jfin.dump(1) << std::endl;
-	jfin = jfin.unflatten();
-	jnew = jnew.unflatten();
-}
-
 
 void param::io::read(const std::string &fileName, parameters &p){
 	std::ifstream file;
@@ -415,7 +393,7 @@ void param::io::read(const std::string &fileName, parameters &p){
 	}
 
 	// Insert values read into the parameter structure
-	param::flatupdate(j_fin,j,false, false);
+	rsvsjson::flatupdate(j_fin,j,false, false);
 	
 	param::from_json(j_fin,p);
 }
@@ -489,7 +467,8 @@ int param::io::updatefromstring(const std::vector<std::string> &flatjsonKeyVal,
 		if(pos==std::string::npos){ // if separator was found
 			std::cerr << "Warning in: " << std::endl << "  "
 				 << __PRETTY_FUNCTION__ << std::endl;
-			std::cerr << "  Separator " << sep << " Was not found in JSON key/val: " 
+			std::cerr << "  Separator " << sep 
+				<< " Was not found in JSON key/val: " 
 				<< keyVal << std::endl << std::endl;
 			++numFail;
 			continue;
@@ -664,7 +643,6 @@ int param::test::prepareforuse(){
 
 	return(0);
 }
-
 
 int param::test::autoflat(){
 	param::parameters params, params2;

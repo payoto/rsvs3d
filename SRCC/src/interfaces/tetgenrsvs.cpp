@@ -15,6 +15,7 @@
 #include "meshrefinement.hpp"
 #include "meshprocessing.hpp"
 #include "tetgenrsvs.hpp"
+#include "rsvsjson.hpp"
 
 void tetgen::internal::MeshData2Tetgenio(const mesh &meshgeom, 
 	tetgen::io_safe &tetin,	int facetOffset, int pointOffset, 
@@ -1347,6 +1348,47 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 	for (int i = startPnt; i < startPnt+numPnt; ++i)	{
 		this->facetmarkerlist[i] = marker;
 	}
+}
+
+
+//================================
+// Tetgen to json
+//================================
+
+void tetgen::to_json(json& j, const tetgen::apiparam& p){
+	j = json{
+		{"lowerB", p.lowerB},
+		{"upperB", p.upperB},
+		{"edgelengths", p.edgelengths},
+		{"distanceTol", p.distanceTol},
+		{"generateMeshInside", p.generateMeshInside},
+		{"command", p.command}
+	};
+}
+void tetgen::from_json(const json& j, tetgen::apiparam& p){
+	j.at("lowerB").get_to(p.lowerB);
+	j.at("upperB").get_to(p.upperB);
+	p.edgelengths=j.at("edgelengths").get<std::vector<double>>();
+	j.at("distanceTol").get_to(p.distanceTol);
+	j.at("generateMeshInside").get_to(p.generateMeshInside);
+	p.command=j.at("command").get<std::string>();
+}
+
+void tetgen::apiparam::ReadJsonString(const std::string &jsonStr){
+	json j=json::parse(jsonStr);
+	json jparam = *this;
+
+	try{
+		j = j.unflatten();
+	} catch (std::exception const& ex) {
+		// if j is already not flat catch the exception and move on
+		// TODO check the correct exception is being thrown (one day)
+	}
+
+	rsvsjson::flatupdate(jparam, j, false, false);
+
+	*this = jparam.get<tetgen::apiparam>();
+
 }
 
 // Test code

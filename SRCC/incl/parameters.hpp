@@ -27,7 +27,8 @@
 
 
 namespace param {
-	typedef std::array<double,2> realbounds; 
+	typedef std::array<double,2> realbounds;
+	typedef std::vector<std::pair<std::string,std::string>> exports;
 	template <class T>
 	struct filltype {
 		bool active=false;
@@ -163,6 +164,7 @@ namespace param {
 		bool appcasename2outdir;
 		ioin ioin;
 		ioout ioout;
+		exports exportconfig;
 		files();
 		void PrepareForUse();
 	};
