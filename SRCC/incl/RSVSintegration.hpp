@@ -112,6 +112,7 @@ namespace integrate {
 			double totT, int nVoluZone, int stepNum);
 		void PostProcessing(RSVSclass &RSVSobj,
 			double totT, int nVoluZone, int stepNum);
+		void Exporting(RSVSclass &RSVSobj);
 
 		namespace logging{
 			// Log only convergence data
@@ -149,6 +150,14 @@ namespace integrate {
 				tecplotfile &outSnake, snake &rsvsSnake,
 				triangulation &rsvsTri, mesh &voluMesh,
 				double totT, int nVoluZone, int stepNum);
+		}
+
+		namespace exporting {
+			void SU2(
+				std::string exportStr,
+				snake &rsvsSnake,
+				param::parameters &paramconf);
+
 		}
 	}
 

@@ -464,14 +464,7 @@ void integrate::prepare::Output(
 	std::string outSnakeName;
 	
 	if (paramconf.files.ioout.outdir.size()!=0){
-		#ifdef USE_CSTD_FILESYSTEM
-		// use c++17 std library filesystem
-		const std::filesystem::path pathout=paramconf.files.ioout.outdir;
-		std::filesystem::create_directories(pathout);
-		#else
-		// else use boost
-		boost::filesystem::create_directories(paramconf.files.ioout.outdir);
-		#endif
+		filesystem::create_directories(paramconf.files.ioout.outdir);
 	}
 	outSnakeName = paramconf.files.ioout.outdir + "/";
 	outSnakeName += "rsvs3D_" + paramconf.files.ioout.pattern + ".plt";
@@ -530,7 +523,8 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 	// std::cerr << " cerr Buffer restored" << std::endl;
 }
 
-integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &RSVSobj){
+integrate::iteratereturns integrate::execute::RSVSiterate(
+	integrate::RSVSclass &RSVSobj){
 
 	vector<double> dt;
 	vector<int> isImpact;
@@ -614,6 +608,10 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 
+	auto limrsvs = RSVSobj.rsvsSnake.Scale(
+			RSVSobj.paramconf.grid.physdomain
+		);
+
 	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
 		integrate::execute::postprocess::Snake(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
@@ -636,7 +634,31 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
 			totT, nVoluZone, stepNum);
 	}
+
+	RSVSobj.rsvsSnake.Scale(limrsvs);
 }
+
+void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
+
+	for (auto exportType : RSVSobj.paramconf.files.exportconfig){
+
+		if(exportType.first.compare("su2"))
+		{
+			integrate::execute::exporting::SU2(
+				exportType.second, RSVSobj.rsvsSnake, RSVSobj.paramconf
+				);
+		} else 
+		{
+			RSVS3D_ERROR_NOTHROW((
+				std::string("The export argument '") + exportType.first
+				+ "' is not known. Check <input file>.json for parameter : "
+				"/files/exportconfig/..."
+				).c_str());
+		}
+
+	}
+}
+
 // ====================
 // integrate
 // 		execute
@@ -745,7 +767,6 @@ void integrate::execute::postprocess::Snake(
 	fileToOpen=paramconf.files.ioout.outdir + "/";
 	fileToOpen += "Snake_" + paramconf.files.ioout.pattern + ".3snk";
 	rsvsSnake.write(fileToOpen.c_str());
-
 }
 
 void integrate::execute::postprocess::FullTecplot(
@@ -756,6 +777,34 @@ void integrate::execute::postprocess::FullTecplot(
 	integrate::execute::logging::FullTecplot(
 		outSnake, rsvsSnake, rsvsTri, voluMesh,
 		totT, nVoluZone, stepNum);
+}
+
+// ====================
+// integrate
+// 		execute
+// 			exporting
+// ====================
+
+void integrate::execute::exporting::SU2(std::string su2ConfStr,
+	snake &rsvsSnake, param::parameters &paramconf){
+
+	std::string su2Path = "", patternReplace = "<pattern>";
+	std::string su2FileStr = su2ConfStr.substr(0, su2ConfStr.find(","));
+	// Make correct file path relative to the output directory 
+	su2Path += paramconf.files.ioout.outdir + "/";
+
+	auto patternIt = su2FileStr.find(patternReplace);
+	if(patternIt < su2FileStr.size()){
+		su2Path += su2FileStr.substr(0, patternIt) 
+			+ paramconf.files.ioout.pattern
+			+ su2FileStr.substr(patternIt+patternReplace.size());
+	}
+
+	const filesystem::path pathout=su2Path;
+	filesystem::create_directories(pathout.parent_path());
+
+	tetgen::apiparam su2MeshParam(su2ConfStr.substr(su2ConfStr.find(",")));
+	tetgen::SnakeToSU2(rsvsSnake, su2Path, su2MeshParam);
 }
 
 // ===================
@@ -778,15 +827,18 @@ int integrate::test::Prepare(){
 	try {
 		integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);
 	} catch (exception const& ex) { 
-		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);" << endl;
+		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, "
+			"voluMesh);" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 
 	
 	try {
-		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs, snakeMesh,voluMesh,  rsvsSnake);
+		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs,
+			snakeMesh,voluMesh,  rsvsSnake);
 	} catch (exception const& ex) { 
-		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh, rsvsSnake);" << endl;
+		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh,"
+			" rsvsSnake);" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 

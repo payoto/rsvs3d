@@ -140,7 +140,7 @@ namespace tetgen {
 		std::string command;
 
 		void ReadJsonString(const std::string &jsonStr);
-
+		apiparam() = default;
 		/**
 		 * @brief      Constructs the object from a json string.
 		 *

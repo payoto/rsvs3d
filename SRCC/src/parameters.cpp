@@ -13,7 +13,6 @@
 #include "parameters.hpp"
 #include "rsvsjson.hpp"
 #include "warning.hpp"
-#include "tetgenrsvs.hpp"
 
 
 //===========================================
@@ -422,7 +421,7 @@ void param::io::readflat(const std::string &fileName, parameters &p){
 	// std::cout << "jfin assigned " << std::endl;
 	file >> jnew;
 	file.close();
-	param::flatupdate(jfin,jnew,false, true);
+	rsvsjson::flatupdate(jfin,jnew,false, true);
 	// p=jfin;
 	param::from_json(jfin,p);
 
