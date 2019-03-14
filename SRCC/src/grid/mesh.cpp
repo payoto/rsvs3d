@@ -3900,9 +3900,9 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 	/*
 	Scale the mesh to be in the range domain where domain is a 2D array:
 	[
-	x [lb ub]
-	y [lb ub]
-	z [lb ub]
+		x [lb ub]
+		y [lb ub]
+		z [lb ub]
 	]
 	*/
 	std::array<std::array<double, 2>,3> currDomain;

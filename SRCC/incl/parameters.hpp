@@ -113,7 +113,7 @@ namespace param {
 		// Domain size
 		std::array<realbounds, 3> domain;
 		// Internal stretching of the meshes
-		std::array<double, 3> stretch;
+		std::array<realbounds, 3> physdomain;
 		std::string activegrid;
 		
 		grid();

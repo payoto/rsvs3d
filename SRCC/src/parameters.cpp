@@ -187,9 +187,10 @@ param::grid::grid(){
 	for(int i=0; i<3; ++i){
 		this->domain[i][0]=0.0;
 		this->domain[i][1]=1.0;
+		this->physdomain[i][0]=0.0;
+		this->physdomain[i][1]=1.0;
 	}
 
-	this->stretch = {1.0, 1.0, 1.0};
 	this->activegrid = "voxel";
 }
 void param::to_json(json& j, const grid& p){
@@ -197,7 +198,7 @@ void param::to_json(json& j, const grid& p){
 		{"domain", p.domain},
 		{"voxel", p.voxel},
 		{"voronoi", p.voronoi},
-		{"stretch", p.stretch},
+		{"physdomain", p.physdomain},
 		{"activegrid", p.activegrid},
 	};
 }
@@ -205,7 +206,7 @@ void param::from_json(const json& j, grid& p){
 	j.at("domain").get_to(p.domain);
 	j.at("voxel").get_to(p.voxel);
 	j.at("voronoi").get_to(p.voronoi);
-	j.at("stretch").get_to(p.stretch);
+	j.at("physdomain").get_to(p.physdomain);
 	j.at("activegrid").get_to(p.activegrid);
 }
 void param::grid::PrepareForUse(){
