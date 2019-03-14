@@ -38,48 +38,51 @@ namespace tetgen{
 // This file defines the functions required to convert the
 // various classes to json
 
-
-using json = nlohmann::json;
+namespace rsvsjson{
+	using json = nlohmann::json;
+}
 namespace param {
+
 	template<class T>
-	void to_json(json& j, const filltype<T>& p);
+	void to_json(rsvsjson::json& j, const filltype<T>& p);
 	template<class T>
-	void from_json(const json& j, filltype<T>& p); 
+	void from_json(const rsvsjson::json& j, filltype<T>& p); 
 
-	void to_json(json& j, const rsvs& p);
-	void from_json(const json& j, rsvs& p); 	
+	void to_json(rsvsjson::json& j, const rsvs& p);
+	void from_json(const rsvsjson::json& j, rsvs& p); 	
 
-	void to_json(json& j, const snaking& p);
-	void from_json(const json& j, snaking& p); 
+	void to_json(rsvsjson::json& j, const snaking& p);
+	void from_json(const rsvsjson::json& j, snaking& p); 
 
-	void to_json(json& j, const voxel& p);
-	void from_json(const json& j, voxel& p);
+	void to_json(rsvsjson::json& j, const voxel& p);
+	void from_json(const rsvsjson::json& j, voxel& p);
 
-	void to_json(json& j, const voronoi& p);
-	void from_json(const json& j, voronoi& p);
+	void to_json(rsvsjson::json& j, const voronoi& p);
+	void from_json(const rsvsjson::json& j, voronoi& p);
 
-	void to_json(json& j, const grid& p);
-	void from_json(const json& j, grid& p); 
+	void to_json(rsvsjson::json& j, const grid& p);
+	void from_json(const rsvsjson::json& j, grid& p); 
 	
-	void to_json(json& j, const parameters& p);
-	void from_json(const json& j, parameters& p); 
+	void to_json(rsvsjson::json& j, const parameters& p);
+	void from_json(const rsvsjson::json& j, parameters& p); 
 
-	void to_json(json& j, const ioin& p);
-	void from_json(const json& j, ioin& p); 
+	void to_json(rsvsjson::json& j, const ioin& p);
+	void from_json(const rsvsjson::json& j, ioin& p); 
 
-	void to_json(json& j, const ioout& p);
-	void from_json(const json& j, ioout& p); 
+	void to_json(rsvsjson::json& j, const ioout& p);
+	void from_json(const rsvsjson::json& j, ioout& p); 
 
-	void to_json(json& j, const files& p);
-	void from_json(const json& j, files& p); 
+	void to_json(rsvsjson::json& j, const files& p);
+	void from_json(const rsvsjson::json& j, files& p); 
 }
 namespace rsvsjson {
 	void flatupdate(json& jfin, json& jnew,
 		bool isFlatFin, bool isFlatNew);
 }
 namespace tetgen {
-	void to_json(json& j, const apiparam& p);
-	void from_json(const json& j, apiparam& p); 
+
+	void to_json(rsvsjson::json& j, const apiparam& p);
+	void from_json(const rsvsjson::json& j, apiparam& p); 
 }
 
 

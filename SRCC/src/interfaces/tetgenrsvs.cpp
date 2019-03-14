@@ -17,6 +17,8 @@
 #include "tetgenrsvs.hpp"
 #include "rsvsjson.hpp"
 
+using json = rsvsjson::json;
+
 void tetgen::internal::MeshData2Tetgenio(const mesh &meshgeom, 
 	tetgen::io_safe &tetin,	int facetOffset, int pointOffset, 
 	int pointMarker, const std::vector<double> &pointMtrList,
@@ -1374,6 +1376,7 @@ void tetgen::from_json(const json& j, tetgen::apiparam& p){
 	p.command=j.at("command").get<std::string>();
 }
 
+
 void tetgen::apiparam::ReadJsonString(const std::string &jsonStr){
 	json j=json::parse(jsonStr);
 	json jparam = *this;
@@ -1387,8 +1390,8 @@ void tetgen::apiparam::ReadJsonString(const std::string &jsonStr){
 
 	rsvsjson::flatupdate(jparam, j, false, false);
 
-	*this = jparam.get<tetgen::apiparam>();
 
+	*this = jparam.get<tetgen::apiparam>();
 }
 
 // Test code
@@ -1438,8 +1441,56 @@ void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh,
 }
 
 int tetgen::test::api(){
+	int errCount = 0;
+	{
+		tetgen::apiparam p1, p2;
+		json j1, j2;
 
-	return(tetgen::test::call());
+		p1.distanceTol=1.0;
+
+
+		j1 = p1;
+		p2 = j1;
+		j2 = p2;
+
+		if(j1!=j2){
+			RSVS3D_ERROR_NOTHROW(" Assignement operator not symmetric");
+			errCount++;
+		} else {
+			std::cout << "Assignement passed " << std::endl;
+		}
+	}
+	{
+		tetgen::apiparam p1(
+			R"foo(
+			{
+				"/distanceTol":2.0,
+				"/edgelengths/2":2.0
+			}
+			)foo");
+		tetgen::apiparam p2;
+		json j1, j2;
+		
+
+		if(p1.distanceTol!=2.0){
+			RSVS3D_ERROR_NOTHROW(" JSON Constructor not working for"
+				" distanceTol");
+			errCount++;
+		} else {
+			std::cout << "Constructor passed " << std::endl;
+		}
+		if(p1.edgelengths.size()!=3){
+			RSVS3D_ERROR_NOTHROW(" JSON Constructor operator not "
+				"working for vector beyond bounds");
+			std::cerr << "edgelengths.size " << p1.edgelengths.size() 
+				<< std::endl;
+			errCount++;
+		} else {
+			std::cout << "Constructor passed " << std::endl;
+		}
+	}
+
+	return(errCount);
 }
 
 int tetgen::test::CFD()

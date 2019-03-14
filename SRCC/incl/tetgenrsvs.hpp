@@ -126,27 +126,34 @@ namespace tetgen {
 	class apiparam {
 	public:
 		/// Lower domain bound
-		std::array<double,3> lowerB={0.0,0.0,0.0};
+		std::array<double,3> lowerB;
 		/// Upper domain bound 
-		std::array<double,3> upperB={1.0, 1.0, 1.0}; 
+		std::array<double,3> upperB; 
 		/// Controls the edgelengths at regular intervals 
-		std::vector<double> edgelengths={0.03, 1.0};
+		std::vector<double> edgelengths;
 		/// Distance tolerance 
-		double distanceTol = 0.3; 
+		double distanceTol; 
 		// mesh the inside of the geometry? (or the outside)
-		bool generateMeshInside = false;
+		bool generateMeshInside;
 
 		// Commmand line string to be passed to tetgen
 		std::string command;
 
 		void ReadJsonString(const std::string &jsonStr);
-		apiparam() = default;
+		apiparam(){
+			this->lowerB={0.0,0.0,0.0};
+			this->upperB={1.0, 1.0, 1.0};
+			this->edgelengths={0.03, 1.0};
+			this->distanceTol = 0.3;
+			this->generateMeshInside = false;
+			this->command="";
+		}
 		/**
 		 * @brief      Constructs the object from a json string.
 		 *
 		 * @param[in]  jsonStr  The json string
 		 */
-		apiparam(const std::string &jsonStr) {
+		apiparam(const std::string &jsonStr) : apiparam() {
 			this->ReadJsonString(jsonStr);
 		}
 	};

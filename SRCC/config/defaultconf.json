@@ -1,6 +1,12 @@
 {
   "files": {
     "appcasename2outdir": true,
+    "exportconfig": [
+      [
+        "",
+        ""
+      ]
+    ],
     "ioin": {
       "casename": "",
       "snakemeshname": "",
@@ -36,10 +42,19 @@
         1.0
       ]
     ],
-    "stretch": [
-      1.0,
-      1.0,
-      1.0
+    "physdomain": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
     ],
     "voronoi": {
       "distancebox": 0.1,

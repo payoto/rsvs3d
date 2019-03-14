@@ -1,6 +1,6 @@
 #include "rsvsjson.hpp"
 
-void rsvsjson::flatupdate(json& jfin, json& jnew,
+void rsvsjson::flatupdate(rsvsjson::json& jfin, rsvsjson::json& jnew,
 	bool isFlatFin, bool isFlatNew){
 	/*
 	Allows recursing update into sub fields

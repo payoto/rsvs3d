@@ -9,7 +9,6 @@
 #include <ctime>
 #include <sstream>
 
-#include "json.hpp"
 #include "parameters.hpp"
 #include "rsvsjson.hpp"
 #include "warning.hpp"
@@ -18,7 +17,7 @@
 //===========================================
 // Bounds template class method definitions
 //===========================================
-
+using json = rsvsjson::json;
 template<class T>
 void param::to_json(json& j, const filltype<T>& p){
 	j = json{
