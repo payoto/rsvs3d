@@ -3887,16 +3887,16 @@ int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
 	return(nBlocks);
 }
 
-void mesh::Scale(){
-	std::array<std::array<double, 2>,3> domain;
+grid::transformation mesh::Scale(){
+	grid::limits domain;
 	for (int i = 0; i < 3; ++i)
 	{
 		domain[i]={0.0, 1.0};
 	}
-	this->Scale(domain);
+	return this->Scale(domain);
 }
 
-void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
+grid::transformation mesh::Scale(const grid::limits &domain){
 	/*
 	Scale the mesh to be in the range domain where domain is a 2D array:
 	[
@@ -3905,27 +3905,18 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 		z [lb ub]
 	]
 	*/
-	std::array<std::array<double, 2>,3> currDomain;
-	std::array<std::array<double, 3>,3> transformation;
+
+	// ``transformation`` stores for each dimension:
+	// {new min, old min, multiplier}
+	grid::transformation transformation;
 	int nVerts, ii, jj;
 
+	grid::limits currDomain = this->BoundingBox();
 
 	nVerts = int(this->verts.size());
 
 	// Find the current range of values of the grid
-	for (int i = 0; i < 3; ++i)
-	{
-		currDomain[i]={std::numeric_limits<double>::infinity(), 
-			-std::numeric_limits<double>::infinity()};
-	}
-	for(ii=0; ii<nVerts; ++ii){
-		for(jj=0; jj<3; ++jj){
-			currDomain[jj][0]= currDomain[jj][0] <= this->verts(ii)->coord[jj] ?
-				currDomain[jj][0]:this->verts(ii)->coord[jj];
-			currDomain[jj][1]= currDomain[jj][0] >= this->verts(ii)->coord[jj] ?
-				currDomain[jj][1]:this->verts(ii)->coord[jj];
-		}
-	}
+
 
 	// Calculate modification parameters
 	for (int i = 0; i < 3; ++i)
@@ -3948,23 +3939,35 @@ void mesh::Scale(const std::array<std::array<double, 2>,3> &domain){
 				*transformation[jj][2]);
 		}
 	}
+	return transformation;
+}
+
+grid::limits mesh::BoundingBox() const{
+	int nVerts = this->verts.size();
+	grid::limits currDomain;
+	for (int i = 0; i < 3; ++i)
+	{
+		currDomain[i]={std::numeric_limits<double>::infinity(), 
+			-std::numeric_limits<double>::infinity()};
+	}
+	for(int ii=0; ii<nVerts; ++ii){
+		for(int jj=0; jj<3; ++jj){
+			currDomain[jj][0]= currDomain[jj][0] <= this->verts(ii)->coord[jj] ?
+				currDomain[jj][0]:this->verts(ii)->coord[jj];
+			currDomain[jj][1]= currDomain[jj][0] >= this->verts(ii)->coord[jj] ?
+				currDomain[jj][1]:this->verts(ii)->coord[jj];
+		}
+	}
+	return (currDomain);
 }
 
 void mesh::ReturnBoundingBox(std::array<double,3> &lowerB, 
-	std::array<double,3> &upperB){
-	int count = this->verts.size();
-
-	lowerB.fill(INFINITY);
-	upperB.fill(-INFINITY);
-	for (int i = 0; i < count; ++i)
+	std::array<double,3> &upperB) const{
+	grid::limits currDomain = this->BoundingBox();
+	for (int i = 0; i < 3; ++i)
 	{
-		for (int j = 0; j < 3; ++j)
-		{
-			lowerB[j] = lowerB[j] < this->verts(i)->coord[j] ?
-				lowerB[j] : this->verts(i)->coord[j];
-			upperB[j] = upperB[j] > this->verts(i)->coord[j] ?
-				upperB[j] : this->verts(i)->coord[j];
-		}
+		lowerB[i]=currDomain[i][0];
+		upperB[i]=currDomain[i][1];
 	}
 }
 

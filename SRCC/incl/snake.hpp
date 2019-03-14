@@ -122,6 +122,7 @@ public:
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
 	void Flip(); // reverses snake directions
+	void Scale(const meshlimits &newSize);
 	// Snake connectivity operations
 	void OrderEdges();
 	void SetSnaxSurfs() {}

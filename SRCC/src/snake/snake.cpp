@@ -1326,6 +1326,11 @@ int snake::FindBlockSnakeMeshVerts(vector<int> &vertBlock) const{
 	}
 	return(nBlocks);
 }
+void snake::Scale(const meshlimits &newSize){
+
+	this->snakemesh->Scale(newSize);
+	this->UpdateCoord();
+}
 
 
 

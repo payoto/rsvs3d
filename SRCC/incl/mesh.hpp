@@ -34,6 +34,7 @@
 #endif //DBG_MEMLEAK
 
 #include <iostream>
+#include <array>
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
@@ -69,7 +70,10 @@ typedef ModiftrackArray<surf> surfarray;
 typedef ArrayStruct<volu> voluarray;
 typedef ModiftrackArray<edge> edgearray;
 typedef ArrayStruct<vert> vertarray;
-
+namespace grid {
+	typedef std::array<std::array<double, 2>,3> limits;
+	typedef std::array<std::array<double, 3>,3> transformation;
+}
 // Forward declared templated functions
 
 // Base class
@@ -546,11 +550,12 @@ public:
  	vector<int> VertexInVolume(const vector<double> testVertices,
  		int sizeVert=3) const; 
 	// Mesh size and position
-	void Scale();
-	void Scale(const std::array<std::array<double, 2>,3> &domain);
+	grid::transformation Scale();
+	grid::transformation Scale(const grid::limits &domain);
 	void LoadTargetFill(const std::string &fileName);
+	grid::limits BoundingBox() const;
 	void ReturnBoundingBox(std::array<double,3> &lowerB, 
-		std::array<double,3> &upperB);
+		std::array<double,3> &upperB) const ;
 	// Mesh Splitting and cropping
 	void Crop(vector<int> indList, int indType=1);
 	vector<int> AddBoundary(const vector<double> &lb, const vector<double> &ub);
