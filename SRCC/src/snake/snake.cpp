@@ -248,7 +248,7 @@ void snake::write(FILE *fid) const {
 int snake::read(const char *str) {
    // Convenience read function taking a single char argument
 	FILE *fid;
-	fopen_s(&fid, str, "r");
+	fid = fopen( str, "r");
 	if (fid!=NULL){
 		this->read(fid);
 		fclose(fid);
@@ -260,7 +260,7 @@ int snake::read(const char *str) {
 }
 int snake::write(const char *str) const {
 	FILE *fid;
-	fopen_s(&fid, str, "w");
+	fid = fopen( str, "w");
 	if (fid!=NULL){
 		this->write(fid);
 		fclose(fid);
