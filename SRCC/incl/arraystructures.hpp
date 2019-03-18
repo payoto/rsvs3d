@@ -44,7 +44,7 @@
 #include <functional>
 #if defined(USE_BOOST) && defined(USE_STACKTRACE)
 	#include <boost/stacktrace.hpp>
-	using stacktrace=boost::stacktrace;
+	namespace stacktrace=boost::stacktrace;
 #endif
 
 

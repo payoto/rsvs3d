@@ -263,7 +263,8 @@ param::ioout::ioout(){
 
 void param::ioout::PrepareForUse(){
 
-	auto t = std::time(nullptr);
+	std::time_t t_ptr;
+	auto t = std::time(&t_ptr);
 	auto tm = *std::localtime(&t);
 	std::ostringstream oss;
 	if (this->pathoutdir.size()==0){
