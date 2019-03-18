@@ -31,6 +31,7 @@ SRCC/config/*
 
 # files which are of no relevance
 SRCC/noexec_rsvsconfig.json
+SRCC/tetgen-tmpfile*.vtk
 
 # Sublime text 
 *.sublime-workspace

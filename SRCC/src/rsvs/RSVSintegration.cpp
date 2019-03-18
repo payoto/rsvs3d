@@ -517,6 +517,7 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 
 	integrate::execute::PostProcessing(RSVSobj,
 		iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
+	integrate::execute::Exporting(RSVSobj);
 	std::cout.rdbuf(coutbuff);
 	std::cerr.rdbuf(cerrbuff);
 	// std::cout << std::endl <<  " cout Buffer restored" << std::endl;
@@ -640,9 +641,20 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 
 void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 
+	RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
+	auto &paramconf = RSVSobj.paramconf;
+	auto outSnakeName = paramconf.files.ioout.outdir + "/";
+	outSnakeName += "rsvs3D_export_" + paramconf.files.ioout.pattern + ".plt";
+	tecplotfile outSnake;
+	outSnake.OpenFile(outSnakeName.c_str());
+
+	outSnake.PrintSnake(RSVSobj.rsvsSnake);
+	outSnake.PrintMesh(*RSVSobj.rsvsSnake.snakemesh);
+	outSnake.PrintMesh(RSVSobj.voluMesh);
+
 	for (auto exportType : RSVSobj.paramconf.files.exportconfig){
 
-		if(exportType.first.compare("su2"))
+		if(exportType.first.compare("su2")==0)
 		{
 			integrate::execute::exporting::SU2(
 				exportType.second, RSVSobj.rsvsSnake, RSVSobj.paramconf
@@ -657,6 +669,8 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 		}
 
 	}
+
+	RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.domain);
 }
 
 // ====================
@@ -803,7 +817,7 @@ void integrate::execute::exporting::SU2(std::string su2ConfStr,
 	const filesystem::path pathout=su2Path;
 	filesystem::create_directories(pathout.parent_path());
 
-	tetgen::apiparam su2MeshParam(su2ConfStr.substr(su2ConfStr.find(",")));
+	tetgen::apiparam su2MeshParam(su2ConfStr.substr(su2ConfStr.find(",")+1));
 	tetgen::SnakeToSU2(rsvsSnake, su2Path, su2MeshParam);
 }
 

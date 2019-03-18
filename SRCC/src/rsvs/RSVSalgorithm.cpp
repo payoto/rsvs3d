@@ -110,14 +110,14 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	snakein.UpdateDistance(dt);
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
-	snakein.displight();
+	// snakein.displight();
 	// detect and remove impacts
 	snakein.SnaxImpactDetection(isImpact);
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
-	snakein.displight();
+	// snakein.displight();
 	// Remove one of the 'snakes'
 	if (snakein.Check3D()){
 		RemoveSnakeInVolu(snakein, voluSnaxDelete, outerBorder);
@@ -126,7 +126,7 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	}
 	snakein.PrepareForUse();
 	snakein.OrientFaces();
-	snakein.displight();
+	// snakein.displight();
 	
 	cout << "Initialisation DONE!" << endl;
 }

@@ -159,7 +159,7 @@ void tetgen::input::RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 	input file.
 	*/
 
-	mesh meshdomain ,meshdomain2, meshgeom;
+	mesh meshdomain, meshgeom;
 	triangulation triRSVS;
 	int nHoles;
 	// int nPtsHole, kk, count;
@@ -172,9 +172,15 @@ void tetgen::input::RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 	PrepareSnakeForCFD(snakein, tetgenParam.distanceTol, meshgeom, holeCoords);
 
 	meshgeom.ReturnBoundingBox(lowerB, upperB);
+	double distBound = tetgenParam.edgelengths.size()>0?
+		tetgenParam.edgelengths[0]: tetgenParam.distanceTol;
+	for (int i = 0; i < 3; ++i)
+	{
+		lowerB[i] -= distBound;
+		upperB[i] += distBound;
+	}
 	meshdomain = BuildCutCellDomain(tetgenParam.lowerB, tetgenParam.upperB,
 		lowerB, upperB, tetgenParam.edgelengths.size(), vertPerSubDomain);
-	
 	nHoles=holeCoords.size()/3;
 	tetgen::internal::Mesh2Tetgenio(meshgeom, meshdomain, tetin, nHoles);
 
@@ -1378,20 +1384,25 @@ void tetgen::from_json(const json& j, tetgen::apiparam& p){
 
 
 void tetgen::apiparam::ReadJsonString(const std::string &jsonStr){
-	json j=json::parse(jsonStr);
-	json jparam = *this;
 
-	try{
-		j = j.unflatten();
+	try {
+		json j=json::parse(jsonStr);
+		json jparam = *this;
+
+		try{
+			j = j.unflatten();
+		} catch (std::exception const& ex) {
+			// if j is already not flat catch the exception and move on
+			// TODO check the correct exception is being thrown (one day)
+		}
+		rsvsjson::flatupdate(jparam, j, false, false);
+
+		*this = jparam.get<tetgen::apiparam>();
 	} catch (std::exception const& ex) {
-		// if j is already not flat catch the exception and move on
-		// TODO check the correct exception is being thrown (one day)
+		RSVS3D_ERROR_NOTHROW((std::string("Unhandled error while parsing json"
+			" string into tetgen parameters: \n")+jsonStr).c_str());
+		throw ex;
 	}
-
-	rsvsjson::flatupdate(jparam, j, false, false);
-
-
-	*this = jparam.get<tetgen::apiparam>();
 }
 
 // Test code
