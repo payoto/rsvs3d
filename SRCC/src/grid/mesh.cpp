@@ -966,10 +966,10 @@ void volu::disp() const{
 	int i;
 	cout << "volu : index " << index << " | fill " << fill << ", "  <<
 	target << ", "<< error << " | isBorder " << isBorder 
-		<< " | surfind " << surfind.size();
+		<< " | surfind " << surfind.size() << ":";
 	if (surfind.size()<30){
 		for (i=0; unsigned_int(i)<surfind.size();i++){
-			cout << "-" << surfind[i];
+			cout << " " << surfind[i];
 		}
 	}
 	cout << endl;
@@ -979,13 +979,13 @@ void surf::disp() const{
 	int i;
 	cout << "surf : index " << index << " | fill " << fill  << ", " << 
 	target << ", "<< error << " | isBorder " << isBorder 
-		<< " | voluind " << voluind.size();
+		<< " | voluind " << voluind.size() << ":";
 	for (i=0; unsigned_int(i)<voluind.size();i++){
-		cout << "-" << voluind[i];
+		cout << " " << voluind[i];
 	}
-	cout << " | edgeind " << edgeind.size();
+	cout << " | edgeind " << edgeind.size() << ":";
 	for (i=0; unsigned_int(i)<edgeind.size();i++){
-		cout << "-" << edgeind[i];
+		cout << " " << edgeind[i];
 	}
 	cout << endl;
 }
@@ -993,13 +993,13 @@ void surf::disp() const{
 void edge::disp() const{
 	int i;
 	cout << "edge : index " << index << " | isBorder " << isBorder 
-		<< " | vertind " << vertind.size();
+		<< " | vertind " << vertind.size() << ":";
 	for (i=0; unsigned_int(i)<vertind.size();i++){
-		cout << "-" << vertind[i];
+		cout << " " << vertind[i];
 	}
-	cout << " | surfind " << surfind.size();
+	cout << " | surfind " << surfind.size() << ":";
 	for (i=0; unsigned_int(i)<surfind.size();i++){
-		cout << "-" << surfind[i];
+		cout << " " << surfind[i];
 	}
 	cout << endl;
 }
@@ -1007,13 +1007,13 @@ void edge::disp() const{
 void vert::disp() const{
 	int i;
 	cout << "vert : index " << index << " | isBorder " << isBorder 
-		<< " | edgeind " << edgeind.size();
+		<< " | edgeind " << edgeind.size()<< ":";
 	for (i=0; unsigned_int(i)<edgeind.size();i++){
-		cout << "-" << edgeind[i];
+		cout << " " << edgeind[i];
 	}
-	cout << " | coord " << coord.size();
+	cout << " | coord " << coord.size() << ":";
 	for (i=0; unsigned_int(i)<coord.size();i++){
-		cout << "-" << coord[i];
+		cout << " " << coord[i];
 	}
 	cout << endl;
 }
@@ -3968,7 +3968,7 @@ grid::limits mesh::BoundingBox() const{
 		for(int jj=0; jj<3; ++jj){
 			currDomain[jj][0]= currDomain[jj][0] <= this->verts(ii)->coord[jj] ?
 				currDomain[jj][0]:this->verts(ii)->coord[jj];
-			currDomain[jj][1]= currDomain[jj][0] >= this->verts(ii)->coord[jj] ?
+			currDomain[jj][1]= currDomain[jj][1] >= this->verts(ii)->coord[jj] ?
 				currDomain[jj][1]:this->verts(ii)->coord[jj];
 		}
 	}
