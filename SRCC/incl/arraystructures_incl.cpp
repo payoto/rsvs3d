@@ -39,6 +39,19 @@ template<class T> void DisplayVector(vector<T> vec)
 	}
 	cout << " | " ;
 }
+template<class T> void DisplayVectorStatistics(vector<T> vec)
+{
+	cout << int(vec.size()) << " - "; 
+	cout << *min_element(vec.begin(), vec.end()) 
+		<< " " << *max_element(vec.begin(), vec.end()) << " " ;
+	T s = 0;
+	for (auto& n : vec){
+    	s += n;
+	}
+	cout << s << " " << double(s)/double(vec.size());
+	cout << " | " ;
+}
+
 template<class T, class R> 
 R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, const vector<int> &subList)
 {

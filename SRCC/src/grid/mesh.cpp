@@ -42,15 +42,21 @@ double coordvec::operator()(int a) const
 
 coordvec coordvec::Unit() const 
 {
-	coordvec unitCoordVec;
-	for (int ii=0;ii<3;++ii){
-		unitCoordVec.elems[ii]=elems[ii]/norm;
-	}
-	unitCoordVec.norm=1;
-	unitCoordVec.isuptodate=1;
+	coordvec unitCoordVec=*this;
+	unitCoordVec.Normalize();
 	return (unitCoordVec);
 }
+double coordvec::Normalize(){
 
+	double oldNorm = this->GetNorm();
+
+	for (int ii=0;ii<3;++ii){
+		this->elems[ii]=this->elems[ii]/oldNorm;
+	}
+	this->norm=1;
+	this->isuptodate=1;
+	return oldNorm;
+}
 double coordvec::Unit(const int a) const
 {
 	#ifdef SAFE_ACCESS // adds a check in debug mode
@@ -207,6 +213,28 @@ double coordvec::angle(const coordvec &coordin) const {
 // Detects which volume (if any a point is in)
 
 /**
+ * @brief      Calculates a plane's normal vector
+ *
+ * @param[in]  planeVert1  The plane vertex 1
+ * @param[in]  planeVert2  The plane vertex 2
+ * @param[in]  planeVert3  The plane vertex 3
+ * @param      normal      The normal
+ * @param      temp1       The temporary 1
+ */
+void PlaneNormal(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1){
+
+	temp1 = planeVert1;
+	normal = planeVert1;
+	temp1.substractfrom(planeVert2);
+	normal.substractfrom(planeVert3);
+
+	normal = temp1.cross(normal.usedata()); // causes allocation
+
+}
+/**
  * @brief      Calculates the distance from a vertex to a plane.
  * calculates the distance from a plane to a vertex, with the plane
  * defined by three vertices. 
@@ -235,12 +263,8 @@ double VertexDistanceToPlane(const vector<double> &planeVert1,
 	if(testVertex.size()!=3){
 		RSVS3D_ERROR_ARGUMENT("testVertices.size() must be of size 3.");
 	}
-	temp1 = planeVert1;
-	temp2 = planeVert1;
-	temp1.substractfrom(planeVert2);
-	temp2.substractfrom(planeVert3);
 
-	temp2 = temp1.cross(temp2.usedata()); // causes allocation
+	PlaneNormal(planeVert1, planeVert2, planeVert3, temp2, temp1);
 
 	planeDistance = temp2.dot(testVertex)-temp2.dot(planeVert1);
 
@@ -359,6 +383,25 @@ vector<int> mesh::VertexInVolume(const vector<double> testVertices,
 	cout << endl ;
 	#endif
 	return vertVolumeIndices;
+}
+
+double PlanesDotProduct(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &planeVert4, 
+	const vector<double> &planeVert5,
+	const vector<double> &planeVert6,
+	bool normalize){
+
+	coordvec normal1, normal2, temp;
+
+	PlaneNormal(planeVert1,planeVert2, planeVert3, normal1, temp);
+	PlaneNormal(planeVert4,planeVert5, planeVert6, normal2, temp);
+	if(normalize){
+		normal1.Normalize();
+		normal2.Normalize();
+	}
+	return normal1.dot(normal2.usedata());
 }
 //// ----------------------------------------
 // Implementation of mesh dependence
@@ -1243,6 +1286,7 @@ void mesh::TightenConnectivity(){
 	surfs.TightenConnectivity();
 	edges.TightenConnectivity();
 	volus.TightenConnectivity();
+	this->facesAreOriented=false;
 }
 
 void mesh::SwitchIndex(int typeInd, int oldInd, int newInd,
@@ -3742,6 +3786,7 @@ void mesh::OrientSurfaceVolume(){
 			surfs.elems[ii].FlipVolus();
 		}
 	}
+	this->facesAreOriented=true;
 }
 
 int mesh::OrientRelativeSurfaceVolume(vector<int> &surfOrient){
@@ -4904,6 +4949,56 @@ namespace meshhelp {
 		return(edgeList);
 	}
 
+	/**
+	 * @brief      Gets 3 unique points in the surface.
+	 * 
+	 * These points are guaranteed to be separate
+	 *
+	 * @param[in]  meshin         The input mesh
+	 * @param[in]  surfCurr       current surface index to analyse.
+	 * @param[out] surfacePoints  The surface points indices.
+	 *
+	 * @return     The number of points which have been found.
+	 */
+	int Get3PointsInSurface(const mesh &meshin, int surfCurr, 
+		std::array<int, 3> &surfacePoints){
+
+		int surfacePointsIdentified = 0;
+		for (auto edgeCurr : meshin.surfs.isearch(surfCurr)->edgeind)
+		{
+			if(meshin.edges.isearch(edgeCurr)->IsLength0(meshin)){
+				continue;
+			}
+			if(surfacePointsIdentified==0){
+				surfacePoints[0] = meshin.edges.isearch(edgeCurr)
+					->vertind[0];
+				surfacePoints[1] = meshin.edges.isearch(edgeCurr)
+					->vertind[1];
+				surfacePointsIdentified=2;
+			} else {
+				for (auto vertCurr : meshin.edges.isearch(edgeCurr)
+					->vertind)
+				{
+					if(vertCurr!=surfacePoints[0] 
+						&& vertCurr!=surfacePoints[1]
+						&& !(meshhelp::IsVerticesDistance0(meshin, 
+							{vertCurr, surfacePoints[0]}))
+						&& !(meshhelp::IsVerticesDistance0(meshin, 
+							{vertCurr, surfacePoints[1]}))
+					){
+						surfacePoints[2] = vertCurr;
+						surfacePointsIdentified++;
+						break;
+					}
+				}
+			}
+			if(surfacePointsIdentified==3){
+				break;
+			}
+		}
+		return surfacePointsIdentified;
+	}
+
 	int VertexInVolume(const mesh &meshin, const vector<double> testCoord,
 		bool needFlip){
 		/*
@@ -4953,39 +5048,8 @@ namespace meshhelp {
 
 				// assign surfacePoints the indices of 3 non coincident
 				// points appearing in the surface
-				int surfacePointsIdentified = 0;
-				for (auto edgeCurr : meshin.surfs.isearch(surfCurr)->edgeind)
-				{
-					if(meshin.edges.isearch(edgeCurr)->IsLength0(meshin)){
-						continue;
-					}
-					if(surfacePointsIdentified==0){
-						surfacePoints[0] = meshin.edges.isearch(edgeCurr)
-							->vertind[0];
-						surfacePoints[1] = meshin.edges.isearch(edgeCurr)
-							->vertind[1];
-						surfacePointsIdentified=2;
-					} else {
-						for (auto vertCurr : meshin.edges.isearch(edgeCurr)
-							->vertind)
-						{
-							if(vertCurr!=surfacePoints[0] 
-								&& vertCurr!=surfacePoints[1]
-								&& !(meshhelp::IsVerticesDistance0(meshin, 
-									{vertCurr, surfacePoints[0]}))
-								&& !(meshhelp::IsVerticesDistance0(meshin, 
-									{vertCurr, surfacePoints[1]}))
-							){
-								surfacePoints[2] = vertCurr;
-								surfacePointsIdentified++;
-								break;
-							}
-						}
-					}
-					if(surfacePointsIdentified==3){
-						break;
-					}
-				}
+				int surfacePointsIdentified = Get3PointsInSurface(meshin,
+					surfCurr, surfacePoints);
 				if(surfacePointsIdentified!=3){
 					// if the surface has less than 3 non-coincident points it 
 					// is degenerate and equivalent to an edge. It does not 

@@ -389,6 +389,7 @@ public:
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
 template<class T> void DisplayVector(vector<T> vec);
+template<class T> void DisplayVectorStatistics(vector<T> vec);
 
 template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn,
 R T::*mp, const vector<int> &subList);

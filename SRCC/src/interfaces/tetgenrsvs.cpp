@@ -149,6 +149,24 @@ void tetgen::internal::Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &mes
 	}
 }
 
+void tetgen::internal::PointCurvature2Metric(std::vector<double> &vertCurvature, 
+	const tetgen::apiparam &inparam){
+
+	double maxCurv = *max_element(vertCurvature.begin(), vertCurvature.end());
+	double minCurv = 0.0;
+	double deltaCurv = maxCurv-minCurv;
+	auto lininterp = [&](double curv) double {
+		return (inparam.surfedgelengths[1]-inparam.surfedgelengths[0])
+			/(deltaCurv)*(curv-minCurv)+inparam.surfedgelengths[0];
+		};
+
+	int count = vertCurvature.size();
+	for (int i = 0; i < count; ++i)
+	{
+		vertCurvature[i] = lininterp(vertCurvature[i]);
+	}
+}
+
 void tetgen::input::RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 	const tetgen::apiparam &tetgenParam){
 	/*
@@ -195,6 +213,19 @@ void tetgen::input::RSVS2CFD(const snake &snakein, tetgen::io_safe &tetin,
 
 	// Assign domain point metrics
 	int startPnt = meshgeom.verts.size();
+	if(tetgenParam.surfedgelengths[0]==tetgenParam.surfedgelengths[1]){
+		tetin.SpecifyTetPointMetric(0,  startPnt,
+			{tetgenParam.surfedgelengths[0]});
+	} else {
+		auto vertCurvature = CalculateVertexCurvature(meshgeom, 
+			tetgenParam.curvatureSmoothing);
+		DisplayVectorStatistics(vertCurvature);
+		tetgen::internal::PointCurvature2Metric(vertCurvature, tetgenParam);
+		tetin.SpecifyTetPointMetric(0,  startPnt,
+			vertCurvature);
+		DisplayVectorStatistics(vertCurvature);
+
+	}
 	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
 		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
 			{tetgenParam.edgelengths[i]});
@@ -1341,6 +1372,27 @@ void tetgen::io_safe::SpecifyTetPointMetric(int startPnt, int numPnt,
 
 	}
 }
+
+void tetgen::io_safe::SpecifyIndividualTetPointMetric(int startPnt, int numPnt, 
+	const std::vector<double> &mtrs){
+	/*
+	assigns the mtr list from `startPnt` index
+	*/
+
+	if((startPnt+numPnt)>this->numberofpoints){
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too high)");
+	} else if (startPnt<0){
+		RSVS3D_ERROR_ARGUMENT("Metrics out of range in tetgen_io (too low)");
+	} else if (numPnt*this->numberofpointmtrs != int(mtrs.size())){
+		RSVS3D_ERROR_ARGUMENT("Metrics need to be the same size as numPnt"
+			"the number of point metrics");
+	}
+	int count = mtrs.size();
+	for (int i = 0; i < count; ++i)	{
+		this->pointmtrlist[(startPnt*this->numberofpointmtrs)+i]
+			=mtrs[i];
+	}
+}
 void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt, 
 	int marker){
 	/*
@@ -1367,6 +1419,8 @@ void tetgen::to_json(json& j, const tetgen::apiparam& p){
 	j = json{
 		{"lowerB", p.lowerB},
 		{"upperB", p.upperB},
+		{"surfedgelengths", p.surfedgelengths},
+		{"curvatureSmoothing", p.curvatureSmoothing},
 		{"edgelengths", p.edgelengths},
 		{"distanceTol", p.distanceTol},
 		{"generateMeshInside", p.generateMeshInside},
@@ -1376,6 +1430,8 @@ void tetgen::to_json(json& j, const tetgen::apiparam& p){
 void tetgen::from_json(const json& j, tetgen::apiparam& p){
 	j.at("lowerB").get_to(p.lowerB);
 	j.at("upperB").get_to(p.upperB);
+	p.surfedgelengths=j.at("surfedgelengths").get<std::array<double,2>>();
+	j.at("curvatureSmoothing").get_to(p.curvatureSmoothing);
 	p.edgelengths=j.at("edgelengths").get<std::vector<double>>();
 	j.at("distanceTol").get_to(p.distanceTol);
 	j.at("generateMeshInside").get_to(p.generateMeshInside);

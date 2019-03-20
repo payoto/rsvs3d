@@ -65,6 +65,11 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	const std::array<double,3> &innerLowerB, 
 	const std::array<double,3> &innerUpperB, int nSteps, 
 	std::vector<int> &vertPerSubDomain);
+double PseudoSurfaceAngle(const mesh &meshin, 
+	const std::array<int, 2> &surfInds);
+std::vector<double> CalculateEdgeCurvature(const mesh &meshin);
+std::vector<double> CalculateVertexCurvature(const mesh &meshin,
+	int smoothingSteps);
 // Forward declared templated functions
 
 // Base class

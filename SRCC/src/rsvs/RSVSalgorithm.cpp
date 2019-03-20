@@ -70,9 +70,6 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	sort(voluOutList);
 	unique(voluOutList);
 	// DisplayVector(voluOutList);
-
-
-
 }
 
 void SpawnRSVS(snake &snakein, int outerBorder){

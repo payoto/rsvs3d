@@ -93,6 +93,7 @@ public:
 	void PrepareForUse();
 	coordvec Unit() const ;
 	double Unit(const int a) const;
+	double Normalize();
 	void assign(double a, double b, double c);
 	double& operator[](int a);
 	double operator()(int a) const;
@@ -445,6 +446,7 @@ class mesh {
 private:
 	bool borderIsSet=false;
 	bool meshDepIsSet=false;
+	bool facesAreOriented=false;
 	int meshDim=0;
 	void SetLastIndex();
 	
@@ -605,6 +607,17 @@ vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1,
 	const vector<double> &planeVert3,
 	const vector<double> &testVertices);
 mesh Points2Mesh(const std::vector<double> &vecPts, int nProp=3);
+double PlanesDotProduct(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	const vector<double> &planeVert4, 
+	const vector<double> &planeVert5,
+	const vector<double> &planeVert6, 
+	bool normalize=true);
+void PlaneNormal(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1);
 namespace meshhelp {
 	template<class T, class V, class W>
 	double ProjectRay(int count, const W &&boundBox,
@@ -640,6 +653,8 @@ namespace meshhelp {
 	int VertexInVolume(const mesh &meshin, 
 		const vector<double> testCoord,
 		bool needFlip=false);
+	int Get3PointsInSurface(const mesh &meshin, int surfCurr, 
+		std::array<int, 3> &surfacePoints);
 }
 //test functions
 int Test_ArrayStructures();

@@ -485,3 +485,136 @@ mesh BuildCutCellDomain(const std::array<double,3> &outerLowerB,
 	
 	return meshdomain;
 }
+
+/**
+ * @brief      Calculates the pseudo surface angle.
+ * 
+ * This pseudo angle is the dot product between the normal, i
+ *
+ * @param[in]  meshin    The input mesh
+ * @param[in]  surfInds  The surface indices
+ *
+ * @return     dot product between surface normals if facing outwards
+ */
+double PseudoSurfaceAngle(const mesh &meshin, 
+	const std::array<int, 2> &surfInds){
+
+	double surfaceAngle=0.0;
+	auto getcoord = [&](int indexVert) auto 
+		{return meshin.verts.isearch(indexVert)->coord;};
+	// if one of the surfaces is not at the boundary of the domain (volu==0) 
+	// then return 0 angle;
+	for(auto surfind : surfInds){
+		if(meshin.surfs.isearch(surfind)->voluind[0]!=0
+			&& meshin.surfs.isearch(surfind)->voluind[1]!=0){
+			return surfaceAngle;
+		}
+	}
+
+	std::array<std::array<int, 3>, 2> surfPoints;
+	for (int i = 0; i < 2; ++i)
+	{
+		int nPts = meshhelp::Get3PointsInSurface(meshin, surfInds[i],
+			surfPoints[i]);
+		if(nPts!=3){
+			return surfaceAngle;
+		}
+	}
+
+	bool surfOrientSame = 
+		(meshin.surfs.isearch(surfInds[0])->voluind[0]==0 
+			&& (meshin.surfs.isearch(surfInds[0])->voluind[0]
+				==meshin.surfs.isearch(surfInds[1])->voluind[0]))
+		|| (meshin.surfs.isearch(surfInds[0])->voluind[1]==0 
+			&& (meshin.surfs.isearch(surfInds[0])->voluind[1]
+				==meshin.surfs.isearch(surfInds[1])->voluind[1]));
+
+	surfaceAngle = PlanesDotProduct(getcoord(surfPoints[0][0]),
+		getcoord(surfPoints[0][1]),
+		getcoord(surfPoints[0][2]),
+		getcoord(surfPoints[1][0]),
+		getcoord(surfPoints[1][1+surfOrientSame]),
+		getcoord(surfPoints[1][2-surfOrientSame]),
+		true);
+
+	return (2.0 - (surfaceAngle+1.0))/2.0;
+}
+/**
+ * @brief      Calculates the angles between the surfaces connected at an edge.
+ * 
+ * To work the faces need have a common orientation
+ *
+ * @param[in]  meshin  The input mesh
+ *
+ * @return     The edge angles.
+ */
+std::vector<double> CalculateEdgeCurvature(const mesh &meshin){
+
+	std::vector<double> edgeCurvatures;
+	int nEdges = meshin.edges.size();
+	edgeCurvatures.assign(nEdges, 0);
+	for (int i = 0; i < nEdges; ++i)
+	{
+		int nSurfsEdge = meshin.edges(i)->surfind.size();
+		for (int j = 0; j < nSurfsEdge; ++j)
+		{
+			for (int k = j+1; k < nSurfsEdge; ++k)
+			{
+				edgeCurvatures[i] += PseudoSurfaceAngle(meshin, 
+					{meshin.edges(i)->surfind[j], meshin.edges(i)->surfind[k]});
+			}	
+		}
+	}
+
+
+	return edgeCurvatures;
+}
+
+/**
+ * @brief      Calculates the vertex curvature.
+ *
+ * @param[in]  meshin          The input mesh
+ * @param[in]  smoothingSteps  The number of metric smoothing steps
+ *
+ * @return     The vertex curvature.
+ */
+std::vector<double> CalculateVertexCurvature(const mesh &meshin,
+	int smoothingSteps){
+
+	std::vector<double> vertCurvatures, edgeCurvatures;
+	int nVerts = meshin.verts.size();
+	int nEdges = meshin.edges.size();
+	int nSteps = 0;
+	vertCurvatures.assign(nVerts, 0);
+	do{
+		if(nSteps==0){
+			edgeCurvatures = CalculateEdgeCurvature(meshin);
+		} else {
+			for (int i = 0; i < nEdges; ++i)
+			{
+				edgeCurvatures[i]=0.0;
+				for (auto vertInd : meshin.edges(i)->vertind)
+				{
+					edgeCurvatures[i] += vertCurvatures[meshin.verts.find(vertInd)]
+						/meshin.verts.isearch(vertInd)->edgeind.size();
+				}
+				edgeCurvatures[i]= edgeCurvatures[i]/2;
+			}
+		}
+		for (int i = 0; i < nVerts; ++i)
+		{
+			for (auto edgeInd : meshin.verts(i)->edgeind)
+			{
+				vertCurvatures[i] += edgeCurvatures[meshin.edges.find(edgeInd)];
+			}
+			if(nSteps>0){
+				vertCurvatures[i] = vertCurvatures[i]/2;
+			}
+		}
+		nSteps++;
+	} while(nSteps<smoothingSteps);
+
+	return vertCurvatures;
+}
+
+

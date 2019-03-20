@@ -114,7 +114,8 @@ namespace tetgen {
 
 		void SpecifyTetPointMetric(int startPnt, int numPnt, 
 			const std::vector<double> &mtrs);
-
+		void SpecifyIndividualTetPointMetric(int startPnt, int numPnt, 
+			const std::vector<double> &mtrs);
 		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
 			int marker);
 		// void deallocate();
@@ -129,6 +130,10 @@ namespace tetgen {
 		std::array<double,3> lowerB;
 		/// Upper domain bound 
 		std::array<double,3> upperB; 
+		/// Controls the surface edgelengths in CFD in the order:
+		/// {point of lowest curvature, point of highest curvature}
+		std::array<double, 2> surfedgelengths;
+		int curvatureSmoothing;
 		/// Controls the edgelengths at regular intervals 
 		std::vector<double> edgelengths;
 		/// Distance tolerance 
@@ -143,6 +148,8 @@ namespace tetgen {
 		apiparam(){
 			this->lowerB={0.0,0.0,0.0};
 			this->upperB={1.0, 1.0, 1.0};
+			this->surfedgelengths = {0.02, 0.005};
+			this->curvatureSmoothing=4;
 			this->edgelengths={0.03, 1.0};
 			this->distanceTol = 0.3;
 			this->generateMeshInside = false;
@@ -200,6 +207,8 @@ namespace tetgen {
 			tetgen::io_safe &tetin, int numHoles);
 		void Mesh2TetgenioPoints(const mesh &meshgeom, 
 			const mesh &meshdomain,	tetgen::io_safe &tetin);
+		void PointCurvature2Metric(std::vector<double> &vertCurvature, 
+			const tetgen::apiparam &inparam);
 	}
 	namespace voronoi {
 
