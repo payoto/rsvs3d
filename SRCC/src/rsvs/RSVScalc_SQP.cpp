@@ -128,13 +128,15 @@ void RSVScalc::ComputeSQPstep(
 	VectorXd &lagMultAct
 	){
 
-	VectorXd  deltaDVAct;
+	int ni = this->subDvAct.size();
+	VectorXd  deltaDVAct(ni);
 	bool isNan, isLarge, rerunDefault=true, attemptConstrOnly;
-	int ii, ni;
+	int ii;
 
 	/*
 	This while loop while expensive allows to use the most stable algorithm
 	*/
+	deltaDVAct.setZero();
 	attemptConstrOnly=false;
 	if((calcMethod%10)!=calcMethod){
 		calcMethod=calcMethod%10;

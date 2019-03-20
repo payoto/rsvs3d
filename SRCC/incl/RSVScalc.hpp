@@ -182,6 +182,7 @@ bool SQPstep(const RSVScalc &calcobj,
 	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
 	isLarge=false;
 	if(!attemptConstrOnly && (isLarge || isNan)){
+		std::cout << "(early sqp return) ";
 		return(isLarge || isNan);
 	}
 	if(isLarge || isNan) {

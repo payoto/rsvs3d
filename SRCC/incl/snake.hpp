@@ -120,7 +120,8 @@ public:
 	// Snake Movement
 	void UpdateDistance(double dt,  double maxDstep=1.0);
 	void UpdateDistance(const vector<double> &dt,  double maxDstep=1.0);
-	void CalculateTimeStep(vector<double> &dt, double dtDefault);
+	void CalculateTimeStep(vector<double> &dt, double dtDefault, 
+		double distDefault=1.0);
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();

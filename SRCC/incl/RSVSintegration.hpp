@@ -142,8 +142,7 @@ namespace integrate {
 				int loglvl);
 			// Store the Snake in a file
 			void Snake(
-				tecplotfile &outSnake, snake &rsvsSnake,
-				mesh &voluMesh, double totT, int nVoluZone,
+				snake &rsvsSnake, mesh &voluMesh,
 				param::parameters &paramconf);
 			// Store All the available information
 			void FullTecplot(

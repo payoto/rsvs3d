@@ -375,7 +375,8 @@ void integrate::prepare::grid::Voronoi(
 	){
 	// Vector points are already loaded
 	tetgen::apiparam inparam;
-	inparam.edgelengths={0.1};
+	inparam.edgelengths={gridconf.voronoi.snakecoarseness};
+	inparam.surfedgelengths={gridconf.voronoi.snakecoarseness};
 	inparam.distanceTol = gridconf.voronoi.distancebox;
 	for (int i = 0; i < 3; ++i)
 	{
@@ -508,16 +509,22 @@ void integrate::prepare::Output(
 
 void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 
-
 	auto coutbuff=std::cout.rdbuf();
 	auto cerrbuff=std::cout.rdbuf();
-
+	std::cout << "Start RSVS preparation" << std::endl;
 	integrate::Prepare(RSVSobj);
+
+	std::cout << "Preparation finished - start iteration" << std::endl;
 	auto iterateInfo=integrate::execute::RSVSiterate(RSVSobj);
 
+	std::cout << "Iteration finished - start PostProcessing" << std::endl;
 	integrate::execute::PostProcessing(RSVSobj,
 		iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
+
+	std::cout << "PostProcessing finished - start Exporting" << std::endl;
 	integrate::execute::Exporting(RSVSobj);
+
+	std::cout << "Exporting finished - close." << std::endl;
 	std::cout.rdbuf(coutbuff);
 	std::cerr.rdbuf(cerrbuff);
 	// std::cout << std::endl <<  " cout Buffer restored" << std::endl;
@@ -539,7 +546,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 	RSVSobj.outSnake.PrintMesh(RSVSobj.snakeMesh);
 	RSVSobj.outSnake.PrintMesh(RSVSobj.voluMesh);
 	nVoluZone=RSVSobj.outSnake.ZoneNum();
-	RSVSobj.rsvsSnake.displight();
+
 	maxStep = RSVSobj.paramconf.snak.maxsteps;
 	for(stepNum=0; stepNum<maxStep; ++stepNum){
 		start_s=clock(); 
@@ -559,7 +566,8 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 			totT, nVoluZone, stepNum);
 
 		RSVSobj.rsvsSnake.CalculateTimeStep(dt,
-			RSVSobj.paramconf.snak.snaxtimestep);
+			RSVSobj.paramconf.snak.snaxtimestep,
+			RSVSobj.paramconf.snak.snaxdiststep);
 		RSVSobj.rsvsSnake.UpdateDistance(dt,
 			RSVSobj.paramconf.snak.snaxdiststep);
 		totT += *max_element(dt.begin(), dt.end());
@@ -592,13 +600,11 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 			);
 	}
 
-	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
+	if (RSVSobj.paramconf.files.ioout.logginglvl==2){
 		integrate::execute::logging::Snake(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.voluMesh, totT, nVoluZone);
-	}
-
-	if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
+	} else if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
 		integrate::execute::logging::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
@@ -609,14 +615,12 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 
-	auto limrsvs = RSVSobj.rsvsSnake.Scale(
-			RSVSobj.paramconf.grid.physdomain
-		);
+	
 
-	if (1 < RSVSobj.paramconf.files.ioout.logginglvl){
+	if (RSVSobj.paramconf.files.ioout.logginglvl>1){
 		integrate::execute::postprocess::Snake(
-			RSVSobj.outSnake, RSVSobj.rsvsSnake,
-			RSVSobj.voluMesh, totT, nVoluZone,
+			RSVSobj.rsvsSnake,
+			RSVSobj.voluMesh,
 			RSVSobj.paramconf);
 	}
 
@@ -628,15 +632,17 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 			RSVSobj.paramconf.files.ioout.logginglvl
 			);
 	}
-
-	if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
+	if(2 == RSVSobj.paramconf.files.ioout.logginglvl){
+		integrate::execute::logging::Snake(
+			RSVSobj.outSnake, RSVSobj.rsvsSnake,
+			RSVSobj.voluMesh, totT, nVoluZone);
+	} else if (2 < RSVSobj.paramconf.files.ioout.logginglvl){
 		integrate::execute::postprocess::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
 			totT, nVoluZone, stepNum);
 	}
 
-	RSVSobj.rsvsSnake.Scale(limrsvs);
 }
 
 void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
@@ -659,6 +665,10 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 			integrate::execute::exporting::SU2(
 				exportType.second, RSVSobj.rsvsSnake, RSVSobj.paramconf
 				);
+		} else if(exportType.first.compare("")==0 
+			&& exportType.second.compare("")==0) 
+		{
+			/*Do nothing, this is the default*/
 		} else 
 		{
 			RSVS3D_ERROR_NOTHROW((
@@ -706,12 +716,12 @@ void integrate::execute::logging::FullTecplot(
 	vector<int> vertList;
 	int jj;
 	if(rsvsSnake.snaxs.size()>0){
-		//rsvsSnake.snakeconn.TightenConnectivity();
-		outSnake.PrintMesh(rsvsSnake.snakeconn,1,totT);
+
+		outSnake.PrintMesh(rsvsSnake.snakeconn,1,totT, 2);
 
 		rsvsSnake.snakeconn.PrepareForUse();
 		
-		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT);
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT, 2);
 		if (stepNum==0){
 			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,3);
 			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,3);
@@ -720,7 +730,8 @@ void integrate::execute::logging::FullTecplot(
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,3);
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,3);
 		if (int(rsvsTri.acttri.size())>0){
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::stattri,5,totT,3,rsvsTri.acttri);
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::stattri,5,totT,
+				3,rsvsTri.acttri);
 		}
 		
 		vertList.clear();
@@ -755,16 +766,9 @@ void integrate::execute::postprocess::Log(
 }
 
 void integrate::execute::postprocess::Snake(
-	tecplotfile &outSnake, snake &rsvsSnake,
-	mesh &voluMesh, double totT, int nVoluZone,
-	param::parameters &paramconf
-	){
+	snake &rsvsSnake, mesh &voluMesh, param::parameters &paramconf){
 
 	string fileToOpen;
-
-	integrate::execute::logging::Snake(
-		outSnake, rsvsSnake,
-		voluMesh, totT, nVoluZone);
 
 	fileToOpen=paramconf.files.ioout.outdir + "/";
 	fileToOpen += "VoluMesh_" + paramconf.files.ioout.pattern + ".msh";

@@ -98,6 +98,7 @@ namespace param {
 		std::vector<double> inputpoints;
 		double distancebox;
 		std::string pointfile;
+		double snakecoarseness;
 
 		voronoi();
 		~voronoi();

@@ -618,3 +618,79 @@ std::vector<double> CalculateVertexCurvature(const mesh &meshin,
 }
 
 
+/**
+ * @brief      Calculates the vertex minimum edge length.
+ *
+ * @param[in]  meshin  The meshin
+ *
+ * @return     The vertex minimum edge length.
+ */
+std::vector<double> CalculateVertexMinEdgeLength(const mesh &meshin){
+
+	std::vector<double> vertEdgeLength;
+	int nVerts = meshin.verts.size();
+	vertEdgeLength.assign(nVerts, 0);
+	
+	auto edgeLength = CalculateEdgeLengths(meshin);
+
+	for (int i = 0; i < nVerts; ++i)
+	{
+		vertEdgeLength[i] = INFINITY;
+		for (auto edgeInd : meshin.verts(i)->edgeind)
+		{
+			double testLength = edgeLength[meshin.edges.find(edgeInd)];
+			vertEdgeLength[i] = testLength < vertEdgeLength[i] ?
+				testLength : vertEdgeLength[i];
+		}
+	}
+	return vertEdgeLength;
+}
+
+/**
+ * @brief      Calculates the vertex mean edge length.
+ *
+ * @param[in]  meshin  The meshin
+ *
+ * @return     The vertex mean edge length.
+ */
+std::vector<double> CalculateVertexMeanEdgeLength(const mesh &meshin){
+
+	std::vector<double> vertEdgeLength;
+	int nVerts = meshin.verts.size();
+
+
+	vertEdgeLength.assign(nVerts, 0);
+	auto edgeLength = CalculateEdgeLengths(meshin);
+
+
+	for (int i = 0; i < nVerts; ++i)
+	{
+		vertEdgeLength[i] = INFINITY;
+		for (auto edgeInd : meshin.verts(i)->edgeind)
+		{
+			double testLength = edgeLength[meshin.edges.find(edgeInd)];
+			vertEdgeLength[i] += testLength;
+		}
+		vertEdgeLength[i] = vertEdgeLength[i]/meshin.verts(i)->edgeind.size();
+	}
+	return vertEdgeLength;
+}
+
+/**
+ * @brief      Calculates the edge lengths.
+ *
+ * @param[in]  meshin  The meshin
+ *
+ * @return     The edge lengths.
+ */
+std::vector<double> CalculateEdgeLengths(const mesh &meshin){
+	std::vector<double> edgeLength;
+	int nEdges = meshin.edges.size();
+	edgeLength.assign(nEdges, 0);
+
+	for (int i = 0; i < nEdges; ++i)
+	{
+		edgeLength[i]=meshin.edges(i)->Length(meshin);
+	}
+	return edgeLength;
+}

@@ -374,6 +374,4 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		StreamOutVector(move(deltaDV),
 			out, string(", "));
 	}
-
-
 }

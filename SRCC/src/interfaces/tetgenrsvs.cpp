@@ -251,39 +251,33 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 	*/
 
 	triangulation triRSVS;
-	int nHoles;
+	int nHoles=0;
 	// int nPtsHole, kk, count;
 
 	std::vector<int>  holeIndices;
 	std::vector<int> vertPerSubDomain;
-	std::vector<double> holeCoords;
-
-	holeCoords.clear();
 
 	vertPerSubDomain.push_back(meshdomain.verts.size());
 	
 
-	nHoles=holeCoords.size()/3;
 	tetgen::internal::Mesh2Tetgenio(meshboundary, meshdomain, tetin, nHoles);
 
-	// std::cout<< std::endl << "Number of holes " << nHoles << std::endl;
-
-	// Assign the holes
-
-	int count = holeCoords.size();
-	for (int i = 0; i < count; ++i){
-		tetin.holelist[i] = holeCoords[i];	
-	}
-
-	// Assign domain point metrics
 	int startPnt = meshboundary.verts.size();
+	// Assign "boundary" point metrics
+	auto vertEdgeLength = CalculateVertexMinEdgeLength(meshdomain);
+	int count = vertEdgeLength.size();
+	for (int i = 0; i < count; ++i)
+	{
+		vertEdgeLength[i] *= tetgenParam.surfedgelengths[0];
+	}
+	tetgen::internal::PointCurvature2Metric(vertEdgeLength, tetgenParam);
+	tetin.SpecifyTetPointMetric(0, startPnt, vertEdgeLength);
+	// Assign domain point metrics
 	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
 		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
 			{tetgenParam.edgelengths[i]});
 		startPnt = startPnt + vertPerSubDomain[i];
 	}
-
-	// tecout.PrintMesh(meshdomain);
 }
 
 void tetgen::input::RSVSGRIDS(const mesh &meshdomain,
@@ -874,7 +868,6 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 
 	*/
 	mesh voroMesh;
-	// tetgen::apiparam inparam;
 	std::vector<int> vertsVoro;
 	std::vector<int> vertBlock, elmMapping;
 
@@ -882,7 +875,7 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 	// Step 1 - 2 
 	auto boundFaces = tetgen::voronoi::Points2VoroAndTetmesh(vecPts,voroMesh,
 		snakMesh, inparam);
-	// voroMesh = vosMesh;
+
 
 	int nBlocks = snakMesh.ConnectedVolumes(elmMapping, boundFaces);
 
@@ -1137,8 +1130,6 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
 
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
-	// tetinT.save_nodes("../TESTOUT/testtetgen/voro/rsvs");
-	// tetinT.save_poly("../TESTOUT/testtetgen/voro/rsvs");
 	cmd = "QpqmnnefO9/7"; 
 	try{
 		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);

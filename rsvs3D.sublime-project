@@ -47,7 +47,7 @@
 		{
 			"path": ".",
 			"file_exclude_patterns": [
-				"*.cpp", "*.hpp",
+				"*.cpp", "*.hpp", "*.d", "*.o"
 			],
 		},
 		{

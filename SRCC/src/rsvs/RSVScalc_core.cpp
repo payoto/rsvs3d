@@ -274,13 +274,15 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	for(ii=0; ii< nDvAct; ++ii){
 		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
 	}
-	nCellTarg=triIn.connec.celltarg.size(); 
-	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
-		nj=subTempVec.size();
-		for(jj=0; jj< nj; ++jj){
-			if (subTempVec[jj]!=-1){
-				this->isConstrAct.at(subTempVec[jj]) = true;
+	if(nDvAct>0){
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
+					this->isConstrAct.at(subTempVec[jj]) = true;
+				}
 			}
 		}
 	}
@@ -457,17 +459,19 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	for(ii=0; ii< nDvAct; ++ii){
 		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
 	}
-	nCellTarg=triIn.connec.celltarg.size(); 
-	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
-		nj=subTempVec.size();
-		for(jj=0; jj< nj; ++jj){
-			if (subTempVec[jj]!=-1){
-				this->isConstrAct.at(subTempVec[jj]) = true;
+	if(nDvAct>0){
+
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
+					this->isConstrAct.at(subTempVec[jj]) = true;
+				}
 			}
 		}
 	}
-
 	// Assign Objective Hessian
 
 	// Assign Constraint Hessian
@@ -717,13 +721,16 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	for(ii=0; ii< nDvAct; ++ii){
 		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;
 	}
-	nCellTarg=triIn.connec.celltarg.size(); 
-	for(ii=0; ii< nCellTarg;++ii){
-		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
-		nj=subTempVec.size();
-		for(jj=0; jj< nj; ++jj){
-			if (subTempVec[jj]!=-1){
-				this->isConstrAct.at(subTempVec[jj]) = true;
+	if(nDvAct>0){
+
+		nCellTarg=triIn.connec.celltarg.size(); 
+		for(ii=0; ii< nCellTarg;++ii){
+			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
+			nj=subTempVec.size();
+			for(jj=0; jj< nj; ++jj){
+				if (subTempVec[jj]!=-1){
+					this->isConstrAct.at(subTempVec[jj]) = true;
+				}
 			}
 		}
 	}

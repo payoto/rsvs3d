@@ -2314,6 +2314,13 @@ void mesh::displight() const {
 	cout << "; surfs " << surfs.size();
 	cout << "; volus " << volus.size() << endl;
 }
+void mesh::size(int &nVe,int &nE, int &nS, int &nVo) const{
+
+	nVe=this->verts.size();
+	nE=this->edges.size();
+	nS=this->surfs.size();
+	nVo=this->volus.size();
+}
  
 void mesh::Init(int nVe,int nE, int nS, int nVo)
 {

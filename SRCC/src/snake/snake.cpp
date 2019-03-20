@@ -912,11 +912,12 @@ void snake::ForceCloseContainers(){
 	}
 }
 
-void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
+void snake::CalculateTimeStep(vector<double> &dt, double dtDefault,
+	double distDefault){
 
 	int nSnax,ii,nEdge;
 	vector<bool> isSnaxDone;
-
+	double newMindDt=dtDefault;
 	nSnax=snaxs.size();
 	isSnaxDone.assign(nSnax,false);
 	dt.assign(nSnax,dtDefault);
@@ -926,6 +927,13 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault){
 		snaxs.PrepareForUse();
 	}
 
+	for (int i = 0; i < nSnax; ++i)
+	{
+		if(fabs(snaxs(i)->v >__DBL_EPSILON__)){
+			newMindDt = distDefault/fabs(snaxs(i)->v);
+			dtDefault =newMindDt<dtDefault ? newMindDt : dtDefault;
+		}
+	}
 	for(ii=0;ii<nSnax;++ii){
 		if(!isSnaxDone[ii]){
 			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
