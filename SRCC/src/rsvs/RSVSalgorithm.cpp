@@ -7,7 +7,7 @@
 #include "snakeengine.hpp"
 #include "warning.hpp"
 
-void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
+std::vector<int> FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	vector<int> &voluOutList, int outerBorder){
 	// Function which identifies spawn points
 	// Spawn points are:
@@ -69,7 +69,40 @@ void FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 
 	sort(voluOutList);
 	unique(voluOutList);
-	// DisplayVector(voluOutList);
+	return(offBorderVert);
+}
+
+void SpawnSnakeAndMove(snake &snakein, std::vector<int> vertSpawn){
+	vector<int> isImpact; 
+	vector<double> dt;
+	int nVe,nE, nS, nVo;
+	snakein.snakeconn.size( nVe, nE,  nS,  nVo);
+	int nNew=vertSpawn.size();
+	// cout << "vertices to output " << ni << endl;
+	snakein.reserve(nVe+nNew*15,nE+nNew*15,nS+nNew*15,nVo+nNew*1);
+	for(int ii=0; ii< nNew; ++ii){
+		SpawnAtVertex(snakein, vertSpawn[ii]);
+		//cout << ii << " " ;
+	}
+	// cout << " vertices Dones" << endl;
+	// Move to half distances
+	int nTotSnax=snakein.snaxs.size();
+	for(int ii=0; ii<nVe; ++ii){
+		snakein.snaxs[ii].v=0.0;
+		snakein.snaxs[ii].d=0.5;
+	}
+	for(int ii=nVe; ii<nTotSnax; ++ii){
+		snakein.snaxs[ii].v=1.0;
+	}
+	snakein.CalculateTimeStep(dt,0.51);
+	snakein.UpdateDistance(dt);
+	snakein.UpdateCoord();
+	snakein.PrepareForUse();
+	snakein.SnaxImpactDetection(isImpact);
+	MergeAllContactVertices(snakein, isImpact);
+	snakein.PrepareForUse();
+	CleanupSnakeConnec(snakein);
+	snakein.PrepareForUse();
 }
 
 void SpawnRSVS(snake &snakein, int outerBorder){
@@ -83,13 +116,14 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	//     + find snaxels
 	//     * invalid snakevolus=[border cell, empty cell]
 	int ii,ni;
-	vector<int> vertSpawn;
+	vector<int> vertSpawn, borderVertSpawn;
 	vector<int> voluSnaxDelete;
 	vector<int> isImpact; 
 	vector<double> dt;
 	snakein.snakemesh->SetBorders();
 	// snakein.snakemesh->disp();
-	FindSpawnVerts(*(snakein.snakemesh), vertSpawn,voluSnaxDelete,outerBorder);
+	borderVertSpawn = FindSpawnVerts(*(snakein.snakemesh), 
+		vertSpawn,voluSnaxDelete,outerBorder);
 	ni=vertSpawn.size();
 	// cout << "vertices to output " << ni << endl;
 	snakein.reserve(ni*15,ni*15,ni*15,ni*15);
@@ -122,9 +156,13 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 		RemoveSnakeInSurf(snakein, voluSnaxDelete, outerBorder);
 	}
 	snakein.PrepareForUse();
-	snakein.OrientFaces();
 	// snakein.displight();
-	
+	// Second spawn phase
+	if (outerBorder==1){
+		SpawnSnakeAndMove(snakein, borderVertSpawn);
+	}
+
+	snakein.OrientFaces();
 	cout << "Initialisation DONE!" << endl;
 }
 

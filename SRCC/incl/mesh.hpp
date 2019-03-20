@@ -508,6 +508,7 @@ public:
 	void SetMaxIndex();
 	void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void Init(int nVe,int nE, int nS, int nVo);
+	void size(int &nVe,int &nE, int &nS, int &nVo) const;
 	void reserve(int nVe,int nE, int nS, int nVo);
 	void PrepareForUse(bool needOrder=true);
 	void disp() const;

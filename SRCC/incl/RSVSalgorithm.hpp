@@ -20,12 +20,14 @@ class snake;
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 	
-void FindSpawnVerts(const mesh &meshin, std::vector<int> &vertList,
+std::vector<int> FindSpawnVerts(const mesh &meshin, std::vector<int> &vertList,
 	std::vector<int> &voluOutList, int outerBorder=1);
 void SpawnRSVS(snake &snakein, int outerBorder=1);
-void RemoveSnakeInVolu(snake &snakein, std::vector<int> &voluInd, int outerBorder);
-void RemoveSnakeInSurf(snake &snakein, std::vector<int> &voluInd, int outerBorder);
-
+void RemoveSnakeInVolu(snake &snakein, std::vector<int> &voluInd, 
+	int outerBorder);
+void RemoveSnakeInSurf(snake &snakein, std::vector<int> &voluInd, 
+	int outerBorder);
+void SpawnSnakeAndMove(snake &snakein, std::vector<int> vertSpawn);
 int Test_RSVSalgo_init();
 int Test_RSVSalgo();
 int Test_RSVSalgoflat();
