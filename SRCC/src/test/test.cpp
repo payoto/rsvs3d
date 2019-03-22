@@ -21,7 +21,7 @@
 
 using namespace rsvstest;
 
-int rsvstest::maintest(){
+int rsvstest::maintest(){ 
 	customtest gridTest("3-D RSVS tests - passing");
 
 	// BASE templatess 

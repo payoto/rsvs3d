@@ -2069,7 +2069,7 @@ int mesh::TestConnectivityBiDir(const char *strRoot,
 	for (ii=0; ii<kk;++ii){
 		testSub=volus.find_list(surfs(ii)->voluind);
 		kk2=testSub.size();
-		if(emptyIsErr && kk2!=2){ // voluind should be of size 2
+		if(this->WhatDim()>2 && emptyIsErr && kk2!=2){ // voluind should be of size 2
 			errCount++;
 			cerr <<  " Test Connectivity Error :"  << errCount 
 				<< " surf " << surfs(ii)->index
@@ -2673,22 +2673,23 @@ int surf::SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd){
 
 	meshin.surfs.isHash=prevHash;
 	prevHash = meshin.volus.isHash;
- 	#ifdef SAFE_ACCESS
-	if (this->voluind.size()<2){
-		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-		cerr << " voluind is of size " << this->voluind.size() << endl;
-		RSVS3D_ERROR_LOGIC("surf::voluind should be size 2");
-	}
- 	#endif // SAFE_ACCESS
-	for (int i = 0; i < 2; ++i)
-	{
-		kk=meshin.volus.find(voluind[i]);
-		if(kk!=-1){
-			meshin.volus[kk].surfind.push_back(newSurf.index);
+	if(meshin.WhatDim()>2){
+	 	#ifdef SAFE_ACCESS
+		if (this->voluind.size()<2){
+			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			cerr << " voluind is of size " << this->voluind.size() << endl;
+			RSVS3D_ERROR_LOGIC("surf::voluind should be size 2");
 		}
-		meshin.volus.isHash=prevHash;
+	 	#endif // SAFE_ACCESS
+		for (int i = 0; i < 2; ++i)
+		{
+			kk=meshin.volus.find(voluind[i]);
+			if(kk!=-1){
+				meshin.volus[kk].surfind.push_back(newSurf.index);
+			}
+			meshin.volus.isHash=prevHash;
+		}
 	}
-	
 	newSurfInd = newSurf.index;
 	#ifdef RSVS_DIAGNOSTIC_FIXED
 	cerr << " Succesful surface split " << this->index << " | "

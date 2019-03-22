@@ -1087,7 +1087,7 @@ int Test_RSVSalgoflat(){
 		outSnake.OpenFile(fileToOpen);
 		fileToOpen="../TESTOUT/TestAlgoRSVS2Dstep_snake.plt";
 		outSnake2.OpenFile(fileToOpen);
-		errTest+=snakeMesh.read("../TESTOUT/mesh230.dat");
+		errTest+=snakeMesh.read("../TESTOUT/tecout100100.dat");
 		
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 
