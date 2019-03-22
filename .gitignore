@@ -1,6 +1,4 @@
 # Ignore git ignore
-
-
 *NOGIT*
 *TESTOUT*
 out/*
@@ -28,7 +26,8 @@ SRCC/modules/external*
 
 SRCC/gch/*
 SRCC/config/*
-
+SRCC/docs/html/*
+SRCC/docs/latex/*
 # files which are of no relevance
 SRCC/noexec_rsvsconfig.json
 SRCC/tetgen-tmpfile*.vtk
