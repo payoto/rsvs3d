@@ -1,9 +1,3 @@
-#ifdef DBG_MEMLEAK
-#define _CRTDBG_MAP_ALLOC  
-#include <stdlib.h>  
-#include <crtdbg.h>
-#endif //DBG_MEMLEAK
-
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -25,20 +19,27 @@
 #include "parameters.hpp"
 #include "tetgenrsvs.hpp"
 
+using namespace rsvstest;
 
-int main(){
-	customtest gridTest("3-D RSVS tests");
+int rsvstest::maintest(){
+	customtest gridTest("3-D RSVS tests - passing");
 
-	#ifdef TEST_ALL_WORKING
 	// BASE templatess 
 	gridTest.RunSilent(Test_ArrayStructures,"arraystructures");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<vert>,"TestTemplate_ArrayStruct<vert>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<edge>,"TestTemplate_ArrayStruct<edge>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<surf>,"TestTemplate_ArrayStruct<surf>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<volu>,"TestTemplate_ArrayStruct<volu>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<snax>,"TestTemplate_ArrayStruct<snax>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxedge>,"TestTemplate_ArrayStruct<snaxedge>");
-	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxsurf>,"TestTemplate_ArrayStruct<snaxsurf>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<vert>,
+		"TestTemplate_ArrayStruct<vert>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<edge>,
+		"TestTemplate_ArrayStruct<edge>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<surf>,
+		"TestTemplate_ArrayStruct<surf>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<volu>,
+		"TestTemplate_ArrayStruct<volu>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snax>,
+		"TestTemplate_ArrayStruct<snax>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxedge>,
+		"TestTemplate_ArrayStruct<snaxedge>");
+	gridTest.RunSilent(TestTemplate_ArrayStruct<snaxsurf>,
+		"TestTemplate_ArrayStruct<snaxsurf>");
 	// Building blocks
 	gridTest.RunSilent(Test_BuildBlockGrid_noout,"Voxel");
 	gridTest.RunSilent(Test_tecplotfile,"post-processing");
@@ -76,15 +77,21 @@ int main(){
 	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
 	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
 	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
-	gridTest.Run(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
+	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
 
-	#endif //TEST_ALL_WORKING
-	#ifdef TEST_ALL_BREAKING
-	// Snakstruct 2D tests
+	rsvstest::newtest();
+
+	return(0);
+}
+
+int rsvstest::newtest(){
+	customtest gridTest("3-D RSVS tests: New and breaking ");
+
+	#ifdef TEST_KNOWN_FAILURES
 	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
-
+	
 	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
 	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
 

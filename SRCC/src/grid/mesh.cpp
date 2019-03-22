@@ -5024,8 +5024,6 @@ namespace meshhelp {
 		coordvec temp1, temp2;
 		std::array<int, 3> surfacePoints = {0,0,0};
 		bool isInCandidate=false, candidateIsValid;
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		int volumeCandidate=0;
 		int pointInVolu, alternateVolume, nVolusExplored=0, nVolus;
 		double distToPlane, multiplierDist;
@@ -5038,7 +5036,6 @@ namespace meshhelp {
 			candidateIsValid=false;
 			// for each face of the candidate volume
 			for(auto surfCurr : meshin.volus.isearch(volumeCandidate)->surfind){
-			#pragma GCC diagnostic pop
 				#ifdef SAFE_ALGO
 				// Checks that ordering and edgeind are correct
 				if(!meshin.surfs.isearch(surfCurr)->isready(true)){

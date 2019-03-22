@@ -164,21 +164,21 @@ public:
 	void TightenConnectivity() {sort(surfind);unique(surfind);};
 
 	volu(){ // Constructor
-		index=0;
-		fill=0;
-		target=1;
-		error=1;
+		this->index=0;
+		this->fill=0;
+		this->target=1;
+		this->error=1;
 
 		#ifdef TEST_ARRAYSTRUCT
 		cout << "volu #" << index << " Was created " << surfind.size() << endl;
 		#endif
 	}
 	volu(const volu& oldVolu){ // Copy-Constructor
-		index=oldVolu.index;
-		fill=oldVolu.fill;
-		target=oldVolu.target;
-		error=oldVolu.error;
-		surfind=oldVolu.surfind;
+		this->index=oldVolu.index;
+		this->fill=oldVolu.fill;
+		this->target=oldVolu.target;
+		this->error=oldVolu.error;
+		this->surfind=oldVolu.surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
 		cout << "copyvolu #" << index << " Was created " 

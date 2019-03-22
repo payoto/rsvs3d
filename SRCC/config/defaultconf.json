@@ -61,7 +61,8 @@
       "inputpoints": [
         0.0
       ],
-      "pointfile": ""
+      "pointfile": "",
+      "snakecoarseness": 0.1
     },
     "voxel": {
       "gridsizebackground": [

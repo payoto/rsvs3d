@@ -20,7 +20,7 @@ OBJDIR = obj
 SRCTREE = src
 DEPDIR := .d
 BINDIR = bin
-INCLDIR= incl
+INCLPROJ= incl
 #modules/tetgen/
 
 # Sources which contain the main function for all and test
@@ -63,7 +63,7 @@ DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144
 INCL= 
 
 SRCTREE+= $(DIRTETGEN)
-INCLDIR+=  $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
+INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
 INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 #------------------------------------------------------
@@ -74,6 +74,11 @@ WARNFLAGS= -Wall -Wextra -pedantic -Werror
 #
 OPTIMLVL=3
 CCPSTD=11
+
+# O3 comes with spurious warnings which is ugly to deal in the code
+ifeq ($(OPTIMLVL), 3)
+WARNFLAGS += -Wno-maybe-uninitialized
+endif
 
 # Other compiler flags
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE
@@ -86,9 +91,9 @@ CCPSTD=11
 # cxxopts #
 CCFLAGDBG= -g -ggdb
 # -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
-CCFLAGPROJ= -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DRSVS_DIAGNOSTIC
-CCFLAGBOOST= -DUSE_STACKTRACE
-CCFLAGEIG= 
+CCFLAGPROJ= 
+CCFLAGBOOST= 
+CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
 CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
@@ -97,7 +102,7 @@ CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETE
 CCFLAGETETGEN += $(CCFLAGDBG)
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
-CFTESTFLAG= -DTEST_ALL -DTEST_ALL_WORKING
+CFTESTFLAG= -DTEST_ALL -DTEST_KNOWN_FAILURES
 
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work
@@ -186,24 +191,23 @@ SOURCES = $(foreach d,$(wildcard $(SRCTREE)*),$(call rwildcard,$d/,*.cpp))
 # $(info $(SOURCES))
 # $(info sources printed)
 # Handling target differences
+SRCS := $(SOURCES)
+# 
 ifeq ($(MAKECMDGOALS), )
-SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
 EXECUTABLE = $(MAINEXECUTABLE)
 endif
 ifeq ($(MAKECMDGOALS), all)
-SRCS := $(filter-out $(MAINTESTSRC),$(SOURCES))
 EXECUTABLE = $(MAINEXECUTABLE)
 endif
 
 ifeq ($(MAKECMDGOALS), testnew)
-SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
-# SRCS := $(filter-out $(NOTNEEDEDNEWTEST),$(SRCS))
 EXECUTABLE = $(TESTEXECUTABLE)
+CCFLAGCUSTOM += -DRSVSTEST
 endif
 
 ifeq ($(MAKECMDGOALS), testall)
-SRCS := $(filter-out $(MAINALLSRC),$(SOURCES))
 EXECUTABLE = $(TESTALLEXECUTABLE)
+CCFLAGCUSTOM += -DRSVSTEST
 endif
 
 # $(info $(SRCS))
@@ -211,14 +215,23 @@ endif
 
 # Define objects from sources
 OBJECTS=$(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
+
+# Allows Conditional build of objects which include "makeontargetchange.h"
+PREVIOUSTARGET = $(shell cat $(DEPDIR)/prevtarget.d)
+ifneq ($(MAKECMDGOALS), $(PREVIOUSTARGET))
+$(shell echo // overwritten when make target changes > $(INCLPROJ)/makeontargetchange.h)
+endif
+
+
+
 #------------------------------------------------------
 #             RECIPES
 #------------------------------------------------------
 
 # TARGETS
-all : $(SRCS) $(EXECUTABLE)  
-testnew : $(SRCS) $(EXECUTABLE) 
-testall : $(SRCS) $(EXECUTABLE) 
+all : FORCE $(SRCS) $(EXECUTABLE)  
+testnew : FORCE $(SRCS) $(EXECUTABLE) 
+testall : FORCE $(SRCS) $(EXECUTABLE) 
   
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
@@ -270,18 +283,18 @@ $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/
 	mkdir -p $(dir $@)
 	touch $@
 
+.PHONY: clean 
 # Clean target
 OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
 	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d 
 
-#precompile.hpp : 
-#	$(CC) -c -H -DDEBUGLVL1 -ggdb $(INCLDIR) -x c++-header precompile.hpp
+FORCE: 
 
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d  %/.f
 
-
+$(shell echo -n $(MAKECMDGOALS) > $(DEPDIR)/prevtarget.d)
 # $(info $(patsubst %,$(DEPDIR)/%.d,$(notdir $(basename $(SRCS)))))
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(notdir $(basename $(SRCS)))))

@@ -32,6 +32,7 @@
   "/grid/voronoi/distancebox": 0.1,
   "/grid/voronoi/inputpoints/0": 0.0,
   "/grid/voronoi/pointfile": "",
+  "/grid/voronoi/snakecoarseness": 0.1,
   "/grid/voxel/gridsizebackground/0": 1,
   "/grid/voxel/gridsizebackground/1": 1,
   "/grid/voxel/gridsizebackground/2": 1,

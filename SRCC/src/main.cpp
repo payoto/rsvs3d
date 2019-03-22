@@ -7,7 +7,27 @@
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
 
+#include "makeontargetchange.h"
+
+#ifdef RSVSTEST
+#include "test.hpp"
+#endif // RSVSTEST
+
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char* argv[]){
+	#ifndef RSVSTEST
+	return RSVSExecution(argc, argv);
+	#elif defined(TEST_ALL)
+	rsvstest::maintest();
+	#else
+	rsvstest::newtest();
+	#endif //RSVSTEST
+}
+#pragma GCC diagnostic pop
+
+int RSVSExecution(int argc, char* argv[]){
 	int execFlow=0;
 	param::parameters paramconf;
 
@@ -22,6 +42,7 @@ int main(int argc, char* argv[]){
 		// Output parameter file to the directory (NO OVERWRITE?)
 		NoExecution(execFlow, paramconf);
 	}
+	return (0);
 }
 
 void NoExecution(int execFlow, param::parameters &paramconf){

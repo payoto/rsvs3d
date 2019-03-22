@@ -25,8 +25,8 @@ namespace param {
 //
 // Substructure names are all 4-5 letters
 
+int RSVSExecution(int argc, char* argv[]);
 void NoExecution(int execFlow, param::parameters &paramconf);
-
 namespace parse {
 	int CommandLineParser(int argc, char* argv[], param::parameters &paramconf);
 

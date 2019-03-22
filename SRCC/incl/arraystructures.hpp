@@ -133,7 +133,7 @@ public:
 	// Operators
 	void issafeaccess(const int a){
 		#ifdef SAFE_ACCESS // adds a check in debug mode
-		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+		if ((unsigned_int(a)>=elems.size()) || (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			#ifdef USE_STACKTRACE 
 			cerr << stacktrace::stacktrace() << endl;
@@ -150,7 +150,7 @@ public:
 	// () Operator returns a constant pointer to the corresponding elems.
 	// Cannot be used on the left hand side and can't be used to edit data in elems
 		#ifdef SAFE_ACCESS // adds a check in debug mode
-		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+		if ((unsigned_int(a)>=elems.size()) || (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			#ifdef USE_STACKTRACE 
 			cerr << stacktrace::stacktrace() << endl;
@@ -168,7 +168,7 @@ public:
 	// Cannot be used on the left hand side and can't be used to edit data in elems
 		int a=this->find(b);
 		#ifdef SAFE_ACCESS // adds a check in debug mode
-		if ((unsigned_int(a)>=elems.size()) | (0>a)){
+		if ((unsigned_int(a)>=elems.size()) || (0>a)){
 			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
 			#ifdef USE_STACKTRACE 
 			cerr << stacktrace::stacktrace() << endl;
