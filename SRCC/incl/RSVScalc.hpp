@@ -23,61 +23,259 @@
 using namespace std; 
 using namespace Eigen; 
 
+/**
+ * Class to handle the RSVS calculation.
+ * 
+ * This class calculates volume and area metrics in a triangulated snake
+ * to update the velocity and volumes. It uses an SQP algorithm to compute the
+ * velocities.
+ */
 class RSVScalc {
 protected:
+	/// Number of design variables
 	int nDv=0;
+	/// Number of constraints
 	int nConstr=0;
+	/// Number of false access operations
 	int falseaccess=0;
+	/// Return the derivatives (obsolete/unused)
 	bool returnDeriv=true;
-public :
-	MatrixXd dConstr,HConstr, HObj, HLag;
+public:
+	/// Constraint Jacobian, size: [nConstr, nDv].
+	MatrixXd dConstr;
+	/// Constraint Hessian, size: [nDv, nDv].
+	MatrixXd HConstr;
+	/// Objective Hessian, size: [nDv, nDv].
+	MatrixXd HObj;
+	/// Lagrangian Hessian, size: [nDv, nDv].
+	MatrixXd HLag;
+	/// Objective Jacobian, size: [1, nDv].
 	RowVectorXd dObj;
-	VectorXd constr, lagMult, deltaDV, constrTarg;
-	double obj=0.0;
-	double limLag = INFINITY;
-
-	vector<bool> isConstrAct, isDvAct;
-	vector<int> subConstrAct, subDvAct;
-	HashedVector<int, int> dvMap;
-	HashedMap<int,int,int> constrMap; // maps snakemesh volu onto constr
-	vector<pair<int,int>> constrList; // keeps pairs with parentindex and voluindex
+	/// Constraint value vector, size: [nConstr, 1].
+	VectorXd constr;
+	/// Lagrangian multiplier, size: [nConstr, 1].
+	VectorXd lagMult;
+	/// Change in design variable, assigned to snake velocity, size: [nDv, 1].
+	VectorXd deltaDV;
+	/// Constraint target values, size: [nConstr, 1].
+	VectorXd constrTarg;
+	///
 	MatrixXd dvCallConstr;
+	/// Objective function value.
+	double obj=0.0;
+	/// Value at which a Lagrangian multiplier is considered problematically
+	/// large
+	double limLag = INFINITY;
+	/// is the corresponding constraint active?
+	std::vector<bool> isConstrAct;
+	/// Is the corresponding design variable active?
+	std::vector<bool> isDvAct;
+	/// Vector of subscripts of the active constraints
+	std::vector<int> subConstrAct;
+	/// Vector of subscripts of the active design variables
+	std::vector<int> subDvAct;
+	/// Maps the snake indices to the position in the design variable vector
+	HashedVector<int, int> dvMap;
+	/// maps snakemesh volu onto constr
+	HashedMap<int,int,int> constrMap;
+	/// keeps pairs with parentindex and voluindex
+	std::vector<pair<int,int>> constrList;
 
+	/**
+	 * @brief      Builds mathematics arrays.
+	 *
+	 * @param[in]  nDv      Number of design variables.
+	 * @param[in]  nConstr  Number of constraints.
+	 */
 	void BuildMathArrays(int nDv, int nConstr);
+
+	/**
+	 * @brief      Builds the constraint mapping.
+	 *
+	 * @param[in]  triangleRSVS  Triangulation containing the RSVS.
+	 */
 	void BuildConstrMap(const triangulation &triangleRSVS);
+
+	/**
+	 * @brief      Builds the constraint mapping.
+	 *
+	 * @param[in]  meshin  mesh for constraint building.
+	 */
 	void BuildConstrMap(const mesh &meshin);
-	void BuildDVMap(const vector<int> &vecin);
+
+	/**
+	 * @brief      Builds a Design variable map.
+	 *
+	 * @param[in]  vecin  The input vector of design variable indices.
+	 *
+	 * @return     The number of design variable.
+	 */
+	int BuildDVMap(const std::vector<int> &vecin);
+	
+	/**
+	 * Returns wether a snaxel is a design variable or not.
+	 * 
+	 * If the snaxel is frozen and all its neighbours are frozen, it is not 
+	 * a design variable.
+	 *
+	 * @param[in]  triRSVS  The triangulation which is being calculated
+	 * @param[in]  ii       the snaxel subscript. 
+	 *
+	 * @return     wether the snaxel is design variable or not.
+	 */
 	bool SnakDVcond(const triangulation &triRSVS, int ii);
+
+	/**
+	 * @brief      Groups actions needed before the calculation of triangular 
+	 * quantities.
+	 *
+	 * @param[in]  triRSVS  The triangulation object.
+	 */
 	void PrepTriangulationCalc(const triangulation &triRSVS);
-	// Calculate derivatives wrapper
+	
+	/**
+	 * @brief      Calculates the mesh volumes.
+	 *
+	 * @param      meshin  The mesh.
+	 */
 	void CalculateMesh(mesh &meshin);
+	
+	/**
+	 * @brief      Calculates the triangulation volume and area derivatives.
+	 *
+	 * @param[in]  triRSVS      The triangle rsvs
+	 * @param[in]  derivMethod  The differentiation method to use. 1 : Finite
+	 *                          Difference, 2 : Direct calculation, all others :
+	 *                          differentiation.
+	 */
 	void CalculateTriangulation(const triangulation &triRSVS, int derivMethod=0);
-	// Calculate derivatives
+
+	/**
+	 * Calculates the properties of single triangle.
+	 *
+	 * These values are returned to the class math arrays.
+	 *
+	 * @param[in]  triIn     The triangle to measure.
+	 * @param[in]  triRSVS   The containing triangulation object.
+	 * @param[in]  isObj     Calculate objective?
+	 * @param[in]  isConstr  Calculate constraint?
+	 * @param[in]  isDeriv   Calculate derivatives?
+	 */
 	void CalcTriangle(
 		const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true
 		);
+
+	/**
+	 * Calculates the properties of single triangle using Finite difference.
+	 *
+	 * These values are returned to the class math arrays.
+	 *
+	 * @param[in]  triIn     The triangle to measure.
+	 * @param[in]  triRSVS   The containing triangulation object.
+	 * @param[in]  isObj     Calculate objective?
+	 * @param[in]  isConstr  Calculate constraint?
+	 * @param[in]  isDeriv   Calculate derivatives?
+	 */
 	void CalcTriangleFD(
 		const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true
 		);
+
+	/**
+	 * Calculates the properties of single triangle using direct calculation.
+	 *
+	 * These values are returned to the class math arrays.
+	 *
+	 * @param[in]  triIn     The triangle to measure.
+	 * @param[in]  triRSVS   The containing triangulation object.
+	 * @param[in]  isObj     Calculate objective?
+	 * @param[in]  isConstr  Calculate constraint?
+	 * @param[in]  isDeriv   Calculate derivatives?
+	 */
 	void CalcTriangleDirectVolume(
 		const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true
 		);
+
+	/**
+	 * Calculates the properties of single triangle for 2D RSVS.
+	 *
+	 * These values are returned to the class math arrays.
+	 *
+	 * @param[in]  triIn     The triangle to measure.
+	 * @param[in]  triRSVS   The containing triangulation object.
+	 * @param[in]  isObj     Calculate objective?
+	 * @param[in]  isConstr  Calculate constraint?
+	 * @param[in]  isDeriv   Calculate derivatives?
+	 */
 	void CalcTriangleEdgeLength(
 		const triangle& triIn, const triangulation &triRSVS,
 		bool isObj=true, bool isConstr=true, bool isDeriv=true);
 
-	void ReturnConstrToMesh(triangulation &triRSVS) const ;
+	/**
+	 * @brief      Returns a constraint to the triangulation::meshDep.
+	 *
+	 * @param      triRSVS  The triangulation object.
+	 */
+	void ReturnConstrToMesh(triangulation &triRSVS) const;
+
+	/**
+	 * @brief      Returns a constraint to the mesh.
+	 *
+	 * @param      meshin  The input mesh.
+	 * @param[in]  volu    The volumetric field that data needs to be returned
+	 *                     to. It is a member point of class volu.
+	 */
 	void ReturnConstrToMesh(mesh &meshin, double volu::*mp=&volu::volume) const ;
+	
+	/**
+	 * @brief      Prepare the active arrays for SQP calculation and calculate
+	 *             the SQP step.
+	 *
+	 * @param[in]  calcMethod  Calculation method for SQP. Check
+	 *                         :meth:RSVScalc::ComputeSQPstep for detail.
+	 */
 	void CheckAndCompute(int calcMethod=0);
+
+	/**
+	 * Calculates the next SQP step.
+	 *
+	 * In normal operation the constraint should be 0 through 4. With 0 the
+	 * default. By adding 10 to these values the "constraint only" mode is
+	 * enabled which performs a gradient descent step based on the constraint.
+	 *
+	 * @param[in]  calcMethod  The calculation method. 10 can be added to all
+	 *                         values to enable the "constraint only" mode.
+	 *                         Values correspond to the following:
+	 *                         `Eigen::HouseholderQR` (1); 	 *
+	 *                         `Eigen::ColPivHouseholderQR` (2) - Default;
+	 *                         Eigen::LLT<MatrixXd> (3); `Eigen::PartialPivLU`
+	 *                         (4);
+	 * @param      dConstrAct  The active constraint Jacobian
+	 * @param      dObjAct     The active objective Jacobian
+	 * @param      constrAct   The active constraint values
+	 * @param      lagMultAct  The active lagrangian multipliers.
+	 */
 	void ComputeSQPstep(int calcMethod,
 		MatrixXd &dConstrAct,
 		RowVectorXd &dObjAct,
 		VectorXd &constrAct,
 		VectorXd &lagMultAct
 		);
+
+	/**
+	 * @brief      Prepares the matrices needed for the SQP step calculation.
+	 *
+	 * @param      dConstrAct  The active constraint Jacobian
+	 * @param      HConstrAct  The active constraint hessian
+	 * @param      HObjAct     The active objective hessian
+	 * @param      dObjAct     The active objective Jacobian
+	 * @param      constrAct   The active constraint values
+	 * @param      lagMultAct  The active lagrangian multipliers.
+	 *
+	 * @return     Returns wether the calculation should be performed or not.
+	 */
 	bool PrepareMatricesForSQP(
 		MatrixXd &dConstrAct,
 		MatrixXd &HConstrAct, 
@@ -86,10 +284,39 @@ public :
 		VectorXd &constrAct,
 		VectorXd &lagMultAct
 		);
+	
+	/**
+	 * @brief      Returns velocities to the snaxels.
+	 *
+	 * @param      triRSVS  The triangulation object, affects the
+	 *                      triangulation::snakeDep attribute.
+	 */
 	void ReturnVelocities(triangulation &triRSVS);
+
+	/**
+	 * @brief      Getter for the number of constraints.
+	 *
+	 * @return     The number of constraints.
+	 */
 	int numConstr(){return(this->nConstr);}
 	// Output functions
-	void Print2Screen(int outType=0)const;
+	
+	/**
+	 * @brief      Prints different amounts of `RSVScalc` owned data to the
+	 *             screen.
+	 *
+	 * @param[in]  outType  The output type to print, values [2,3,4].
+	 */
+	void Print2Screen(int outType=0) const;
+
+	/**
+	 * @brief      Print convergence information to file stream.
+	 *
+	 * @param      out     The output filestream
+	 * @param[in]  loglvl  The logging detail to output. <1 nothing, ==1 Vector
+	 *                     statistics, ==2 ...and constraint vectors, >2 ...and 
+	 *                     snaxel velocity vector.
+	 */
 	void ConvergenceLog(ofstream &out, int loglvl=3) const;
 };
 
@@ -99,14 +326,88 @@ public :
 //       ie replaced by their code at compile time
 	
 
+/**
+ * Resizes the lagrangian multiplier LagMultAct based on whether any of its
+ * values are nan or too large.
+
+ This uses the RSVScalc object to guide the resizing operation if it is needed.
+
+ @param[in]     calcobj     The calculation object.
+ @param[in,out] lagMultAct  The vector of active lagrangian multipliers.
+ @param[out]    isLarge     Returns if lagMultAct is too large.
+ @param[out]    isNan       Returns if lagMultAct has Nan values.
+*/
 void ResizeLagrangianMultiplier(const RSVScalc &calcobj, 
 	VectorXd &lagMultAct, 
 	bool &isLarge, bool &isNan);
+
+ /**
+  * Template for calculation of an SQP step.
+  *
+  * This template cannot be deduced and needs the developer to pass the required
+  * solver class when it is called.
+  *
+  * Instantiation options: Eigen::HouseholderQR Eigen::ColPivHouseholderQR
+  * Eigen::LLT<MatrixXd> (*) <- needs a full type to be defined (see below)
+  * Eigen::PartialPivLU
+  *
+  * For stability info
+  * https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
+  * https://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html
+  *
+  * @param[in]  calcobj            The calculation object
+  * @param[in]  dConstrAct         Active constraint jacobian dh/dx
+  * @param[in]  dObjAct            Active objective jacobian dJ/dx
+  * @param[in]  constrAct          Active constraint vector
+  * @param      lagMultAct         The active lagrangian multipliers
+  * @param      deltaDVAct         The active SQP step to take
+  * @param[out] isNan              Indicates if lagMult is nan
+  * @param[out] isLarge            Indicates if lagMult is large
+  * @param[in]  attemptConstrOnly  Should the step algorithm attempt using only
+  *                                the constraint to step.
+  *
+  * @tparam     T                  The Eigen object template type to use. A full
+  *                                type will be defined using T<MatrixXd>.
+  *
+  * @return     (isLarge || isNan), if true some form of failure was detected.
+  */
 template<class T>
 bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
 	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
+
+/**
+ * Template for calculation of an SQP step.
+ *
+ * This template cannot be deduced and needs the developer to pass the required
+ * solver class when it is called.
+ *
+ * Instantiation options: Eigen::HouseholderQR<MatrixXd>
+ * Eigen::ColPivHouseholderQR<MatrixXd> Eigen::LLT<MatrixXd>
+ * Eigen::PartialPivLU<MatrixXd>
+ *
+ * For stability info
+ * https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
+ * https://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html
+ *
+ * @param[in]  calcobj            The calculation object
+ * @param[in]  dConstrAct         Active constraint jacobian dh/dx
+ * @param[in]  dObjAct            Active objective jacobian dJ/dx
+ * @param[in]  constrAct          Active constraint vector
+ * @param      lagMultAct         The active lagrangian multipliers
+ * @param      deltaDVAct         The active SQP step to take
+ * @param[out] isNan              Indicates if lagMult is nan
+ * @param[out] isLarge            Indicates if lagMult is large
+ * @param[in]  attemptConstrOnly  Should the step algorithm attempt using only
+ *                                the constraint to step.
+ *
+ * @tparam     T                  The Eigen object type to use. Should take a
+ *                                RSVScalc::HLag as a constructor and support a
+ *                                solve method.
+ *
+ * @return     (isLarge || isNan), if true some form of failure was detected.
+ */
 template<template<typename> class T>
 bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
@@ -114,32 +415,13 @@ bool SQPstep(const RSVScalc &calcobj,
 	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
 
 
-// Code needs to be included as it is a templated functions
+// Code to be included as templated functions
 
- 
 template<template<typename> class T>
 bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
 	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
-	/*
-	This template cannot be deduced and needs the developer to
-	pass the required solver template class when it is called.
-
-	This accepts any single parameter template for instantiation
-
-	Instantiation options:
-	Eigen::HouseholderQR
-	Eigen::ColPivHouseholderQR
-	Eigen::LLT<MatrixXd> (*) <- needs a full type to be defined (see below)
-	Eigen::PartialPivLU
-
-	For stability info
-	https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-	https://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html
-
-	*see : template<class T> void SQPstep
-	*/
 
 	return(SQPstep<T<MatrixXd>>(calcobj, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
@@ -147,25 +429,12 @@ bool SQPstep(const RSVScalc &calcobj,
 
 }
 
+
 template<class T>
 bool SQPstep(const RSVScalc &calcobj,
 	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
 	const VectorXd &constrAct, VectorXd &lagMultAct,
 	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
-	/*
-	This template cannot be deduced and needs the developer to
-	pass the required solver class when it is called.
-
-	Instantiation options:
-	Eigen::HouseholderQR<MatrixXd>
-	Eigen::ColPivHouseholderQR<MatrixXd>
-	Eigen::LLT<MatrixXd>
-	Eigen::PartialPivLU<MatrixXd>
-
-	For stability info
-	https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-	https://eigen.tuxfamily.org/dox/group__DenseDecompositionBenchmark.html
-	*/
 
 	MatrixXd temp1, temp2;
 	T HLagSystem(calcobj.HLag);
@@ -188,12 +457,12 @@ bool SQPstep(const RSVScalc &calcobj,
 	if(isLarge || isNan) {
 		// Use a least squared solver if only using the constraint
 		std::cout << "(constrmov) " ;
-	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
+	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV)
+	 		.solve(constrAct);
 	} else {
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
 						+ dConstrAct.transpose()*lagMultAct));
 	}
-	// cout << __PRETTY_FUNCTION__<< endl;
 	return(isLarge || isNan);
 }
 

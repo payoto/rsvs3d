@@ -31,7 +31,6 @@ void RSVScalc::PrepTriangulationCalc(const triangulation &triRSVS){
 	} else {
 		nDv=0;
 	} 
-	BuildMathArrays(nDv, nConstr);
 	
 	// TODO this needs to be supported by mapping each volume to the constraint position
 	// There can be more than one constraint for each cell.
@@ -46,7 +45,9 @@ void RSVScalc::PrepTriangulationCalc(const triangulation &triRSVS){
 			vecin.push_back(triRSVS.snakeDep->snaxs(ii)->index);
 		}
 	}
-	BuildDVMap(vecin);
+	nDv = this->BuildDVMap(vecin);
+
+	BuildMathArrays(nDv, nConstr);
 }
 
 bool RSVScalc::SnakDVcond(const triangulation &triRSVS, int ii){
@@ -59,9 +60,12 @@ bool RSVScalc::SnakDVcond(const triangulation &triRSVS, int ii){
 	kk=0;
 	// Check if all neighbours of the snaxel are 
 	while(kk<nEdges && allNeighFroze){
-		tempEdge=triRSVS.snakeDep->snakeconn.edges.isearch(triRSVS.snakeDep->snakeconn.verts(ii)->edgeind[kk]);
-		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(tempEdge->vertind[0])->isfreeze;
-		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(tempEdge->vertind[1])->isfreeze;
+		tempEdge=triRSVS.snakeDep->snakeconn.edges.isearch(
+			triRSVS.snakeDep->snakeconn.verts(ii)->edgeind[kk]);
+		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(
+			tempEdge->vertind[0])->isfreeze;
+		allNeighFroze &= triRSVS.snakeDep->snaxs.isearch(
+			tempEdge->vertind[1])->isfreeze;
 
 		++kk;
 	} 
@@ -97,8 +101,7 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 	ni=triRSVS.intertri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.intertri(ii)), triRSVS, false, true, true);
-	} 
-	// PrintMatrixFile(this->dConstr, "matrix_dConstr.txt");
+	}
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, 
@@ -285,7 +288,6 @@ void RSVScalc::BuildMathArrays(int nDvIn, int nConstrIn){
 		lagMult.setZero(nConstr);
 	}
 	deltaDV.setZero(nDv);
-	// constrTarg.setZero(nConstr);
 
 	dvCallConstr.setZero(nDv,1);
 }
@@ -323,11 +325,12 @@ void RSVScalc::BuildConstrMap(const mesh &meshin){
 	constrMap.GenerateHash();
 }
 
-void RSVScalc::BuildDVMap(const vector<int> &vecin){
-	dvMap.vec=vecin;
-	sort(dvMap.vec);
-	unique(dvMap.vec);
-	dvMap.GenerateHash();
+int RSVScalc::BuildDVMap(const vector<int> &vecin){
+	this->dvMap.vec=vecin;
+	sort(this->dvMap.vec);
+	unique(this->dvMap.vec);
+	this->dvMap.GenerateHash();
+	return this->dvMap.vec.size();
 }
 
 void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {

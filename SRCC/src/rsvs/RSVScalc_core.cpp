@@ -53,50 +53,6 @@ void ResizeLagrangianMultiplier(const RSVScalc &calcobj,
 		}
 	}
 }
-/*
-void SQPstep(const RSVScalc &calcobj,
-	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
-	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge){
-
-
-	MatrixXd temp1, temp2;
-
-	// ColPivHouseholderQR<MatrixXd> HLagSystem(HLag);
-	HouseholderQR<MatrixXd> HLagSystem(calcobj.HLag);
-	// LLT<MatrixXd> HLagSystem(HLag);
-	// PartialPivLU<MatrixXd> HLagSystem(HLag);
-
-
-	
-	temp1 = HLagSystem.solve(dConstrAct.transpose());
-	temp2 = HLagSystem.solve(dObjAct.transpose());
-
-	lagMultAct = (
-			dConstrAct*(temp1)
-		// ).colPivHouseholderQr().solve(
-		).householderQr().solve(
-		// ).llt().solve(
-		// ).partialPivLu().solve(
-			constrAct - (dConstrAct*(temp2))
-		);
-
-	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
-	
-	if(isLarge) {
-
-		// PrintMatrixFile(dConstrAct, "matrix_dConstrAct.txt");
-	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV).solve(constrAct);
-
-	} else {
-
-		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
-						+ dConstrAct.transpose()*lagMultAct));
-	}
-
-}*/
-
-
 
 //==========================================
 // Core class functions
