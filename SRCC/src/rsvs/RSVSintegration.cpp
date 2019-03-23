@@ -717,7 +717,8 @@ void integrate::execute::logging::FullTecplot(
 	int jj;
 	if(rsvsSnake.snaxs.size()>0){
 
-		outSnake.PrintMesh(rsvsSnake.snakeconn,1,totT, 2);
+		outSnake.PrintSnake(rsvsSnake, 1, totT);
+
 
 		rsvsSnake.snakeconn.PrepareForUse();
 		

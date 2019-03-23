@@ -17,7 +17,9 @@
 //===========================================
 // Bounds template class method definitions
 //===========================================
+using namespace std;
 using json = rsvsjson::json;
+
 template<class T>
 void param::to_json(json& j, const filltype<T>& p){
 	j = json{
@@ -89,9 +91,9 @@ void param::from_json(const json& j, voronoi& p){
 	j.at("snakecoarseness").get_to(p.snakecoarseness);
 }
 void param::voronoi::ReadPoints(){
-	ifstream pointstream;
+	std::ifstream pointstream;
 
-	pointstream.open(this->pointfile, ios::in);
+	pointstream.open(this->pointfile, std::ios::in);
 	CheckFStream(pointstream, __PRETTY_FUNCTION__, this->pointfile);
 
 	this->inputpoints.clear();

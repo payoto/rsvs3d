@@ -12,11 +12,6 @@
 // 		and to avoid circular dependencies
 
 
-namespace Eigen {
-	class MatrixXd;
-	class RowVectorXd;
-	class VectorXd;
-}
 
 //=================================
 // included dependencies
@@ -25,6 +20,7 @@ namespace Eigen {
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <Eigen>
 #include "vectorarray.hpp"
 
 
