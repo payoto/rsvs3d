@@ -2367,23 +2367,6 @@ void mesh::MakeCompatible_inplace(mesh &other) const{
 }
 
 void mesh::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){
-   /*int ii;
-   // Volumes
-   for(ii=0;ii<volus.size();++ii){
-	  volus[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
-   }
-   // Surfaces
-   for(ii=0;ii<surfs.size();++ii){
-	  surfs[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
-   }
-   // Volumes
-   for(ii=0;ii<edges.size();++ii){
-	  edges[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
-   }
-   // Surfaces
-   for(ii=0;ii<verts.size();++ii){
-	  verts[ii].ChangeIndices(nVert,nEdge,nSurf,nVolu);
-   }*/
 	volus.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 	edges.ChangeIndices(nVert,nEdge,nSurf,nVolu);
 	surfs.ChangeIndices(nVert,nEdge,nSurf,nVolu);

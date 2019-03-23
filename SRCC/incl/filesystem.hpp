@@ -1,6 +1,9 @@
-// Custom filesystem header Faff about with filesystem depending on version
-// To give a readable compile time error if incompatible things are attempted.
-// Basically a workaround gcc on windows hating me.
+/**
+* @file
+* Custom filesystem header Faff about with filesystem depending on version To
+* give a readable compile time error if incompatible things are attempted.
+* Basically a workaround gcc on windows hating me.
+*/
 
 // test for c++17 which has its own filesystem header
 #if __cplusplus == 201703L

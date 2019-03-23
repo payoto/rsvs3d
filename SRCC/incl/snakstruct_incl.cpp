@@ -1,8 +1,10 @@
-/*
+/**
 File for the implementation of the class template SnakStruct
 this .cpp file is INCLUDED as part of arraystructures.hpp and  cannot be 
 compiled on its own.
 This file adds the support for a second hashed variable called by KeyParent
+
+@file
 */
 
 #ifndef SNAKSTRUCT_INCL_H_INCLUDED

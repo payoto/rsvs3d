@@ -1,3 +1,8 @@
+/**
+ * Functions needed to evolve the r-surface snake.
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards

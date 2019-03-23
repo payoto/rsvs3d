@@ -1,8 +1,16 @@
+/**
+ * Provides a triangulation for snake and meshes.
+ * 
+ * This links an active snake and mesh to their triangulated representation 
+ * needed to compute areas and volumes. 
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards
-#ifndef SNAKEVEL_H_INCLUDED
-#define SNAKEVEL_H_INCLUDED
+#ifndef TRIANGULATE_H_INCLUDED
+#define TRIANGULATE_H_INCLUDED
 
 //===============================================
 // Levels of debuging Guards
@@ -11,14 +19,9 @@
 #define TEST_ALL
 #endif
 
-#ifdef DEBUGLVL1 // Debugging of new features.
+#ifdef DEBUGLVL1
 
 #endif
-
-//=================================
-// forward declared dependencies
-// 		class foo; //when you only need a pointer not the actual object
-// 		and to avoid circular dependencies
 
 class RSVScalc;
 
@@ -228,5 +231,5 @@ int Test_surfcentre();
 int Test_snakeRSVS_singlevol();
 int Test_RSVSalgo_singlevol();
 int Test_MeshOrient();
-#endif // SNAKEVEL_H_INCLUDED
+#endif // TRIANGULATE_H_INCLUDED
 

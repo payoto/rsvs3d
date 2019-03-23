@@ -1,7 +1,11 @@
+/**
+ * file containing the main functions and the command line parser.
+ * @file
+ */
+
+
 #ifndef MAIN_H_INCLUDED 
 #define MAIN_H_INCLUDED 
-
-
 
 //=================================
 // forward declared dependencies

@@ -988,7 +988,7 @@ void tetgen::SnakeToSU2(const snake &snakein, const std::string &fileName,
  *
  * @return     mesh object containing the translated grid.
  * 
- * @raises  invalid_argument if tetout was generated without passing the neighbour
+ * @throw  invalid_argument if tetout was generated without passing the neighbour
  * flag to tetgen (`-nn`)
  */
 mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){

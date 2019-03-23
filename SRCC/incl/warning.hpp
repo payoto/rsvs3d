@@ -1,4 +1,8 @@
-
+/**
+ * Provides the error and warning system used by the RSVS3D project.
+ *  
+ *@file
+ */
 #ifndef WARNING_H_INCLUDED
 #define WARNING_H_INCLUDED
 
@@ -32,21 +36,96 @@
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 
-using namespace std;
+/**
+ * @brief      Namespace for general purpose tools of the RSVS project.
+ */
 namespace rsvs3d {
+
+	/**
+	 * @brief      Exception for signaling rsvs errors.
+	 */
 	class rsvs_exception : public std::logic_error {
 		using std::logic_error::logic_error;
 	};
 
+	/**
+	 * Custom error function.
+	 *
+	 * Displays the name of the caller function and throw an exception type
+	 * object with the message specified. can be turned off by setting the last
+	 * parameter to false.
+	 *
+	 * @param[in]  message     Error message
+	 * @param[in]  caller      Caller function
+	 * @param[in]  file        The file in which the caller is.
+	 * @param[in]  line        The line at which the caller is.
+	 * @param[in]  throwError  should the error be thrown (True) or a warning
+	 *                         (False)?
+	 *
+	 * @tparam     E           Exception type to throw
+	 *
+	 * Convenience macros are also provided to use this function without typing
+	 * all the file, line and caller function macro names:
+	 *  - RSVS3D_ERROR(M) : throws the default exception type (std::exception);
+	 *  - RSVS3D_ERROR_LOGIC(M) : throws std::logic_error;
+	 *  - RSVS3D_ERROR_ARGUMENT(M) : throws std::invalid_argument;
+	 *  - RSVS3D_ERROR_TYPE(M, T) : throws T(M);
+	 */
 	template <class E=rsvs_exception>
 	void error(const char* message="", const char* caller="",
 		const char *file="", int line=0, bool throwError=true);
 }
+/**
+ * @brief      Throw generic rsvs errors.
+ *
+ * @param      M     Message of the error (const char*).
+ *
+ * @throw     rsvs3d::rsvs_exception
+ */
 #define RSVS3D_ERROR(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
+/**
+ * @brief      Generic rsvs warning.
+ *
+ * @param      M     Message of the warning (const char*).
+ */
 #define RSVS3D_ERROR_NOTHROW(M) (rsvs3d::error(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, false))
+
+/**
+ * @brief      Throw a specific error type.
+ *
+ * @param      M     Message of the warning (const char*).
+ * @tparam      T     Type of the exception to throw.
+ *
+ * @throw     T
+ */
 #define RSVS3D_ERROR_TYPE(M, T) (rsvs3d::error<T>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
+/**
+ * @brief      Throw a logic_error.
+ *
+ * @param      M     Message of the error (const char*).
+ *
+ * @throw     std::logic_error
+ */
 #define RSVS3D_ERROR_LOGIC(M) (rsvs3d::error<std::logic_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
+/**
+ * @brief      Throw a invalid_argument.
+ *
+ * @param      M     Message of the error (const char*).
+ *
+ * @throw     std::invalid_argument
+ */
 #define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
+
+/**
+ * @brief      Throw a range_error.
+ *
+ * @param      M     Message of the error (const char*).
+ *
+ * @throw     std::range_error
+ */
 #define RSVS3D_ERROR_RANGE(M) (rsvs3d::error<std::range_error>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 
 void ThrowWarning(const char * message);
@@ -55,11 +134,11 @@ void ThrowWarning(const char * message);
  *
  * @param[in]  file      input or output file stream
  * @param[in]  callerID  the name of the caller function as given by pretty
- * function
+ *                       function
  * @param[in]  fileName  The name of the file opened in the stream.
  *
  * @tparam     T         either ifstream or ofstream, needs to support method
- * `T::is_open()`
+ *                       `T::is_open()`
  */
 template<class T>
 void CheckFStream(const T &file, const char* callerID, 
@@ -76,44 +155,17 @@ void CheckFStream(const T &file, const char* callerID,
 
 namespace rsvs3d {
 
-	/**
-	 * Custom error function. 
-	 * 
-	 * Displays the name of the caller
-	 * function and throw an exception type object with the message
-	 * specified. can be turned off by setting the last parameter to
-	 * false.
-	 *
-	 * @param[in]  message     Error message
-	 * @param[in]  caller      Caller function
-	 * @param[in]  file        The file
-	 * @param[in]  line        The line
-	 * @param[in]  throwError  should the error be thrown (True) or a warning
-	 *                         (False)?
-	 *
-	 * @tparam     E           Exception type to throw
-	 *
-	 * Convenience macros are also provided to use this function
-	 * without typing all the file, line and caller function macro
-	 * names:
-	 *  - RSVS3D_ERROR(M) : throws the default exception type (std::exception);
-	 *  - RSVS3D_ERROR_LOGIC(M) : throws std::logic_error;
-	 *  - RSVS3D_ERROR_ARGUMENT(M) : throws std::invalid_argument;
-	 *  - RSVS3D_ERROR_TYPE(M, T) : throws T(M);
-	 */
 	template <class E>
 	void error(const char* message, const char* caller,
 		const char *file, int line, bool throwError){
-		cerr << endl << "Error at: " << file << ":" << line 
-			<< endl << "    " <<  caller << endl;
+		std::cerr << std::endl << "Error at: " << file << ":" << line 
+			<< std::endl << "    " <<  caller << std::endl;
 		if (throwError){
 			throw E(message);
 		} else {
-			cerr << "Exception (not thrown)" << message << endl;
+			std::cerr << "Exception (not thrown)" << message << std::endl;
 		}
 	}
 
-
-	//(?s)throw\s+([a-zA-Z:_]*)\s*\(([^;]*)\);
 }
 #endif // WARNING_H_INCLUDED

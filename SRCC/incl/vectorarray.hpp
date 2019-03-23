@@ -1,3 +1,8 @@
+/**
+ * Provides a 2D std::vector based container.
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards
@@ -36,6 +41,13 @@ using namespace std;
  
 // Template Class
 
+/**
+ * @brief      Template class for vector of vectors (matrix).
+ * 
+ * This is designed to be rectangular.
+ *
+ * @tparam     T     Type of the vector elements.
+ */
 template<class T> class ArrayVec{
 protected:
 	vector< vector<T> > elems;
@@ -76,25 +88,6 @@ public:
 	}
 
 };
-
-/*template<class T> class vectorsafe : public vector<T>{
-public: 
-	using vector<T>::size;
-
-	T& operator[](const int a) const { 
-	// [] Operator returns a reference to the corresponding elems.
-		#ifdef SAFE_ACCESS // adds a check in debug mode
-		if (((a)>=int(size())) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-			RSVS3D_ERROR_RANGE(" : Index is out of range");
-		}
-		#endif //SAFE_ACCESS
-		return((*this)[a]);
-	}
-	void operator=(vector<T> &a){
-		(this)= dynamic_cast<vectorsafe*>(a);
-	}
-};*/
 
 #include "vectorarray_incl.cpp"
 

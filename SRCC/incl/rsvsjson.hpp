@@ -1,7 +1,14 @@
+/**
+ * Interface between the RSVS project and the 
+ * [JSON for Modern C++ library](https://github.com/nlohmann/json).
+ *  
+ *@file
+ */
+
+
+
 #ifndef PARAMETERS2JSON_H_INCLUDED 
 #define PARAMETERS2JSON_H_INCLUDED 
-
-
 
 //=================================
 // forward declared dependencies

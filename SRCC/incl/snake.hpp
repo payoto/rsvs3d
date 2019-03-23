@@ -1,3 +1,10 @@
+/**
+ * Provides the core restricted surface snake container.
+ * 
+ * This container allows efficient and robust geometry and topology evolution.
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards

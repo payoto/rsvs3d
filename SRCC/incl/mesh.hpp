@@ -1,3 +1,12 @@
+/**
+ * Provides all the mesh tools used for the generation of 3D grids and 
+ * geometries.
+ * 
+ * This file provides the mesh class and it's associated sub-component. These 
+ * can be used to robustly control changes in geometry.
+ *  
+ *@file
+ */
 
 //===============================================
 // Include Guards
@@ -77,8 +86,13 @@ namespace grid {
 }
 
 
-/// Handles the use and norm of a vector for which the norm and the unit
-/// value might be needed
+
+/**
+ * Handles the use and norm of a vector for which the norm and the unit value
+ *  might be needed.
+ *  
+ *  Implements some simple mathematical operations for coordinate (3-D) vectors.
+*/
 class coordvec {
 protected:
 	vector<double> elems;
@@ -136,7 +150,7 @@ public:
 
 
 /**
- * @brief      /Abstract class to ensure interface is correct
+ * @brief      /Abstract class to ensure mesh interfaces are correct.
  */
 class meshpart : public ArrayStructpart { 
 public : 
@@ -144,7 +158,10 @@ public :
 
 };
 
-// Derived Classes
+
+/**
+ * @brief      Class for volume cell objects in a mesh.
+ */
 class volu: public meshpart {
 public:
 	
@@ -210,6 +227,9 @@ public:
 
 
 
+/**
+ * @brief      Class for surface object in a mesh.
+ */
 class surf: public meshpart , public modiftrackpart {
 protected:
 	bool isordered;
@@ -281,6 +301,9 @@ public:
 };
 
 
+/**
+ * @brief      Class for an edge object in a mesh.
+ */
 class edge: public meshpart , public modiftrackpart {
 public:
 	friend class mesh;
@@ -340,6 +363,9 @@ public:
 	int Key() const {return(index);}
 };
 
+/**
+ * @brief      Class for a vertex in a mesh.
+ */
 class vert: public meshpart {
 public:
 	
@@ -389,6 +415,10 @@ public:
 
 
 
+/**
+ * @brief      Class containing the information needed to trim objects from a 
+ * mesh.
+ */
 class ConnecRemv {
 public:
 	int keepind;
@@ -399,38 +429,31 @@ public:
 	
 };
 
-/*
-class surfarray : public ArrayStruct<surf>{
-	using ArrayStruct<surf>::elems;
-	friend class mesh;
-	friend class snake;
 
-public:
-	void SetNoModif();
-	void ReturnModifInd(vector<int> &vecind);
-	void ReturnModifLog(vector<bool> &modiflog);
-	surf& operator[](const int a){ 
-		#ifdef SAFE_ACCESS 
-		ArrayStruct<surf>::issafeaccess(a);
-		#endif
-		elems[a].isModif=true;
-		return(ArrayStruct<surf>::operator[](a));
-	}
-};*/
+/**
+ * @brief      Class for connecting meshes.
 
+ * Stores a vector of mesh references for parent and children. Needs to support
+ * partial meshes for constraint handling. 
+*/
 class meshdependence {
-	// Class for connecting meshes
-	// Stores a vector of mesh references for parent and children
-	// Needs to support partial meshes for constraint handling
 protected:
 	friend class mesh;
+	/// Number of parent meshes
 	int nParents = 0;
-	vector<int> elemind; // active element index
-	vector<mesh*> parentmesh; // use references as cannot be null
+	/// Indices of the active elements of the owning mesh
+	vector<int> elemind;
+	/// Vector of pointers to the mesh which are coarser (parents).
+	vector<mesh*> parentmesh;
+	/// Vector of pointers to the mesh which are finer (children).
 	vector<mesh*> childmesh;
+	/// parent/to self connectivity, 1 vector element per parent. This is an 
+	/// vector with the index of each parent element stored at the location of 
+	/// each self element.
 	vector<HashedVectorSafe<int,int>> parentconn;
 	// These methods are protected to avoid broken/uni-directional
 	// connectivities being generated
+	
 	int AddParent(mesh* meshin);
 	int AddChild(mesh* meshin);
 	void AddParent(mesh* meshin, vector<int> &parentind);
@@ -442,6 +465,15 @@ public:
 };
 
 
+/**
+ * @brief      Class for mesh handling.
+ * 
+ * Class implementing the functionality of this file. The mesh class allow, the
+ * robust evolution of a grid. Element connectivity is stored bi-directionnaly.
+ * This allows no connectivity to need to be infered and allows very fast and
+ * robust traversing of the mesh by using hashed lists of the indices of the
+ * mesh components.
+ */
 class mesh {
 private:
 	bool borderIsSet=false;
@@ -665,9 +697,6 @@ int Test_Vert();
 int Test_Edge();
 int Test_Mesh();
 int Test_Crop();
-void PopulateIndices(mesh *meshin);
-//template <class T> bool CompareDisp(T *mesh1,T *mesh2);
-//bool CompareFuncOut(function<void()> mesh1, function<void()> mesh2);
 
   
 template<class T, class V, class W>

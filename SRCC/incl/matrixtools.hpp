@@ -1,6 +1,10 @@
+/**
+ * Tools to support conversion, display and derivatives of Eigen matrices.
+ * @file
+ */
+
 #ifndef MATRIXTOOLS_H_INCLUDED 
 #define MATRIXTOOLS_H_INCLUDED 
-
 
 //=================================
 // forward declared dependencies
@@ -8,49 +12,64 @@
 // 		and to avoid circular dependencies
 
 
+namespace Eigen {
+	class MatrixXd;
+	class RowVectorXd;
+	class VectorXd;
+}
+
 //=================================
 // included dependencies
 
 #include <vector> 
-#include <Eigen>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include "vectorarray.hpp"
 
-using namespace std; 
-using namespace Eigen; 
 
-template <class T> void PrintMatrixFile(const vector<T> &mat, const char * name);
-void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, MatrixXd &dSdd);
-void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,const MatrixXd &HSc,const MatrixXd &Hcd,MatrixXd &HSd);
-void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retArray);
-void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn, MatrixXd &matOut);
-void PrintMatrix(const MatrixXd &mat);
-void PrintMatrixFile(const MatrixXd &mat, const char * name);
-void PrintMatrix(const RowVectorXd &mat);
-void PrintMatrix(const VectorXd &mat);
-double StreamStatistics(const VectorXd &&vec, ofstream &out, 
-	const string &&sep=string(", "));
-void StreamOutVector(const VectorXd &&vec, ofstream &out, 
-	const string &&sep=string(", "));
+template <class T> void PrintMatrixFile(const std::vector<T> &mat,
+	const char * name);
+void Deriv1stChainScalar(const Eigen::MatrixXd &dSdc,
+	const Eigen::MatrixXd &dcdd, Eigen::MatrixXd &dSdd);
+void Deriv2ndChainScalar(const Eigen::MatrixXd &dSdc,
+	const Eigen::MatrixXd &dcdd, 
+	const Eigen::MatrixXd &HSc,
+	const Eigen::MatrixXd &Hcd,
+	Eigen::MatrixXd &HSd);
+void VecBy3DimArray(const Eigen::MatrixXd &vec, 
+	const Eigen::MatrixXd &arr3dim, Eigen::MatrixXd &retArray);
+void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn,
+	Eigen::MatrixXd &matOut);
+void PrintMatrix(const Eigen::MatrixXd &mat);
+void PrintMatrixFile(const Eigen::MatrixXd &mat,
+	const char * name);
+void PrintMatrix(const Eigen::RowVectorXd &mat);
+void PrintMatrix(const Eigen::VectorXd &mat);
+double StreamStatistics(const Eigen::VectorXd &&vec,
+	std::ofstream &out, 
+	const std::string &&sep=std::string(", "));
+void StreamOutVector(const Eigen::VectorXd &&vec, std::ofstream &out, 
+	const std::string &&sep=std::string(", "));
+
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
 
-template <class T> void PrintMatrixFile(const vector<T> &mat, const char * name){
+template <class T> void PrintMatrixFile(const std::vector<T> &mat, 
+	const char * name){
 	int ii,ni;
-	ofstream myfile;
+	std::ofstream myfile;
 	ni=mat.size();
 
-	myfile.open(name, ios::app);
+	myfile.open(name, std::ios::app);
 	myfile.precision(16);
 	myfile << std::scientific;
 	for(ii=0;ii<ni;++ii){
 		myfile  << mat[ii] << " ";
 	}
-	myfile  << endl;
+	myfile  << std::endl;
 	myfile.close();
 
 }

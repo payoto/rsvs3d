@@ -1,3 +1,9 @@
+/**
+ * Interface between the RSVS project and [tetgen](tetgen.org).
+ *  
+ *@file
+ */
+
 #ifndef TETGEN_RSVS_API_H_INCLUDED 
 #define TETGEN_RSVS_API_H_INCLUDED 
 

@@ -1,3 +1,9 @@
+/**
+ * Tools for the refinement and coarsening of meshes. 
+ *  
+ *@file
+ */
+
 //===============================================
 // Include Guards
 #ifndef MESHREFINEMENT_H_INCLUDED

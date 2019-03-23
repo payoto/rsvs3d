@@ -1,4 +1,8 @@
-
+/**
+ * Provides the custom testing system used by the RSVS3D project.
+ *  
+ *@file
+ */
 //===============================================
 // Include Guards
 #ifndef TEST_H_INCLUDED
@@ -35,10 +39,15 @@
 //       ie replaced by their code at compile time
 
 
-// Base classes
+/**
+ * @brief      Namespace for rsvs tests.
+ */
 namespace rsvstest {
 
 	using namespace std;
+	/**
+	 * @brief      Class for customtest.
+	 */
 	class customtest {
 		private:
 			int testCount;

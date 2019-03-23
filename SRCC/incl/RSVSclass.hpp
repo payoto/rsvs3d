@@ -1,3 +1,10 @@
+/**
+ * Simple class containing all the information needed for the 3D-RSVS execution.
+ *  
+ *@file
+ */
+
+
 #ifndef RSVSCLASS_H_INCLUDED 
 #define RSVSCLASS_H_INCLUDED 
 

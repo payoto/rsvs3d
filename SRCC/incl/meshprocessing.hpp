@@ -1,3 +1,9 @@
+/**
+ * Tools for the mathematical processing of meshes. 
+ *  
+ *@file
+ */
+
 //===============================================
 // Include Guards
 #ifndef MESHPROCESSING_H_INCLUDED

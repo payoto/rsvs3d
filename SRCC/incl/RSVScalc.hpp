@@ -1,3 +1,9 @@
+/**
+ * Provides the infrastructure for calculation of the RSVS equations.
+ *  
+ *@file
+ */
+
 #ifndef RSVSINTERFACE_H_INCLUDED 
 #define RSVSINTERFACE_H_INCLUDED 
 

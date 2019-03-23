@@ -1,3 +1,11 @@
+/**
+ * Provide vector container with hashed index mapping.
+ * 
+ * This file provides classes and methods for the handling of groups of mesh
+ * subcomponents...
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards

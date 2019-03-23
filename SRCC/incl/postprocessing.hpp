@@ -1,3 +1,8 @@
+/**
+ * Provide tecplot file formating for mesh and snake outputs.
+ *  
+ *@file
+ */
 
 //===============================================
 // Include Guards

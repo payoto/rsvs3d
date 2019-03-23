@@ -1,3 +1,11 @@
+/**
+ * Integration into the full 3 dimensional Restricted Snake Volume of Solid
+ * method.
+ *  
+ *@file
+ */
+
+
 #ifndef RSVSINTEGRATION_H_INCLUDED 
 #define RSVSINTEGRATION_H_INCLUDED 
 

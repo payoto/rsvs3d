@@ -1,3 +1,11 @@
+/**
+ * Functions which are part of the RSVS algorithm but not core to the snaking
+ * process.
+ *  
+ *@file
+ */
+
+
 #ifndef RSVSALGORITHM_H_INCLUDED 
 #define RSVSALGORITHM_H_INCLUDED 
 
@@ -28,6 +36,10 @@ void RemoveSnakeInVolu(snake &snakein, std::vector<int> &voluInd,
 void RemoveSnakeInSurf(snake &snakein, std::vector<int> &voluInd, 
 	int outerBorder);
 void SpawnSnakeAndMove(snake &snakein, std::vector<int> vertSpawn);
+
+
+
+
 int Test_RSVSalgo_init();
 int Test_RSVSalgo();
 int Test_RSVSalgoflat();

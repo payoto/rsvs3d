@@ -1,3 +1,8 @@
+/**
+ * Generation of cartesian grids.
+ * 
+ *@file
+ */
 
 //===============================================
 // Include Guards
@@ -46,9 +51,20 @@
 using namespace std;
 using namespace Eigen;
 // Templates
+
+/**
+ * @brief      template which applies cumulative sum to Eigen Matrix.
+ *
+ *	Cumprod is applied row-wise for d=0 and col-wise for d=1
+ *
+ * @param[in]  matIn  The matrix input
+ * @param[in]  d      dimension to use 0-row wise, 1 col-wise
+ *
+ * @tparam     T      Eigen type
+ *
+ * @return     The cumulative sum.
+ */
 template <class T> T cumsum(const T &matIn, int d) {
-	/* template which applies cumsum to Eigen Matrix
-	Cumsum is applied row-wise for d=0 and col-wise for d=1*/
 	T mat=matIn;
 	if (!d) {
 		for (int i=0;i<mat.rows();++i){
@@ -67,9 +83,19 @@ template <class T> T cumsum(const T &matIn, int d) {
 
 }
 
+/**
+ * @brief      template which applies cumulative product to Eigen Matrix.
+ *
+ *	Cumprod is applied row-wise for d=0 and col-wise for d=1
+ *
+ * @param[in]  matIn  The matrix input
+ * @param[in]  d      dimension to use 0-row wise, 1 col-wise
+ *
+ * @tparam     T      Eigen type
+ *
+ * @return     The cumulative product.
+ */
 template <class T> T cumprod(const T &matIn, int d) {
-	/* template which applies cumsum to Eigen Matrix
-	Cumprod is applied row-wise for d=0 and col-wise for d=1*/
 	T mat=matIn;
 	if (!d) {
 		for (int i=0;i<mat.rows();++i){
@@ -87,12 +113,6 @@ template <class T> T cumprod(const T &matIn, int d) {
 	return(mat);
 
 }
-// Declare a couple of template specialisations
-// template<> RowVector3i cumprod<RowVector3i>(RowVector3i mat, int d);
-// template<> RowVector3i cumsum<RowVector3i>(RowVector3i mat, int d);
-// Base classes
-
-// Derived Classes
 
 // functions
 int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid);
@@ -113,11 +133,6 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh& blockGrid,
 //test functions
 int Test_BuildBlockGrid_noout();
 int Test_MeshOut();
-
-
-// member function definition template <class T> : "ArrayStruct"
-
-
 
 #endif // VOXEL_H_INCLUDED
 

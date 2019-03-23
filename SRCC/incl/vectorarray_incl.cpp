@@ -1,8 +1,10 @@
 
-/*
+/**
 File for the implementation of the class template vectorarray
 this .cpp file is INCLUDED as part of vectorarray.hpp and  cannot be 
 compiled on its own.
+
+@file
 */
 
 
