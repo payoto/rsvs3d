@@ -264,20 +264,22 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 
 	int startPnt = meshboundary.verts.size();
 	// Assign "boundary" point metrics
-	auto vertEdgeLength = CalculateVertexMinEdgeLength(meshdomain);
+	auto vertEdgeLength = CalculateVertexMinEdgeLength(meshboundary);
 	int count = vertEdgeLength.size();
 	for (int i = 0; i < count; ++i)
 	{
-		vertEdgeLength[i] *= tetgenParam.surfedgelengths[0];
+		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.surfedgelengths[0];
 	}
-	tetgen::internal::PointCurvature2Metric(vertEdgeLength, tetgenParam);
 	tetin.SpecifyTetPointMetric(0, startPnt, vertEdgeLength);
 	// Assign domain point metrics
-	for (int i = 0; i < int(tetgenParam.edgelengths.size()); ++i){
-		tetin.SpecifyTetPointMetric(startPnt,  vertPerSubDomain[i],
-			{tetgenParam.edgelengths[i]});
-		startPnt = startPnt + vertPerSubDomain[i];
+	vertEdgeLength = CalculateVertexMinEdgeLength(meshdomain);
+	count = vertEdgeLength.size();
+	for (int i = 0; i < count; ++i)
+	{
+		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.surfedgelengths[0];
 	}
+	tetin.SpecifyTetPointMetric(startPnt, startPnt+vertEdgeLength.size(),
+		vertEdgeLength);
 }
 
 void tetgen::input::RSVSGRIDS(const mesh &meshdomain,
@@ -1130,7 +1132,7 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
 
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
-	cmd = "QpqmnnefO9/7"; 
+	cmd = "pqmnnefO9/7"; 
 	try{
 		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
 	} catch (exception const& ex) {

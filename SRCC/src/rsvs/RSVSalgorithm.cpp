@@ -35,7 +35,7 @@ std::vector<int> FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	vertList.clear();
 	ni=internalSurf.size();
 
-	cout << "vertices to output internalSurf " << ni << endl;
+	cout << "Vertices : " << ni << " (interal), ";
 	for (ii=0; ii< ni; ++ii){
 		surfSurb=meshin.surfs.find(internalSurf[ii]);
 		nj=meshin.surfs(surfSurb)->edgeind.size();
@@ -54,7 +54,7 @@ std::vector<int> FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	sort(offBorderVert);
 	unique(offBorderVert);
 	ni=offBorderVert.size();
-	cout << "vertices to output offBorderVert " << ni << endl;
+	cout << ni << " (border); " << endl;
 	for (ii=0; ii< ni; ++ii){
 		vertList.push_back(offBorderVert[ii]);
 	}
