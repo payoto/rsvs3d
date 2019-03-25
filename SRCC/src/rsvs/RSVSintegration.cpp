@@ -550,7 +550,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 	maxStep = RSVSobj.paramconf.snak.maxsteps;
 	for(stepNum=0; stepNum<maxStep; ++stepNum){
 		start_s=clock(); 
-		// calcObj.limLag=10000.0;
+		RSVSobj.calcObj.limLag=10000.0;
 		std::cout << std::endl << "Step " << stepNum << " ";
 		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
 		start_s=TimeStamp(" deriv:", start_s);
@@ -608,7 +608,7 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 		integrate::execute::logging::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
-			totT, nVoluZone, stepNum);
+			totT, nVoluZone);
 	}
 }
 
@@ -640,7 +640,7 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 		integrate::execute::postprocess::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
-			totT, nVoluZone, stepNum);
+			totT, nVoluZone);
 	}
 
 }
@@ -712,22 +712,14 @@ void integrate::execute::logging::Snake(
 void integrate::execute::logging::FullTecplot(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	triangulation &rsvsTri, mesh &voluMesh,
-	double totT, int nVoluZone, int stepNum){
+	double totT, int nVoluZone){
 	vector<int> vertList;
 	int jj;
 	if(rsvsSnake.snaxs.size()>0){
 
-		outSnake.PrintSnake(rsvsSnake, 1, totT);
-
-
 		rsvsSnake.snakeconn.PrepareForUse();
-		
+		outSnake.PrintSnake(rsvsSnake, 1, totT, 2);
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT, 2);
-		if (stepNum==0){
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,3);
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,3);
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,5,totT,3);
-		}
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,3);
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,3);
 		if (int(rsvsTri.acttri.size())>0){
@@ -791,11 +783,11 @@ void integrate::execute::postprocess::Snake(
 void integrate::execute::postprocess::FullTecplot(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	triangulation &rsvsTri, mesh &voluMesh,
-	double totT, int nVoluZone, int stepNum){
+	double totT, int nVoluZone){
 
 	integrate::execute::logging::FullTecplot(
 		outSnake, rsvsSnake, rsvsTri, voluMesh,
-		totT, nVoluZone, stepNum);
+		totT, nVoluZone);
 }
 
 // ====================

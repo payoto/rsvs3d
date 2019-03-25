@@ -109,7 +109,7 @@ namespace tetgen {
 		using tetgenio::vfacetlist;
 		using tetgenio::vcelllist;
 
-		// using tetgenio::~tetgenio;
+		using tetgenio::initialize;
 
 		
 		void allocate();
@@ -124,10 +124,7 @@ namespace tetgen {
 			const std::vector<double> &mtrs);
 		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
 			int marker);
-		// void deallocate();
-		// ~io_safe(){
-		// 	this->deallocate();
-		// }
+		io_safe(){initialize();}
 	};
 
 	class apiparam {

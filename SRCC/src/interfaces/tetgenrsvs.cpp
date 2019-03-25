@@ -95,7 +95,7 @@ void tetgen::internal::Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomai
 
 	tetin.numberoffacets = meshgeom.surfs.size() + meshdomain.surfs.size();
 	tetin.numberofholes = numHoles;
-	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
+	tetin.numberofpoints += meshgeom.verts.size() + meshdomain.verts.size();
 
 	tetin.numberofpointmtrs = 1;
 	tetin.numberoffacetconstraints = 2;
@@ -103,7 +103,7 @@ void tetgen::internal::Mesh2Tetgenio(const mesh &meshgeom, const mesh &meshdomai
 
 	tetin.allocate();
 
-	tetgen::internal::MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.03},{0.0},0);
+	tetgen::internal::MeshData2Tetgenio(meshgeom, tetin, 0, 0, 1, {0.0},{0.0},0);
 	tetgen::internal::MeshData2Tetgenio(meshdomain, tetin, meshgeom.surfs.size(), 
 		meshgeom.verts.size(), -1, {-1.0},{0.0},1);
 }
@@ -124,7 +124,7 @@ void tetgen::internal::Mesh2TetgenioPoints(const mesh &meshgeom, const mesh &mes
 
 	tetin.numberoffacets = 0;
 	tetin.numberofholes = 0;
-	tetin.numberofpoints = meshgeom.verts.size() + meshdomain.verts.size();
+	tetin.numberofpoints += meshgeom.verts.size() + meshdomain.verts.size();
 
 	tetin.numberofpointmtrs = 0;
 	tetin.numberoffacetconstraints = 0;
@@ -394,21 +394,19 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 	
 	tetgen::internal::Mesh2TetgenioPoints(meshgeom, meshdomain, tetin);
 }
+/**
+Ouputs a tetgen io object to an SU2 mesh file.
 
+File format: https://su2code.github.io/docs/Mesh-File/
+
+@param      fileName  is a string with the path to the target mesh fileName
+@param      tetout    is tetgenio object (safe)
+
+@throws     invalid_argument  if `fileName` cannot be opened.
+
+*/
 void tetgen::output::SU2(const char* fileName, const tetgenio &tetout){
-	/*
-	Ouputs a tetgen io object to an SU2 mesh file.
 	
-	Args:
-		fileName: is a string with the path to the target mesh fileName
-		tetout: is tetgenio object (safe) 
-
-	Raises:
-		- invalid_argument if `fileName` cannot be opened. 
-
-	File format:
-	https://su2code.github.io/docs/Mesh-File/
-	*/
 	std::ofstream meshFile;
 	std::vector<int> diffBounds, numBounds;
 	int DEINCR;
@@ -1130,15 +1128,19 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 	std::vector<int> vertPerSubDomain;
 	mesh meshdomain = BuildCutCellDomain({0,0,0}, {0,0,0}, // upper bounds are not used
 		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
-
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
-	cmd = "pqmnnefO9/7"; 
+
+	
+	cmd = "pqminnefO9/7"; 
 	try{
-		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT);
+		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT, &tetinV);
 	} catch (exception const& ex) {
 		std::cerr <<  std::endl << "Input points: ";
 		DisplayVector(vecPts);
 		std::cerr << std::endl;
+
+		tetinT.save_poly("dbg/tetgen_error");
+		tetinT.save_nodes("dbg/tetgen_error");
 		voroMesh.displight();
 		throw ex;
 	}
