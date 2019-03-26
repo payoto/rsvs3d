@@ -92,8 +92,15 @@ int rsvstest::newtest(){
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
 	
-	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
-	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
+	// Parameter and JSON tests
+	gridTest.RunSilent(param::test::base,"parameter implementation");
+	gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
+	gridTest.RunSilent(param::test::io,"parameter read write");
+	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
+	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
+		" write flat format");
+	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
+		"determination of flat json");
 
 
 	return(0);

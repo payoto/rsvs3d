@@ -151,7 +151,7 @@ void param::snaking::PrepareForUse(){
 param::rsvs::rsvs(){
 	this->solveralgorithm = 0;
 
-	this->cstfill.active=false;
+	this->cstfill.active=true;
 	this->cstfill.fill=0.5;
 
 	this->filefill.active=false;
@@ -331,6 +331,7 @@ void param::files::PrepareForUse(){
 		this->ioout.pattern += this->ioin.casename;
 		this->appcasename2outdir=false;
 	}
+	std::cout << "Output folder: " << this->ioout.outdir << std::endl;
 }
 void param::to_json(json& j, const files& p){
 	j = json{

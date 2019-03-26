@@ -3,6 +3,7 @@
 *TESTOUT*
 out/*
 .gitattributes
+temp/*
 
 !*.lay
 
@@ -12,7 +13,6 @@ out/*
 *Automated_Function_Directory*
 
 # ignore compiled files
-
 *.exe
 *.s
 *.o
@@ -31,7 +31,7 @@ SRCC/docs/latex/*
 # files which are of no relevance
 SRCC/noexec_rsvsconfig.json
 SRCC/tetgen-tmpfile*.vtk
-
+defaultconfigRSVS3D.json*
 # Sublime text 
 *.sublime-workspace
 *.sublime-syntax

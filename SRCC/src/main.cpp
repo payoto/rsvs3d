@@ -52,7 +52,8 @@ void NoExecution(parse::ParserOutput parseOut, param::parameters &paramconf){
 		parseOut.paramFileOut="failexec_rsvsconfig.json";
 	}
 
-	param::io::writeflat(parseOut.paramFileOut, paramconf);
+	param::io::writeflat(parseOut.paramFileOut+"flat", paramconf);
+	param::io::write(parseOut.paramFileOut, paramconf);
 
 	if (parseOut.execFlow==-2){
 		cerr << "Error while parsing the arguments. Check generated '"
@@ -142,8 +143,8 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 			parseOut.paramFileOut = confCase;
 			break;
 		}
+		std::cout << parseOut.paramFileOut << std::endl;
 	}
-	std::cout << parseOut.paramFileOut << std::endl;
 
 	// Parameter configuration
 	// if one of the triggers is found specify that execution

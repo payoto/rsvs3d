@@ -1,5 +1,5 @@
 #include "rsvsjson.hpp"
-
+#include "warning.hpp"
 void rsvsjson::flatupdate(rsvsjson::json& jfin, rsvsjson::json& jnew,
 	bool isFlatFin, bool isFlatNew){
 	/*
@@ -15,6 +15,18 @@ void rsvsjson::flatupdate(rsvsjson::json& jfin, rsvsjson::json& jnew,
 	// Insert values read into the parameter structure
 	jfin.update(jnew);
 
-	jfin = jfin.unflatten();
-	jnew = jnew.unflatten();
+	try {
+		jnew = jnew.unflatten();
+	} catch (std::exception const& ex){
+		std::cerr << jnew.dump(2) << std::endl; 
+		std::cerr << ex.what() << std::endl;
+		RSVS3D_ERROR("Could not unflatten jnew");
+	}
+	try {
+		jfin = jfin.unflatten();
+	} catch (std::exception const& ex){
+		std::cerr << jfin.dump(2) << std::endl; 
+		std::cerr << ex.what() << std::endl;
+		RSVS3D_ERROR("Could not unflatten jfin");
+	}
 }
