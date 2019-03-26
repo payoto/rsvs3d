@@ -101,6 +101,8 @@ int rsvstest::newtest(){
 		" write flat format");
 	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
 		"determination of flat json");
+	gridTest.RunSilent(param::test::symmetry_makefillactive,
+		"makefill.active symmetrical?");
 
 
 	return(0);

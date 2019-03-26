@@ -702,3 +702,38 @@ int param::test::symmetry(){
 
 	return(0);
 }
+
+int param::test::symmetry_makefillactive(){
+	json j1, j2;
+	param::parameters v1;
+	// std::vector<double> v1, v2;
+	if(v1.rsvs.makefill.active){
+		RSVS3D_ERROR_NOTHROW("makefile has been turned active at "
+			"construction.");
+		return (3);
+	}
+	
+	j1=v1;
+	// v2 = j1
+	j1.get_to(v1);
+	if(v1.rsvs.makefill.active){
+		RSVS3D_ERROR_NOTHROW("makefile has been turned active when returned "
+			"from json.");
+		return (2);
+	}
+	j2=v1;
+	
+	std::cout << j1 << endl;
+	std::cout << j2 << endl;
+
+	if (j1!=j2){
+		std::cout << j1 << endl;
+		std::cout << j2 << endl;
+		std::cerr << "Error: Parameter conversion to JSON "
+			<<" is not symmetrical" << std::endl;
+		std::cerr << "In: " << __PRETTY_FUNCTION__ << std::endl;
+		return (1);
+	};
+
+	return(0);
+}

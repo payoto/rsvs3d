@@ -247,6 +247,7 @@ namespace param {
 		int prepareforuse();
 		int autoflat();
 		int symmetry();
+		int symmetry_makefillactive();
 	}
 }
 

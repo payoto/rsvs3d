@@ -79,7 +79,7 @@
   },
   "rsvs": {
     "cstfill": {
-      "active": false,
+      "active": true,
       "fill": 0.5
     },
     "filefill": {
