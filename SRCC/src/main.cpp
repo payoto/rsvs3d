@@ -28,11 +28,11 @@ int main(int argc, char* argv[]){
 #pragma GCC diagnostic pop
 
 int RSVSExecution(int argc, char* argv[]){
-	int execFlow=0;
+
 	param::parameters paramconf;
 
-	execFlow = parse::CommandLineParser(argc, argv, paramconf);
-	if (execFlow>0){
+	auto parseOut = parse::CommandLineParser(argc, argv, paramconf);
+	if (parseOut.execFlow>0){
 		integrate::RSVSclass RSVSobj;
 		RSVSobj.paramconf = paramconf;
 
@@ -40,47 +40,48 @@ int RSVSExecution(int argc, char* argv[]){
 
 	} else {
 		// Output parameter file to the directory (NO OVERWRITE?)
-		NoExecution(execFlow, paramconf);
+		NoExecution(parseOut, paramconf);
 	}
 	return (0);
 }
 
-void NoExecution(int execFlow, param::parameters &paramconf){
-	std::string nameConfOut("noexec_rsvsconfig.json");
+void NoExecution(parse::ParserOutput parseOut, param::parameters &paramconf){
 
-	if (execFlow==-2){
-		nameConfOut="failexec_rsvsconfig.json";
+
+	if (parseOut.execFlow==-2){
+		parseOut.paramFileOut="failexec_rsvsconfig.json";
 	}
 
-	param::io::writeflat(nameConfOut, paramconf);
+	param::io::writeflat(parseOut.paramFileOut, paramconf);
 
-	if (execFlow==-2){
-		cerr << "Error while parsing the arguments. Check generated"
-			"  'conf.json' file";
+	if (parseOut.execFlow==-2){
+		cerr << "Error while parsing the arguments. Check generated '"
+			<< parseOut.paramFileOut << "' file";
 			exit(-2);
 	}
 }
 
-int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramconf){
-	/*
-	Takes in the command line arguments and returns an integer specifying the
-	execution flow of the rest of the program.
-	*/
+/**
+Takes in the command line arguments and returns an integer specifying the
+execution flow of the rest of the program.
 
-	int execFlow=0;
-	std::vector<std::string> triggerExec,configParam, configFiles, configPredef;
+@param[in]  argc       The number of arguments
+@param      argv       the arguments
+@param      paramconf  The parameter struncture
+
+@return     Number indicating the state of the program after parsing: 0   does
+            nothing; 1   Run RSVS; -1  No exec stops it; -2  Error parsing
+            inputs.
+*/
+parse::ParserOutput parse::CommandLineParser(int argc, char* argv[], 
+	param::parameters &paramconf){
+
+	parse::ParserOutput parseOut;
+	parseOut.execFlow=0;
+	std::vector<std::string> triggerExec,configParam, configFiles, configPredef,
+		noexecStr;
 	// options that will trigger execution of RSVS
 	triggerExec = {"use-config","load-config","param"};
-	/*
-	execFlow controls the following execution of the flow. It is usually only
-	modified if it is 0 (by config parameters) but can be overriden by the exec or
-	noexec commands.
-	execFlow values and corresponding actions:
-		0   does nothing
-		1   Run RSVS
-		-1  No exec stops it
-		-2  Error parsing inputs 
-	*/
 
 	std::string strDescription;
 	strDescription = "\nProgram for the execution of the Restricted-Surface";
@@ -98,26 +99,26 @@ int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramcon
 	("u,use-config","Use one of the predefined configurations stored in the code.",
 		cxxopts::value(configPredef), "STRING")
 	("l,load-config", 
-		std::string("Load configuration file in JSON format to set parameter structure.")
-		+ std::string(" Multiple files can be specified and will be processed")
-		+ std::string(" in order of appearance."), cxxopts::value(configFiles), "FILES")
+		std::string("Load configuration file in JSON format to set parameter "
+		"structure. Multiple files can be specified and will be processed"
+		" in order of appearance."), cxxopts::value(configFiles), "FILES")
 	("p,param", "Define a parameter manually on the command line."
 		" The format must be a flat key into the JSON configuration:"
 		" (e.g.: '/snak/maxsteps:50' will set 'param.snak.maxsteps=50')",
 		 cxxopts::value(configParam),
 		"KEY:VAL")
 	("default-config","Output the default configuration to a file.",
-		cxxopts::value<std::string>()->implicit_value("default_config"), "FILE")
-	;
+		cxxopts::value<std::string>()->implicit_value("default_config"),
+		"FILE");
 
 	options.add_options("Execution control")
-	("n,noexec",std::string("Do not execute RSVS process, ")
-		+ std::string("will only parse the inputs and output ")
-		+ std::string("the resulting configuration file to 'arg'"),
-		cxxopts::value<std::string>()->implicit_value("./noexec_config.json"))
-	("e,exec", "Execute RSVS. With no command line argument the program does nothing.")
+	("n,noexec",std::string("Do not execute RSVS process, "
+		"will only parse the inputs and output "
+		"the resulting configuration file to 'arg'"),
+		cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"))
+	("e,exec", "Execute RSVS. With no command line argument the "
+		"program does nothing.")
 	;
-
 
 	auto result = options.parse(argc, argv);
 	// ""
@@ -125,7 +126,7 @@ int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramcon
 		std::cout << options.help({"", "Execution control",
 			"Parameter configuration"}) << std::endl;
 		exit(0);
-		execFlow = -1;
+		parseOut.execFlow = -1;
 	}
 	// "Execution control"
 	if(result.count("noexec")>0 && result.count("exec")>0){
@@ -133,21 +134,24 @@ int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramcon
 		std::cerr << " on the command line." << std::endl;
 		std::cerr << " see --help for more info" << std::endl;
 		exit(-1);
+	} else if (result.count("exec")){
+		parseOut.execFlow = 1;
+	} else if (result.count("noexec")){
+		parseOut.execFlow = -1;
+		for (auto confCase : noexecStr){
+			parseOut.paramFileOut = confCase;
+			break;
+		}
 	}
-	if (result.count("exec")){
-		execFlow = 1;
-	}
-	if (result.count("noexec")){
-		execFlow = -1;
-	}
+	std::cout << parseOut.paramFileOut << std::endl;
 
 	// Parameter configuration
 	// if one of the triggers is found specify that execution
 	// should take place
-	if (execFlow==0){
+	if (parseOut.execFlow==0){
 		for (auto i : triggerExec){
 			if(result.count(i)){
-				execFlow = 1;
+				parseOut.execFlow = 1;
 				break;
 			}
 		}
@@ -165,11 +169,11 @@ int parse::CommandLineParser(int argc, char* argv[], param::parameters &paramcon
 	}
 	if (result.count("param")){
 		if(param::io::updatefromstring(configParam, paramconf)>0){
-			execFlow = -2;
+			parseOut.execFlow = -2;
 		}
 	}
 
-	return(execFlow);
+	return(parseOut);
 }
 
 #pragma GCC diagnostic push

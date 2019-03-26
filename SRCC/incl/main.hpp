@@ -15,7 +15,9 @@
 namespace param {
 	class parameters;
 }
-
+namespace parse {
+	class ParserOutput;
+}
 //=================================
 // included dependencies
 
@@ -30,9 +32,17 @@ namespace param {
 // Substructure names are all 4-5 letters
 
 int RSVSExecution(int argc, char* argv[]);
-void NoExecution(int execFlow, param::parameters &paramconf);
+void NoExecution(parse::ParserOutput execFlow, param::parameters &paramconf);
 namespace parse {
-	int CommandLineParser(int argc, char* argv[], param::parameters &paramconf);
+	
+	class ParserOutput {
+	public:
+		int execFlow = 0;
+		std::string paramFileOut = "noexec_config.json";
+	};
+
+	ParserOutput CommandLineParser(int argc, char* argv[],
+		param::parameters &paramconf);
 
 	namespace config{
 		void useconfig(const std::string &confCase, param::parameters &paramconf);
