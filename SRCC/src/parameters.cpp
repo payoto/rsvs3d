@@ -158,7 +158,7 @@ param::rsvs::rsvs(){
 	this->filefill.fill="";
 	
 	this->makefill.active=false;
-	this->makefill.active="";
+	this->makefill.fill="";
 }
 
 param::rsvs::~rsvs(){
@@ -712,7 +712,7 @@ int param::test::symmetry_makefillactive(){
 			"construction.");
 		return (3);
 	}
-	
+
 	j1=v1;
 	// v2 = j1
 	j1.get_to(v1);

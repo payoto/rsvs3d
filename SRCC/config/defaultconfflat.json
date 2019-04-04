@@ -43,7 +43,7 @@
   "/rsvs/cstfill/fill": 0.5,
   "/rsvs/filefill/active": false,
   "/rsvs/filefill/fill": "",
-  "/rsvs/makefill/active": true,
+  "/rsvs/makefill/active": false,
   "/rsvs/makefill/fill": "",
   "/rsvs/solveralgorithm": 0,
   "/snak/arrivaltolerance": 1e-07,

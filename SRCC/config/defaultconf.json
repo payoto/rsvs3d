@@ -87,7 +87,7 @@
       "fill": ""
     },
     "makefill": {
-      "active": true,
+      "active": false,
       "fill": ""
     },
     "solveralgorithm": 0
