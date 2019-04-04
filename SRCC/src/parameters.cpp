@@ -229,7 +229,7 @@ void param::grid::PrepareForUse(){
 param::ioin::ioin(){
 	this->snakemeshname = "";
 	this->volumeshname = "";
-	this->targetfill = "";
+	this->snakefile = "";
 	this->casename = "";
 }
 
@@ -237,18 +237,22 @@ void param::to_json(json& j, const ioin& p){
 	j = json{
 		{"snakemeshname", p.snakemeshname},
 		{"volumeshname", p.volumeshname},
-		{"targetfill", p.targetfill},
+		{"snakefile", p.snakefile},
 		{"casename", p.casename},
 	};
 }
 void param::from_json(const json& j, ioin& p){
 	j.at("snakemeshname").get_to(p.snakemeshname);
 	j.at("volumeshname").get_to(p.volumeshname);
-	j.at("targetfill").get_to(p.targetfill);
+	j.at("snakefile").get_to(p.snakefile);
 	j.at("casename").get_to(p.casename);
 }
 void param::ioin::PrepareForUse(){
-
+	if(!this->snakefile.empty() 
+		&& (this->volumeshname.empty() || this->snakemeshname.empty())){
+		RSVS3D_ERROR_ARGUMENT("Incompatible ioin parameters: mesh files must "
+			"be defined to load a 'snakefile'.");
+	}
 }
 
 param::ioout::ioout(){

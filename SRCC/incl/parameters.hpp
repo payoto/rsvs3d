@@ -28,8 +28,8 @@
 // Substructure names are all 4-5 letters
 
 /**
- * Namespace containing the parameter classes used to control execution of the
- * 3D-RSVS program..
+ * Namespace containing the parameter classes used to control execution 
+ * of the 3D-RSVS program..
  */
 namespace param {
 	/// Collects a lower and an upper bound.
@@ -84,7 +84,8 @@ namespace param {
 		double snaxtimestep;
 		/// maximum snaxel distance movement
 		double snaxdiststep;
-		/// Initialisation boundary (either 0 or 1)
+		/// Initialisation boundary (either 0 (outer border), 
+		/// 1 (inner border))
 		int initboundary;
 		/// maximum number of steps
 		int maxsteps;
@@ -157,7 +158,7 @@ namespace param {
 	public:
 		std::string snakemeshname;
 		std::string volumeshname;
-		std::string targetfill;
+		std::string snakefile;
 		std::string casename;
 
 		ioin();

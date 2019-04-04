@@ -29,6 +29,7 @@ namespace param {
 	class rsvs;
 	class voxel;
 	class voronoi;
+	class ioin;
 }
 
 //=================================
@@ -70,12 +71,14 @@ namespace integrate {
 	namespace prepare {
 		void Mesh(
 			const param::grid &gridconf,
+			const param::ioin &ioinconf,
 			mesh &snakeMesh,
 			mesh &voluMesh
 		);
 		void Snake(
 			const param::snaking &snakconf, 
 			const param::rsvs &rsvsconf, 
+			const param::ioin &ioinconf, 
 			mesh &snakeMesh,
 			mesh &voluMesh,
 			snake &rsvsSnake
@@ -105,7 +108,7 @@ namespace integrate {
 				mesh &voluMesh
 			);
 			void Load(
-				const param::grid &gridconf,
+				const param::ioin &ioinconf,
 				mesh &snakeMesh,
 				mesh &voluMesh
 			);

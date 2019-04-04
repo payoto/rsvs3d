@@ -149,14 +149,14 @@ namespace tetgen {
 
 		void ReadJsonString(const std::string &jsonStr);
 		apiparam(){
-			this->lowerB={0.0,0.0,0.0};
-			this->upperB={1.0, 1.0, 1.0};
+			this->lowerB = {0.0, 0.0, 0.0};
+			this->upperB = {1.0, 1.0, 1.0};
 			this->surfedgelengths = {0.02, 0.005};
-			this->curvatureSmoothing=4;
-			this->edgelengths={0.03, 1.0};
+			this->curvatureSmoothing = 4;
+			this->edgelengths = {0.03, 1.0};
 			this->distanceTol = 0.3;
 			this->generateMeshInside = false;
-			this->command="";
+			this->command = "";
 		}
 		/**
 		 * @brief      Constructs the object from a json string.

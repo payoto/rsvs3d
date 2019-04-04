@@ -14,6 +14,7 @@
 #include "parameters.hpp"
 #include "voxel.hpp"
 #include "meshrefinement.hpp"
+#include "meshprocessing.hpp"
 #include "RSVScalc.hpp"
 #include "RSVSalgorithm.hpp"
 #include "postprocessing.hpp"
@@ -284,8 +285,10 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	origconf = RSVSobj.paramconf;
 	RSVSobj.paramconf.PrepareForUse();
 
-	integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.snakeMesh, RSVSobj.voluMesh);
+	integrate::prepare::Mesh(RSVSobj.paramconf.grid, 
+		RSVSobj.paramconf.files.ioin, RSVSobj.snakeMesh, RSVSobj.voluMesh);
 	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.paramconf.rsvs,
+		RSVSobj.paramconf.files.ioin,
 		RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
 	integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
 	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.logFile,
@@ -294,6 +297,7 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 
 void integrate::prepare::Mesh(
 	const param::grid &gridconf,
+	const param::ioin &ioinconf,
 	mesh &snakeMesh,
 	mesh &voluMesh
 	){
@@ -307,7 +311,7 @@ void integrate::prepare::Mesh(
 	} else if(gridconf.activegrid.compare("voronoi")==0) {
 		integrate::prepare::grid::Voronoi(gridconf, snakeMesh, voluMesh);
 	} else if(gridconf.activegrid.compare("load")==0) {
-		RSVS3D_ERROR("Load functionality not implemented.");
+		integrate::prepare::grid::Load(ioinconf, snakeMesh, voluMesh);
 	} else {
 		RSVS3D_ERROR_ARGUMENT(
 			(gridconf.activegrid + " not recognised. "
@@ -388,9 +392,30 @@ void integrate::prepare::grid::Voronoi(
 		voluMesh, snakeMesh, inparam);
 }
 
+void integrate::prepare::grid::Load(
+	const param::ioin &ioinconf,
+	mesh &snakeMesh,
+	mesh &voluMesh)
+{
+	snakeMesh.read(ioinconf.snakemeshname.c_str());
+	voluMesh.read(ioinconf.volumeshname.c_str());
+	snakeMesh.PrepareForUse(true);
+	voluMesh.PrepareForUse(true);
+
+	// need to find mesh lineage
+	auto snakMeshVolPts = CoordInVolume(snakeMesh);
+	auto elmMapping = voluMesh.VertexInVolume(snakMeshVolPts,3);
+
+	snakeMesh.AddParent(&voluMesh, elmMapping);
+
+	snakeMesh.PrepareForUse();
+	voluMesh.PrepareForUse();
+}
+
 void integrate::prepare::Snake(
 	const param::snaking &snakconf, 
 	const param::rsvs &rsvsconf, 
+	const param::ioin &ioinconf, 
 	mesh &snakeMesh, // non const as it is passed to the snake as a pointer
 	mesh &voluMesh,
 	snake &rsvsSnake
@@ -408,11 +433,8 @@ void integrate::prepare::Snake(
 			for(int i=0; i< nElms; ++i){
 				voluMesh.volus[i].target=rsvsconf.cstfill.fill;
 			}
-		} else {
-			for(int i=0; i< nElms; ++i){
-				voluMesh.volus[i].target=voluMesh.volus[i].target;
-			}
 		}
+
 	} else if(voluMesh.WhatDim()==2){
 		nElms = voluMesh.surfs.size();
 		if(rsvsconf.filefill.active){
@@ -423,18 +445,23 @@ void integrate::prepare::Snake(
 			for(int i=0; i< nElms; ++i){
 				voluMesh.surfs[i].target=rsvsconf.cstfill.fill;
 			}
-		} else {
-			for(int i=0; i< nElms; ++i){
-				voluMesh.surfs[i].target=voluMesh.surfs[i].target;
-			}
 		}
 	}
 	voluMesh.PrepareForUse();
 
 
 	rsvsSnake.snakemesh = &snakeMesh;
-	SpawnRSVS(rsvsSnake,snakconf.initboundary);
-	rsvsSnake.PrepareForUse();
+	if(!ioinconf.snakefile.empty()){
+		rsvsSnake.read(ioinconf.snakefile.c_str());
+		rsvsSnake.snakemesh = &snakeMesh;
+		rsvsSnake.PrepareForUse(true);
+		rsvsSnake.OrientFaces();
+		rsvsSnake.AssignInternalVerts();
+	} else {
+		SpawnRSVS(rsvsSnake,snakconf.initboundary);
+	}
+	rsvsSnake.PrepareForUse(true);
+	rsvsSnake.OrientFaces();
 }
 
 void integrate::prepare::Triangulation(
@@ -498,7 +525,6 @@ void integrate::prepare::Output(
 		cerrFile.open(outSnakeName);
 		std::cerr.rdbuf(cerrFile.rdbuf());
 	}
-
 }
 
 
@@ -809,6 +835,8 @@ void integrate::execute::exporting::SU2(std::string su2ConfStr,
 		su2Path += su2FileStr.substr(0, patternIt) 
 			+ paramconf.files.ioout.pattern
 			+ su2FileStr.substr(patternIt+patternReplace.size());
+	} else {
+		su2Path += su2FileStr;
 	}
 
 	const filesystem::path pathout=su2Path;
@@ -836,7 +864,8 @@ int integrate::test::Prepare(){
 	origconf = paramconf;
 	paramconf.PrepareForUse();
 	try {
-		integrate::prepare::Mesh(paramconf.grid, snakeMesh, voluMesh);
+		integrate::prepare::Mesh(paramconf.grid, paramconf.files.ioin,
+			snakeMesh, voluMesh);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, "
 			"voluMesh);" << endl;
@@ -845,7 +874,8 @@ int integrate::test::Prepare(){
 	} 
 	
 	try {
-		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs,
+		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs, 
+			paramconf.files.ioin,
 			snakeMesh,voluMesh,  rsvsSnake);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh,"

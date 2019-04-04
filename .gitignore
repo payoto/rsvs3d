@@ -40,5 +40,9 @@ defaultconfigRSVS3D.json*
 *test-cppcheck-build-dir*
 *.cppcheck
 
+# Data output files
+*.vtk
+*.plt
+
 
 

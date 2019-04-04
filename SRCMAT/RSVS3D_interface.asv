@@ -14,16 +14,16 @@ end
 
 % Read default parameters
 function [defaultparam]=RSVS3D_DefaultParam(pathRSVS, defaultName)
-
+    
     if~exist('pathRSVS', 'var'); pathRSVS = '.';end
     if~exist('defaultName', 'var')
         defaultName = './defaultconfigRSVS3D.json';
     end
-
+    
     if isunix()
-       fileExt = ''; 
+        fileExt = '';
     else
-       fileExt = '.exe';
+        fileExt = '.exe';
     end
     
     pathDefaultConf = [pathRSVS, filesep, 'RSVS3D', fileExt];
@@ -40,14 +40,14 @@ end
 function [paramOut]=RSVS3D_ReadParam(fileIn)
     
     fid = fopen(fileIn, 'r');
-    string = ''; 
+    string = '';
     while ~feof(fid)
         string = [string, squeeze(fgetl(fid))];
     end
     fclose(fid);
     paramOut = jsondecode(string);
     [paramOut.structdat]=GetStructureData(paramOut);
-
+    
 end
 
 % Write new parameter files
@@ -61,7 +61,7 @@ function [success]=RSVS3D_WriteParam(paramIn, fileOut)
     strJson = jsonencode(rmfield(paramIn,'structdat'));
     success=fprintf(fid, '%s', strJson);
     fclose(fid);
-
+    
 end
 % Handle a few standard modifications
 
@@ -69,18 +69,76 @@ end
 
 % Caller to handle correcting the file structure
 % This caller sets the outputs to a specific directory
+function [param3D]=RSVS3D_CallInDirectory(param3D, targDir, varargin)
+    
+    if exist('targDir', 'var') && ~isempty(targDir)
+        param3D.files.ioout.outdir = targDir;
+    end
+end
 
 % Caller to generate meshes
 % Achieved by calling RSVS3D with 0 steps and no exports
+function [param3D]=RSVS3D_CallMeshes(param3D, varargin)
+    
+    param3D.snak.maxsteps = 0;
+    [param3D]=RSVS3D_CallInDirectory(param3D, varargin{:});
+end
+
 
 % Caller to run export
 % Run in full "loading" mode and 0 steps
+function [param3D]=RSVS3D_CallExport(param3D, exportConf,voluMesh, snakeMesh, ...
+        snakeFile, varargin)
+    if(~isempty(exportConf))
+        for ii = 1:numel(exportConf)
+            if(numel(exportConf{ii})~=2)
+                errstruct.message = sprintf(...
+                    ["The number of 'exportconfig' parameters should be even",...
+                    " (%i)"], numel(exportConf{ii}));
+                errstruct.identifier = 'rsvs3D:caller:exportConfig:Odd';
+                error(errstruct);
+            end
+        end
+        param3D.files.exportconfig = exportConf;
+    end
+    param3D.snak.maxsteps = 0;
+    if (isempty(voluMesh) || isempty(snakeFile) || isempty(snakeMesh))
+        errstruct.message = sprintf(...
+            ["Not all mesh files defined: voluMesh (%i), voluMesh (%i), ",...
+            " snakeFile (%i)"], isempty(voluMesh), isempty(snakeFile),...
+            isempty(snakeMesh));
+        errstruct.identifier = 'rsvs3D:caller:exportConfig:NoMesh';
+        error(errstruct);
+    end
+    [param3D]=RSVS3D_CallLoadMeshes(param3D, voluMesh, snakeMesh, ...
+        snakeFile,varargin{:});
+end
 
 % caller to run RSVS process
-% Full loading 
+% Full loading
+function [param3D]=RSVS3D_CallLoadMeshes(param3D,voluMesh, snakeMesh, ...
+        snakeFile,varargin)
+    
+    if ~exist('voluMesh', 'var'); voluMesh = ''; end
+    if ~exist('snakeMesh', 'var'); snakeMesh = ''; end
+    if ~exist('snakeFile', 'var'); snakeFile = ''; end
+    
+    if (isempty(snakeMesh) || isempty(voluMesh))
+        errstruct.message = sprintf(['Cannot do a partial mesh load; \n', ...
+            'Volume mesh: "%s"\nSnake mesh: "%s"'], voluMesh, snakeMesh);
+        errstruct.identifier = 'rsvs3D:caller:partialMeshLoad';
+        error(errstruct)
+    end
+    
+    param3D.grid.activegrid = 'load';
+    param3D.files.ioin.volumeshname = voluMesh;
+    param3D.files.ioin.snakemeshname = snakeMesh;
+    param3D.files.ioin.snakefile= snakeFile;
+    [param3D]=RSVS3D_CallInDirectory(param3D, varargin{:});
+end
 
 % Base caller
-function [outRSVS3D]=RSVS3D_Caller(param3D, configOutput)
+function [outRSVS3D]=RSVS3D_Run(param3D, configOutput)
     % RSVS3D_CALLER Call the RSVS 3D executable with a predefined config.
     %  PARAM3D: The set of 3D-RSVS parameters to be called
     %  CONFIGOUTPUT: A structure configuring calling options for the RSVS3D
@@ -100,7 +158,7 @@ function [outRSVS3D]=RSVS3D_Caller(param3D, configOutput)
     % Call RSVS
     [cmd]=RSVS3D_Config2Cmd(configOutput);
     [status, output]=systemnomatlab(cmd);
-   
+    
     if status~=0 % Program should end with status==0
         errstruct.identifier = 'rsvs3D:caller:execution';
         fmtMessage = ['Exit status of "RSVS3D" was not 0 (%i); \n', ...
@@ -117,8 +175,10 @@ function [outRSVS3D]=RSVS3D_Caller(param3D, configOutput)
 end
 
 function [defaultConfig]=RSVS3D_CallConfig()
+    % Sets where to call the executable from.
+    
     % Path to the executable
-    defaultConfig.executablePath = 'RSVS3D';
+    defaultConfig.executablePath = 'SRCC\RSVS3D';
     % Execution path, path from which this command should be executed
     defaultConfig.executionPath = '.';
     % Commands to prepend and post after the RSVS3D call
@@ -159,7 +219,7 @@ function [outRSVS3D, errorstatus] = RSVS3D_ProcessCall(charOut)
     end
     outRSVS3D.conv = convstruct;
     % Find output directory
-    dirString = 'Output folder:'; 
+    dirString = 'Output folder:';
     posDir = RSVS3D_ProcessFindLines(outRSVS3D.char, dirString);
     if numel(posDir)>1
         warning('More than one folder output detected')
@@ -171,11 +231,11 @@ end
 function folder=RSVS3D_ProcessCallFolder(line, dirString)
     dirCells = regexp(squeeze(line), dirString, 'split');
     if (numel(dirCells)<1)
-       warning('Output processing failed, returning multiple output folders.');
-    else if 
+        warning('Output processing failed, returning multiple output folders.');
+    elseif (numel(dirCells)==0)
         error('Output processing failed, no output folder found');
     end
-    folder=dirCells{1};
+    folder=dirCells{2};
 end
 
 function convstruct = RSVS3D_convstruct()
@@ -213,6 +273,75 @@ function [pos]=RSVS3D_ProcessFindLines(charAll, pattern)
 end
 
 %% callers for SU2
+
+function  [su2meshparam] = RSVS3D_SU2Config()
+    % Loads the configuration for SU2
+    % Need loading of the tetgen::apiparam class for SU2 configuration
+    
+    % XYZ CFD domain lower bound
+    su2meshparam.lowerB = -[15 15 15];
+    % XYZ CFD domain upper bound
+    su2meshparam.upperB = [15 15 15];
+    % Edge lengths at regular intervals
+    su2meshparam.edgelengths = [0.0250, 0.2000, 0.5000, 0, 0, 0, 2.0000];
+    % Edge length at which two snake points are considered in the same 
+    % place
+    su2meshparam.distanceTol = 1e-3;
+    % Surface edge lengths at minimum curvature and max curvature
+    su2meshparam.surfedgelengths = [0.02,0.005];
+    % Number of steps for curvature smoothing
+    su2meshparam.curvatureSmoothing = 10;
+end
+
+function [strctout]=RSVS3D_GetOutputFiles(outDir, cellRecognize)
+    % Gathers from a directory the outptu files specified by cell Recognize
+    if ~exist('cellRecognize','var')
+        cellRecognize = {'volu','^VoluMesh_.*.msh';
+            'snaking','^SnakeMesh_.*.msh';
+            'snake','^Snake_.*.3snk'};
+    end
+    filestruct = struct('name', '', 'path', '');
+    strctout = struct();
+    for ii = 1: size(cellRecognize,1)
+        [pathStr, fileStr] = FindDirRegex(outDir,cellRecognize{ii,2},0);
+        strctout.(cellRecognize{ii,1}) = filestruct;
+        if numel(pathStr)==1
+            strctout.(cellRecognize{ii,1}).path = pathStr{1};
+            strctout.(cellRecognize{ii,1}).file = fileStr{1};
+        elseif numel(pathStr)>1
+            strctout.(cellRecognize{ii,1}).path = pathStr{1};
+            strctout.(cellRecognize{ii,1}).file = fileStr{1};
+            warning("Multiple (%i) files found matching : %s in:\n%s",...
+                numel(pathStr) ,cellRecognize{ii,2}, outDir);
+        else
+            strctout.(cellRecognize{ii,1}).path = '';
+            strctout.(cellRecognize{ii,1}).file = '';
+        end
+    end
+end
+
+function [outRSVS3D] = SU2Mesh_RSVS3D(param3D, meshFolder, su2meshparam, ...
+    meshName)
+    
+    if ~exist('su2meshparam','var')
+        [su2meshparam] = RSVS3D_SU2Config();
+    end
+    if ~exist('meshName','var')
+        meshName = 'mesh.su2';
+    end
+    
+    jsonSu2Str = jsonencode(su2meshparam);
+    su2ParamStr = [meshName,', ',jsonSu2Str];
+    [param3D]=RSVS3D_CallInDirectory(param3D, meshFolder);
+    [diroutfiles]=RSVS3D_GetOutputFiles(meshFolder);
+    exportConf = {{'su2', su2ParamStr}};
+    param3D = RSVS3D_CallExport(param3D, exportConf,diroutfiles.volu.path, ...
+        diroutfiles.snaking.path, diroutfiles.snake.path);
+    
+    [outRSVS3D]=RSVS3D_Run(param3D);
+    
+    outRSVS3D.folder
+end
 
 
 

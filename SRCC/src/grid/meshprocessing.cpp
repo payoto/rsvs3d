@@ -696,3 +696,43 @@ std::vector<double> CalculateEdgeLengths(const mesh &meshin){
 	}
 	return edgeLength;
 }
+
+/**
+ * @brief      Generate a vector of coordinates of points probably inside
+ *  volumes.
+ *
+ * @param[in]  meshin  The input mesh
+ *
+ * @return     vector of coordinates with one coordinate inside each volume
+ */
+std::vector<double> CoordInVolume(const mesh &meshin){
+	std::vector<double> vecPts;
+	int nPtsPerVolu;
+	int nVolu;
+
+	nVolu = meshin.volus.size();
+	vecPts.assign(nVolu*3, 0.0);
+
+
+	for (int i = 0; i < nVolu; ++i)
+	{
+		nPtsPerVolu = 0;
+		for(auto surfInd : meshin.volus(i)->surfind){
+			for(auto edgeInd : meshin.surfs.isearch(surfInd)->edgeind){
+				for(auto vertInd : meshin.edges.isearch(edgeInd)->vertind){
+					for (int j = 0; j < 3; ++j)
+					{
+						vecPts[i*3+j] += meshin.verts.isearch(vertInd)->coord[j];
+						nPtsPerVolu++; 
+					}
+				}
+			}
+		}
+		for (int j = 0; j < 3; ++j)
+		{
+			vecPts[i*3+j] = vecPts[i*3+j]/double(nPtsPerVolu); 
+		}
+	}
+
+	return(vecPts);
+}

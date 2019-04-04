@@ -418,8 +418,8 @@ void tetgen::output::SU2(const char* fileName, const tetgenio &tetout){
 
 	// If file was not opened correctly
 	if(meshFile.fail()){
-		std::cerr << "Error: " << fileName << std::endl <<
-			 " in " << __PRETTY_FUNCTION__ << std::endl; 
+		std::cerr << std::endl << "Error: " << fileName << std::endl <<
+			 " in could not be opened" << std::endl; 
 		RSVS3D_ERROR_ARGUMENT("Output mesh file could not be opened");
 	}
 	// Set appropriate precision for mesh point position
@@ -974,7 +974,7 @@ void tetgen::SnakeToSU2(const snake &snakein, const std::string &fileName,
 	// Tetrahedralize the PLC. Switches are chosen to read a PLC (p),
 	//   do quality mesh generation (q) with a specified quality bound
 	//   (1.414), and apply a maximum volume constraint (a0.1).
-	inparam.command = "Qpkqm"; 
+	inparam.command = "pkqm"; 
 	tetrahedralize(inparam.command.c_str(), &tetin, &tetout);
 
 	tetgen::output::SU2(fileName.c_str(),tetout);
