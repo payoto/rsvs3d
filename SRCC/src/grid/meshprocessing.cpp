@@ -104,11 +104,12 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 	for (ii = 0; ii< cntII; ++ii){
 		cntJJ = vols(ii)->surfind.size();
 		for (jj = 0; jj< cntJJ; ++jj){
-			auto surfEdgeind = snakein.snakeconn.surfs.isearch(
-				vols(ii)->surfind[jj])->edgeind;
+			auto surfEdgeind =snakein.snakeconn.edges.find_list( 
+				snakein.snakeconn.surfs.isearch(
+				vols(ii)->surfind[jj])->edgeind);
 			cntKK = surfEdgeind.size();
 			for (kk = 0; kk<cntKK; ++kk){
-				for (ll = 0; ll<2; ++ll){
+				for (ll = 0; ll<2; ++ll){ 
 					vertAct = snakein.snaxs.isearch( 
 						snakein.snakeconn.edges(surfEdgeind[kk])->vertind[ll]
 						)->fromvert;
@@ -121,6 +122,7 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 			if(holeInd!=-1){break;}
 		}
 		if(holeInd!=-1){holeInds.push_back(holeInd);}
+		std::cout << std::endl << holeInd << std::endl; 
 	}
 	return (holeInds);
 }
