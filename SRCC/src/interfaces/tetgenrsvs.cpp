@@ -953,7 +953,7 @@ std::vector<int> tetgen::RSVSVoronoiMesh(const std::vector<double> &vecPts,
 	
 	return vecPtsMapping;
 }
-
+ 
 /**
  * @brief      Genrates an SU2 mesh file from a snake.
  * 
@@ -1094,10 +1094,10 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
  * @return     A tetgen io object which can be passed directly to tetrahedralize
  * as the fourth input.
  */
-tetgen::io_safe tetgen::voronoi::GenerateInternalPoints(const mesh &meshin, 
-	int nLevels){
+void tetgen::voronoi::GenerateInternalPoints(const mesh &meshin, 
+	int nLevels, tetgen::io_safe &tetinPts){
 
-	tetgen::io_safe tetinPts;
+
 	auto vecPts = VolumeInternalLayers(meshin, nLevels);
 	mesh meshgeom = Points2Mesh(vecPts,3);
 	mesh meshdomain;
@@ -1106,8 +1106,6 @@ tetgen::io_safe tetgen::voronoi::GenerateInternalPoints(const mesh &meshin,
 	meshgeom.PrepareForUse();
 	
 	tetgen::internal::Mesh2TetgenioPoints(meshgeom, meshdomain, tetinPts);
-
-	return(tetinPts);
 }
 std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<double> &vecPts,
 	mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
@@ -1158,7 +1156,7 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 	if(inparam.surfedgelengths.size()>1){
 		nInternalLayers = round(inparam.surfedgelengths[1]);
 	}
-	tetinSupport=tetgen::voronoi::GenerateInternalPoints(voroMesh,nInternalLayers);
+	tetgen::voronoi::GenerateInternalPoints(voroMesh,nInternalLayers, tetinSupport);
 
 	cmd = "pqminnefO9/7"; 
 	try{

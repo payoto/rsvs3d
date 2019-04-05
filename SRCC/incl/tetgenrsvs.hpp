@@ -214,7 +214,8 @@ namespace tetgen {
 			const tetgen::apiparam &inparam);
 	}
 	namespace voronoi {
-		tetgen::io_safe GenerateInternalPoints(const mesh &meshin, int nLevels);
+		void GenerateInternalPoints(const mesh &meshin, int nLevels, 
+			tetgen::io_safe &tetinPts);
 		std::vector<bool> Points2VoroAndTetmesh(const std::vector<double> &vecPts,
 			mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam);
 		std::vector<bool> BoundaryFacesFromPoints(const mesh &meshin,
