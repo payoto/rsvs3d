@@ -337,7 +337,8 @@ void SurfaceCentroid_fun2(coordvec &coord,const surf &surfin,
 	coord.assign(0,0,0);
 	n=int(surfin.edgeind.size());
 	for(ii=0; ii<n; ++ii){
-		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+		meshin.edges.isearch(surfin.edgeind[ii])->GeometricProperties(
+			&meshin,edgeCentre,edgeLength);
 		edgeCentre.mult(edgeLength);
 		coord.add(edgeCentre.usedata());
 		surfLength+=edgeLength;

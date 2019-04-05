@@ -380,7 +380,10 @@ void integrate::prepare::grid::Voronoi(
 	// Vector points are already loaded
 	tetgen::apiparam inparam;
 	inparam.edgelengths={gridconf.voronoi.snakecoarseness};
-	inparam.surfedgelengths={gridconf.voronoi.snakecoarseness};
+	inparam.surfedgelengths={
+		gridconf.voronoi.snakecoarseness,
+		double(gridconf.voronoi.vorosnakelayers)
+	};
 	inparam.distanceTol = gridconf.voronoi.distancebox;
 	for (int i = 0; i < 3; ++i)
 	{

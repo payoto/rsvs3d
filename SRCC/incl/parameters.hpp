@@ -125,6 +125,9 @@ namespace param {
 		/// The coarseneness level of the snaking mesh that will be generated.
 		/// 1 -> same as VOS, 0.1 -> 1 tenth the edge length of the VOS.
 		double snakecoarseness;
+		/// The number of layers making up the snaking mesh inside each VOS cell
+		/// [6 6 6] is roughly equal to 2.
+		int vorosnakelayers;
 
 		voronoi();
 		~voronoi();

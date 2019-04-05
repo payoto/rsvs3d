@@ -168,6 +168,7 @@ public:
 	double fill,target,error, volume;
 	vector<int> surfind;
 
+	std::vector<int> vertind(const mesh &meshin) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
@@ -179,6 +180,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void TightenConnectivity() {sort(surfind);unique(surfind);};
+	coordvec PseudoCentroid(const mesh &meshin) const;
 
 	volu(){ // Constructor
 		this->index=0;
@@ -260,7 +262,9 @@ public:
 		sort(edgeind);unique(edgeind);isordered=false;};
 	void FlipVolus();
 	bool edgeconneq(const surf &other, bool recurse=true) const;
-	//bool returnIsModif() const {return(isModif);}
+	coordvec PseudoCentroid(const mesh &meshin) const;
+	int PseudoCentroid(const mesh &meshin, coordvec &coord) const;
+
 
 	surf(){ // Constructor
 		index=0;
@@ -373,6 +377,7 @@ public:
 	vector<int> edgeind;
 	vector<double> coord;
 	 // reserves 2 as this is the size of the array
+	std::vector<int> elmind(const mesh &meshin) const;
 
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;

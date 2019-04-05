@@ -68,7 +68,8 @@ param::voronoi::voronoi(){
 	this->inputpoints={0.0};
 	this->pointfile = "";
 	this->distancebox = 0.1;
-	this->snakecoarseness = 0.1;
+	this->snakecoarseness = 0.0;
+	this->vorosnakelayers = 2;
 }
 
 param::voronoi::~voronoi(){
@@ -81,6 +82,7 @@ void param::to_json(json& j, const voronoi& p){
 		{"distancebox", p.distancebox},
 		{"pointfile", p.pointfile},
 		{"snakecoarseness", p.snakecoarseness},
+		{"vorosnakelayers", p.vorosnakelayers},
 	};
 }
 void param::from_json(const json& j, voronoi& p){
@@ -89,6 +91,7 @@ void param::from_json(const json& j, voronoi& p){
 	j.at("distancebox").get_to(p.distancebox);
 	j.at("pointfile").get_to(p.pointfile);
 	j.at("snakecoarseness").get_to(p.snakecoarseness);
+	j.at("vorosnakelayers").get_to(p.vorosnakelayers);
 }
 void param::voronoi::ReadPoints(){
 	std::ifstream pointstream;

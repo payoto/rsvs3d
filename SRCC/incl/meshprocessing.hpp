@@ -80,6 +80,8 @@ std::vector<double> CalculateVertexMinEdgeLength(const mesh &meshin);
 std::vector<double> CalculateVertexMeanEdgeLength(const mesh &meshin);
 std::vector<double> CalculateEdgeLengths(const mesh &meshin);
 std::vector<double> CoordInVolume(const mesh &meshin);
+std::vector<double> VolumeCentroids(const mesh &meshin);
+std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers);
 // Forward declared templated functions
 
 // Base class

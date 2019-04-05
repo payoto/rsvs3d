@@ -403,6 +403,75 @@ double PlanesDotProduct(const vector<double> &planeVert1,
 	}
 	return normal1.dot(normal2.usedata());
 }
+
+/**
+ * @brief      Calculates the length weighted pseudo-centroid of a surface.
+ *
+ *	For a more efficient implementation for repeated calls see the other 
+ *	surf::PseudoCentroid.
+ *
+ * @param[in]  meshin  The mesh the surface is part of
+ *
+ * @return     The coordinate of the pseudo centroid of the surface.
+ */
+coordvec surf::PseudoCentroid(const mesh &meshin) const {
+	coordvec coord;
+
+	this->PseudoCentroid(meshin, coord);
+
+	return coord;
+}
+
+/**
+ * @brief      Calculates the length weighted pseudo-centroid of a surface.
+ *
+ * @param[in]  meshin  The mesh the surface is part of
+ * @param[out] coord   The coordinate vector to which the position is written.
+ *
+ * @return     the length of the perimeter of the surface.
+ */
+int surf::PseudoCentroid(const mesh &meshin, coordvec &coord) const {
+	int ii,n;
+	coordvec edgeCentre;
+	double edgeLength,surfLength=0;
+	coord.assign(0,0,0);
+	n=int(this->edgeind.size());
+	for(ii=0; ii<n; ++ii){
+		meshin.edges.isearch(this->edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+		edgeCentre.mult(edgeLength);
+		coord.add(edgeCentre.usedata());
+		surfLength+=edgeLength;
+	}
+
+	coord.div(surfLength);
+	return surfLength;
+}
+
+/**
+ * @brief      Calculates the length weighted pseudo-centroid of a volume.
+ *
+ * @param[in]  meshin  The mesh the volume is part of
+ *
+ * @return     The coordinate of the pseudo centroid of the volume.
+ */
+coordvec volu::PseudoCentroid(const mesh &meshin) const {
+	coordvec coordVolu, coordSurf;
+	double surfLength, voluLength;
+	coordVolu.assign(0,0,0);
+
+	for (auto surfInd : this->surfind){
+		surfLength = meshin.surfs.isearch(surfInd)
+			->PseudoCentroid(meshin, coordSurf);
+		coordSurf.mult(surfLength);
+		coordVolu.add(coordSurf.usedata());
+		voluLength += surfLength;
+	}
+
+	coordVolu.div(voluLength);
+
+	return coordVolu;
+}
+
 //// ----------------------------------------
 // Implementation of mesh dependence
 //// ----------------------------------------
@@ -1241,6 +1310,51 @@ void vert::read(FILE * fid) {
 		fscanf(fid, "%lf ",&coord[i]);
 	}
 
+}
+
+std::vector<int> vert::elmind(const mesh &meshin) const {
+	std::vector<int> elmind;
+	elmind.reserve(30);
+	if(meshin.WhatDim()==3)
+		for(auto edgeInd : this->edgeind){
+			for(auto surfInd : meshin.edges.isearch(edgeInd)->surfind){
+				for(auto voluInd : meshin.surfs.isearch(surfInd)->voluind){
+					elmind.push_back(voluInd);
+				}
+			}
+		}
+	else {
+		for(auto edgeInd : this->edgeind){
+			for(auto surfInd : meshin.edges.isearch(edgeInd)->surfind){
+				elmind.push_back(surfInd);
+			}
+		}
+	}
+	sort(elmind);
+	unique(elmind);
+	return elmind;
+}
+
+/**
+ * @brief      Get all the vertices a volume is connected to.
+ *
+ * @param[in]  meshin  The mesh containing the volume object
+ *
+ * @return     List of vertex indices which make corners of the polyhedron.
+ */
+std::vector<int> volu::vertind(const mesh &meshin) const {
+	std::vector<int> vertind;
+	vertind.reserve(30);
+	for(auto surfInd : this->surfind){
+		for(auto edgeInd : meshin.surfs.isearch(surfInd)->edgeind){
+			for(auto vertInd : meshin.edges.isearch(edgeInd)->vertind){
+				vertind.push_back(vertInd);
+			}
+		}
+	}
+	sort(vertind);
+	unique(vertind);
+	return vertind;
 }
 
 #pragma GCC diagnostic push

@@ -128,8 +128,7 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 }
 
 /**
- * @brief      Prepares the snake to be used for CFD, removes duplicate points and 
-	triangulates it.
+ * Prepares the snake to be used for CFD, removes duplicate points and triangulates it.
  *
  * @param[in]  snakein      The snakein
  * @param[in]  distanceTol  The distance tolerance
@@ -735,4 +734,81 @@ std::vector<double> CoordInVolume(const mesh &meshin){
 	}
 
 	return(vecPts);
+}
+
+/**
+ * @brief      Generate a vector of coordinates of points at the volume pseudo centroid.
+ *
+ * @param[in]  meshin  The input mesh
+ *
+ * @return     vector of coordinates with one coordinate inside each volume
+ */
+std::vector<double> VolumeCentroids(const mesh &meshin){
+	std::vector<double> vecPts;
+	int nVolu;
+
+	nVolu = meshin.volus.size();
+	vecPts.assign(nVolu*3, 0.0);
+
+
+	for (int i = 0; i < nVolu; ++i)
+	{
+		auto voluCoord = meshin.volus(i)->PseudoCentroid(meshin);
+		for (int j = 0; j < 3; ++j)
+		{
+			vecPts[i*3+j] = voluCoord[j];
+		}
+	}
+
+	return(vecPts);
+}
+
+/**
+ * @brief      Returns points on edges between volume pseudo centroid and
+ *             vertices.
+ *
+ * @param[in]  meshin   The input mesh to process
+ * @param[in]  nLayers  The number of layers of points (0: only the centre, 1:
+ *                      layer surroundin the centre)
+ *
+ * @throw     std::invalid_argument  if the number of layers is below 0.
+ *
+ * @return     Vector of points containing the centres and additional points.
+ */
+std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers){
+	
+	if(nLayers<0){
+		RSVS3D_ERROR_ARGUMENT("Unknown number of layers.");
+	}
+
+	int nVolu = meshin.volus.size();
+	std::vector<double> vecPts = VolumeCentroids(meshin);
+	auto multcentre = [&](int pos) -> double {
+		return double(pos+1)/double(nLayers+1);
+	};
+	auto multvert = [&](int pos) -> double {
+		return double(nLayers-pos)/double(nLayers+1);
+	};
+
+	vecPts.reserve(nVolu * 3 * (8 * nLayers + 1));
+	for (int i = 0; i < nVolu; ++i)
+	{
+		auto voluVerts = meshin.verts.find_list(
+			meshin.volus(i)->vertind(meshin));
+
+		for (auto vertSub : voluVerts){
+			for (int j = 0; j < nLayers; ++j)
+			{
+				for (int k = 0; k < 3; ++k)
+				{
+				vecPts.push_back(
+					vecPts[i*3+k] * multcentre(j) 
+					+ meshin.verts(vertSub)->coord[k] * multvert(j)
+					);
+				}
+			}
+		}
+	}
+	return(vecPts);
+
 }

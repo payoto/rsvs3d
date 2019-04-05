@@ -1085,12 +1085,36 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 	return meshout;
 }
 
+/**
+ * @brief      Generate points inside volume cells of a mesh
+ *
+ * @param[in]  meshin   The input mesh
+ * @param[in]  nLevels  The number of layers of points in each cell.
+ *
+ * @return     A tetgen io object which can be passed directly to tetrahedralize
+ * as the fourth input.
+ */
+tetgen::io_safe tetgen::voronoi::GenerateInternalPoints(const mesh &meshin, 
+	int nLevels){
+
+	tetgen::io_safe tetinPts;
+	auto vecPts = VolumeInternalLayers(meshin, nLevels);
+	mesh meshgeom = Points2Mesh(vecPts,3);
+	mesh meshdomain;
+	meshdomain.Init(0,0,0,0);
+	meshdomain.PrepareForUse();
+	meshgeom.PrepareForUse();
+	
+	tetgen::internal::Mesh2TetgenioPoints(meshgeom, meshdomain, tetinPts);
+
+	return(tetinPts);
+}
 std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<double> &vecPts,
 	mesh &voroMesh, mesh &tetMesh, const tetgen::apiparam &inparam){
 	/*
 	Turns a set of points into the voronisation and tetrahedralisation.
 	*/
-	tetgen::io_safe tetinV, tetoutV, tetinT, tetoutT;
+	tetgen::io_safe tetinV, tetoutV, tetinT, tetoutT, tetinSupport;
 	mesh ptsMesh = Points2Mesh(vecPts,4);
 	std::string cmd;
 	int INCR;
@@ -1130,10 +1154,15 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 		inparam.lowerB, inparam.upperB, 1, vertPerSubDomain);
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
 
-	
+	int nInternalLayers = 0;
+	if(inparam.surfedgelengths.size()>1){
+		nInternalLayers = round(inparam.surfedgelengths[1]);
+	}
+	tetinSupport=tetgen::voronoi::GenerateInternalPoints(voroMesh,nInternalLayers);
+
 	cmd = "pqminnefO9/7"; 
 	try{
-		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT, &tetinV);
+		tetrahedralize(cmd.c_str(), &tetinT, &tetoutT, &tetinSupport);
 	} catch (exception const& ex) {
 		std::cerr <<  std::endl << "Input points: ";
 		DisplayVector(vecPts);
