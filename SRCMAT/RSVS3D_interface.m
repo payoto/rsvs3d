@@ -65,14 +65,14 @@ function [success]=RSVS3D_WriteParam(paramIn, fileOut)
 end
 % Handle a few standard modifications
 
-%% Callers for the RSVS3D
+%% Parameter modifiers for the RSVS3D
 
 % Caller to handle correcting the file structure
 % This caller sets the outputs to a specific directory
 function [param3D]=RSVS3D_CallInDirectory(param3D, targDir, varargin)
     
     if exist('targDir', 'var') && ~isempty(targDir)
-        param3D.files.ioout.outdir = targDir;
+        param3D = SetVariables({'outdir'},{targDir}, param3D);
     end
 end
 
@@ -80,10 +80,9 @@ end
 % Achieved by calling RSVS3D with 0 steps and no exports
 function [param3D]=RSVS3D_CallMeshes(param3D, varargin)
     
-    param3D.snak.maxsteps = 0;
+    param3D = SetVariables({'maxsteps'},{0}, param3D);
     [param3D]=RSVS3D_CallInDirectory(param3D, varargin{:});
 end
-
 
 % Caller to run export
 % Run in full "loading" mode and 0 steps
@@ -99,9 +98,9 @@ function [param3D]=RSVS3D_CallExport(param3D, exportConf,voluMesh, snakeMesh, ..
                 error(errstruct);
             end
         end
-        param3D.files.exportconfig = exportConf;
+        param3D = SetVariables({'exportconfig'},{exportConf}, param3D);
     end
-    param3D.snak.maxsteps = 0;
+    param3D = SetVariables({'maxsteps'},{0}, param3D);
     if (isempty(voluMesh) || isempty(snakeFile) || isempty(snakeMesh))
         errstruct.message = sprintf(...
             ["Not all mesh files defined: voluMesh (%i), voluMesh (%i), ",...
@@ -130,14 +129,91 @@ function [param3D]=RSVS3D_CallLoadMeshes(param3D,voluMesh, snakeMesh, ...
         error(errstruct)
     end
     
-    param3D.grid.activegrid = 'load';
-    param3D.files.ioin.volumeshname = voluMesh;
-    param3D.files.ioin.snakemeshname = snakeMesh;
-    param3D.files.ioin.snakefile= snakeFile;
+    param3D = SetVariables({'activegrid'},{'load'}, param3D);
+    param3D = SetVariables({'volumeshname'},{voluMesh}, param3D);
+    param3D = SetVariables({'snakemeshname'},{snakeMesh}, param3D);
+    param3D = SetVariables({'snakefile'},{snakeFile}, param3D);
+
     [param3D]=RSVS3D_CallInDirectory(param3D, varargin{:});
 end
 
-% Base caller
+% Caller to run a specific set of fill data. This writes a temporary file
+% to send the fill information
+function [param3D]=RSVS3D_CallFill(param3D, fill, configOutput)
+    % Call RSVS3D with a given fill
+    if ~exist('configOutput','var')
+        fillFile = RSVS3D_tempfile('_3d.fill', 'temp');
+    else
+        fillFile = regexprep(configOutput.paramOut,...
+            '_3dparam.json','_3d.fill');
+    end
+    
+    fid = fopen(fillFile, 'w');
+    for ii=1:numel(fill)
+        fprintf(fid, '%.16f\n', fill(ii));
+    end
+    fclose(fid);
+    param3D.rsvs.cstfill.active = false;
+    param3D.rsvs.makefill.active = false;
+    param3D.rsvs.filefill.active = true;
+    param3D.rsvs.filefill.fill = fillFile;
+end
+
+% Set up a voxel mesh
+function [param3D]=RSVS3D_CallVoxel(param3D, voluGridSize, snakGridSize,...
+        varargin)
+    param3D = SetVariables({'activegrid'},{'voxel'}, param3D);
+    param3D = SetVariables({'gridsizebackground'},{voluGridSize}, param3D);
+    param3D = SetVariables({'gridsizesnake'},{snakGridSize}, param3D);
+    
+    [param3D]=RSVS3D_SetDomain(param3D,varargin{:}); 
+end
+
+function [param3D]=RSVS3D_SetDomain(param3D,compDomainBounds, physDomainBounds)
+    % Set correct domain size checking that they are the correct dimension
+    if ~exist('compDomainBounds', 'var')
+        compDomainBounds = repmat([0, 1],[3,1]);
+    end
+    if ~exist('physDomainBounds', 'var')
+        physDomainBounds = repmat([0, 1],[3,1]);
+    end
+    errstruct.message = '%s was of incorrect size %f should be [3,2].';
+    errstruct.identifier = 'rsvs3D:caller:sizedomain';
+    if any(size(compDomainBounds)~=[3,2])
+        errstruct.message = sprintf(errstruct.message,...
+            'compDomainBounds', size(compDomainBounds));
+        error(errstruct)
+    end
+    if any(size(physDomainBounds)~=[3,2])
+        errstruct.message = sprintf(errstruct.message,...
+            'physDomainBounds', size(physDomainBounds));
+        error(errstruct)
+    end
+    param3D = SetVariables({'domain'},{compDomainBounds}, param3D);
+    param3D = SetVariables({'physdomain'},{physDomainBounds}, param3D);
+end
+
+% set up a voronoi mesh from points
+function [param3D]=RSVS3D_CallVoronoi(param3D, voroPoints, snakeCoarseNess,...
+        distanceBoundBox, varargin)
+    
+    voroFile = RSVS3D_tempfile('_3d.vpnt', 'temp');
+    
+    param3D = SetVariables({'activegrid'},{'voronoi'}, param3D);
+    param3D = SetVariables({'snakecoarseness'},{snakeCoarseNess}, param3D);
+    param3D = SetVariables({'pointfile'},{voroFile}, param3D);
+    param3D = SetVariables({'distancebox'},{distanceBoundBox}, param3D);
+    
+    fid = fopen(voroFile, 'w');
+    for ii=1:numel(voroPoints)
+        fprintf(fid, '%.16f\n', voroPoints(ii));
+    end
+    fclose(fid);
+    
+    [param3D]=RSVS3D_SetDomain(param3D, varargin{:}); 
+end
+
+%% RSVS 3D calling function
 function [outRSVS3D]=RSVS3D_Run(param3D, configOutput)
     % RSVS3D_CALLER Call the RSVS 3D executable with a predefined config.
     %  PARAM3D: The set of 3D-RSVS parameters to be called
@@ -185,12 +261,22 @@ function [defaultConfig]=RSVS3D_CallConfig()
     defaultConfig.preCmd = '';
     defaultConfig.postCmd = '';
     % unique temp file
-    if ~exist('temp','dir'), mkdir([cd,filesep,'temp']);end
-    defaultConfig.paramOut = [tempname([cd,filesep,'temp']),'_3dparam.json'];
+    defaultConfig.paramOut = RSVS3D_tempfile('_3dparam.json', 'temp');
     defaultConfig.deleteParam = false;
     
 end
 
+function [tempFile] = RSVS3D_tempfile(tempNamePattern, folder)
+    % Generates a temporary file finishing with tempNamePattern.
+    
+    if ~exist('folder','var'); folder = 'temp';end
+    
+    if ~exist(folder,'dir'), mkdir([cd,filesep,folder]);end
+    tempFile = [tempname([cd,filesep,folder]),tempNamePattern];
+    fid = fopen(tempFile,'w');
+    fclose(fid);
+end
+    
 function [cmd]=RSVS3D_Config2Cmd(config)
     % Builds the command from the config structure
     % structure generated by "RSVS3D_CallConfig"
