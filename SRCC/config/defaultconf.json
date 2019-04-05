@@ -9,8 +9,8 @@
     ],
     "ioin": {
       "casename": "",
+      "snakefile": "",
       "snakemeshname": "",
-      "targetfill": "",
       "volumeshname": ""
     },
     "ioout": {
@@ -62,7 +62,8 @@
         0.0
       ],
       "pointfile": "",
-      "snakecoarseness": 0.1
+      "snakecoarseness": 0.0,
+      "vorosnakelayers": 2
     },
     "voxel": {
       "gridsizebackground": [
