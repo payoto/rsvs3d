@@ -637,7 +637,7 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 		integrate::execute::logging::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
-			totT, nVoluZone);
+			totT, nVoluZone, stepNum);
 	}
 }
 
@@ -669,7 +669,7 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 		integrate::execute::postprocess::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
-			totT, nVoluZone);
+			totT, nVoluZone, stepNum);
 	}
 
 }
@@ -741,7 +741,7 @@ void integrate::execute::logging::Snake(
 void integrate::execute::logging::FullTecplot(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	triangulation &rsvsTri, mesh &voluMesh,
-	double totT, int nVoluZone){
+	double totT, int nVoluZone, int stepNum){
 	vector<int> vertList;
 	int jj;
 	if(rsvsSnake.snaxs.size()>0){
@@ -750,10 +750,21 @@ void integrate::execute::logging::FullTecplot(
 		outSnake.PrintSnake(rsvsSnake, 1, totT, 2);
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT, 2);
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,3);
+		if (stepNum==0 && rsvsTri.intertri.size()==0){
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,3
+				, {rsvsTri.dynatri(0)->index});
+		}
 		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,3);
+		if (stepNum==0 && rsvsTri.trisurf.size()==0){
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,3
+				, {rsvsTri.dynatri(0)->index});
+		}
 		if (int(rsvsTri.acttri.size())>0){
 			outSnake.PrintTriangulation(rsvsTri,&triangulation::stattri,5,totT,
 				3,rsvsTri.acttri);
+		} else if (stepNum==0){
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,5,totT,3
+				, {rsvsTri.dynatri(0)->index});
 		}
 		
 		vertList.clear();
@@ -812,11 +823,11 @@ void integrate::execute::postprocess::Snake(
 void integrate::execute::postprocess::FullTecplot(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	triangulation &rsvsTri, mesh &voluMesh,
-	double totT, int nVoluZone){
+	double totT, int nVoluZone, int stepNum){
 
 	integrate::execute::logging::FullTecplot(
 		outSnake, rsvsSnake, rsvsTri, voluMesh,
-		totT, nVoluZone);
+		totT, nVoluZone, stepNum);
 }
 
 // ====================
@@ -869,6 +880,7 @@ int integrate::test::Prepare(){
 	try {
 		integrate::prepare::Mesh(paramconf.grid, paramconf.files.ioin,
 			snakeMesh, voluMesh);
+		voluMesh.volus.disp();
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, "
 			"voluMesh);" << endl;

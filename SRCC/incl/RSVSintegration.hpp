@@ -141,7 +141,7 @@ namespace integrate {
 			void FullTecplot(
 				tecplotfile &outSnake, snake &rsvsSnake,
 				triangulation &rsvsTri, mesh &voluMesh,
-				double totT, int nVoluZone);
+				double totT, int nVoluZone, int stepNum);
 		}
 
 		namespace postprocess{
@@ -159,7 +159,7 @@ namespace integrate {
 			void FullTecplot(
 				tecplotfile &outSnake, snake &rsvsSnake,
 				triangulation &rsvsTri, mesh &voluMesh,
-				double totT, int nVoluZone);
+				double totT, int nVoluZone, int stepNum);
 		}
 
 		namespace exporting {
