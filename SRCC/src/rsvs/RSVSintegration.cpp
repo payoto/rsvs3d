@@ -379,9 +379,7 @@ void integrate::prepare::grid::Voronoi(
 	){
 	// Vector points are already loaded
 	tetgen::apiparam inparam;
-	inparam.edgelengths={gridconf.voronoi.snakecoarseness};
-	inparam.surfedgelengths={
-		gridconf.voronoi.snakecoarseness,
+	inparam.edgelengths={gridconf.voronoi.snakecoarseness,
 		double(gridconf.voronoi.vorosnakelayers)
 	};
 	inparam.distanceTol = gridconf.voronoi.distancebox;
@@ -733,9 +731,9 @@ void integrate::execute::logging::Snake(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	mesh &voluMesh, double totT, int nVoluZone
 	){
-
+	rsvsSnake.snakeconn.PrepareForUse();
 	outSnake.PrintVolumeDat(voluMesh,nVoluZone,1,totT);
-	outSnake.PrintSnake(rsvsSnake, 2, totT);
+	outSnake.PrintSnake(rsvsSnake, 2, totT,2);
 }
 
 void integrate::execute::logging::FullTecplot(

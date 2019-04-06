@@ -1,5 +1,5 @@
 #!MC 1410
-$!VarSet |LFDSFN1| = '"rsvs3D_190325T170424_vorotest.plt"'
+$!VarSet |LFDSFN1| = '"rsvs3D_190406T160127_.plt"'
 $!VarSet |LFDSVL1| = '"X" "Y" "Z" "v1" "v2" "v3"'
 $!SETSTYLEBASE FACTORY
 $!PLOTOPTIONS 
@@ -17,9 +17,13 @@ $!GLOBALPAPER
       BOTTOMHARDCLIPOFFSET = 0.125
       }
     }
+$!SETAUXDATA 
+  AUXDATALOCATION = LAYOUT
+  NAME = 'UI.FirstPageOffset'
+  VALUESTRING = '1'
 ### Page Number 1 ###
 $!PAGE 
-  NAME = 'Snake'
+  NAME = 'VOS values'
   PAPERATTRIBUTES
     {
     BACKGROUNDCOLOR = WHITE
@@ -54,6 +58,1481 @@ $!FRAMELAYOUT
   HEADERCOLOR = RED
   XYPOS
     {
+    X = 0.81156
+    Y = 0.25
+    }
+  WIDTH = 9
+  HEIGHT = 8
+$!THREEDAXIS 
+  ASPECTRATIOLIMIT = 25
+  BOXASPECTRATIOLIMIT = 25
+$!PLOTTYPE  = CARTESIAN3D
+$!FRAMENAME  = 'Frame 001'
+$!GLOBALTIME 
+  SOLUTIONTIME = 70
+$!ACTIVEFIELDMAPS  =  [4,8-9]
+$!GLOBALRGB 
+  REDCHANNELVAR = 4
+  GREENCHANNELVAR = 4
+  BLUECHANNELVAR = 4
+  RANGEMIN = 0
+  RANGEMAX = 1
+$!GLOBALCONTOUR  1
+  VAR = 5
+  COLORMAPNAME = 'Diverging - Blue/Red'
+  DEFNUMLEVELS = 11
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 0.0625
+    RANGEMAX = 0.1875
+    }
+  COLORMAPFILTER
+    {
+    COLORMAPDISTRIBUTION = CONTINUOUS
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 1
+  RAWDATA
+11
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+$!GLOBALCONTOUR  2
+  VAR = 4
+  COLORMAPNAME = 'Diverging - Orange/Purple'
+  DEFNUMLEVELS = 7
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 21.719
+      Y = 68.544
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 0.2
+    RANGEMAX = 0.6
+    }
+  COLORMAPFILTER
+    {
+    COLORMAPDISTRIBUTION = CONTINUOUS
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 0.8
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 2
+  RAWDATA
+7
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+$!GLOBALCONTOUR  3
+  VAR = 6
+  COLORMAPNAME = 'Diverging - Blue/Yellow/Red'
+  DEFNUMLEVELS = 13
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 82.438
+      Y = 79.572
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = -12.9991306363
+    RANGEMAX = -6.99739190876
+    }
+  COLORMAPFILTER
+    {
+    COLORMAPDISTRIBUTION = CONTINUOUS
+    CONTINUOUSCOLOR
+      {
+      CMIN = -16
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 3
+  RAWDATA
+13
+-15
+-14
+-13
+-12
+-11
+-10
+-9
+-8
+-7
+-6
+-5
+-4
+-3
+$!GLOBALCONTOUR  4
+  VAR = 4
+  DEFNUMLEVELS = 19
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 0.186662166461
+    RANGEMAX = 0.559986499383
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 4
+  RAWDATA
+19
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+$!GLOBALCONTOUR  5
+  VAR = 4
+  DEFNUMLEVELS = 19
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 5
+  RAWDATA
+19
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+$!GLOBALCONTOUR  6
+  VAR = 4
+  DEFNUMLEVELS = 19
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 6
+  RAWDATA
+19
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+$!GLOBALCONTOUR  7
+  VAR = 4
+  DEFNUMLEVELS = 19
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 7
+  RAWDATA
+19
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+$!GLOBALCONTOUR  8
+  VAR = 4
+  DEFNUMLEVELS = 19
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 8
+  RAWDATA
+19
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+$!GLOBALSCATTER 
+  VAR = 4
+  RELATIVESIZE = 0.07348
+  LEGEND
+    {
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  REFSCATSYMBOL
+    {
+    COLOR = RED
+    FILLCOLOR = RED
+    }
+$!BLANKING 
+  VALUE
+    {
+    INCLUDE = YES
+    VALUEBLANKCELLMODE = PRIMARYVALUE
+    CONSTRAINT 1
+      {
+      INCLUDE = YES
+      VALUECUTOFF = -14
+      VARA = 6
+      }
+    CONSTRAINT 2
+      {
+      VARA = 4
+      }
+    }
+$!FIELDMAP  [1]
+  MESH
+    {
+    COLOR = BLACK
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = FLOOD
+    COLOR = BLACK
+    USELIGHTINGEFFECT = YES
+    }
+  VECTOR
+    {
+    COLOR = BLACK
+    }
+  SCATTER
+    {
+    COLOR = BLACK
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = BLACK
+    LINETHICKNESS = 0.1
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = BOUNDARYFACES
+    IRANGE
+      {
+      MAX = 1
+      }
+    }
+  VOLUMEMODE
+    {
+    VOLUMEOBJECTSTOPLOT
+      {
+      SHOWISOSURFACES = NO
+      SHOWSLICES = NO
+      SHOWSTREAMTRACES = NO
+      }
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!FIELDMAP  [2]
+  MESH
+    {
+    SHOW = NO
+    MESHTYPE = WIREFRAME
+    COLOR = BLACK
+    }
+  CONTOUR
+    {
+    SHOW = NO
+    CONTOURTYPE = FLOOD
+    COLOR = BLACK
+    USELIGHTINGEFFECT = YES
+    }
+  VECTOR
+    {
+    COLOR = BLACK
+    }
+  SCATTER
+    {
+    COLOR = BLACK
+    }
+  SHADE
+    {
+    SHOW = NO
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    COLOR = BLACK
+    LINETHICKNESS = 0.1
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = BOUNDARYFACES
+    IRANGE
+      {
+      MAX = 1
+      }
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!FIELDMAP  [3]
+  MESH
+    {
+    SHOW = NO
+    COLOR = BLACK
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = PRIMARYVALUE
+    FLOODCOLORING = GROUP2
+    COLOR = BLACK
+    USELIGHTINGEFFECT = YES
+    }
+  VECTOR
+    {
+    COLOR = BLACK
+    }
+  SCATTER
+    {
+    COLOR = BLACK
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = BLACK
+    LINETHICKNESS = 0.1
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    IRANGE
+      {
+      MAX = 1
+      }
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!FIELDMAP  [4]
+  MESH
+    {
+    SHOW = NO
+    COLOR = CYAN
+    }
+  CONTOUR
+    {
+    SHOW = NO
+    CONTOURTYPE = PRIMARYVALUE
+    COLOR = CYAN
+    }
+  VECTOR
+    {
+    COLOR = CYAN
+    }
+  SCATTER
+    {
+    SHOW = NO
+    COLOR = CYAN
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [5]
+  MESH
+    {
+    COLOR = YELLOW
+    }
+  CONTOUR
+    {
+    COLOR = YELLOW
+    }
+  VECTOR
+    {
+    COLOR = YELLOW
+    }
+  SCATTER
+    {
+    COLOR = YELLOW
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = YELLOW
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [6]
+  MESH
+    {
+    COLOR = PURPLE
+    }
+  CONTOUR
+    {
+    COLOR = PURPLE
+    }
+  VECTOR
+    {
+    COLOR = PURPLE
+    }
+  SCATTER
+    {
+    COLOR = PURPLE
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = PURPLE
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [7]
+  MESH
+    {
+    COLOR = RED
+    }
+  CONTOUR
+    {
+    COLOR = RED
+    }
+  VECTOR
+    {
+    COLOR = RED
+    }
+  SCATTER
+    {
+    COLOR = RED
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = RED
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [8]
+  MESH
+    {
+    SHOW = NO
+    COLOR = GREEN
+    }
+  CONTOUR
+    {
+    COLOR = GREEN
+    }
+  VECTOR
+    {
+    COLOR = GREEN
+    }
+  SCATTER
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = BLACK
+    FRAMESIZE = 0.5
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    COLOR = GREEN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = KPLANES
+    }
+$!FIELDMAP  [9]
+  MESH
+    {
+    COLOR = CUSTOM2
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = PRIMARYVALUE
+    COLOR = BLUE
+    }
+  VECTOR
+    {
+    COLOR = BLUE
+    }
+  SCATTER
+    {
+    SHOW = NO
+    COLOR = BLUE
+    }
+  SHADE
+    {
+    SHOW = NO
+    COLOR = CUSTOM18
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = BLUE
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!FIELDMAP  [10]
+  MESH
+    {
+    COLOR = CYAN
+    }
+  CONTOUR
+    {
+    COLOR = CYAN
+    }
+  VECTOR
+    {
+    COLOR = CYAN
+    }
+  SCATTER
+    {
+    COLOR = CYAN
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = CYAN
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = EXPOSEDCELLFACES
+    }
+$!THREEDAXIS 
+  XDETAIL
+    {
+    VARNUM = 1
+    }
+  YDETAIL
+    {
+    VARNUM = 2
+    }
+  ZDETAIL
+    {
+    VARNUM = 3
+    }
+$!VIEW FIT
+$!THREEDAXIS 
+  AXISMODE = XYZDEPENDENT
+  XYDEPXTOYRATIO = 1
+  DEPXTOYRATIO = 1
+  DEPXTOZRATIO = 1
+$!THREEDAXIS 
+  XDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = -0.74562500000000009
+    RANGEMAX = 1.0831249999999999
+    GRSPACING = 0.5
+    AXISLINE
+      {
+      EDGE = 4
+      }
+    }
+$!THREEDAXIS 
+  YDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = -0.65374999999999994
+    RANGEMAX = 1.0787500000000001
+    GRSPACING = 0.5
+    AXISLINE
+      {
+      EDGE = 1
+      }
+    }
+$!THREEDAXIS 
+  ZDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = -0.18124999999999999
+    RANGEMAX = 1.0562499999999999
+    GRSPACING = 0.5
+    AXISLINE
+      {
+      EDGE = 3
+      }
+    }
+$!ISOSURFACEATTRIBUTES  1
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 0.0625
+  ISOVALUE2 = 0.125
+  ISOVALUE3 = 0.1875
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  2
+  DEFINITIONCONTOURGROUP = 2
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 0.2
+  ISOVALUE2 = 0.4
+  ISOVALUE3 = 0.6
+  CONTOUR
+    {
+    LINECONTOURGROUP = 2
+    FLOODCOLORING = GROUP2
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  3
+  DEFINITIONCONTOURGROUP = 3
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = -12.9991306363
+  ISOVALUE2 = -9.9982612725
+  ISOVALUE3 = -6.99739190876
+  CONTOUR
+    {
+    LINECONTOURGROUP = 3
+    FLOODCOLORING = GROUP3
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  4
+  DEFINITIONCONTOURGROUP = 4
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 0.186662166461
+  ISOVALUE2 = 0.373324332922
+  ISOVALUE3 = 0.559986499383
+  CONTOUR
+    {
+    LINECONTOURGROUP = 4
+    FLOODCOLORING = GROUP4
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  5
+  DEFINITIONCONTOURGROUP = 5
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 5
+    FLOODCOLORING = GROUP5
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  6
+  DEFINITIONCONTOURGROUP = 6
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 6
+    FLOODCOLORING = GROUP6
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  7
+  DEFINITIONCONTOURGROUP = 7
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 7
+    FLOODCOLORING = GROUP7
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  8
+  DEFINITIONCONTOURGROUP = 8
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 8
+    FLOODCOLORING = GROUP8
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!SLICEATTRIBUTES  1
+  SHOWPRIMARYSLICE = NO
+  PRIMARYPOSITION
+    {
+    X = 0.248
+    Y = 0
+    Z = 0
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWSTARTENDSLICE = YES
+  STARTPOSITION
+    {
+    X = 0
+    Y = 0.05
+    Z = 0.05
+    I = 1
+    J = 1
+    K = 1
+    }
+  ENDPOSITION
+    {
+    X = 1
+    Y = 0.95
+    Z = 0.95
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWINTERMEDIATESLICES = YES
+  NUMINTERMEDIATESLICES = 5
+  MESH
+    {
+    COLOR = CUSTOM2
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = PRIMARYVALUE
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    LINETHICKNESS = 0.1
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 80
+    USETRANSLUCENCY = YES
+    }
+  SLICECONSTRAINT
+    {
+    INCLUDE = NO
+    ORIGIN
+      {
+      X = 0
+      Y = 0
+      Z = 0
+      }
+    BOXDIMENSION
+      {
+      X = 0
+      Y = 0
+      Z = 0
+      }
+    }
+$!SLICEATTRIBUTES  2
+  SHOWGROUP = YES
+  SLICESURFACE = YPLANES
+  SHOWPRIMARYSLICE = NO
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWSTARTENDSLICE = YES
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = -0.05
+    Z = 0.05
+    I = 1
+    J = 1
+    K = 1
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 1.05
+    Z = 0.95
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWINTERMEDIATESLICES = YES
+  NUMINTERMEDIATESLICES = 5
+  MESH
+    {
+    COLOR = CUSTOM2
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = PRIMARYVALUE
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    LINETHICKNESS = 0.1
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 80
+    USETRANSLUCENCY = YES
+    }
+  SLICECONSTRAINT
+    {
+    INCLUDE = NO
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  3
+  SHOWGROUP = YES
+  SLICESURFACE = ZPLANES
+  SHOWPRIMARYSLICE = NO
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWSTARTENDSLICE = YES
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = -0.05
+    I = 1
+    J = 1
+    K = 1
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 1.05
+    I = 1
+    J = 1
+    K = 1
+    }
+  SHOWINTERMEDIATESLICES = YES
+  NUMINTERMEDIATESLICES = 5
+  MESH
+    {
+    COLOR = CUSTOM2
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = PRIMARYVALUE
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    LINETHICKNESS = 0.1
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 80
+    USETRANSLUCENCY = YES
+    }
+  SLICECONSTRAINT
+    {
+    INCLUDE = NO
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  4
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = 0.05
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 0.95
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  5
+  SLICESURFACE = YPLANES
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = 0.05
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 0.95
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  6
+  SLICESURFACE = ZPLANES
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = 0.05
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 0.95
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  7
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = 0.05
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 0.95
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!SLICEATTRIBUTES  8
+  SLICESURFACE = YPLANES
+  PRIMARYPOSITION
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  STARTPOSITION
+    {
+    X = 0.05
+    Y = 0.05
+    Z = 0.05
+    }
+  ENDPOSITION
+    {
+    X = 0.95
+    Y = 0.95
+    Z = 0.95
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    ORIGIN
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    BOXDIMENSION
+      {
+      X = 0.5
+      Y = 0.5
+      Z = 0.5
+      }
+    }
+$!STREAMATTRIBUTES 
+  STREAMTIMING
+    {
+    MARKSIZE = 1
+    MARKSYMBOL
+      {
+      GEOMSHAPE = SPHERE
+      }
+    }
+  RODRIBBON
+    {
+    EFFECTS
+      {
+      LIGHTINGEFFECT = GOURAUD
+      }
+    }
+  MAXSTEPS = 10000
+$!GLOBALTHREED 
+  AXISSCALEFACT
+    {
+    X = 1
+    Y = 1
+    Z = 1
+    }
+  ROTATEORIGIN
+    {
+    X = 0.4885285304414007
+    Y = 0.33864451529
+    Z = 0.22245405672
+    }
+  LIGHTSOURCE
+    {
+    XYZDIRECTION
+      {
+      X = -0.2
+      Y = -0.2
+      Z = 0.9591663046625438
+      }
+    INTENSITY = 75
+    BACKGROUNDLIGHT = 25
+    INCLUDESPECULAR = YES
+    SPECULARINTENSITY = 40
+    SPECULARSHININESS = 60
+    }
+  LINELIFTFRACTION = 0.2
+  SYMBOLLIFTFRACTION = 0.6
+  VECTORLIFTFRACTION = 0.7
+  NEARPLANEFRACTION = 0.1
+$!THREEDVIEW 
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
+  VIEWERPOSITION
+    {
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
+    }
+  VIEWWIDTH = 2.07757
+$!FIELDLAYERS 
+  SHOWCONTOUR = YES
+  SHOWSCATTER = YES
+  SHOWSHADE = YES
+  USETRANSLUCENCY = YES
+$!STREAMTRACELAYERS 
+  SHOW = NO
+$!LINKING 
+  BETWEENFRAMES
+    {
+    LINKSOLUTIONTIME = YES
+    LINK3DVIEW = YES
+    }
+$!FRAMECONTROL ACTIVATEBYNUMBER
+  FRAME = 1
+### Page Number 2 ###
+$!PAGECONTROL CREATE
+$!PAGE 
+  NAME = 'Snake'
+  PAPERATTRIBUTES
+    {
+    BACKGROUNDCOLOR = WHITE
+    ISTRANSPARENT = YES
+    ORIENTPORTRAIT = NO
+    SHOWGRID = YES
+    SHOWRULER = NO
+    SHOWPAPER = NO
+    PAPERSIZE = LETTER
+    RULERSPACING = ONEINCH
+    PAPERGRIDSPACING = HALFINCH
+    REGIONINWORKAREA
+      {
+      X1 = 1
+      Y1 = 0.25
+      X2 = 10
+      Y2 = 8.25
+      }
+    }
+### Frame Number 1, Page Number 2 ###
+$!ATTACHDATASET 
+  PAGENUM = 2
+  FRAME = 1
+$!FRAMELAYOUT 
+  SHOWHEADER = NO
+  HEADERCOLOR = RED
+  XYPOS
+    {
     X = 1
     Y = 0.25
     }
@@ -65,7 +1544,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [3-4]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -519,7 +1998,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -803,7 +2282,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -815,7 +2294,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -1082,16 +2561,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSHADE = YES
   SHOWEDGE = NO
@@ -1105,7 +2584,7 @@ $!LINKING
     }
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 2 ###
+### Page Number 3 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'velocity'
@@ -1128,9 +2607,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 2 ###
+### Frame Number 1, Page Number 3 ###
 $!ATTACHDATASET 
-  PAGENUM = 2
+  PAGENUM = 3
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -1148,7 +2627,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [3-4]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -1615,7 +3094,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -1901,7 +3380,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -1913,7 +3392,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -2182,16 +3661,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWCONTOUR = YES
   SHOWEDGE = NO
@@ -2205,7 +3684,7 @@ $!LINKING
     }
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 3 ###
+### Page Number 4 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'intersection'
@@ -2228,9 +3707,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 3 ###
+### Frame Number 1, Page Number 4 ###
 $!ATTACHDATASET 
-  PAGENUM = 3
+  PAGENUM = 4
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -2248,8 +3727,8 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
-$!ACTIVEFIELDMAPS  =  [5-6]
+  SOLUTIONTIME = 70
+$!ACTIVEFIELDMAPS  =  [5-8]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
   GREENCHANNELVAR = 4
@@ -2704,7 +4183,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -2721,6 +4200,7 @@ $!FIELDMAP  [4]
     }
   SCATTER
     {
+    SHOW = NO
     COLOR = CYAN
     }
   SHADE
@@ -2816,7 +4296,7 @@ $!FIELDMAP  [6]
 $!FIELDMAP  [7]
   MESH
     {
-    COLOR = BLACK
+    COLOR = CUSTOM14
     }
   CONTOUR
     {
@@ -2828,6 +4308,7 @@ $!FIELDMAP  [7]
     }
   SCATTER
     {
+    SHOW = NO
     COLOR = CUSTOM38
     }
   SHADE
@@ -2851,6 +4332,7 @@ $!FIELDMAP  [7]
 $!FIELDMAP  [8]
   MESH
     {
+    SHOW = NO
     COLOR = GREEN
     LINETHICKNESS = 0.4
     }
@@ -2864,7 +4346,12 @@ $!FIELDMAP  [8]
     }
   SCATTER
     {
-    COLOR = GREEN
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = CUSTOM14
+    FRAMESIZE = 0.5
     }
   SHADE
     {
@@ -2991,7 +4478,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -3003,7 +4490,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -3520,17 +5007,18 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
+  SHOWSCATTER = YES
   SHOWEDGE = NO
   USETRANSLUCENCY = YES
   USELIGHTINGEFFECT = NO
@@ -3544,7 +5032,7 @@ $!LINKING
     }
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 4 ###
+### Page Number 5 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'All'
@@ -3567,9 +5055,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 4 ###
+### Frame Number 1, Page Number 5 ###
 $!ATTACHDATASET 
-  PAGENUM = 4
+  PAGENUM = 5
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -3587,7 +5075,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'VOS'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [4-9]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -4045,7 +5533,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     IRANGE
       {
       MAX = 1
@@ -4364,7 +5852,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -4376,7 +5864,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -4908,16 +6396,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWEDGE = NO
@@ -4931,7 +6419,7 @@ $!LINKING
     LINKSOLUTIONTIME = YES
     LINK3DVIEW = YES
     }
-### Frame Number 2, Page Number 4 ###
+### Frame Number 2, Page Number 5 ###
 $!CREATENEWFRAME 
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -4949,7 +6437,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Intersection'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [5-8]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -5408,7 +6896,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -5721,7 +7209,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -5733,7 +7221,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -6250,16 +7738,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWEDGE = NO
@@ -6273,7 +7761,7 @@ $!LINKING
     LINKSOLUTIONTIME = YES
     LINK3DVIEW = YES
     }
-### Frame Number 3, Page Number 4 ###
+### Frame Number 3, Page Number 5 ###
 $!CREATENEWFRAME 
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -6291,7 +7779,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Intersection'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [3-8]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -6749,7 +8237,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -7063,7 +8551,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -7075,7 +8563,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -7592,16 +9080,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWSHADE = YES
@@ -7616,7 +9104,7 @@ $!LINKING
     LINKSOLUTIONTIME = YES
     LINK3DVIEW = YES
     }
-### Frame Number 4, Page Number 4 ###
+### Frame Number 4, Page Number 5 ###
 $!CREATENEWFRAME 
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -7634,7 +9122,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Intersection'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [1,3-4]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -8092,7 +9580,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     }
 $!FIELDMAP  [4]
   MESH
@@ -8406,7 +9894,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -8418,7 +9906,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -8935,16 +10423,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWSHADE = YES
@@ -8959,8 +10447,8 @@ $!LINKING
     LINK3DVIEW = YES
     }
 $!FRAMECONTROL ACTIVATEBYNUMBER
-  FRAME = 4
-### Page Number 5 ###
+  FRAME = 1
+### Page Number 6 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'slice and snake'
@@ -8983,9 +10471,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 5 ###
+### Frame Number 1, Page Number 6 ###
 $!ATTACHDATASET 
-  PAGENUM = 5
+  PAGENUM = 6
   FRAME = 4
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -9003,7 +10491,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'VOS'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [3-9]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -9481,7 +10969,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     IRANGE
       {
       MAX = 1
@@ -9805,7 +11293,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -9817,7 +11305,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -10349,16 +11837,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
     }
-  VIEWWIDTH = 2.64534
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSCATTER = YES
   SHOWEDGE = NO
@@ -10374,10 +11862,10 @@ $!LINKING
     }
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 6 ###
+### Page Number 7 ###
 $!PAGECONTROL CREATE
 $!PAGE 
-  NAME = 'Meshes and snake'
+  NAME = 'VOS convergence'
   PAPERATTRIBUTES
     {
     BACKGROUNDCOLOR = WHITE
@@ -10397,9 +11885,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 6 ###
+### Frame Number 1, Page Number 7 ###
 $!ATTACHDATASET 
-  PAGENUM = 6
+  PAGENUM = 7
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -10417,7 +11905,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = CARTESIAN3D
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 25
+  SOLUTIONTIME = 70
 $!ACTIVEFIELDMAPS  =  [4,9]
 $!GLOBALRGB 
   REDCHANNELVAR = 4
@@ -10784,12 +12272,16 @@ $!BLANKING
     CONSTRAINT 1
       {
       INCLUDE = YES
-      VARA = 5
+      VALUECUTOFF = -14
+      VARA = 6
       }
     CONSTRAINT 2
       {
-      INCLUDE = YES
-      VARA = 4
+      VARA = 6
+      }
+    CONSTRAINT 3
+      {
+      VARA = 1
       }
     }
 $!FIELDMAP  [1]
@@ -10932,7 +12424,7 @@ $!FIELDMAP  [3]
     }
   SURFACES
     {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
+    SURFACESTOPLOT = KPLANES
     IRANGE
       {
       MAX = 1
@@ -11225,7 +12717,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 4
+      EDGE = 1
       }
     }
 $!THREEDAXIS 
@@ -11237,7 +12729,7 @@ $!THREEDAXIS
     GRSPACING = 0.5
     AXISLINE
       {
-      EDGE = 2
+      EDGE = 3
       }
     }
 $!ISOSURFACEATTRIBUTES  1
@@ -11373,7 +12865,7 @@ $!SLICEATTRIBUTES  1
     K = 1
     }
   SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 3
+  NUMINTERMEDIATESLICES = 2
   MESH
     {
     COLOR = CUSTOM2
@@ -11391,6 +12883,7 @@ $!SLICEATTRIBUTES  1
   EFFECTS
     {
     LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 70
     USETRANSLUCENCY = YES
     }
   SLICECONSTRAINT
@@ -11442,7 +12935,7 @@ $!SLICEATTRIBUTES  2
     K = 1
     }
   SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 5
+  NUMINTERMEDIATESLICES = 2
   MESH
     {
     COLOR = CUSTOM2
@@ -11460,6 +12953,7 @@ $!SLICEATTRIBUTES  2
   EFFECTS
     {
     LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 70
     USETRANSLUCENCY = YES
     }
   SLICECONSTRAINT
@@ -11511,7 +13005,7 @@ $!SLICEATTRIBUTES  3
     K = 1
     }
   SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 5
+  NUMINTERMEDIATESLICES = 2
   MESH
     {
     COLOR = CUSTOM2
@@ -11529,6 +13023,7 @@ $!SLICEATTRIBUTES  3
   EFFECTS
     {
     LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 70
     USETRANSLUCENCY = YES
     }
   SLICECONSTRAINT
@@ -11814,1478 +13309,16 @@ $!GLOBALTHREED
   VECTORLIFTFRACTION = 0.7
   NEARPLANEFRACTION = 0.1
 $!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
+  PSIANGLE = 50.7836
+  THETAANGLE = 86.9721
+  ALPHAANGLE = 87.7098
   VIEWERPOSITION
     {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
-    }
-  VIEWWIDTH = 2.64534
-$!FIELDLAYERS 
-  SHOWSHADE = YES
-$!SLICELAYERS 
-  SHOW = YES
-$!STREAMTRACELAYERS 
-  SHOW = NO
-$!LINKING 
-  BETWEENFRAMES
-    {
-    LINKSOLUTIONTIME = YES
-    LINK3DVIEW = YES
-    }
-$!FRAMECONTROL ACTIVATEBYNUMBER
-  FRAME = 1
-### Page Number 7 ###
-$!PAGECONTROL CREATE
-$!PAGE 
-  NAME = 'Meshes'
-  PAPERATTRIBUTES
-    {
-    BACKGROUNDCOLOR = WHITE
-    ISTRANSPARENT = YES
-    ORIENTPORTRAIT = NO
-    SHOWGRID = YES
-    SHOWRULER = NO
-    SHOWPAPER = NO
-    PAPERSIZE = LETTER
-    RULERSPACING = ONEINCH
-    PAPERGRIDSPACING = HALFINCH
-    REGIONINWORKAREA
-      {
-      X1 = 1
-      Y1 = 0.25
-      X2 = 10
-      Y2 = 8.25
-      }
-    }
-### Frame Number 1, Page Number 7 ###
-$!ATTACHDATASET 
-  PAGENUM = 7
-  FRAME = 1
-$!FRAMELAYOUT 
-  SHOWHEADER = NO
-  HEADERCOLOR = RED
-  XYPOS
-    {
-    X = 0.81156
-    Y = 0.25
-    }
-  WIDTH = 9
-  HEIGHT = 8
-$!THREEDAXIS 
-  ASPECTRATIOLIMIT = 25
-  BOXASPECTRATIOLIMIT = 25
-$!PLOTTYPE  = CARTESIAN3D
-$!FRAMENAME  = 'Frame 001'
-$!GLOBALTIME 
-  SOLUTIONTIME = 25
-$!ACTIVEFIELDMAPS  =  [2,4]
-$!GLOBALRGB 
-  REDCHANNELVAR = 4
-  GREENCHANNELVAR = 4
-  BLUECHANNELVAR = 4
-  RANGEMIN = 0
-  RANGEMAX = 1
-$!GLOBALCONTOUR  1
-  VAR = 4
-  COLORMAPNAME = 'Diverging - Blue/Red'
-  DEFNUMLEVELS = 11
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORCUTOFF
-    {
-    RANGEMIN = 0.25075
-    RANGEMAX = 0.75025
-    }
-  COLORMAPFILTER
-    {
-    COLORMAPDISTRIBUTION = CONTINUOUS
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 1
-  RAWDATA
-11
-0
-0.1
-0.2
-0.3
-0.4
-0.5
-0.6
-0.7
-0.8
-0.9
-1
-$!GLOBALCONTOUR  2
-  VAR = 4
-  COLORMAPNAME = 'Diverging - Orange/Purple'
-  DEFNUMLEVELS = 7
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORCUTOFF
-    {
-    RANGEMIN = 0.2
-    RANGEMAX = 0.6
-    }
-  COLORMAPFILTER
-    {
-    COLORMAPDISTRIBUTION = CONTINUOUS
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 0.8
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 2
-  RAWDATA
-7
-0.1
-0.2
-0.3
-0.4
-0.5
-0.6
-0.7
-$!GLOBALCONTOUR  3
-  VAR = 6
-  COLORMAPNAME = 'Diverging - Blue/Yellow/Red'
-  DEFNUMLEVELS = 13
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 82.438
-      Y = 79.572
-      }
-    }
-  COLORCUTOFF
-    {
-    RANGEMIN = -12.9991306363
-    RANGEMAX = -6.99739190876
-    }
-  COLORMAPFILTER
-    {
-    COLORMAPDISTRIBUTION = CONTINUOUS
-    CONTINUOUSCOLOR
-      {
-      CMIN = -16
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 3
-  RAWDATA
-13
--15
--14
--13
--12
--11
--10
--9
--8
--7
--6
--5
--4
--3
-$!GLOBALCONTOUR  4
-  VAR = 4
-  DEFNUMLEVELS = 19
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORCUTOFF
-    {
-    RANGEMIN = 0.186662166461
-    RANGEMAX = 0.559986499383
-    }
-  COLORMAPFILTER
-    {
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 4
-  RAWDATA
-19
-0.05
-0.1
-0.15
-0.2
-0.25
-0.3
-0.35
-0.4
-0.45
-0.5
-0.55
-0.6
-0.65
-0.7
-0.75
-0.8
-0.85
-0.9
-0.95
-$!GLOBALCONTOUR  5
-  VAR = 4
-  DEFNUMLEVELS = 19
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORMAPFILTER
-    {
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 5
-  RAWDATA
-19
-0.05
-0.1
-0.15
-0.2
-0.25
-0.3
-0.35
-0.4
-0.45
-0.5
-0.55
-0.6
-0.65
-0.7
-0.75
-0.8
-0.85
-0.9
-0.95
-$!GLOBALCONTOUR  6
-  VAR = 4
-  DEFNUMLEVELS = 19
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORMAPFILTER
-    {
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 6
-  RAWDATA
-19
-0.05
-0.1
-0.15
-0.2
-0.25
-0.3
-0.35
-0.4
-0.45
-0.5
-0.55
-0.6
-0.65
-0.7
-0.75
-0.8
-0.85
-0.9
-0.95
-$!GLOBALCONTOUR  7
-  VAR = 4
-  DEFNUMLEVELS = 19
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORMAPFILTER
-    {
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 7
-  RAWDATA
-19
-0.05
-0.1
-0.15
-0.2
-0.25
-0.3
-0.35
-0.4
-0.45
-0.5
-0.55
-0.6
-0.65
-0.7
-0.75
-0.8
-0.85
-0.9
-0.95
-$!GLOBALCONTOUR  8
-  VAR = 4
-  DEFNUMLEVELS = 19
-  LEGEND
-    {
-    SHOW = YES
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  COLORMAPFILTER
-    {
-    CONTINUOUSCOLOR
-      {
-      CMIN = 0
-      CMAX = 1
-      }
-    }
-$!CONTOURLEVELS NEW
-  CONTOURGROUP = 8
-  RAWDATA
-19
-0.05
-0.1
-0.15
-0.2
-0.25
-0.3
-0.35
-0.4
-0.45
-0.5
-0.55
-0.6
-0.65
-0.7
-0.75
-0.8
-0.85
-0.9
-0.95
-$!GLOBALSCATTER 
-  VAR = 4
-  RELATIVESIZE = 0.07348
-  LEGEND
-    {
-    XYPOS
-      {
-      X = 95
-      }
-    }
-  REFSCATSYMBOL
-    {
-    COLOR = RED
-    FILLCOLOR = RED
-    }
-$!BLANKING 
-  VALUE
-    {
-    INCLUDE = YES
-    VALUEBLANKCELLMODE = PRIMARYVALUE
-    CONSTRAINT 1
-      {
-      INCLUDE = YES
-      VARA = 5
-      }
-    CONSTRAINT 2
-      {
-      INCLUDE = YES
-      VARA = 4
-      }
-    }
-$!FIELDMAP  [1]
-  MESH
-    {
-    COLOR = BLACK
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = FLOOD
-    COLOR = BLACK
-    USELIGHTINGEFFECT = YES
-    }
-  VECTOR
-    {
-    COLOR = BLACK
-    }
-  SCATTER
-    {
-    COLOR = BLACK
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = BLACK
-    LINETHICKNESS = 0.1
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = BOUNDARYFACES
-    IRANGE
-      {
-      MAX = 1
-      }
-    }
-  VOLUMEMODE
-    {
-    VOLUMEOBJECTSTOPLOT
-      {
-      SHOWISOSURFACES = NO
-      SHOWSLICES = NO
-      SHOWSTREAMTRACES = NO
-      }
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!FIELDMAP  [2]
-  MESH
-    {
-    SHOW = NO
-    MESHTYPE = WIREFRAME
-    COLOR = BLACK
-    }
-  CONTOUR
-    {
-    SHOW = NO
-    CONTOURTYPE = FLOOD
-    COLOR = BLACK
-    USELIGHTINGEFFECT = YES
-    }
-  VECTOR
-    {
-    COLOR = BLACK
-    }
-  SCATTER
-    {
-    COLOR = BLACK
-    }
-  SHADE
-    {
-    SHOW = NO
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    COLOR = BLACK
-    LINETHICKNESS = 0.1
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = BOUNDARYFACES
-    IRANGE
-      {
-      MAX = 1
-      }
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!FIELDMAP  [3]
-  MESH
-    {
-    SHOW = NO
-    COLOR = BLACK
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = PRIMARYVALUE
-    FLOODCOLORING = GROUP2
-    COLOR = BLACK
-    USELIGHTINGEFFECT = YES
-    }
-  VECTOR
-    {
-    COLOR = BLACK
-    }
-  SCATTER
-    {
-    COLOR = BLACK
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = BLACK
-    LINETHICKNESS = 0.1
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
-    IRANGE
-      {
-      MAX = 1
-      }
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!FIELDMAP  [4]
-  MESH
-    {
-    SHOW = NO
-    COLOR = CYAN
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = FLOOD
-    FLOODCOLORING = GROUP2
-    COLOR = CYAN
-    }
-  VECTOR
-    {
-    COLOR = CYAN
-    }
-  SCATTER
-    {
-    COLOR = CYAN
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    COLOR = CYAN
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = KPLANES
-    }
-$!FIELDMAP  [5]
-  MESH
-    {
-    COLOR = YELLOW
-    }
-  CONTOUR
-    {
-    COLOR = YELLOW
-    }
-  VECTOR
-    {
-    COLOR = YELLOW
-    }
-  SCATTER
-    {
-    COLOR = YELLOW
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = YELLOW
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = KPLANES
-    }
-$!FIELDMAP  [6]
-  MESH
-    {
-    COLOR = PURPLE
-    }
-  CONTOUR
-    {
-    COLOR = PURPLE
-    }
-  VECTOR
-    {
-    COLOR = PURPLE
-    }
-  SCATTER
-    {
-    COLOR = PURPLE
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = PURPLE
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = KPLANES
-    }
-$!FIELDMAP  [7]
-  MESH
-    {
-    COLOR = RED
-    }
-  CONTOUR
-    {
-    COLOR = RED
-    }
-  VECTOR
-    {
-    COLOR = RED
-    }
-  SCATTER
-    {
-    COLOR = RED
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = RED
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = KPLANES
-    }
-$!FIELDMAP  [8]
-  MESH
-    {
-    COLOR = GREEN
-    }
-  CONTOUR
-    {
-    COLOR = GREEN
-    }
-  VECTOR
-    {
-    COLOR = GREEN
-    }
-  SCATTER
-    {
-    COLOR = GREEN
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = GREEN
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = KPLANES
-    }
-$!FIELDMAP  [9]
-  MESH
-    {
-    SHOW = NO
-    COLOR = BLUE
-    }
-  CONTOUR
-    {
-    COLOR = BLUE
-    }
-  VECTOR
-    {
-    COLOR = BLUE
-    }
-  SCATTER
-    {
-    COLOR = BLUE
-    }
-  SHADE
-    {
-    SHOW = NO
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = BLUE
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
-    }
-$!FIELDMAP  [10]
-  MESH
-    {
-    COLOR = CYAN
-    }
-  CONTOUR
-    {
-    COLOR = CYAN
-    }
-  VECTOR
-    {
-    COLOR = CYAN
-    }
-  SCATTER
-    {
-    COLOR = CYAN
-    }
-  SHADE
-    {
-    COLOR = CUSTOM2
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    COLOR = CYAN
-    }
-  POINTS
-    {
-    POINTSTOPLOT = SURFACENODES
-    }
-  SURFACES
-    {
-    SURFACESTOPLOT = EXPOSEDCELLFACES
-    }
-$!THREEDAXIS 
-  XDETAIL
-    {
-    VARNUM = 1
-    }
-  YDETAIL
-    {
-    VARNUM = 2
-    }
-  ZDETAIL
-    {
-    VARNUM = 3
-    }
-$!VIEW FIT
-$!THREEDAXIS 
-  AXISMODE = XYZDEPENDENT
-  XYDEPXTOYRATIO = 1
-  DEPXTOYRATIO = 1
-  DEPXTOZRATIO = 1
-$!THREEDAXIS 
-  XDETAIL
-    {
-    SHOWAXIS = NO
-    RANGEMIN = -0.74562500000000009
-    RANGEMAX = 1.0831249999999999
-    GRSPACING = 0.5
-    AXISLINE
-      {
-      EDGE = 4
-      }
-    }
-$!THREEDAXIS 
-  YDETAIL
-    {
-    SHOWAXIS = NO
-    RANGEMIN = -0.65374999999999994
-    RANGEMAX = 1.0787500000000001
-    GRSPACING = 0.5
-    AXISLINE
-      {
-      EDGE = 4
-      }
-    }
-$!THREEDAXIS 
-  ZDETAIL
-    {
-    SHOWAXIS = NO
-    RANGEMIN = -0.18124999999999999
-    RANGEMAX = 1.0562499999999999
-    GRSPACING = 0.5
-    AXISLINE
-      {
-      EDGE = 2
-      }
-    }
-$!ISOSURFACEATTRIBUTES  1
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  ISOVALUE1 = 0.25075
-  ISOVALUE2 = 0.5005
-  ISOVALUE3 = 0.75025
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  2
-  DEFINITIONCONTOURGROUP = 2
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  ISOVALUE1 = 0.2
-  ISOVALUE2 = 0.4
-  ISOVALUE3 = 0.6
-  CONTOUR
-    {
-    LINECONTOURGROUP = 2
-    FLOODCOLORING = GROUP2
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  3
-  DEFINITIONCONTOURGROUP = 3
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  ISOVALUE1 = -12.9991306363
-  ISOVALUE2 = -9.9982612725
-  ISOVALUE3 = -6.99739190876
-  CONTOUR
-    {
-    LINECONTOURGROUP = 3
-    FLOODCOLORING = GROUP3
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  4
-  DEFINITIONCONTOURGROUP = 4
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  ISOVALUE1 = 0.186662166461
-  ISOVALUE2 = 0.373324332922
-  ISOVALUE3 = 0.559986499383
-  CONTOUR
-    {
-    LINECONTOURGROUP = 4
-    FLOODCOLORING = GROUP4
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  5
-  DEFINITIONCONTOURGROUP = 5
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  CONTOUR
-    {
-    LINECONTOURGROUP = 5
-    FLOODCOLORING = GROUP5
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  6
-  DEFINITIONCONTOURGROUP = 6
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  CONTOUR
-    {
-    LINECONTOURGROUP = 6
-    FLOODCOLORING = GROUP6
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  7
-  DEFINITIONCONTOURGROUP = 7
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  CONTOUR
-    {
-    LINECONTOURGROUP = 7
-    FLOODCOLORING = GROUP7
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!ISOSURFACEATTRIBUTES  8
-  DEFINITIONCONTOURGROUP = 8
-  ISOSURFACESELECTION = ONESPECIFICVALUE
-  CONTOUR
-    {
-    LINECONTOURGROUP = 8
-    FLOODCOLORING = GROUP8
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    }
-$!SLICEATTRIBUTES  1
-  SHOWPRIMARYSLICE = NO
-  PRIMARYPOSITION
-    {
-    X = 0.248
-    Y = 0
-    Z = 0
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWSTARTENDSLICE = YES
-  STARTPOSITION
-    {
-    X = 0
-    Y = 0.05
-    Z = 0.05
-    I = 1
-    J = 1
-    K = 1
-    }
-  ENDPOSITION
-    {
-    X = 1
-    Y = 0.95
-    Z = 0.95
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 3
-  MESH
-    {
-    COLOR = CUSTOM2
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = PRIMARYVALUE
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    LINETHICKNESS = 0.1
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    USETRANSLUCENCY = YES
-    }
-  SLICECONSTRAINT
-    {
-    INCLUDE = NO
-    ORIGIN
-      {
-      X = 0
-      Y = 0
-      Z = 0
-      }
-    BOXDIMENSION
-      {
-      X = 0
-      Y = 0
-      Z = 0
-      }
-    }
-$!SLICEATTRIBUTES  2
-  SHOWGROUP = YES
-  SLICESURFACE = YPLANES
-  SHOWPRIMARYSLICE = NO
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWSTARTENDSLICE = YES
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = -0.05
-    Z = 0.05
-    I = 1
-    J = 1
-    K = 1
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 1.05
-    Z = 0.95
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 5
-  MESH
-    {
-    COLOR = CUSTOM2
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = PRIMARYVALUE
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    LINETHICKNESS = 0.1
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    USETRANSLUCENCY = YES
-    }
-  SLICECONSTRAINT
-    {
-    INCLUDE = NO
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  3
-  SHOWGROUP = YES
-  SLICESURFACE = ZPLANES
-  SHOWPRIMARYSLICE = NO
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWSTARTENDSLICE = YES
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = -0.05
-    I = 1
-    J = 1
-    K = 1
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 1.05
-    I = 1
-    J = 1
-    K = 1
-    }
-  SHOWINTERMEDIATESLICES = YES
-  NUMINTERMEDIATESLICES = 5
-  MESH
-    {
-    COLOR = CUSTOM2
-    }
-  CONTOUR
-    {
-    CONTOURTYPE = PRIMARYVALUE
-    }
-  EDGELAYER
-    {
-    SHOW = YES
-    LINETHICKNESS = 0.1
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    USETRANSLUCENCY = YES
-    }
-  SLICECONSTRAINT
-    {
-    INCLUDE = NO
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  4
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    }
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = 0.05
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 0.95
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    SURFACETRANSLUCENCY = 10
-    }
-  SLICECONSTRAINT
-    {
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  5
-  SLICESURFACE = YPLANES
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    }
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = 0.05
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 0.95
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    SURFACETRANSLUCENCY = 10
-    }
-  SLICECONSTRAINT
-    {
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  6
-  SLICESURFACE = ZPLANES
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    }
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = 0.05
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 0.95
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    SURFACETRANSLUCENCY = 10
-    }
-  SLICECONSTRAINT
-    {
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  7
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    }
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = 0.05
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 0.95
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    SURFACETRANSLUCENCY = 10
-    }
-  SLICECONSTRAINT
-    {
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!SLICEATTRIBUTES  8
-  SLICESURFACE = YPLANES
-  PRIMARYPOSITION
-    {
-    X = 0.5
-    Y = 0.5
-    Z = 0.5
-    }
-  STARTPOSITION
-    {
-    X = 0.05
-    Y = 0.05
-    Z = 0.05
-    }
-  ENDPOSITION
-    {
-    X = 0.95
-    Y = 0.95
-    Z = 0.95
-    }
-  EDGELAYER
-    {
-    SHOW = NO
-    }
-  EFFECTS
-    {
-    LIGHTINGEFFECT = GOURAUD
-    SURFACETRANSLUCENCY = 10
-    }
-  SLICECONSTRAINT
-    {
-    ORIGIN
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    BOXDIMENSION
-      {
-      X = 0.5
-      Y = 0.5
-      Z = 0.5
-      }
-    }
-$!STREAMATTRIBUTES 
-  STREAMTIMING
-    {
-    MARKSIZE = 1
-    MARKSYMBOL
-      {
-      GEOMSHAPE = SPHERE
-      }
-    }
-  RODRIBBON
-    {
-    EFFECTS
-      {
-      LIGHTINGEFFECT = GOURAUD
-      }
-    }
-  MAXSTEPS = 10000
-$!GLOBALTHREED 
-  AXISSCALEFACT
-    {
-    X = 1
-    Y = 1
-    Z = 1
-    }
-  ROTATEORIGIN
-    {
-    X = 0.4885285304414007
-    Y = 0.33864451529
-    Z = 0.22245405672
-    }
-  LIGHTSOURCE
-    {
-    XYZDIRECTION
-      {
-      X = -0.2
-      Y = -0.2
-      Z = 0.9591663046625438
-      }
-    INTENSITY = 75
-    BACKGROUNDLIGHT = 25
-    INCLUDESPECULAR = YES
-    SPECULARINTENSITY = 40
-    SPECULARSHININESS = 60
-    }
-  LINELIFTFRACTION = 0.2
-  SYMBOLLIFTFRACTION = 0.6
-  VECTORLIFTFRACTION = 0.7
-  NEARPLANEFRACTION = 0.1
-$!THREEDVIEW 
-  PSIANGLE = 138.977
-  THETAANGLE = -130.412
-  ALPHAANGLE = 174.724
-  VIEWERPOSITION
-    {
-    X = 7.954492239250759
-    Y = 6.58475005217704
-    Z = -10.67208941073288
-    }
-  VIEWWIDTH = 2.64534
+    X = -10.874320192396
+    Y = -0.2666548608182667
+    Z = 9.38377645713174
+    }
+  VIEWWIDTH = 2.07757
 $!FIELDLAYERS 
   SHOWSHADE = YES
 $!SLICELAYERS 
