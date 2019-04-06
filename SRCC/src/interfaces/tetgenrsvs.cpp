@@ -268,7 +268,7 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 	int count = vertEdgeLength.size();
 	for (int i = 0; i < count; ++i)
 	{
-		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.surfedgelengths[0];
+		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.edgelengths[0];
 	}
 	tetin.SpecifyTetPointMetric(0, startPnt, vertEdgeLength);
 	// Assign domain point metrics
@@ -276,7 +276,7 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 	count = vertEdgeLength.size();
 	for (int i = 0; i < count; ++i)
 	{
-		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.surfedgelengths[0];
+		vertEdgeLength[i] = vertEdgeLength[i] * tetgenParam.edgelengths[0];
 	}
 	tetin.SpecifyTetPointMetric(startPnt, startPnt+vertEdgeLength.size(),
 		vertEdgeLength);
@@ -1088,17 +1088,19 @@ mesh tetgen::output::TET2MESH(tetgen::io_safe &tetout){
 /**
  * @brief      Generate points inside volume cells of a mesh
  *
- * @param[in]  meshin   The input mesh
- * @param[in]  nLevels  The number of layers of points in each cell.
- *
- * @return     A tetgen io object which can be passed directly to tetrahedralize
- * as the fourth input.
+ * @param[in]  meshin    The input mesh
+ * @param[in]  nLevels   The number of layers of points in each cell.
+ * @param      tetinPts  A tetgen io object which can be passed directly to
+ *                       tetrahedralize ast he fourth input.
  */
 void tetgen::voronoi::GenerateInternalPoints(const mesh &meshin, 
 	int nLevels, tetgen::io_safe &tetinPts){
 
 
 	auto vecPts = VolumeInternalLayers(meshin, nLevels);
+	// Can't be done as causes tetgen to crash
+	// auto vecPts2 = SurfaceInternalLayers(meshin, 0);
+	// vecPts.insert(vecPts.end(),vecPts2.begin(),vecPts2.end());
 	mesh meshgeom = Points2Mesh(vecPts,3);
 	mesh meshdomain;
 	meshdomain.Init(0,0,0,0);
@@ -1140,7 +1142,7 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 	voroMesh.OrderEdges();
 	voroMesh.SetBorders();
 	// voroMesh.displight();
-	FlattenBoundaryFaces(voroMesh);
+	TriangulateAllFaces(voroMesh);
 	voroMesh.PrepareForUse();
 	voroMesh.TightenConnectivity(); 
 	voroMesh.OrderEdges();
@@ -1153,8 +1155,9 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 	tetgen::input::RSVSGRIDS(voroMesh, tetinT, inparam);
 
 	int nInternalLayers = 0;
-	if(inparam.surfedgelengths.size()>1){
-		nInternalLayers = round(inparam.surfedgelengths[1]);
+
+	if(inparam.edgelengths.size()>1){
+		nInternalLayers = round(inparam.edgelengths[1]);
 	}
 	tetgen::voronoi::GenerateInternalPoints(voroMesh,nInternalLayers, tetinSupport);
 

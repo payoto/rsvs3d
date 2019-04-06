@@ -194,15 +194,20 @@ function [param3D]=RSVS3D_SetDomain(param3D,compDomainBounds, physDomainBounds)
 end
 
 % set up a voronoi mesh from points
-function [param3D]=RSVS3D_CallVoronoi(param3D, voroPoints, snakeCoarseNess,...
+function [param3D]=RSVS3D_CallVoronoi(param3D, voroPoints, voroSnakeLayers,...
         distanceBoundBox, varargin)
     
     voroFile = RSVS3D_tempfile('_3d.vpnt', 'temp');
     
     param3D = SetVariables({'activegrid'},{'voronoi'}, param3D);
-    param3D = SetVariables({'snakecoarseness'},{snakeCoarseNess}, param3D);
+    param3D = SetVariables({'snakecoarseness'},{0}, param3D);
+    param3D = SetVariables({'vorosnakelayers'},{voroSnakeLayers}, param3D);
     param3D = SetVariables({'pointfile'},{voroFile}, param3D);
     param3D = SetVariables({'distancebox'},{distanceBoundBox}, param3D);
+    
+    param3D.rsvs.cstfill.active = false;
+    param3D.rsvs.makefill.active = false;
+    param3D.rsvs.filefill.active = false;
     
     fid = fopen(voroFile, 'w');
     for ii=1:numel(voroPoints)

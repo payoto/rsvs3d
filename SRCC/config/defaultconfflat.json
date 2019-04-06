@@ -40,7 +40,7 @@
   "/grid/voxel/gridsizesnake/0": 6,
   "/grid/voxel/gridsizesnake/1": 6,
   "/grid/voxel/gridsizesnake/2": 6,
-  "/rsvs/cstfill/active": true,
+  "/rsvs/cstfill/active": false,
   "/rsvs/cstfill/fill": 0.5,
   "/rsvs/filefill/active": false,
   "/rsvs/filefill/fill": "",

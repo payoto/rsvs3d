@@ -67,7 +67,7 @@ param::voronoi::voronoi(){
 
 	this->inputpoints={0.0};
 	this->pointfile = "";
-	this->distancebox = 0.1;
+	this->distancebox = 0.51;
 	this->snakecoarseness = 0.0;
 	this->vorosnakelayers = 2;
 }
@@ -154,7 +154,7 @@ void param::snaking::PrepareForUse(){
 param::rsvs::rsvs(){
 	this->solveralgorithm = 0;
 
-	this->cstfill.active=true;
+	this->cstfill.active=false;
 	this->cstfill.fill=0.5;
 
 	this->filefill.active=false;

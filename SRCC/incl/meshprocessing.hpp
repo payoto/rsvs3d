@@ -48,6 +48,7 @@
 //       
 
 void FlattenBoundaryFaces(mesh &meshin);
+void TriangulateAllFaces(mesh &meshin);
 std::vector<int> FindHolesInSnake(const snake &snakein,
 	const HashedVector<int, int> &uncertainVert);
 void PrepareSnakeForCFD(const snake &snakein, double distanceTol,
@@ -82,6 +83,8 @@ std::vector<double> CalculateEdgeLengths(const mesh &meshin);
 std::vector<double> CoordInVolume(const mesh &meshin);
 std::vector<double> VolumeCentroids(const mesh &meshin);
 std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers);
+std::vector<double> SurfaceCentroids(const mesh &meshin);
+std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers);
 // Forward declared templated functions
 
 // Base class

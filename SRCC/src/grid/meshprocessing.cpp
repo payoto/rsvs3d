@@ -72,6 +72,41 @@ void FlattenBoundaryFaces(mesh &meshin){
 	}
 }
 
+void TriangulateAllFaces(mesh &meshin){
+	mesh meshout;
+	vector<int> subList;
+	triangulation triangleRSVS;
+	int nSurf;
+
+
+	nSurf = meshin.surfs.size();
+	subList.reserve(nSurf);
+
+	triangleRSVS.stattri.clear();
+	triangleRSVS.trivert.clear();
+	triangleRSVS.PrepareForUse();
+
+	TriangulateContainer(meshin,triangleRSVS , 1, {}); 
+		triangleRSVS.meshDep = &meshin;
+
+
+	triangleRSVS.PrepareForUse();
+	triangleRSVS.CalcTriVertPos();
+	triangleRSVS.PrepareForUse();
+	// meshin.displight();
+	auto newSurfs = ConcatenateVectorField(meshin.surfs,
+		&surf::edgeind, subList);
+	// cerr << "Num new surfs " << newSurfs.size()-subList.size() 
+	// 	<< " from " << subList.size() << endl;
+	MeshTriangulation(meshout,meshin,triangleRSVS.stattri,
+		triangleRSVS.trivert);
+	meshin=meshout;
+	meshin.PrepareForUse();
+	// meshin.displight();
+	meshin.TightenConnectivity();
+	meshin.OrderEdges();
+	// meshin.displight();
+}
 
 std::vector<int> FindHolesInSnake(const snake &snakein,
 	const HashedVector<int, int> &uncertainVert){
@@ -810,5 +845,83 @@ std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers){
 		}
 	}
 	return(vecPts);
+}
 
+/**
+ * @brief      Generate a vector of coordinates of points at the surfaces pseudo centroid.
+ *
+ * @param[in]  meshin  The input mesh
+ *
+ * @return     vector of coordinates with one coordinate inside each surface
+ */
+std::vector<double> SurfaceCentroids(const mesh &meshin){
+	std::vector<double> vecPts;
+	int nSurf;
+
+	nSurf = meshin.surfs.size();
+	vecPts.assign(nSurf*3, 0.0);
+
+
+	for (int i = 0; i < nSurf; ++i)
+	{
+		auto surfCoord = meshin.surfs(i)->PseudoCentroid(meshin);
+		for (int j = 0; j < 3; ++j)
+		{
+			vecPts[i*3+j] = surfCoord[j];
+		}
+	}
+
+	return(vecPts);
+}
+
+
+/**
+ * @brief      Returns points on edges between surface pseudo centroid and
+ *             vertices.
+ *
+ * @param[in]  meshin   The input mesh to process
+ * @param[in]  nLayers  The number of layers of points (0: only the centre, 1:
+ *                      layer surroundin the centre)
+ *
+ * @throw     std::invalid_argument  if the number of layers is below 0.
+ *
+ * @return     Vector of points containing the centres and additional points.
+ */
+std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers){
+	
+	if(nLayers<0){
+		RSVS3D_ERROR_ARGUMENT("Unknown number of layers.");
+	}
+
+	int nSurfs = meshin.surfs.size();
+	std::vector<double> vecPts = SurfaceCentroids(meshin);
+	auto multcentre = [&](int pos) -> double {
+		return double(pos+1)/double(nLayers+1);
+	};
+	auto multvert = [&](int pos) -> double {
+		return double(nLayers-pos)/double(nLayers+1);
+	};
+
+	vecPts.reserve(nSurfs * 3 * (8 * nLayers + 1));
+	for (int i = 0; i < nSurfs; ++i)
+	{
+		auto tempEdge = meshin.edges.find_list(meshin.surfs(i)->edgeind);
+		auto surfInd = ConcatenateVectorField(meshin.edges, &edge::vertind,
+			tempEdge);
+		auto surfVerts = meshin.verts.find_list(surfInd);
+
+		for (auto vertSub : surfVerts){
+			for (int j = 0; j < nLayers; ++j)
+			{
+				for (int k = 0; k < 3; ++k)
+				{
+				vecPts.push_back(
+					vecPts[i*3+k] * multcentre(j) 
+					+ meshin.verts(vertSub)->coord[k] * multvert(j)
+					);
+				}
+			}
+		}
+	}
+	return(vecPts);
 }

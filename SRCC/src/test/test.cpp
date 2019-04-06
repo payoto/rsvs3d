@@ -103,6 +103,8 @@ int rsvstest::newtest(){
 		"determination of flat json");
 	gridTest.RunSilent(param::test::symmetry_makefillactive,
 		"makefill.active symmetrical?");
+	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
+	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
 
 
 	return(0);

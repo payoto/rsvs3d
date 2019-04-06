@@ -923,8 +923,8 @@ int Test_RSVSvoro_init(){
 		fileToOpen="../TESTOUT/TestVoroRSVS.plt";
 		outSnake.OpenFile(fileToOpen);
 
-		voroparam.edgelengths={0.1};
-		voroparam.distanceTol=0.1;
+		voroparam.edgelengths={0.0, 3.0};
+		voroparam.distanceTol=0.5;
 		vecPts.assign(4, 0.66);
 		vecPts.insert(vecPts.end(), 4,0.33);
 		tetgen::RSVSVoronoiMesh(vecPts, voluMesh, snakeMesh, voroparam);
@@ -935,7 +935,7 @@ int Test_RSVSvoro_init(){
 		// 	voluMesh.volus[i].target = 0.5;
 		// }
 		int i1 =1;
-		for (int i = 0; i < 5; ++i)
+		for (int i = 0; i < 3; ++i)
 		{
 			voluMesh.volus[i1++].target=1.0;
 		}
