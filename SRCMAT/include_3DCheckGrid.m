@@ -166,6 +166,52 @@ function [voluOnRight]=FindRightSurface2D(grid)
     
 end
 
+function [currVertSub, currVertInd, currEdgeSub, currEdgeInd]=...
+        OrderSurfaceVertList(grid, ii, edgeInd, vertInd)
+    
+    blockEdges = vertcat(grid.edge(FindObjNum([],grid.surf(ii).edgeind,...
+        edgeInd)).vertind);
+    [cellOrderedVertex,cellOrderedEdges]=OrderBlockEdges(blockEdges);
+    
+    if numel(cellOrderedVertex)>1
+        errstruct.message = "A face was closed into multiple loops.";
+        errstruct.identifier = "rsvs3D:grid:multiloopface";
+        error(errstruct)
+    end
+    
+    currVertSub = FindObjNum([],cellOrderedVertex{1},vertInd);
+    currVertInd = cellOrderedVertex{1};
+    
+    currEdgeSub = FindObjNum([],cellOrderedEdges{1},vertInd);
+    currEdgeInd = cellOrderedEdges{1};
+end
+
+function [currVertSub]=OrderSurfaceVertListClosed(grid, ii, ...
+        edgeInd, vertInd)
+    [currVertSub]=OrderSurfEdgeVertListClosed(grid, grid.surf(ii).edgeind, ...
+        edgeInd, vertInd);
+end
+
+function [currVertSub]=OrderSurfEdgeVertListClosed(grid, surfEdgeIndOrd, ...
+        edgeInd, vertInd)
+    % requires edges to be Ordered
+    currVertSub=FindObjNum([],...
+        [grid.edge(...
+        FindObjNum([],surfEdgeIndOrd,edgeInd)...
+        ).vertind],vertInd);
+    [~,b,~]=unique(currVertSub);
+    b = sort(b);
+    if currVertSub(b(end))==currVertSub(end)
+        b(end+1) = numel(currVertSub)-1;
+    else
+        b(end+1) = numel(currVertSub);
+    end
+    currVertSub=currVertSub(b);
+    if currVertSub(end)~=currVertSub(1)
+        currVertSub(1:2)=currVertSub(2:-1:1);
+    end
+end
+
 %% Tecplot Output
 
 function [cellStr]=PrepareCharForTecplot(cellStr)
@@ -323,21 +369,7 @@ function []=Plot3DSurf(grid,textLevel)
     vertexSymbols={'o','x','s','+','*','d','v'};
     if size(grid.vert(1).coord,2)==3
         for ii=1:numel(grid.surf)
-            currVertSub=FindObjNum([],...
-                [grid.edge(...
-                FindObjNum([],[grid.surf(ii).edgeind],edgeInd)...
-                ).vertind],vertInd);
-            [~,b,~]=unique(currVertSub);
-            b = sort(b);
-            if currVertSub(b(end))==currVertSub(end)
-                b(end+1) = numel(currVertSub)-1;
-            else
-                b(end+1) = numel(currVertSub);
-            end
-            currVertSub=currVertSub(b);
-            if currVertSub(end)~=currVertSub(1)
-                currVertSub(1:2)=currVertSub(2:-1:1);
-            end
+            [currVertSub]=OrderSurfaceVertListClosed(grid, ii, edgeInd, vertInd);
             coord=vertcat(grid.vert(currVertSub).coord);
             mCoord=mean(coord,1);
             coord=(coord-repmat(mean(coord,1),[size(coord,1),1]))*0.95...
@@ -690,18 +722,4 @@ switch range
         error('Range must be either "1" to scale from 0 to 1 or "256" to scale from 0 to 255.')
 end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

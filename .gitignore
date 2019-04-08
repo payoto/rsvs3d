@@ -17,6 +17,7 @@ temp/*
 *.s
 *.o
 *.f
+*.asv
 SRCC/obj/*.o
 SRCC/.d/*
 SRCC/dbg*
@@ -43,6 +44,9 @@ defaultconfigRSVS3D.json*
 # Data output files
 *.vtk
 *.plt
+# Matlab spam files
+*.dXYZ
+surface_analysis.dat
 
 
 
