@@ -66,6 +66,8 @@ public:
 	Eigen::VectorXd constrTarg;
 	///
 	Eigen::MatrixXd dvCallConstr;
+	/// Sensitivity of the optimum design variables to the constraint.
+	Eigen::MatrixXd sensDv;
 	/// Objective function value.
 	double obj=0.0;
 	/// Value at which a Lagrangian multiplier is considered problematically
@@ -241,7 +243,7 @@ public:
 	 * @param[in]  calcMethod  Calculation method for SQP. Check
 	 *                         :meth:RSVScalc::ComputeSQPstep for detail.
 	 */
-	void CheckAndCompute(int calcMethod=0);
+	void CheckAndCompute(int calcMethod=0, bool sensCalc=false);
 
 	/**
 	 * Calculates the next SQP step.
@@ -269,6 +271,13 @@ public:
 		Eigen::VectorXd &lagMultAct
 		);
 
+	void ComputeSQPsens(
+		int calcMethod,
+		const Eigen::MatrixXd &sensMult,
+		const Eigen::MatrixXd &sensInv,
+		Eigen::MatrixXd &sensRes
+		);
+	
 	/**
 	 * @brief      Prepares the matrices needed for the SQP step calculation.
 	 *
@@ -289,6 +298,32 @@ public:
 		Eigen::VectorXd &constrAct,
 		Eigen::VectorXd &lagMultAct
 		);
+
+	/**
+	 * @brief      Prepares the matrices needed for the calculation of 
+	 * the sensitivity of the SQP.
+	 * 
+	 * This is done to then call RSVScalc::ComputeSQPsens which implements
+	 * the SQP optimality sensitivity giving the change in design variables
+	 * due to a small change of constraint at the optimal condition.
+	 *
+	 * @param      dConstrAct  The active constraint Jacobian
+	 * @param      HConstrAct  The active constraint hessian
+	 * @param      HObjAct     The active objective hessian
+	 * @param      sensMult    The sensitivity RHS multiplier
+	 * @param      sensInv     The sensitivity RHS Matrix equation
+	 * @param      sensRes     The sensitivity LHS result matrix.
+	 *
+	 * @return     Returns if the sensitivity should be computed or not.
+	 */
+	bool PrepareMatricesForSQPSensitivity(
+		const Eigen::MatrixXd &dConstrAct,
+		const Eigen::MatrixXd &HConstrAct, 
+		const Eigen::MatrixXd &HObjAct,
+		Eigen::MatrixXd &sensMult,
+		Eigen::MatrixXd &sensInv,
+		Eigen::MatrixXd &sensRes
+		) const;
 	
 	/**
 	 * @brief      Returns velocities to the snaxels.
@@ -297,13 +332,14 @@ public:
 	 *                      triangulation::snakeDep attribute.
 	 */
 	void ReturnVelocities(triangulation &triRSVS);
-
+	void ReturnSensitivities(const triangulation &triRSVS, 
+		std::vector<double> &sensVec, int constrNum) const;
 	/**
 	 * @brief      Getter for the number of constraints.
 	 *
 	 * @return     The number of constraints.
 	 */
-	int numConstr(){return(this->nConstr);}
+	int numConstr() const {return(this->nConstr);}
 	// Output functions
 	
 	/**
@@ -422,6 +458,18 @@ bool SQPstep(const RSVScalc &calcobj,
 	bool attemptConstrOnly=true);
 
 
+template<class T>
+bool SQPsens(
+	const Eigen::MatrixXd &sensMult,
+	const Eigen::MatrixXd &sensInv,
+	Eigen::MatrixXd &sensRes);
+
+template<template<typename> class T>
+bool SQPsens(
+	const Eigen::MatrixXd &sensMult,
+	const Eigen::MatrixXd &sensInv,
+	Eigen::MatrixXd &sensRes);
+
 // Code to be included as templated functions
 
 template<template<typename> class T>
@@ -473,6 +521,27 @@ bool SQPstep(const RSVScalc &calcobj,
 						+ dConstrAct.transpose()*lagMultAct));
 	}
 	return(isLarge || isNan);
+}
+
+template<template<typename> class T>
+bool SQPsens(
+	const Eigen::MatrixXd &sensMult,
+	const Eigen::MatrixXd &sensInv,
+	Eigen::MatrixXd &sensRes){
+
+	return SQPsens<T<Eigen::MatrixXd>>(sensMult, sensInv, sensRes);
+}
+
+template<class T>
+bool SQPsens(
+	const Eigen::MatrixXd &sensMult,
+	const Eigen::MatrixXd &sensInv,
+	Eigen::MatrixXd &sensRes){
+
+	T HLagSystem(sensInv);
+
+	sensRes = HLagSystem.solve(sensMult);
+	return(true);
 }
 
 #endif

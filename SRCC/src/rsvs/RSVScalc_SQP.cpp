@@ -95,13 +95,51 @@ bool RSVScalc::PrepareMatricesForSQP(
 	return(nDvAct>0);
 }
 
-void RSVScalc::CheckAndCompute(int calcMethod){
+bool RSVScalc::PrepareMatricesForSQPSensitivity(
+	const MatrixXd &dConstrAct,
+	const MatrixXd &HConstrAct, 
+	const MatrixXd &HObjAct,
+	MatrixXd &sensMult,
+	MatrixXd &sensInv,
+	MatrixXd &sensRes
+	) const {
+
+	int nDvAct, nConstrAct;
+	MatrixXd HLagAct;
+
+	// Find active design variables and active constraint
+	nDvAct = this->subDvAct.size();
+	nConstrAct  = this->subConstrAct.size();
+
+
+	/// sensitivity requires : [H_d L , J_d constr; J_d constr ^T, 0]^-1
+	/// [Dd^TD_v L (=0s) ; D_V constr (=eye(lagMult))]
+ 	
+	sensMult.resize(nDvAct+nConstrAct, nDvAct+nConstrAct);
+	sensInv.resize(nDvAct+nConstrAct, nConstrAct);
+	sensRes.resize(nDvAct+nConstrAct, nConstrAct);
+
+	sensInv << HConstrAct+HObjAct , dConstrAct.transpose(), 
+		dConstrAct, MatrixXd::Zero(nConstrAct, nConstrAct);
+
+	sensMult.setZero();
+	for (int i = 0; i < nConstrAct; ++i)
+	{
+		sensMult(nDvAct+i, i) = this->lagMult[this->subConstrAct[i]];
+	}
+	sensRes.setZero();
+
+	// do some size checks on the constructed matrices.
+
+	return(nDvAct>0 && nConstrAct>0);
+}
+
+void RSVScalc::CheckAndCompute(int calcMethod, bool sensCalc){
 	int ii;
 	bool computeFlag;
 	MatrixXd dConstrAct,HConstrAct, HObjAct;
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
-
 	computeFlag = PrepareMatricesForSQP(
 		dConstrAct,HConstrAct, HObjAct,dObjAct,
 		constrAct,lagMultAct
@@ -115,7 +153,16 @@ void RSVScalc::CheckAndCompute(int calcMethod){
 	} else {
 		for (ii=0; ii<nDv; ++ii){
 			deltaDV[ii]=0.0;
-			
+		}
+	}
+	if(sensCalc){ 
+		MatrixXd sensMult, sensInv, sensRes;
+		bool computeSens = this->PrepareMatricesForSQPSensitivity(dConstrAct,
+			HConstrAct, HObjAct, sensMult, sensInv, sensRes);
+		this->sensDv.setZero(this->nDv, this->nConstr);
+		if (computeSens)
+		{
+			this->ComputeSQPsens(calcMethod, sensMult, sensInv, sensRes);
 		}
 	}
 }
@@ -145,29 +192,29 @@ void RSVScalc::ComputeSQPstep(
 	while(rerunDefault){
 		switch(calcMethod){
 			case 1:
-				rerunDefault=SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, dObjAct,
-					constrAct, lagMultAct,
+				rerunDefault=SQPstep<Eigen::HouseholderQR>(*this, dConstrAct, 
+					dObjAct, constrAct, lagMultAct,
 					deltaDVAct, isNan, isLarge,attemptConstrOnly);
 				// cout << "case 1:" << endl;
 
 			break;
 			case 2:
-				rerunDefault=SQPstep<Eigen::ColPivHouseholderQR>(*this, dConstrAct, dObjAct,
-					constrAct, lagMultAct,
+				rerunDefault=SQPstep<Eigen::ColPivHouseholderQR>(*this,
+					dConstrAct, dObjAct, constrAct, lagMultAct,
 					deltaDVAct, isNan, isLarge,attemptConstrOnly);
 				// cout << "case 2:" << endl;
 			break;
 			case 3: 
 				// Eigen::LLT is inconveniently a 2 parameter template so
 				// a full type is passed
-				rerunDefault=SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, dObjAct,
-					constrAct, lagMultAct,
+				rerunDefault=SQPstep<Eigen::LLT<MatrixXd>>(*this, dConstrAct, 
+					dObjAct, constrAct, lagMultAct,
 					deltaDVAct, isNan, isLarge,attemptConstrOnly);
 				// cout << "case 3:" << endl;
 			break;
 			case 4:
-				rerunDefault=SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, dObjAct,
-					constrAct, lagMultAct,
+				rerunDefault=SQPstep<Eigen::PartialPivLU>(*this, dConstrAct, 
+					dObjAct, constrAct, lagMultAct,
 					deltaDVAct, isNan, isLarge,attemptConstrOnly);
 				// cout << "case 4:" << endl;
 			break;
@@ -214,55 +261,43 @@ void RSVScalc::ComputeSQPstep(
 	}
 }
 
-/// INSPIRATION
-/*
-void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin){ 
-	int ii,n;
-	vector<int> vertind;
-	vector<vector<double> const *> veccoord;
-	SurfCentroid tempCalc;
-	ArrayVec<double> tempCoord,jac,hes;
+void RSVScalc::ComputeSQPsens(
+	int calcMethod,
+	const Eigen::MatrixXd &sensMult,
+	const Eigen::MatrixXd &sensInv,
+	Eigen::MatrixXd &sensRes
+	){
 
-	coord.assign(0,0,0);
-	n=int(surfin.edgeind.size());
 
-	veccoord.reserve(n);
-	ConnVertFromConnEdge(meshin, surfin.edgeind,vertind);
-
-	for(ii=0; ii<n; ++ii){
-		veccoord.push_back(&(meshin.verts.isearch(vertind[ii])->coord));
+	switch(calcMethod){
+		case 1:
+			SQPsens<Eigen::HouseholderQR>(sensMult, sensInv, sensRes);
+		break;
+		case 2:
+			SQPsens<Eigen::ColPivHouseholderQR>(sensMult, sensInv, sensRes);
+		break;
+		case 3: 
+			// Eigen::LLT is inconveniently a 2 parameter template so
+			// a full type is passed
+			SQPsens<Eigen::LLT<MatrixXd>>(sensMult, sensInv, sensRes);
+		break;
+		case 4:
+			SQPsens<Eigen::PartialPivLU>(sensMult, sensInv, sensRes);
+		break;
+		default:
+			SQPsens<Eigen::ColPivHouseholderQR>(sensMult, sensInv, sensRes);
+		break;
 	}
 
-	tempCalc.assign(veccoord);
-	tempCalc.Calc();
-
-	tempCalc.ReturnDat(tempCoord,jac,hes);
-	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
-}
-
-void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin,
-	const mesh& snakeconn){ 
-	int ii,n;
-	vector<int> vertind;
-	vector<vector<double> const *> veccoord;
-	SurfCentroid tempCalc;
-	ArrayVec<double> tempCoord,jac,hes;
-
-	coord.assign(0,0,0);
-
-	n=surfin.indvert.size();
-	for(ii=0; ii<n; ++ii){
-		if(surfin.typevert[ii]==1){
-			veccoord.push_back(&(meshin.verts.isearch(surfin.indvert[ii])->coord));
-		} else if (surfin.typevert[ii]==2){
-			veccoord.push_back(&(snakeconn.verts.isearch(surfin.indvert[ii])->coord));
+	int nConstrAct, nDvAct;
+	nConstrAct = this->subConstrAct.size();
+	nDvAct = this->subDvAct.size();
+	for (int i = 0; i < nDvAct; ++i)
+	{
+		for (int j = 0; j < nConstrAct; ++j)
+		{
+			this->sensDv(this->subDvAct[i],this->subConstrAct[i]) = 
+				sensRes(i, j);
 		}
 	}
-
-	tempCalc.assign(veccoord);
-	tempCalc.Calc();
-
-	tempCalc.ReturnDat(tempCoord,jac,hes);
-	coord.assign(tempCoord[0][0],tempCoord[1][0],tempCoord[2][0]);
 }
-*/

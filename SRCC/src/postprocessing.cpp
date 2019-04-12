@@ -4,6 +4,7 @@
 #include "postprocessing.hpp" 
 #include "triangulate.hpp"
 #include "warning.hpp"
+#include "RSVScalc.hpp"
 
 
 // Functions
@@ -1378,8 +1379,7 @@ void tecplotfile::ZoneHeaderFelineseg(int nVert,int nEdge,  int nVertDat,
 
 
 void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf,
-	int totNumFaceNode,
-	int nVertDat, int nCellDat){
+	int totNumFaceNode,	int nVertDat, int nCellDat, int nSensDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1388,14 +1388,14 @@ void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf,
 	fprintf(fid, "TOTALNUMFACENODES = %i\n",totNumFaceNode);
 	fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
 	fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat);
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat+nSensDat);
 
 	fprintf(fid, "DATAPACKING=BLOCK\n");
 
 }
 
 void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf,
-	int nVertDat, int nCellDat){
+	int nVertDat, int nCellDat, int nSensDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYGON\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1404,7 +1404,7 @@ void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf,
 	fprintf(fid, "TOTALNUMFACENODES = %i\n",2*nEdge);
 	fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
 	fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat);
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat+nSensDat);
 
 
 	fprintf(fid, "DATAPACKING=BLOCK\n");
@@ -1412,26 +1412,126 @@ void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf,
 }
 
 void tecplotfile::ZoneHeaderFelinesegSnake(int nVert,int nEdge,  int nVertDat,
-	int nCellDat){
+	int nCellDat, int nSensDat){
 
 	fprintf(fid, "ZONETYPE = FELINESEG\n");
 	fprintf(fid, "NODES = %i\n", nVert);
 	fprintf(fid, "ELEMENTS = %i\n",nEdge);
 	this->Print( "FACES = %i\n",nEdge);
-	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat);
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat+nSensDat);
 
 	fprintf(fid, "DATAPACKING=BLOCK\n");
 
 }
 
-void tecplotfile::ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat){
+void tecplotfile::ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat,
+	int nSensDat){
 
 	fprintf(fid, "ZONETYPE = ORDERED\n");
 	fprintf(fid, "I = %i\n", nVert);
-	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat);
+	fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n",1,nVertDat+nCellDat+nSensDat);
 	fprintf(fid, "DATAPACKING=BLOCK\n");
 
 }
+
+
+// Print snake with sensitivity
+int tecplotfile::PrintSnakeSensitivity(const triangulation& triRSVS, const RSVScalc &calcObj,
+	int strandID, double timeStep, int forceOutType, 
+	const vector<int> &vertList){
+
+	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat, nSensDat;
+	const snake& snakeout = *triRSVS.snakeDep;
+	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert==0){ // Don't print mesh
+		return(1);
+	}
+	
+	if(nZones==0){
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"" );
+		for (int i = 0; i < calcObj.numConstr(); ++i)
+		{
+			fprintf(fid, ", \"sens_%i\"",i);
+		}
+		fprintf(fid, "\n");
+	}
+
+	this->NewZone();
+
+	if(strandID>0){
+		this->StrandTime(strandID, timeStep);
+	}
+	// Fixed by the dimensionality of the mesh
+	nVertDat=3;
+	nCellDat=3;
+	nSensDat = calcObj.numConstr();
+
+	if (forceOutType==0){
+		if(nVolu>0){
+			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+		} else if (nSurf>0){
+			forceOutType=2;// output as Surface data (FEPOLYGON)
+		} else if (nEdge>0){
+			forceOutType=3; // output as line data (FELINESEG)
+		} else {
+			forceOutType=4;
+		}
+	}
+
+
+	if (forceOutType==1){
+		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->VolFaceMap(snakeout.snakeconn,nSurf);
+	}
+	else if (forceOutType==2){
+		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->SurfFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==3){
+		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->LineFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==4){
+		if(int(vertList.size())==nVert){
+			nVert=0;
+			for (int ii=0; ii< int(vertList.size());++ii){
+				nVert += int(vertList[ii]); 
+			}
+		} else if (vertList.size()>0){
+			nVert=int(vertList.size());
+		}
+		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		// No map just points
+	}
+	return(0);
+}
+int tecplotfile::SensitivityDataBlock(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int nVert, int nSensDat){
+	// Prints the Coord and Fill Data blocks to the tecplot file
+
+	int ii,jj;
+	// Print vertex Data
+	std::vector<double> sensTemp;
+
+	for (jj=0;jj<nSensDat;++jj){
+		calcObj.ReturnSensitivities(triRSVS, sensTemp, jj);
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%.16lf ",sensTemp[ii]);
+		}
+		fprintf(fid,"\n");this->ResetLine();
+	}
+	return 0;
+}
+// tecplotfile operations
 
 int tecplotfile::OpenFile (const char *str, const char *mode){
 	if (fid!=NULL){

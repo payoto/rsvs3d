@@ -109,7 +109,7 @@ public:
 	int PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp,
 		int strandID=0, double timeStep=0, int forceOutType=0);
 
-	// Snak especific functions
+	// Snake specific functions
 	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
 		int forceOutType=0, const vector<int> &vertList={});
@@ -118,13 +118,22 @@ public:
 		int nVertDat, int nCellDat);
 	void ZoneHeaderPolygon(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
 	void ZoneHeaderFelineseg(int nVert,int nEdge,int nVertDat, int nCellDat);
-	void ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat);
+	void ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat,
+		int nSensDat=0);
 
-	void ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf, int totNumFaceNode,
-		int nVertDat, int nCellDat);
-	void ZoneHeaderPolygonSnake(int nVert,int nEdge, int nSurf,int nVertDat, int nCellDat);
-	void ZoneHeaderFelinesegSnake(int nVert,int nEdge,int nVertDat, int nCellDat);
-	void ZoneHeaderOrderedSnake(int nVert,  int nVertDat, int nCellDat);
+	void ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf, 
+		int totNumFaceNode, int nVertDat, int nCellDat, int nSensDat=0);
+	void ZoneHeaderPolygonSnake(int nVert,int nEdge, int nSurf,int nVertDat, 
+		int nCellDat, int nSensDat=0);
+	void ZoneHeaderFelinesegSnake(int nVert,int nEdge,int nVertDat, 
+		int nCellDat, int nSensDat=0);
+
+	// Snake sensitivity
+	int PrintSnakeSensitivity(const triangulation& triRSVS, const RSVScalc &calcObj,
+		int strandID=0, double timeStep=0, int forceOutType=0, 
+		const vector<int> &vertList={});
+	int SensitivityDataBlock(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int nVert, int nSensDat);
 
 	tecplotfile(){
 		fid=NULL;

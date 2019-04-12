@@ -129,6 +129,22 @@ void RSVScalc::ReturnVelocities(triangulation &triRSVS){
 	triRSVS.snakeDep->snaxs.PrepareForUse();
 }
 
+void RSVScalc::ReturnSensitivities(const triangulation &triRSVS, 
+	std::vector<double> &sensVec, int constrNum) const {
+
+	int ii, ni, temp;
+	if(constrNum>=this->nConstr){
+		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
+	}
+	ni=triRSVS.snakeDep->snaxs.size();
+	sensVec.assign(ni, 0);
+	for(ii=0; ii<ni; ii++){
+		temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+		sensVec[ii] = temp!=-1 ?
+				this->sensDv(temp, constrNum) : 0;
+	}
+}
+
 void RSVScalc::CalculateMesh(mesh &meshin){
 
 	int ii,ni, jj, nj;
