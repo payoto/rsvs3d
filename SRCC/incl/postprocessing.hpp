@@ -26,13 +26,18 @@
 // 		and to avoid circular dependencies
 
 class mesh;
+class snake;
+class RSVScalc;
+class triangulation;
+class trisurfarray;
+class triarray;
 
 //=================================
 // included dependencies
 #include <iostream>
 #include <stdarg.h>
 #include "arraystructures.hpp"
-#include "triangulate.hpp" 
+
 
 
 //==================================

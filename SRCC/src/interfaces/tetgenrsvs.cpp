@@ -10,6 +10,7 @@
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
+#include "triangulate.hpp"
 #include "voxel.hpp"
 #include "postprocessing.hpp"
 #include "meshrefinement.hpp"

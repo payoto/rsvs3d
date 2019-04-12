@@ -23,16 +23,16 @@
 
 #endif
 
+//========================================
+// Forward declared dependencies
 class RSVScalc;
 
 //=================================
 // included dependencies
 #include <vector>
 #include "arraystructures.hpp"
-#include "snake.hpp" 
-#include "mesh.hpp" 
-
-
+#include "mesh.hpp"
+#include "snake.hpp"
 
 //==================================
 // Code
@@ -47,9 +47,9 @@ class trianglepoint;
 class trianglesurf;
 class tecplotfile; 
 
-typedef TriStruct<triangle> triarray;
-typedef TriStruct<trianglepoint>  tripointarray;
-typedef TriStruct<trianglesurf>  trisurfarray;
+// typedef TriStruct<triangle> triarray;
+// typedef TriStruct<trianglepoint>  tripointarray;
+// typedef TriStruct<trianglesurf>  trisurfarray;
 
 // Template Class
 
@@ -57,6 +57,10 @@ template <class T>
 class TriStruct : public SnakStruct<T>{
 	friend class triangulation;
 };
+
+class triarray : public TriStruct<triangle>{};
+class tripointarray : public TriStruct<trianglepoint>{};
+class trisurfarray : public TriStruct<trianglesurf>{};
 
 // Base classes
 class triangulation  

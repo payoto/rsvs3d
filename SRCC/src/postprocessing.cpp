@@ -128,7 +128,8 @@ int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat){
 	return(0);
 }
 
-int tecplotfile::SurfDataBlock(const mesh &meshout,int nVert,int nSurf, int nVertDat){
+int tecplotfile::SurfDataBlock(const mesh &meshout,int nVert,int nSurf, 
+	int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj, nCoord;
@@ -163,7 +164,8 @@ int tecplotfile::SurfDataBlock(const mesh &meshout,int nVert,int nSurf, int nVer
 	return(0);
 }
 
-int tecplotfile::LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVertDat,int nCellDat){
+int tecplotfile::LineDataBlock(const mesh &meshout,int nVert,int nEdge, 
+	int nVertDat,int nCellDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj;
@@ -190,7 +192,8 @@ int tecplotfile::LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVer
 	return(0);
 }
 
-int tecplotfile::VertDataBlock(const mesh &meshout,int nVert, int nVertDat,int nCellDat, const vector<int> &vertList){
+int tecplotfile::VertDataBlock(const mesh &meshout,int nVert, int nVertDat,
+	int nCellDat, const vector<int> &vertList){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj, nCoord;
@@ -414,7 +417,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep, 
+int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 	int forceOutType, const vector<int> &vertList){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
@@ -580,7 +583,8 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 }
 
 
-int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, int strandID, double timeStep){
+int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, 
+	int strandID, double timeStep){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 	int forceOutType;
@@ -641,7 +645,8 @@ int tecplotfile::DefShareZoneVolume(int shareZone, int nVertDat){
 	return(0);
 }
 
-int tecplotfile::PrintSnakeInternalPts(const snake &snakein,int strandID, double timeStep){
+int tecplotfile::PrintSnakeInternalPts(const snake &snakein,int strandID, 
+	double timeStep){
 	int jj;
 	std::vector<int> vertList;
 	vertList.clear();
@@ -658,7 +663,8 @@ int tecplotfile::PrintSnakeInternalPts(const snake &snakein,int strandID, double
 }
 
 // Functions triarray
-void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractTriData(const triangulation &triout, triarray triangulation::*mp,
+	int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 
 
@@ -669,7 +675,8 @@ void ExtractTriData(const triangulation &triout, triarray triangulation::*mp, in
 	*totNumFaceNode=(triout.*mp).size()*3;
 }
 
-void ExtractTriData(int nTriangles, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractTriData(int nTriangles, int *nVert, int *nEdge, int *nVolu, 
+	int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 
 
@@ -680,7 +687,8 @@ void ExtractTriData(int nTriangles, int *nVert, int *nEdge, int *nVolu, int *nSu
 	*totNumFaceNode=nTriangles*3;
 }
 
-int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
+int tecplotfile::VolDataBlock(const triangulation &triout, 
+	triarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -727,7 +735,8 @@ int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulatio
 	return(0);
 }
 
-int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nSurf, int nVertDat){
+int tecplotfile::SurfDataBlock(const triangulation &triout, 
+	triarray triangulation::*mp,int nVert,int nSurf, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -774,7 +783,8 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulati
 	return(0);
 }
 
-int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat){
+int tecplotfile::LineDataBlock(const triangulation &triout, 
+	triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -817,7 +827,9 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 }
 
 
-int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat, const vector<int> &triList){
+int tecplotfile::LineDataBlock(const triangulation &triout, 
+	triarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat,
+	const vector<int> &triList){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -859,7 +871,8 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
 	return(0);
 }
 
-int tecplotfile::SurfFaceMap(const triangulation &triout, triarray triangulation::*mp){
+int tecplotfile::SurfFaceMap(const triangulation &triout, 
+	triarray triangulation::*mp){
 	int ii,jj,kk;
 
 	int nTri;
@@ -892,7 +905,8 @@ int tecplotfile::SurfFaceMap(const triangulation &triout, triarray triangulation
 	return(0);
 }
 
-int tecplotfile::LineFaceMap(const triangulation &triout, triarray triangulation::*mp){
+int tecplotfile::LineFaceMap(const triangulation &triout, 
+	triarray triangulation::*mp){
 	int ii,jj,kk;
 
 	int nTri;
@@ -936,7 +950,8 @@ int tecplotfile::LineFaceMap(const vector<int> &triList){
 	return(0);
 }
 
-int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf){
+int tecplotfile::VolFaceMap(const triangulation &triout, 
+	triarray triangulation::*mp,int nSurf){
 	int ii,jj,kk,n;
 	n=(triout.*mp)(0)->pointind.size();
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
@@ -962,7 +977,9 @@ int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation:
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,int strandID, double timeStep, int forceOutType, const vector<int> &triList){
+int tecplotfile::PrintTriangulation(const triangulation &triout, 
+	triarray triangulation::*mp,int strandID, double timeStep, 
+	int forceOutType, const vector<int> &triList){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
@@ -1022,7 +1039,9 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
 
 
 // Functions
-void ExtractTriData(const triangulation &triout, trisurfarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, int *nSurf, int *totNumFaceNode){
+void ExtractTriData(const triangulation &triout,
+	trisurfarray triangulation::*mp, int *nVert, int *nEdge, int *nVolu, 
+	int *nSurf, int *totNumFaceNode){
 	// Extracts Data needed to write out a mesh to tecplot
 	int ii;
 
@@ -1038,7 +1057,8 @@ void ExtractTriData(const triangulation &triout, trisurfarray triangulation::*mp
 	*totNumFaceNode=*nVert;
 }
 
-int tecplotfile::VolDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
+int tecplotfile::VolDataBlock(const triangulation &triout,
+	trisurfarray triangulation::*mp,int nVert,int nVolu, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -1085,7 +1105,8 @@ int tecplotfile::VolDataBlock(const triangulation &triout, trisurfarray triangul
 	return(0);
 }
  
-int tecplotfile::SurfDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nSurf, int nVertDat){
+int tecplotfile::SurfDataBlock(const triangulation &triout,
+	trisurfarray triangulation::*mp,int nVert,int nSurf, int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -1132,7 +1153,9 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, trisurfarray triangu
 	return(0);
 }
 
-int tecplotfile::LineDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,int nVert,int nEdge, int nVertDat,int nCellDat){
+int tecplotfile::LineDataBlock(const triangulation &triout,
+	trisurfarray triangulation::*mp,int nVert,int nEdge, int nVertDat,
+	int nCellDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj,kk;
@@ -1173,7 +1196,8 @@ int tecplotfile::LineDataBlock(const triangulation &triout, trisurfarray triangu
 	}
 	return(0);
 }
-int tecplotfile::SurfFaceMap(const triangulation &triout, trisurfarray triangulation::*mp){
+int tecplotfile::SurfFaceMap(const triangulation &triout,
+	trisurfarray triangulation::*mp){
 	int ii,jj,kk;
 
 	int nTri;
@@ -1206,7 +1230,8 @@ int tecplotfile::SurfFaceMap(const triangulation &triout, trisurfarray triangula
 	return(0);
 }
 
-int tecplotfile::LineFaceMap(const triangulation &triout, trisurfarray triangulation::*mp){
+int tecplotfile::LineFaceMap(const triangulation &triout,
+	trisurfarray triangulation::*mp){
 	int ii,jj,kk;
 
 	int nTri;
@@ -1228,7 +1253,8 @@ int tecplotfile::LineFaceMap(const triangulation &triout, trisurfarray triangula
 	return(0);
 }
 
-int tecplotfile::VolFaceMap(const triangulation &triout, trisurfarray triangulation::*mp,int nSurf){
+int tecplotfile::VolFaceMap(const triangulation &triout,
+	trisurfarray triangulation::*mp,int nSurf){
 	int ii,jj,kk;
 
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
@@ -1254,7 +1280,9 @@ int tecplotfile::VolFaceMap(const triangulation &triout, trisurfarray triangulat
 	return(0);
 }
 // Class function Implementation
-int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp,int strandID, double timeStep, int forceOutType){
+int tecplotfile::PrintTriangulation(const triangulation &triout,
+	trisurfarray triangulation::*mp,int strandID, double timeStep,
+	int forceOutType){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
@@ -1305,7 +1333,8 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray tr
 
 
 
-void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
+void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf,
+	int totNumFaceNode,
 	int nVertDat, int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
@@ -1320,7 +1349,8 @@ void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totN
 
 }
 
-void tecplotfile::ZoneHeaderPolygon(int nVert,int nEdge,  int nSurf, int nVertDat, int nCellDat){
+void tecplotfile::ZoneHeaderPolygon(int nVert,int nEdge,  int nSurf,
+	int nVertDat, int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYGON\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1334,7 +1364,8 @@ void tecplotfile::ZoneHeaderPolygon(int nVert,int nEdge,  int nSurf, int nVertDa
 
 }
 
-void tecplotfile::ZoneHeaderFelineseg(int nVert,int nEdge,  int nVertDat, int nCellDat){
+void tecplotfile::ZoneHeaderFelineseg(int nVert,int nEdge,  int nVertDat, 
+	int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FELINESEG\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1346,7 +1377,8 @@ void tecplotfile::ZoneHeaderFelineseg(int nVert,int nEdge,  int nVertDat, int nC
 }
 
 
-void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf, int totNumFaceNode,
+void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf,
+	int totNumFaceNode,
 	int nVertDat, int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
@@ -1362,7 +1394,8 @@ void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf, int
 
 }
 
-void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf, int nVertDat, int nCellDat){
+void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf,
+	int nVertDat, int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FEPOLYGON\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1378,7 +1411,8 @@ void tecplotfile::ZoneHeaderPolygonSnake(int nVert,int nEdge,  int nSurf, int nV
 
 }
 
-void tecplotfile::ZoneHeaderFelinesegSnake(int nVert,int nEdge,  int nVertDat, int nCellDat){
+void tecplotfile::ZoneHeaderFelinesegSnake(int nVert,int nEdge,  int nVertDat,
+	int nCellDat){
 
 	fprintf(fid, "ZONETYPE = FELINESEG\n");
 	fprintf(fid, "NODES = %i\n", nVert);
@@ -1436,7 +1470,8 @@ int Test_tecplotfile(){
 	return(0);
 }
 
-int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid, tecplotfile &outmesh1){
+int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid,
+	tecplotfile &outmesh1){
 	
 	int errFlag=0;
 	int errTest=0;
