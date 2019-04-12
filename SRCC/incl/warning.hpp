@@ -74,6 +74,9 @@ namespace rsvs3d {
 	template <class E=rsvs_exception>
 	void error(const char* message="", const char* caller="",
 		const char *file="", int line=0, bool throwError=true);
+
+	int TimeStamp(const char* str,int start_s);
+
 }
 /**
  * @brief      Throw generic rsvs errors.

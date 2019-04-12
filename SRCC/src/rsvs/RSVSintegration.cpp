@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <ctime>
 #include <vector>
 #include <string>
 #include<tuple>
@@ -42,21 +41,21 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 
 	start_s=clock();
 
-	start_s=TimeStamp("position: ", start_s);
+	start_s=rsvs3d::TimeStamp("position: ", start_s);
 
 	snakein.SnaxImpactDetection(isImpact);
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
 
-	start_s=TimeStamp("Merge: ", start_s);
+	start_s=rsvs3d::TimeStamp("Merge: ", start_s);
 
 	CleanupSnakeConnec(snakein);
 	
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 	snakein.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(snakein,isImpact);
 
-	start_s=TimeStamp("Spawn: ", start_s);
+	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
 
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.SnaxAlmostImpactDetection(isImpact, 0.01);
@@ -66,14 +65,14 @@ void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact){
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	
-	start_s=TimeStamp("Impact: ", start_s);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_s);
 
 	CleanupSnakeConnec(snakein);
 
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
 
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 }
 
 void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
@@ -98,19 +97,19 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_f);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_f);
 	// ======================
 	// Merge
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Merge: ", start_s);
+	start_s=rsvs3d::TimeStamp("Merge: ", start_s);
 	// ======================
 	// Clean
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 
 
 	//===============================
@@ -121,33 +120,33 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact){
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.SnaxAlmostImpactDetection(isImpact, impactAlmostRange);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_s);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_s);
 	// ======================
 	// Spawn
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(snakein,isImpact);
-	start_s=TimeStamp("Spawn: ", start_s);
+	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
 	// ======================
 	// Impact
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_s);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_s);
 	// ======================
 	// Merge
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Merge: ", start_s);
+	start_s=rsvs3d::TimeStamp("Merge: ", start_s);
 	// ======================
 	// Clean
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 
-	TimeStamp(" - Connec Update: ", start_f);
+	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
 
 void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
@@ -171,33 +170,33 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.SnaxAlmostImpactDetection(isImpact, impactAlmostRange);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_f);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_f);
 	// ======================
 	// Spawn
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(snakein,isImpact);
-	start_s=TimeStamp("Spawn: ", start_s);
+	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
 	// ======================
 	// Impact
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_s);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_s);
 	// ======================
 	// Merge
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Merge: ", start_s);
+	start_s=rsvs3d::TimeStamp("Merge: ", start_s);
 	// ======================
 	// Clean
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 
-	TimeStamp(" - Connec Update: ", start_f);
+	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
 
 void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
@@ -222,49 +221,34 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.SnaxAlmostImpactDetection(isImpact, impactAlmostRange);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_f);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_f);
 	// ======================
 	// Spawn
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(snakein,isImpact);
-	start_s=TimeStamp("Spawn: ", start_s);
+	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
 	// ======================
 	// Impact
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Impact: ", start_s);
+	start_s=rsvs3d::TimeStamp("Impact: ", start_s);
 	// ======================
 	// Merge
 	MergeAllContactVertices(snakein, isImpact);
 	snakein.PrepareForUse();
-	start_s=TimeStamp("Merge: ", start_s);
+	start_s=rsvs3d::TimeStamp("Merge: ", start_s);
 	// ======================
 	// Clean
 	CleanupSnakeConnec(snakein);
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 
-	TimeStamp(" - Connec Update: ", start_f);
+	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
-
-#ifndef TIME_EXEC
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored  "-Wunused-parameter"
-#endif
-int TimeStamp(const char* str,int start_s){
-	int stop_s=clock();
-	#ifdef TIME_EXEC
-	cout << str << " " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms; ";
-	#endif
-	return(stop_s);
-}
-#ifndef TIME_EXEC
-	#pragma GCC diagnostic pop
-#endif
 
 // ====================
 // integrate
@@ -580,12 +564,12 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 		RSVSobj.calcObj.limLag=10000.0;
 		std::cout << std::endl << "Step " << stepNum << " ";
 		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
-		start_s=TimeStamp(" deriv:", start_s);
+		start_s=rsvs3d::TimeStamp(" deriv:", start_s);
 		RSVSobj.calcObj.CheckAndCompute(
 			RSVSobj.paramconf.rsvs.solveralgorithm);
 		RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
 		RSVSobj.calcObj.ReturnVelocities(RSVSobj.rsvsTri);
-		start_s=TimeStamp(" solve:", start_s);
+		start_s=rsvs3d::TimeStamp(" solve:", start_s);
 		
 		CalculateNoNanSnakeVel(RSVSobj.rsvsSnake);
 
@@ -605,7 +589,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 			RSVSobj.paramconf.snak.multiarrivaltolerance);
 		start_s=clock();
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
-		start_s=TimeStamp(" triangulate:", start_s);
+		start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	}
 	std::cout << std::endl << "RSVS iteration finished" << std::endl;
 	integrate::iteratereturns retStruct(nVoluZone,stepNum, totT);
@@ -696,6 +680,12 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 			&& exportType.second.compare("")==0) 
 		{
 			/*Do nothing, this is the default*/
+		}  else if(exportType.first.compare("snake")==0) 
+		{
+				auto fileToOpen=paramconf.files.ioout.outdir + "/";
+				fileToOpen += "SnakeConnExport_" + paramconf.files.ioout.pattern
+					+ ".msh";
+				RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
 		} else 
 		{
 			RSVS3D_ERROR_NOTHROW((
@@ -732,6 +722,7 @@ void integrate::execute::logging::Snake(
 	mesh &voluMesh, double totT, int nVoluZone
 	){
 	rsvsSnake.snakeconn.PrepareForUse();
+	rsvsSnake.snakeconn.OrientFaces();
 	outSnake.PrintVolumeDat(voluMesh,nVoluZone,1,totT);
 	outSnake.PrintSnake(rsvsSnake, 2, totT,2);
 }

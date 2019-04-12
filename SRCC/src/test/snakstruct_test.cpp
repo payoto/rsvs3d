@@ -659,23 +659,23 @@ void Test_stepalgo_mergeclean(snake &testSnake, vector<int> &isImpact){
 
 	
 
-	start_s=TimeStamp("position: ", start_s);
+	start_s=rsvs3d::TimeStamp("position: ", start_s);
 
 	testSnake.PrepareForUse();
 	MergeCleanSnake(testSnake, isImpact);
 	testSnake.PrepareForUse();
-	start_s=TimeStamp("MergeClean: ", start_s);
+	start_s=rsvs3d::TimeStamp("MergeClean: ", start_s);
 
 	testSnake.SnaxImpactDetection(isImpact);
 	SpawnArrivedSnaxels(testSnake,isImpact);
-	start_s=TimeStamp("Spawn: ", start_s);
+	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
 
 	testSnake.PrepareForUse();
 	MergeCleanSnake(testSnake, isImpact);
 	testSnake.PrepareForUse();
 
 	testSnake.OrientFaces();
-	start_s=TimeStamp("Clean: ", start_s);
+	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 }
 
 int Test_snakeOrderEdges(){
@@ -1038,7 +1038,7 @@ int Test_RSVSalgo(){
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
-			stop_s=TimeStamp("Total: ", stop_s);
+			stop_s=rsvs3d::TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
@@ -1129,7 +1129,7 @@ int Test_RSVSalgoflat(){
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
 			// Test_stepalgo(testSnake, isImpact);
 			// MaintainTriangulateSnake(triRSVS);
-			stop_s=TimeStamp("Total: ", stop_s);
+			stop_s=rsvs3d::TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
@@ -1207,7 +1207,7 @@ int Test_snakeRSVS(){
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
-			stop_s=TimeStamp("Total: ", stop_s);
+			stop_s=rsvs3d::TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
@@ -1319,7 +1319,7 @@ int Test_RSVSalgo_singlevol(){
 			// }
 			stop_s=clock();
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
-			stop_s=TimeStamp("Total: ", stop_s);
+			stop_s=rsvs3d::TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
@@ -1419,7 +1419,7 @@ int Test_snakeRSVS_singlevol(){
 				triMesh, triRSVS, voluMesh, nVoluZone, ii);
 			stop_s=clock();
 			Test_stepalgoRSVS(testSnake,triRSVS, dt, isImpact, calcObj, outSnake2, totT);
-			stop_s=TimeStamp("Total: ", stop_s);
+			stop_s=rsvs3d::TimeStamp("Total: ", stop_s);
 			cout << endl;
 			totT=totT+1;
 		}
@@ -1500,14 +1500,14 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// Small step away from edge without crossover.
 	// Need to develop that.
 	// Check if impact detect crossovers
-	start_s=TimeStamp(" triangulate:", start_s);
+	start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	// calcObj.limLag=10000.0;
 	calcObj.CalculateTriangulation(RSVStri);
 	calcObj.ReturnConstrToMesh(RSVStri);
-	start_s=TimeStamp(" deriv:", start_s);
+	start_s=rsvs3d::TimeStamp(" deriv:", start_s);
 	calcObj.CheckAndCompute(2);
 	calcObj.ReturnVelocities(RSVStri);
-	start_s=TimeStamp(" solve:", start_s);
+	start_s=rsvs3d::TimeStamp(" solve:", start_s);
 	
 	calcObj.Print2Screen();
 	// calcObj.Print2Screen(2);
@@ -1536,7 +1536,7 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	// Small step away from edge without crossover.
 	// Need to develop that.
 	// Check if impact detect crossovers
-	start_s=TimeStamp(" triangulate:", start_s);
+	start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	// calcObj.limLag=10000.0;
 	// for(int ii=0; ii<testSnake.snakemesh->verts.size();++ii){
 	// 	for(int jj=0; jj<3;++jj){
@@ -1560,10 +1560,10 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	}
 
 	calcObj.ReturnConstrToMesh(RSVStri);
-	start_s=TimeStamp(" deriv:", start_s);
+	start_s=rsvs3d::TimeStamp(" deriv:", start_s);
 	calcObj.CheckAndCompute(3);
 	calcObj.ReturnVelocities(RSVStri);
-	start_s=TimeStamp(" solve:", start_s);
+	start_s=rsvs3d::TimeStamp(" solve:", start_s);
 	outSnake2.PrintSnake(testSnake, 1, totT);
 	
 	calcObj.Print2Screen();

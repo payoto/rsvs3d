@@ -49,8 +49,6 @@ void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact,
 void SnakeConnectivityUpdate_2D(snake &testSnake,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact);
-int TimeStamp(const char* str,int start_s);
-
 
 namespace integrate {
 	class iteratereturns {
