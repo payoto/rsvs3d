@@ -27,7 +27,6 @@
 #include <Eigen>
 
 using namespace std; 
-using namespace Eigen; 
 
 /**
  * Class to handle the RSVS calculation.
@@ -48,25 +47,25 @@ protected:
 	bool returnDeriv=true;
 public:
 	/// Constraint Jacobian, size: [nConstr, nDv].
-	MatrixXd dConstr;
+	Eigen::MatrixXd dConstr;
 	/// Constraint Hessian, size: [nDv, nDv].
-	MatrixXd HConstr;
+	Eigen::MatrixXd HConstr;
 	/// Objective Hessian, size: [nDv, nDv].
-	MatrixXd HObj;
+	Eigen::MatrixXd HObj;
 	/// Lagrangian Hessian, size: [nDv, nDv].
-	MatrixXd HLag;
+	Eigen::MatrixXd HLag;
 	/// Objective Jacobian, size: [1, nDv].
-	RowVectorXd dObj;
+	Eigen::RowVectorXd dObj;
 	/// Constraint value vector, size: [nConstr, 1].
-	VectorXd constr;
+	Eigen::VectorXd constr;
 	/// Lagrangian multiplier, size: [nConstr, 1].
-	VectorXd lagMult;
+	Eigen::VectorXd lagMult;
 	/// Change in design variable, assigned to snake velocity, size: [nDv, 1].
-	VectorXd deltaDV;
+	Eigen::VectorXd deltaDV;
 	/// Constraint target values, size: [nConstr, 1].
-	VectorXd constrTarg;
+	Eigen::VectorXd constrTarg;
 	///
-	MatrixXd dvCallConstr;
+	Eigen::MatrixXd dvCallConstr;
 	/// Objective function value.
 	double obj=0.0;
 	/// Value at which a Lagrangian multiplier is considered problematically
@@ -256,7 +255,7 @@ public:
 	 *                         Values correspond to the following:
 	 *                         `Eigen::HouseholderQR` (1); 	 *
 	 *                         `Eigen::ColPivHouseholderQR` (2) - Default;
-	 *                         Eigen::LLT<MatrixXd> (3); `Eigen::PartialPivLU`
+	 *                         Eigen::LLT<Eigen::MatrixXd> (3); `Eigen::PartialPivLU`
 	 *                         (4);
 	 * @param      dConstrAct  The active constraint Jacobian
 	 * @param      dObjAct     The active objective Jacobian
@@ -264,10 +263,10 @@ public:
 	 * @param      lagMultAct  The active lagrangian multipliers.
 	 */
 	void ComputeSQPstep(int calcMethod,
-		MatrixXd &dConstrAct,
-		RowVectorXd &dObjAct,
-		VectorXd &constrAct,
-		VectorXd &lagMultAct
+		Eigen::MatrixXd &dConstrAct,
+		Eigen::RowVectorXd &dObjAct,
+		Eigen::VectorXd &constrAct,
+		Eigen::VectorXd &lagMultAct
 		);
 
 	/**
@@ -283,12 +282,12 @@ public:
 	 * @return     Returns wether the calculation should be performed or not.
 	 */
 	bool PrepareMatricesForSQP(
-		MatrixXd &dConstrAct,
-		MatrixXd &HConstrAct, 
-		MatrixXd &HObjAct,
-		RowVectorXd &dObjAct,
-		VectorXd &constrAct,
-		VectorXd &lagMultAct
+		Eigen::MatrixXd &dConstrAct,
+		Eigen::MatrixXd &HConstrAct, 
+		Eigen::MatrixXd &HObjAct,
+		Eigen::RowVectorXd &dObjAct,
+		Eigen::VectorXd &constrAct,
+		Eigen::VectorXd &lagMultAct
 		);
 	
 	/**
@@ -344,7 +343,7 @@ public:
  @param[out]    isNan       Returns if lagMultAct has Nan values.
 */
 void ResizeLagrangianMultiplier(const RSVScalc &calcobj, 
-	VectorXd &lagMultAct, 
+	Eigen::VectorXd &lagMultAct, 
 	bool &isLarge, bool &isNan);
 
  /**
@@ -354,7 +353,7 @@ void ResizeLagrangianMultiplier(const RSVScalc &calcobj,
   * solver class when it is called.
   *
   * Instantiation options: Eigen::HouseholderQR Eigen::ColPivHouseholderQR
-  * Eigen::LLT<MatrixXd> (*) <- needs a full type to be defined (see below)
+  * Eigen::LLT<Eigen::MatrixXd> (*) <- needs a full type to be defined (see below)
   * Eigen::PartialPivLU
   *
   * For stability info
@@ -373,15 +372,16 @@ void ResizeLagrangianMultiplier(const RSVScalc &calcobj,
   *                                the constraint to step.
   *
   * @tparam     T                  The Eigen object template type to use. A full
-  *                                type will be defined using T<MatrixXd>.
+  *                                type will be defined using T<Eigen::MatrixXd>.
   *
   * @return     (isLarge || isNan), if true some form of failure was detected.
   */
 template<class T>
 bool SQPstep(const RSVScalc &calcobj,
-	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
-	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
+	const Eigen::MatrixXd &dConstrAct, const Eigen::RowVectorXd &dObjAct,
+	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
+	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
+	bool attemptConstrOnly=true);
 
 /**
  * Template for calculation of an SQP step.
@@ -389,9 +389,9 @@ bool SQPstep(const RSVScalc &calcobj,
  * This template cannot be deduced and needs the developer to pass the required
  * solver class when it is called.
  *
- * Instantiation options: Eigen::HouseholderQR<MatrixXd>
- * Eigen::ColPivHouseholderQR<MatrixXd> Eigen::LLT<MatrixXd>
- * Eigen::PartialPivLU<MatrixXd>
+ * Instantiation options: Eigen::HouseholderQR<Eigen::MatrixXd>
+ * Eigen::ColPivHouseholderQR<Eigen::MatrixXd> Eigen::LLT<Eigen::MatrixXd>
+ * Eigen::PartialPivLU<Eigen::MatrixXd>
  *
  * For stability info
  * https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
@@ -416,20 +416,22 @@ bool SQPstep(const RSVScalc &calcobj,
  */
 template<template<typename> class T>
 bool SQPstep(const RSVScalc &calcobj,
-	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
-	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly=true);
+	const Eigen::MatrixXd &dConstrAct, const Eigen::RowVectorXd &dObjAct,
+	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
+	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
+	bool attemptConstrOnly=true);
 
 
 // Code to be included as templated functions
 
 template<template<typename> class T>
 bool SQPstep(const RSVScalc &calcobj,
-	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
-	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
+	const Eigen::MatrixXd &dConstrAct, const Eigen::RowVectorXd &dObjAct,
+	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
+	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
+	bool attemptConstrOnly){
 
-	return(SQPstep<T<MatrixXd>>(calcobj, dConstrAct, dObjAct,
+	return(SQPstep<T<Eigen::MatrixXd>>(calcobj, dConstrAct, dObjAct,
 				constrAct, lagMultAct,
 				deltaDVAct, isNan, isLarge,attemptConstrOnly));
 
@@ -438,11 +440,12 @@ bool SQPstep(const RSVScalc &calcobj,
 
 template<class T>
 bool SQPstep(const RSVScalc &calcobj,
-	const MatrixXd &dConstrAct, const RowVectorXd &dObjAct,
-	const VectorXd &constrAct, VectorXd &lagMultAct,
-	VectorXd &deltaDVAct, bool &isNan, bool &isLarge, bool attemptConstrOnly){
+	const Eigen::MatrixXd &dConstrAct, const Eigen::RowVectorXd &dObjAct,
+	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
+	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
+	bool attemptConstrOnly){
 
-	MatrixXd temp1, temp2;
+	Eigen::MatrixXd temp1, temp2;
 	T HLagSystem(calcobj.HLag);
 
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
@@ -463,7 +466,7 @@ bool SQPstep(const RSVScalc &calcobj,
 	if(isLarge || isNan) {
 		// Use a least squared solver if only using the constraint
 		std::cout << "(constrmov) " ;
-	 	deltaDVAct = -dConstrAct.bdcSvd(ComputeThinU | ComputeThinV)
+	 	deltaDVAct = -dConstrAct.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV)
 	 		.solve(constrAct);
 	} else {
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
