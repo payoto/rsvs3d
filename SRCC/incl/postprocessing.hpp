@@ -133,9 +133,12 @@ public:
 		int strandID=0, double timeStep=0, int forceOutType=0, 
 		const vector<int> &vertList={});
 	int SensitivityDataBlock(const triangulation& triRSVS, 
-		const RSVScalc &calcObj, int nVert, int nSensDat);
+		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0);
+	int PrintSnakeSensitivityTime(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
+		int forceOutType=0, const vector<int> &vertList={});
 
-	tecplotfile(){
+		tecplotfile(){
 		fid=NULL;
 		lengthLine=0;
 		cout << "tecplot file object created" << endl;

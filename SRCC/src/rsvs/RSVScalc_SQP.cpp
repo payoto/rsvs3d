@@ -115,8 +115,8 @@ bool RSVScalc::PrepareMatricesForSQPSensitivity(
 	/// sensitivity requires : [H_d L , J_d constr; J_d constr ^T, 0]^-1
 	/// [Dd^TD_v L (=0s) ; D_V constr (=eye(lagMult))]
  	
-	sensMult.resize(nDvAct+nConstrAct, nDvAct+nConstrAct);
-	sensInv.resize(nDvAct+nConstrAct, nConstrAct);
+	sensInv.resize(nDvAct+nConstrAct, nDvAct+nConstrAct);
+	sensMult.resize(nDvAct+nConstrAct, nConstrAct);
 	sensRes.resize(nDvAct+nConstrAct, nConstrAct);
 
 	sensInv << HConstrAct+HObjAct , dConstrAct.transpose(), 
@@ -159,7 +159,6 @@ void RSVScalc::CheckAndCompute(int calcMethod, bool sensCalc){
 		MatrixXd sensMult, sensInv, sensRes;
 		bool computeSens = this->PrepareMatricesForSQPSensitivity(dConstrAct,
 			HConstrAct, HObjAct, sensMult, sensInv, sensRes);
-		this->sensDv.setZero(this->nDv, this->nConstr);
 		if (computeSens)
 		{
 			this->ComputeSQPsens(calcMethod, sensMult, sensInv, sensRes);
@@ -289,6 +288,7 @@ void RSVScalc::ComputeSQPsens(
 		break;
 	}
 
+	this->sensDv.setZero(this->nDv, this->nConstr);
 	int nConstrAct, nDvAct;
 	nConstrAct = this->subConstrAct.size();
 	nDvAct = this->subDvAct.size();
@@ -296,7 +296,7 @@ void RSVScalc::ComputeSQPsens(
 	{
 		for (int j = 0; j < nConstrAct; ++j)
 		{
-			this->sensDv(this->subDvAct[i],this->subConstrAct[i]) = 
+			this->sensDv(this->subDvAct[i],this->subConstrAct[j]) = 
 				sensRes(i, j);
 		}
 	}

@@ -682,12 +682,23 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 			/*Do nothing, this is the default*/
 		}  else if(exportType.first.compare("snake")==0) 
 		{
-				auto fileToOpen=paramconf.files.ioout.outdir + "/";
-				fileToOpen += "SnakeConnExport_" + paramconf.files.ioout.pattern
-					+ ".msh";
-				RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
-		} else 
-		{
+			RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.domain);
+			auto fileToOpen=paramconf.files.ioout.outdir + "/";
+			fileToOpen += "SnakeConnExport_" + paramconf.files.ioout.pattern
+				+ ".msh";
+			auto tecFileToOpen=paramconf.files.ioout.outdir + "/";
+			tecFileToOpen += "SnakeSensitivity_" + paramconf.files.ioout.pattern
+				+ ".plt";
+			RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
+			tecplotfile tecsens;
+			tecsens.OpenFile(tecFileToOpen.c_str());
+			RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
+			RSVSobj.calcObj.CheckAndCompute(
+				RSVSobj.paramconf.rsvs.solveralgorithm, true);
+			RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
+			tecsens.PrintSnakeSensitivityTime(RSVSobj.rsvsTri, RSVSobj.calcObj);
+			
+		} else {
 			RSVS3D_ERROR_NOTHROW((
 				std::string("The export argument '") + exportType.first
 				+ "' is not known. Check <input file>.json for parameter : "

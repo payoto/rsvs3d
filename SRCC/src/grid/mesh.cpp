@@ -3865,9 +3865,9 @@ void mesh::OrientSurfaceVolume(){
 			if(jj==nj){ // if the orientation cannot be defined
 				dotProd=1.0;
 				kk=0;
-				cerr << "Warning: Cell orientations could not "
-					"be computed " << endl;
-				cerr << "			in " << __PRETTY_FUNCTION__ << endl;
+				cerr << endl << "Warning: Cell orientations could not "
+					"be computed ";
+				cerr << "			in " << __PRETTY_FUNCTION__ ;
 				break;
 			}
 			kk=surfs(jj)->voluind[0]==0;

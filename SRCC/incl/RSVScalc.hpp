@@ -540,7 +540,7 @@ bool SQPsens(
 
 	T HLagSystem(sensInv);
 
-	sensRes = HLagSystem.solve(sensMult);
+	sensRes = -HLagSystem.solve(sensMult);
 	return(true);
 }
 

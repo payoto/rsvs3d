@@ -1515,14 +1515,14 @@ int tecplotfile::PrintSnakeSensitivity(const triangulation& triRSVS, const RSVSc
 	return(0);
 }
 int tecplotfile::SensitivityDataBlock(const triangulation& triRSVS, 
-		const RSVScalc &calcObj, int nVert, int nSensDat){
+	const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
 	int ii,jj;
 	// Print vertex Data
 	std::vector<double> sensTemp;
 
-	for (jj=0;jj<nSensDat;++jj){
+	for (jj=sensStart;jj<nSensDat;++jj){
 		calcObj.ReturnSensitivities(triRSVS, sensTemp, jj);
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%.16lf ",sensTemp[ii]);
@@ -1531,6 +1531,113 @@ int tecplotfile::SensitivityDataBlock(const triangulation& triRSVS,
 	}
 	return 0;
 }
+
+
+// Print snake with sensitivity
+int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS, 
+	const RSVScalc &calcObj, int strandID, double timeStep, int forceOutType, 
+	const vector<int> &vertList){
+
+	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat, nSensDat, nSensStep;
+	const snake& snakeout = *triRSVS.snakeDep;
+	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert==0){ // Don't print mesh
+		return(1);
+	}
+	nVertDat=3;
+	nCellDat=3;
+	nSensDat = 1;
+	nSensStep = calcObj.numConstr();
+	
+	if(nZones==0){
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"" );
+		for (int i = 0; i < nSensDat; ++i)
+		{
+			fprintf(fid, ", \"sens_%i\"",i);
+		}
+		fprintf(fid, "\n");
+	}
+
+	this->NewZone();
+	if(strandID<=0){
+		strandID = rand();
+	}
+	if(strandID>0){
+		this->StrandTime(strandID, timeStep);
+	}
+	// Fixed by the dimensionality of the mesh
+
+	if (forceOutType==0){
+		if(nVolu>0){
+			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+		} else if (nSurf>0){
+			forceOutType=2;// output as Surface data (FEPOLYGON)
+		} else if (nEdge>0){
+			forceOutType=3; // output as line data (FELINESEG)
+		} else {
+			forceOutType=4;
+		}
+	}
+
+
+	if (forceOutType==1){
+		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->VolFaceMap(snakeout.snakeconn,nSurf);
+	}
+	else if (forceOutType==2){
+		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->SurfFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==3){
+		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->LineFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==4){
+		if(int(vertList.size())==nVert){
+			nVert=0;
+			for (int ii=0; ii< int(vertList.size());++ii){
+				nVert += int(vertList[ii]); 
+			}
+		} else if (vertList.size()>0){
+			nVert=int(vertList.size());
+		}
+		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		// No map just points
+	}
+	int shareZone = this->ZoneNum();
+	double tStepMultiplier = pow(10,- ceil(log10(double(nSensStep))));
+	for (int i = nSensDat; i < nSensStep; ++i)
+	{
+		this->NewZone();
+		this->StrandTime(strandID, timeStep+tStepMultiplier*i);
+		if (forceOutType==1){
+			this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+				nVertDat,nCellDat,nSensDat);
+		} else if (forceOutType==2){
+			this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
+				nSensDat);
+		} else if (forceOutType==3){
+			this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
+				nSensDat);
+		} else if (forceOutType==4){
+			this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
+		}
+		this->DefShareZoneVolume(shareZone, nVertDat+nCellDat);
+		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, i+1, i);
+	}
+
+	return(0);
+}
+
 // tecplotfile operations
 
 int tecplotfile::OpenFile (const char *str, const char *mode){

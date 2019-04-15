@@ -6,7 +6,7 @@ out/*
 temp/*
 
 !*.lay
-
+*.mat
 # ignore matlab executables
 *.mexw64
 *.mexw64.pdb
