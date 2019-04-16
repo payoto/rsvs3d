@@ -13,6 +13,7 @@
 
 using namespace std; 
 using namespace Eigen; 
+using namespace rsvs3d::constants;
 
 /*
 Implementation of the core calculation functions of
@@ -83,11 +84,11 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	veccoord.reserve(3);
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
-		if(triIn.pointtype[ii]==1){
+		if(triIn.pointtype[ii]==meshtypes::mesh){
 			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==2){
+		} else if (triIn.pointtype[ii]==meshtypes::snake){
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==3){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
 		}
 	}
@@ -126,7 +127,8 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	dPos.setZero(9,nDvAct);
 	for(ii=0; ii<ni; ++ii){
 		if (triIn.pointtype[ii]==2
-			&& this->dvMap.find(triIn.pointind[ii])!=-1){
+		if (triIn.pointtype[ii]==meshtypes::snake
+			&& this->dvMap.find(triIn.pointind[ii])!=__notfound){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
 			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
@@ -166,11 +168,12 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< nDvAct; ++kk){
-							this->dConstr(subTempVec[jj],this->dvMap.find(dvListMap.vec[kk])) += 
+							this->dConstr(subTempVec[jj],
+								this->dvMap.find(dvListMap.vec[kk])) += 
 								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
 							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
 							for(ll=0; ll< nDvAct; ++ll){
@@ -236,7 +239,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->isConstrAct.at(subTempVec[jj]) = true;
 				}
 			}
@@ -278,11 +281,11 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
-		if(triIn.pointtype[ii]==1){
+		if(triIn.pointtype[ii]==meshtypes::mesh){
 			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==2){
+		} else if (triIn.pointtype[ii]==meshtypes::snake){
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==3){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
 		}
 	}
@@ -294,13 +297,13 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	// Active DV lists
 
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==meshtypes::snake){
 			dvList.push_back(triIn.pointind[ii]);
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
 			nj=triRSVS.trisurf(subTemp)->indvert.size();
 			for(jj=0;jj<nj;++jj){
-				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==meshtypes::snake){
 					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
 				}
 			}
@@ -319,7 +322,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==meshtypes::snake){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
 			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
@@ -328,7 +331,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 
 		}
 	}
@@ -356,7 +359,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< nDvAct; ++kk){
@@ -422,7 +425,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->isConstrAct.at(subTempVec[jj]) = true;
 				}
 			}
@@ -469,11 +472,11 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	veccoordvol[0] = &dvec;
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
-		if(triIn.pointtype[ii]==1){
+		if(triIn.pointtype[ii]==meshtypes::mesh){
 			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==2){
+		} else if (triIn.pointtype[ii]==meshtypes::snake){
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==3){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
 		}
 	}
@@ -482,14 +485,14 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	dvOrder.assign(3,0);
 	ni = 3;
 	for(ii=0; ii<ni; ++ii){
-		if(triIn.pointtype[ii]==1){
+		if(triIn.pointtype[ii]==meshtypes::mesh){
 
 
 			dvec[ii] = 0;
 			veccoordvol[1+ii] = &(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord);
 			veccoordvol[1+3+ii] = &(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord);
 
-		} else if (triIn.pointtype[ii]==2){
+		} else if (triIn.pointtype[ii]==meshtypes::snake){
 
 			subTemp = triRSVS.snakeDep->snakeconn.verts.find(triIn.pointind[ii]);
 			dvOrder[ii] = triIn.pointind[ii];
@@ -500,7 +503,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 			veccoordvol[1+ii+3] = &(triRSVS.meshDep->verts.isearch(
 				triRSVS.snakeDep->snaxs(subTemp)->tovert)->coord);
 
-		} else if (triIn.pointtype[ii]==3){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation){
 
 			dvec[ii] = 0; // dvec used as a pointer
 			veccoordvol[1+ii] = (triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr());
@@ -515,13 +518,13 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 
 	// Active DV lists
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==meshtypes::snake){
 			dvList.push_back(triIn.pointind[ii]);
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
 			nj=triRSVS.trisurf(subTemp)->indvert.size();
 			for(jj=0;jj<nj;++jj){
-				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==meshtypes::snake){
 					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
 				}
 			}
@@ -541,7 +544,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	dPos.setZero(9,nDvAct);
 
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2){
+		if (triIn.pointtype[ii]==meshtypes::snake){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
 			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
@@ -550,7 +553,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 
 		}
 	}
@@ -580,14 +583,14 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 		}
 		constrPart=*retVal2;
 		
-		if(dvListMap.find(1044)!=-1 && isDeriv){
+		if(dvListMap.find(1044)!=__notfound && isDeriv){
 			cout << endl;
 			DisplayVector(dvOrder);
 			cout << endl;
 			PrintMatrix(dConstrPart);
 			cout << endl;
 		}
-		// if((dvListMap.find(1044)!=-1 )  && isDeriv){
+		// if((dvListMap.find(1044)!=__notfound )  && isDeriv){
 		// 	std::vector<double> v={constrPart};
 		// 	PrintMatrixFile(triIn.connec.celltarg,"matrices/matrix_dConstrPart_inter2.txt");
 		// 	PrintMatrixFile(triIn.connec.constrinfluence,"matrices/matrix_dConstrPart_inter2.txt");
@@ -613,7 +616,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 			subTempVec=this->constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< 3; ++kk){
@@ -684,7 +687,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 			subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
-				if (subTempVec[jj]!=-1){
+				if (subTempVec[jj]!=__notfound){
 					this->isConstrAct.at(subTempVec[jj]) = true;
 				}
 			}
@@ -727,11 +730,11 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	veccoord.reserve(3);
 	ni=3;
 	for(ii=0; ii<ni; ++ii){
-		if(triIn.pointtype[ii]==1){
+		if(triIn.pointtype[ii]==meshtypes::mesh){
 			veccoord.push_back(&(triRSVS.meshDep->verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==2){
+		} else if (triIn.pointtype[ii]==meshtypes::snake){
 			veccoord.push_back(&(triRSVS.snakeDep->snakeconn.verts.isearch(triIn.pointind[ii])->coord));
-		} else if (triIn.pointtype[ii]==3){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation){
 			veccoord.push_back((triRSVS.trivert.isearch(triIn.pointind[ii])->coord.retPtr()));
 		}
 	}
@@ -743,14 +746,14 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	// Active DV lists
 
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2 
-			&& this->dvMap.find(triIn.pointind[ii])!=-1){
+		if (triIn.pointtype[ii]==meshtypes::snake 
+			&& this->dvMap.find(triIn.pointind[ii])!=__notfound){
 			dvList.push_back(triIn.pointind[ii]);
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 			subTemp=triRSVS.trivert.find(triIn.pointind[ii]);
 			nj=triRSVS.trisurf(subTemp)->indvert.size();
 			for(jj=0;jj<nj;++jj){
-				if (triRSVS.trisurf(subTemp)->typevert[jj]==2){
+				if (triRSVS.trisurf(subTemp)->typevert[jj]==meshtypes::snake){
 					dvList.push_back(triRSVS.trisurf(subTemp)->indvert[jj]);
 				}
 			}
@@ -769,8 +772,8 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	HPos.setZero(nDvAct,nDvAct);
 	dPos.setZero(9,nDvAct);
 	for(ii=0; ii<ni; ++ii){
-		if (triIn.pointtype[ii]==2
-			&& this->dvMap.find(triIn.pointind[ii])!=-1){
+		if (triIn.pointtype[ii]==meshtypes::snake
+			&& this->dvMap.find(triIn.pointind[ii])!=__notfound){
 			subTemp=triRSVS.snakeDep->snaxs.find(triIn.pointind[ii]);
 			subTemp1=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->fromvert);
 			subTemp2=triRSVS.meshDep->verts.find(triRSVS.snakeDep->snaxs(subTemp)->tovert);
@@ -779,7 +782,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 				dPos(ii*3+jj,subTemp3)+=triRSVS.meshDep->verts(subTemp2)->coord[jj]
 					-triRSVS.meshDep->verts(subTemp1)->coord[jj];
 			}
-		} else if (triIn.pointtype[ii]==3 && false){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && false){
 
 		}
 	}
@@ -805,7 +808,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 		dVal.setZero(1,9);
 		objPart=0;
 		for (int ed = 0; ed < 3; ++ed){
-			if(triIn.pointtype[ed]==2 && triIn.pointtype[(ed+1)%3]==2){
+			if(triIn.pointtype[ed]==meshtypes::snake && triIn.pointtype[(ed+1)%3]==meshtypes::snake){
 
 				HVal2.setZero(6,6);
 				dVal2.setZero(1,6);
@@ -854,7 +857,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 		subTempVec=constrMap.findall(triIn.connec.celltarg[ii]);
 		nj=subTempVec.size();
 		for(jj=0; jj< nj; ++jj){
-			if (subTempVec[jj]!=-1){
+			if (subTempVec[jj]!=__notfound){
 				this->isConstrAct.at(subTempVec[jj]) = true;
 			}
 		}
@@ -904,9 +907,9 @@ void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const
 
 	n=surfin.indvert.size();
 	for(ii=0; ii<n; ++ii){
-		if(surfin.typevert[ii]==1){
+		if(surfin.typevert[ii]==meshtypes::mesh){
 			veccoord.push_back(&(meshin.verts.isearch(surfin.indvert[ii])->coord));
-		} else if (surfin.typevert[ii]==2){
+		} else if (surfin.typevert[ii]==meshtypes::snake){
 			veccoord.push_back(&(snakeconn.verts.isearch(surfin.indvert[ii])->coord));
 		}
 	}

@@ -19,8 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector> 
-#include "vectorarray.hpp" 
-#include "RSVSmath.hpp"
+
 #include "mesh.hpp"
 #include "snake.hpp"
 #include "triangulate.hpp"

@@ -26,6 +26,7 @@
 //========================================
 // Forward declared dependencies
 class RSVScalc;
+class SurfCentroid;
 
 //=================================
 // included dependencies
@@ -52,7 +53,15 @@ class tecplotfile;
 // typedef TriStruct<trianglesurf>  trisurfarray;
 
 // Template Class
-
+namespace rsvs3d {
+	namespace constants{
+		namespace meshtypes {
+			static const int mesh = 1;
+			static const int snake = 2;
+			static const int triangulation = 3;
+		}
+	}
+}
 template <class T>
 class TriStruct : public SnakStruct<T>{
 	friend class triangulation;
