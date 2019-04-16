@@ -238,11 +238,11 @@ template <class T> int TestTemplate_ArrayStruct()
 		errFlag+=TestReadyness(stackT," after find",true);
 
 
-		if (i!=2 || j!=-1){
+		if (i!=2 || j!=rsvs3d::constants::__notfound){
 			std::cerr << "FIND did not Succesfully identify the indices" << std::endl;
 			errFlag++;
 		}
-		if (testSub[2]!=2 || testSub[3]!=-1){
+		if (testSub[2]!=2 || testSub[3]!=rsvs3d::constants::__notfound){
 			std::cerr << "FIND_LISTS did not Succesfully identify the indices" << std::endl;
 			errFlag++;
 		}
@@ -380,7 +380,7 @@ template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const
 	
 
 	if (search==hashTable.end()){
-		return(-1);
+		return(rsvs3d::constants::__notfound);
 	}
 	#ifdef SAFE_ACCESS
 	int key2;
@@ -691,11 +691,11 @@ template <class T,class Q,class R> inline vector<int> HashedVector<T,Q,R>::find_
 }
 template <class T,class Q,class R> inline bool HashedVector<T,Q,R>::IsInVec(const Q &key) const
 {
-	return(FindSub(key.Key(), hashTable)!=-1);
+	return(FindSub(key.Key(), hashTable)!=rsvs3d::constants::__notfound);
 }
 template <class T,class Q,class R>  bool HashedVector<T,Q,R>::operator()(const Q &key) const
 {
-	return(FindSub(key.Key(), hashTable)!=-1);
+	return(FindSub(key.Key(), hashTable)!=rsvs3d::constants::__notfound);
 }
 
 template <class T,class Q,class R> inline void HashedMap<T,Q,R>::GenerateHash()
@@ -710,7 +710,7 @@ template<class T>  int FindSub(const T &key, const unordered_multimap<T,int> &ha
 	auto search=hashTable.find(key);
 
 	if (search==hashTable.end()){
-		return(-1);
+		return(rsvs3d::constants::__notfound);
 	}
 
 	return(search->second);

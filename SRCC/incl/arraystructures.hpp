@@ -64,7 +64,11 @@
 //       ie replaced by their code at compile time
 using namespace std;
 
-
+namespace rsvs3d {
+	namespace constants {
+		static const int __notfound = -1;
+	}
+}
 
 template <class T> class ArrayStruct;
 template <class T,class Q, class R=int> class HashedVector;
