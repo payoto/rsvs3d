@@ -378,7 +378,7 @@ public:
 	vector<int> edgeind;
 	vector<double> coord;
 	 // reserves 2 as this is the size of the array
-	std::vector<int> elmind(const mesh &meshin) const;
+	std::vector<int> elmind(const mesh &meshin, int dimOveride=-1) const;
 
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;

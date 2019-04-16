@@ -89,7 +89,9 @@ namespace param {
 		int initboundary;
 		/// maximum number of steps
 		int maxsteps;
-
+		/// Position of spawn
+		double spawnposition;
+		
 		snaking();
 		~snaking();
 		void PrepareForUse();

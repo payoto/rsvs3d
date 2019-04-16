@@ -122,6 +122,7 @@ param::snaking::snaking(){
 	this->snaxdiststep=0.9;
 	this->initboundary = 1;
 	this->maxsteps = 50;
+	this->spawnposition = 1e-5;
 }
 
 param::snaking::~snaking(){

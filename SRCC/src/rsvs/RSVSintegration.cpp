@@ -161,7 +161,7 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 
 	int start_s, start_f;
 	start_f=clock();
-
+	// double stepLength = 1e-5;
 	//===============================
 	// Spawn
 	// ======================
@@ -175,8 +175,16 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	// Spawn
 	SAFE_ALGO_TestConn(snakein);
 	snakein.SnaxImpactDetection(isImpact);
+	snakein.snaxs.SetMaxIndex();
+	// int maxIndPreSpawn = snakein.snaxs.GetMaxIndex();
 	SpawnArrivedSnaxels(snakein,isImpact);
 	start_s=rsvs3d::TimeStamp("Spawn: ", start_s);
+	// snakein.PrepareForUse();
+	// ==============
+	// step away from edge
+	// snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
+	// snakein.UpdateCoord();
+	// snakein.PrepareForUse();
 	// ======================
 	// Impact
 	SAFE_ALGO_TestConn(snakein);
@@ -191,14 +199,21 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	// ======================
 	// Clean
 	CleanupSnakeConnec(snakein);
+	// Take Spawn step
 	snakein.PrepareForUse();
 	SAFE_ALGO_TestConn(snakein);
 	snakein.OrientFaces();
 	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
-
 	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
+void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength){
+	// double stepLength = 1e-5;
 
+	snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
+	snakein.UpdateCoord();
+	snakein.PrepareForUse();
+
+}
 void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	/*
 	Performs the snake step except the movement of the snake.
@@ -250,6 +265,16 @@ void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
 
+double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
+	double snaxtimestep, double snaxdiststep){
+
+	rsvsSnake.CalculateTimeStep(dt, snaxtimestep, snaxdiststep);
+	rsvsSnake.UpdateDistance(dt,snaxdiststep);
+	
+	rsvsSnake.UpdateCoord();
+	rsvsSnake.PrepareForUse();
+	return *max_element(dt.begin(), dt.end());
+}
 // ====================
 // integrate
 // 		prepare
@@ -576,17 +601,15 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 		integrate::execute::Logging(RSVSobj,
 			totT, nVoluZone, stepNum);
 
-		RSVSobj.rsvsSnake.CalculateTimeStep(dt,
+		totT += SnakePositionUpdate(RSVSobj.rsvsSnake, dt,
 			RSVSobj.paramconf.snak.snaxtimestep,
 			RSVSobj.paramconf.snak.snaxdiststep);
-		RSVSobj.rsvsSnake.UpdateDistance(dt,
-			RSVSobj.paramconf.snak.snaxdiststep);
-		totT += *max_element(dt.begin(), dt.end());
-		RSVSobj.rsvsSnake.UpdateCoord();
-		RSVSobj.rsvsSnake.PrepareForUse();
 
+		int maxIndPreSpawn = RSVSobj.rsvsSnake.snaxs.GetMaxIndex();
 		SnakeConnectivityUpdate(RSVSobj.rsvsSnake, isImpact,
 			RSVSobj.paramconf.snak.multiarrivaltolerance);
+		SnakeSpawnStep(RSVSobj.rsvsSnake, maxIndPreSpawn,
+			RSVSobj.paramconf.snak.spawnposition);
 		start_s=clock();
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
 		start_s=rsvs3d::TimeStamp(" triangulate:", start_s);

@@ -62,6 +62,7 @@ protected:
 
 public: 
 	friend class snake;
+	friend class snax;
 	friend void SpawnArrivedSnaxelsDir(snake &fullsnake, snake &partSnake,
 		const vector<int> &isImpact, int dir);
 
@@ -141,6 +142,7 @@ public:
 	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
 	void AssignInternalVerts();
 	void CheckConnectivity() const; 
+	void TakeSpawnStep(int minIndex, double stepLength);
 
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
@@ -183,7 +185,7 @@ public:
 		int tovert,int edgeind,int isfreeze,int orderedge);
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
 	void TightenConnectivity(){}
-
+	void TakeSpawnStep(snake &snakein, double stepLength);
 };
 
 

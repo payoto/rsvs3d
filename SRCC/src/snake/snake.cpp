@@ -775,7 +775,7 @@ void snake::UpdateCoord(){
 		toVertSub=snakemesh->verts.find(snaxs(ii)->tovert);
 
 		for(jj=0;jj<3;++jj){
-			snakeconn.verts[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
+			snakeconn.verts.elems[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
 				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
 			+snakemesh->verts(fromVertSub)->coord[jj];
 		}
@@ -879,10 +879,13 @@ void snaxarray::ReorderOnEdge()
 	isOrderedOnEdge=1;
 }
 
-void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnaxDone, int edgeInd){
+void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, 
+	vector<bool> &isSnaxDone, int edgeInd){
+
 	int nSnax,ii,jj;
 	vector<int> snaxSubs;
 	double impactTime;
+
 	snaxSubs=ReturnDataEqualRange(edgeInd, hashParent);
 	nSnax=snaxSubs.size();
 	for(ii=0;ii<nSnax;++ii){
@@ -890,10 +893,81 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnax
 		for(jj=ii+1;jj<nSnax;++jj){
 			impactTime=SnaxImpactDt(elems[snaxSubs[ii]],elems[snaxSubs[jj]]);
 			if (impactTime>=0.0){
-				dt[snaxSubs[ii]]= (dt[snaxSubs[ii]]>impactTime) ? impactTime : dt[snaxSubs[ii]];
-				dt[snaxSubs[jj]]= (dt[snaxSubs[jj]]>impactTime) ? impactTime : dt[snaxSubs[jj]];
+				dt[snaxSubs[ii]]= (dt[snaxSubs[ii]]>impactTime) ?
+					impactTime : dt[snaxSubs[ii]];
+				dt[snaxSubs[jj]]= (dt[snaxSubs[jj]]>impactTime) ?
+					impactTime : dt[snaxSubs[jj]];
 			}
 		}
+	}
+}
+
+void snake::TakeSpawnStep(int minIndex, double stepLength){
+
+	int nSnax = this->snaxs.size();
+	for (int i = 0; i < nSnax; ++i)
+	{
+		if(this->snaxs(i)->index>minIndex){
+			this->snaxs.elems[i].TakeSpawnStep(*this, stepLength);
+		}
+	}
+
+}
+
+void snax::TakeSpawnStep(snake &snakein, double stepLength){
+
+	if(IsAproxEqual(stepLength,0.0)){
+		return;
+	}
+	if(stepLength<-__DBL_EPSILON__ || stepLength>=0.5){
+		RSVS3D_ERROR_ARGUMENT("The spawn step must be 0.5>=x>=0");
+	}
+	int closeVert = this->fromvert;
+	if(this->d>0.5){ // if spawned in reverse
+		closeVert = this->tovert;
+		stepLength = -stepLength;
+	}
+
+	double minEdgeLength = INFINITY;
+	for (auto edgeInd : snakein.snakemesh->verts.isearch(closeVert)->edgeind)
+	{
+		double testLength = snakein.snakemesh->edges.isearch(edgeInd)
+			->Length(*snakein.snakemesh);
+		minEdgeLength = testLength < minEdgeLength ?
+			testLength : minEdgeLength;
+	}
+	stepLength = stepLength * minEdgeLength / snakein.snakemesh->edges.isearch(this->edgeind)
+			->Length(*snakein.snakemesh);
+	int nEdge=snakein.snaxs.countparent(this->edgeind);
+	this->d += stepLength;
+	if (this->d<0 || this->d>1.0){
+		RSVS3D_ERROR_LOGIC("Distance should be between 0 and 1");
+	}
+	if(nEdge==1){
+		return;
+	} else if (nEdge>1){
+		int nChanges=0;
+		std::vector<int> snaxSubs;
+		snakein.snaxs.findsiblings(this->edgeind,snaxSubs);
+		for (auto snaxtest : snaxSubs)
+		{
+			auto tempSnax = snakein.snaxs(snaxtest);
+			if (this->index!=tempSnax->index)
+			{
+				if(!((tempSnax->d<0.5) ^ (this->d<0.5))){
+					if (fabs(tempSnax->d-0.5)>fabs(this->d))
+					{
+						this->d = tempSnax->d;
+						nChanges++;
+					}
+				}
+			} 
+		}
+		if (nChanges>0){
+			std::cout << " " << nChanges << "," << this->d << ",";
+		}
+	} else {
+		RSVS3D_ERROR_RANGE("Parent hashing returned a number <=0");
 	}
 
 }

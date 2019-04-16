@@ -49,7 +49,8 @@ void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact,
 void SnakeConnectivityUpdate_2D(snake &testSnake,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact);
 void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact);
-
+double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
+	double snaxtimestep, double snaxdiststep);
 namespace integrate {
 	class iteratereturns {
 	public:

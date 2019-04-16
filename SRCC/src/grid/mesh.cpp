@@ -1312,10 +1312,14 @@ void vert::read(FILE * fid) {
 
 }
 
-std::vector<int> vert::elmind(const mesh &meshin) const {
+std::vector<int> vert::elmind(const mesh &meshin, int dimOveride) const {
 	std::vector<int> elmind;
 	elmind.reserve(30);
-	if(meshin.WhatDim()==3)
+	int dim = meshin.WhatDim(); 
+	if (dimOveride>0){
+		dim = dimOveride;
+	}
+	if(dim==3)
 		for(auto edgeInd : this->edgeind){
 			for(auto surfInd : meshin.edges.isearch(edgeInd)->surfind){
 				for(auto voluInd : meshin.surfs.isearch(surfInd)->voluind){

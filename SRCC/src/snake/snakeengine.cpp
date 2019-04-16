@@ -86,8 +86,9 @@ void SpawnAtVertex(snake& snakein,int indVert){
 
 }
 
-void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, const vector<int> &surfInds,
-	const vector<int> &edgeInds,const vector<int> &edgeSubs, unordered_multimap<int,int> &hashSurfInds){
+void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, 
+	const vector<int> &surfInds, const vector<int> &edgeInds, 
+	const vector<int> &edgeSubs, unordered_multimap<int,int> &hashSurfInds){
 	int ii,jj;
 	vector<int> edgeSubsTemp;
 
@@ -107,8 +108,10 @@ void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert, cons
 	newsnake.snakeconn.verts.ChangeIndices(0,1,0,0);
 }
 
-void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,const vector<int> &edgeInds,
-	const vector<int> &voluInds,const vector<int> &surfSubs,unordered_multimap<int,int> &hashEdgeInds, unordered_multimap<int,int> &hashVoluInds){
+void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
+	const vector<int> &edgeInds, const vector<int> &voluInds, 
+	const vector<int> &surfSubs, unordered_multimap<int,int> &hashEdgeInds,
+	unordered_multimap<int,int> &hashVoluInds){
 	int ii,jj,kk;
 	vector<int> surfSubsTemp,vertSubsTemp;
 
