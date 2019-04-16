@@ -16,7 +16,7 @@
 #include <vector> 
 #include <cmath> 
 #include "vectorarray.hpp" 
-#include "RSVSmath_automatic.hpp"
+
 
 using namespace std; 
 
@@ -215,6 +215,10 @@ public:
 	void Disp();
 	void Calc() override;
 	void assigncentroid(const vector<double> &vecin);
+
+	const ArrayVec<double>& jac_ptr() const {return((this->jac));};
+	const ArrayVec<double>& hes_ptr() const {return((this->hes));};
+
 	SurfCentroid() : CoordFunc(3,4,3){centroid.assign(nDim,0);};
 	explicit SurfCentroid(int a) : CoordFunc(3,a,3){
 		nCoord=a;

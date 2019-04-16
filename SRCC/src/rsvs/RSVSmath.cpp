@@ -453,15 +453,18 @@ the jacobian is arranged :
 			switch(nCoord){
 				case 4:
 					//SurfCentroid4_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
-					SurfCentroid4_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					SurfCentroid4_df(x,y,z,edgeLength,centroid[0],centroid[1],
+						centroid[2],jac);
 					break;
 				case 5:
 					//SurfCentroid5_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
-					SurfCentroid5_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					SurfCentroid5_df(x,y,z,edgeLength,centroid[0],centroid[1],
+						centroid[2],jac);
 					break;
 				case 6:
 					//SurfCentroid6_f(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],funA);
-					SurfCentroid6_df(x,y,z,edgeLength,centroid[0],centroid[1],centroid[2],jac);
+					SurfCentroid6_df(x,y,z,edgeLength,centroid[0],centroid[1],
+						centroid[2],jac);
 					break;
 			}
 		} else {
