@@ -351,9 +351,9 @@ int Test_Crop(){
       ub = {0.9,0.9,0.9};
       meshin.PrepareForUse();
       tecout.PrintMesh(meshin);
-      tecout.PrintMesh(meshin,0,0,3);
+      tecout.PrintMesh(meshin,0,0,rsvs3d::constants::tecplot::line);
       auto verts = meshin.AddBoundary(lb, ub);
-      tecout.PrintMesh(meshin,0,0,3);
+      tecout.PrintMesh(meshin,0,0,rsvs3d::constants::tecplot::line);
       tecout.PrintMesh(meshin);
       meshin.Crop(verts, 1);
       tecout.PrintMesh(meshin);

@@ -6,6 +6,7 @@
 #include "warning.hpp"
 #include "RSVScalc.hpp"
 
+using namespace rsvs3d::constants;
 
 // Functions
 void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge,
@@ -441,34 +442,34 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 	nVertDat=3;
 	nCellDat=3;
 
-	if (forceOutType==0){
+	if (forceOutType==tecplot::autoselect){
 		if(nVolu>0){
-			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=2;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=3; // output as line data (FELINESEG)
+			forceOutType=tecplot::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=4;
+			forceOutType=tecplot::point;
 		}
 	}
 
 
-	if (forceOutType==1){
+	if (forceOutType==tecplot::polyhedron){
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
 		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
 		this->VolFaceMap(meshout,nSurf);
 	}
-	else if (forceOutType==2){
+	else if (forceOutType==tecplot::polygon){
 		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->SurfDataBlock(meshout,nVert,nSurf, nVertDat);
 		this->SurfFaceMap(meshout,nEdge);
-	} else if (forceOutType==3){
+	} else if (forceOutType==tecplot::line){
 		this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 		this->LineDataBlock(meshout,nVert,nEdge, nVertDat,nCellDat);
 		this->LineFaceMap(meshout,nEdge);
-	} else if (forceOutType==4){
+	} else if (forceOutType==tecplot::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -540,34 +541,34 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 	nVertDat=3;
 	nCellDat=3;
 
-	if (forceOutType==0){
+	if (forceOutType==tecplot::autoselect){
 		if(nVolu>0){
-			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=2;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=3; // output as line data (FELINESEG)
+			forceOutType=tecplot::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=4;
+			forceOutType=tecplot::point;
 		}
 	}
 
 
-	if (forceOutType==1){
+	if (forceOutType==tecplot::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==2){
+	else if (forceOutType==tecplot::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==3){
+	} else if (forceOutType==tecplot::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==4){
+	} else if (forceOutType==tecplot::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -602,35 +603,35 @@ int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone,
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
 	nCellDat=3;
-	// forceOutType=0;
-	// if (forceOutType==0){
+	// forceOutType=tecplot::autoselect;
+	// if (forceOutType==tecplot::autoselect){
 	if(nVolu>0){
-		forceOutType=1; // output as volume data (FEPOLYHEDRON)
+		forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 	} else if (nSurf>0){
-		forceOutType=2;// output as Surface data (FEPOLYGON)
+		forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 	} else if (nEdge>0){
-		forceOutType=3; // output as line data (FELINESEG)
+		forceOutType=tecplot::line; // output as line data (FELINESEG)
 	} else {
-		forceOutType=4;
+		forceOutType=tecplot::point;
 	}
 	// }
 
 
-	if (forceOutType==1){
+	if (forceOutType==tecplot::polyhedron){
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 		this->DefShareZoneVolume(shareZone, nVertDat);
 		this->VolDataBlock(meshout,nVert,nVolu, 0);
 		//this->VolFaceMap(meshout,nSurf);
 	}
-	else if (forceOutType==2){
+	else if (forceOutType==tecplot::polygon){
 		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->DefShareZoneVolume(shareZone, nVertDat);
 		this->SurfDataBlock(meshout,nVert,nSurf, 0);
 		//this->SurfFaceMap(meshout,nEdge);
 
-	} else if (forceOutType==3){
+	} else if (forceOutType==tecplot::line){
 		RSVS3D_ERROR_ARGUMENT("Cannot output volume of line");
-	} else if (forceOutType==4){
+	} else if (forceOutType==tecplot::point){
 		RSVS3D_ERROR_ARGUMENT("Cannot output volume of point");
 	}
 	return(0);
@@ -1003,27 +1004,27 @@ int tecplotfile::PrintTriangulation(const triangulation &triout,
 		nVertDat=3;
 		nCellDat=3;
 
-		if (forceOutType==0){
+		if (forceOutType==tecplot::autoselect){
 			if(nVolu>0 && triout.snakeDep->Check3D()){
-				forceOutType=1; // output as volume data (FEPOLYHEDRON)
+				forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
-				forceOutType=2;// output as Surface data (FEPOLYGON)
+				forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 			} else {
-				forceOutType=3; // output as line data (FELINESEG)
+				forceOutType=tecplot::line; // output as line data (FELINESEG)
 			}
 		}
 
 
-		if (forceOutType==1){
+		if (forceOutType==tecplot::polyhedron){
 			this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 			this->VolDataBlock(triout,mp,nVert,nVolu, nVertDat);
 			this->VolFaceMap(triout,mp,nSurf);
 		}
-		else if (forceOutType==2){
+		else if (forceOutType==tecplot::polygon){
 			this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 			this->SurfDataBlock(triout,mp,nVert,nSurf, nVertDat);
 			this->SurfFaceMap(triout,mp);
-		} else if (forceOutType==3){
+		} else if (forceOutType==tecplot::line){
 			this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 			if(triList.size()==0){
 				this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
@@ -1303,27 +1304,27 @@ int tecplotfile::PrintTriangulation(const triangulation &triout,
 		nVertDat=3;
 		nCellDat=3;
 
-		if (forceOutType==0){
+		if (forceOutType==tecplot::autoselect){
 			if(nVolu>0 && triout.snakeDep->Check3D()){
-				forceOutType=1; // output as volume data (FEPOLYHEDRON)
+				forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
-				forceOutType=2;// output as Surface data (FEPOLYGON)
+				forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 			} else {
-				forceOutType=3; // output as line data (FELINESEG)
+				forceOutType=tecplot::line; // output as line data (FELINESEG)
 			}
 		}
 
 
-		if (forceOutType==1){
+		if (forceOutType==tecplot::polyhedron){
 			this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 			this->VolDataBlock(triout,mp,nVert,nVolu, nVertDat);
 			this->VolFaceMap(triout,mp,nSurf);
 		}
-		else if (forceOutType==2){
+		else if (forceOutType==tecplot::polygon){
 			this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 			this->SurfDataBlock(triout,mp,nVert,nSurf, nVertDat);
 			this->SurfFaceMap(triout,mp);
-		} else if (forceOutType==3){
+		} else if (forceOutType==tecplot::line){
 			this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 			this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
 			this->LineFaceMap(triout,mp);
@@ -1466,39 +1467,39 @@ int tecplotfile::PrintSnakeSensitivity(const triangulation& triRSVS, const RSVSc
 	nCellDat=3;
 	nSensDat = calcObj.numConstr();
 
-	if (forceOutType==0){
+	if (forceOutType==tecplot::autoselect){
 		if(nVolu>0){
-			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=2;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=3; // output as line data (FELINESEG)
+			forceOutType=tecplot::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=4;
+			forceOutType=tecplot::point;
 		}
 	}
 
 
-	if (forceOutType==1){
+	if (forceOutType==tecplot::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==2){
+	else if (forceOutType==tecplot::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==3){
+	} else if (forceOutType==tecplot::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==4){
+	} else if (forceOutType==tecplot::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -1567,39 +1568,39 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 	}
 	// Fixed by the dimensionality of the mesh
 
-	if (forceOutType==0){
+	if (forceOutType==tecplot::autoselect){
 		if(nVolu>0){
-			forceOutType=1; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=2;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=3; // output as line data (FELINESEG)
+			forceOutType=tecplot::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=4;
+			forceOutType=tecplot::point;
 		}
 	}
 
 
-	if (forceOutType==1){
+	if (forceOutType==tecplot::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==2){
+	else if (forceOutType==tecplot::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==3){
+	} else if (forceOutType==tecplot::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SensitivityDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==4){
+	} else if (forceOutType==tecplot::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -1619,16 +1620,16 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 	{
 		this->NewZone();
 		this->StrandTime(strandID, timeStep+tStepMultiplier*i);
-		if (forceOutType==1){
+		if (forceOutType==tecplot::polyhedron){
 			this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 				nVertDat,nCellDat,nSensDat);
-		} else if (forceOutType==2){
+		} else if (forceOutType==tecplot::polygon){
 			this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 				nSensDat);
-		} else if (forceOutType==3){
+		} else if (forceOutType==tecplot::line){
 			this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 				nSensDat);
-		} else if (forceOutType==4){
+		} else if (forceOutType==tecplot::point){
 			this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
 		}
 		this->DefShareZoneVolume(shareZone, nVertDat+nCellDat);

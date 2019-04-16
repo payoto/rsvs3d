@@ -386,7 +386,7 @@ void tetgen::input::POINTGRIDS(const mesh &meshdomain, tetgen::io_safe &tetin,
 
 		meshgeom = Points2Mesh(vertsToAdd,3);
 		#ifdef RSVS_DIAGNOSTIC_RESOLVED
-		tecout.PrintMesh(meshgeom, 0,0,4);
+		tecout.PrintMesh(meshgeom, 0,0, rsvs3d::constants::tecplot::point);
 		#endif
 	} else{ 
 		meshgeom.Init(0, 0, 0, 0);
@@ -1681,10 +1681,10 @@ int tetgen::test::call()
 		inparam.command = "Qv"; 
 		tetrahedralize(inparam.command.c_str(), &tetin3, &tetout3);
 		meshvoro = tetgen::output::VORO2MESH(tetout3);
-		// tecout.PrintMesh(meshvoro,0,0,2);
+		// tecout.PrintMesh(meshvoro,0,0,rsvs3d::constants::tecplot::polygon);
 		tecout.PrintMesh(meshvoro);
-		tecout.PrintMesh(meshvoro,0,0,3);
-		tecout.PrintMesh(meshvoro,0,0,4);
+		tecout.PrintMesh(meshvoro,0,0,rsvs3d::constants::tecplot::line);
+		tecout.PrintMesh(meshvoro,0,0,rsvs3d::constants::tecplot::point);
 		std::cout << " Meshed the voronization" << std::endl;
 
 		inparam.edgelengths = {0.15};
@@ -1785,7 +1785,7 @@ int tetgen::test::RSVSVOROFunc_contain(int nPts, double distanceTol, const char*
 				vecPts.begin()+i*4+3);
 		}
 		meshPts.PrepareForUse();
-		// tecout.PrintMesh(meshPts,0,nPts+distanceTol,4);
+		// tecout.PrintMesh(meshPts,0,nPts+distanceTol,rsvs3d::constants::tecplot::point);
 		int nVecMap = vecMap.size();
 		for (int i = 0; i < nVecMap; ++i)
 		{
@@ -1793,7 +1793,8 @@ int tetgen::test::RSVSVOROFunc_contain(int nPts, double distanceTol, const char*
 			tecout.PrintMesh(vosMesh,nPts*3+1,i,5,
 				{snakMesh.ParentElementIndex(vecMap[i])});
 			tecout.PrintMesh(snakMesh,nPts*3+2,i,5,{vecMap[i]});
-			tecout.PrintMesh(meshPts,nPts*3+3,i,4,{i+1});
+			tecout.PrintMesh(meshPts,nPts*3+3,i,
+				rsvs3d::constants::tecplot::point,{i+1});
 		}
 		cout << "__________________________________________________" << endl;
 
@@ -1847,7 +1848,8 @@ int tetgen::test::RSVSVOROFunc(int nPts, double distanceTol, const char* tecoutS
 				vecPts.begin()+i*4+3);
 		}
 		meshPts.PrepareForUse();
-		tecout.PrintMesh(meshPts,3,nPts+distanceTol,4);
+		tecout.PrintMesh(meshPts,3,nPts+distanceTol,
+			rsvs3d::constants::tecplot::point);
 		cout << "__________________________________________________" << endl;
 
 	} catch (exception const& ex) {

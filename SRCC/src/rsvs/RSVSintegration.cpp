@@ -21,7 +21,7 @@
 #include "tetgenrsvs.hpp"
 
 #include "filesystem.hpp"
-
+  
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
 
@@ -735,7 +735,8 @@ void integrate::execute::logging::Snake(
 	rsvsSnake.snakeconn.PrepareForUse();
 	rsvsSnake.snakeconn.OrientFaces();
 	outSnake.PrintVolumeDat(voluMesh,nVoluZone,1,totT);
-	outSnake.PrintSnake(rsvsSnake, 2, totT,2);
+	outSnake.PrintSnake(rsvsSnake, 2, totT,
+		rsvs3d::constants::tecplot::polygon);
 }
 
 void integrate::execute::logging::FullTecplot(
@@ -747,24 +748,28 @@ void integrate::execute::logging::FullTecplot(
 	if(rsvsSnake.snaxs.size()>0){
 
 		rsvsSnake.snakeconn.PrepareForUse();
-		outSnake.PrintSnake(rsvsSnake, 1, totT, 2);
-		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT, 2);
-		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,3);
+		outSnake.PrintSnake(rsvsSnake, 1, totT, 
+			rsvs3d::constants::tecplot::polygon);
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,2,totT, 
+			rsvs3d::constants::tecplot::polygon);
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::intertri,3,totT,
+			rsvs3d::constants::tecplot::line);
 		if (stepNum==0 && rsvsTri.intertri.size()==0){
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,3
-				, {rsvsTri.dynatri(0)->index});
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,3,totT,
+				rsvs3d::constants::tecplot::line, {rsvsTri.dynatri(0)->index});
 		}
-		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,3);
+		outSnake.PrintTriangulation(rsvsTri,&triangulation::trisurf,4,totT,
+			rsvs3d::constants::tecplot::line);
 		if (stepNum==0 && rsvsTri.trisurf.size()==0){
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,3
-				, {rsvsTri.dynatri(0)->index});
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,4,totT,
+				rsvs3d::constants::tecplot::line, {rsvsTri.dynatri(0)->index});
 		}
 		if (int(rsvsTri.acttri.size())>0){
 			outSnake.PrintTriangulation(rsvsTri,&triangulation::stattri,5,totT,
-				3,rsvsTri.acttri);
+				rsvs3d::constants::tecplot::line,rsvsTri.acttri);
 		} else if (stepNum==0){
-			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,5,totT,3
-				, {rsvsTri.dynatri(0)->index});
+			outSnake.PrintTriangulation(rsvsTri,&triangulation::dynatri,5,totT,
+				rsvs3d::constants::tecplot::line, {rsvsTri.dynatri(0)->index});
 		}
 		
 		vertList.clear();
@@ -776,7 +781,8 @@ void integrate::execute::logging::FullTecplot(
 		if(int(rsvsSnake.isMeshVertIn.size())==0){
 			vertList.push_back(rsvsSnake.snakemesh->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(rsvsSnake.snakemesh),6,totT,4,vertList);
+		outSnake.PrintMesh(*(rsvsSnake.snakemesh),6,totT,
+			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,7,totT);
 		outSnake.PrintSnake(rsvsSnake, 8, totT);
 

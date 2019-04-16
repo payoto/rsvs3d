@@ -46,6 +46,17 @@ class triarray;
 //       ie replaced by their code at compile time
 using namespace std;
 
+namespace rsvs3d {
+	namespace constants{
+		namespace tecplot {
+			static const int autoselect=0;
+			static const int polyhedron=1;
+			static const int polygon=2;
+			static const int line=3;
+			static const int point=4;
+		}
+	}
+}
 
 // Base classes
 
@@ -60,7 +71,8 @@ public:
 	int ZoneNum() const {return(nZones);}
 	// Mesh out
 	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0, 
-		int forceOutType=0, const vector<int> &vertList={});
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const vector<int> &vertList={});
 	int PrintSnakeInternalPts(const snake &snakein,int strandID=0, double timeStep=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
 		const std::vector<int> &voluList={},
@@ -93,7 +105,8 @@ public:
 	int LineFaceMap( const vector<int> &triList);
 	int VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf);
 	int PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,
-		int strandID=0, double timeStep=0, int forceOutType=0,
+		int strandID=0, double timeStep=0,
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const vector<int> &triList={});
 
 	// Triangulation surface array out
@@ -107,12 +120,14 @@ public:
 	int LineFaceMap(const triangulation &triout, trisurfarray triangulation::*mp);
 	int VolFaceMap(const triangulation &triout, trisurfarray triangulation::*mp,int nSurf);
 	int PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp,
-		int strandID=0, double timeStep=0, int forceOutType=0);
+		int strandID=0, double timeStep=0,
+		int forceOutType=rsvs3d::constants::tecplot::autoselect);
 
 	// Snake specific functions
 	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
-		int forceOutType=0, const vector<int> &vertList={});
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const vector<int> &vertList={});
 	// Zone Headers
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
 		int nVertDat, int nCellDat);
@@ -130,13 +145,15 @@ public:
 
 	// Snake sensitivity
 	int PrintSnakeSensitivity(const triangulation& triRSVS, const RSVScalc &calcObj,
-		int strandID=0, double timeStep=0, int forceOutType=0, 
+		int strandID=0, double timeStep=0,
+		int forceOutType=rsvs3d::constants::tecplot::autoselect, 
 		const vector<int> &vertList={});
 	int SensitivityDataBlock(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0);
 	int PrintSnakeSensitivityTime(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
-		int forceOutType=0, const vector<int> &vertList={});
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const vector<int> &vertList={});
 
 		tecplotfile(){
 		fid=NULL;

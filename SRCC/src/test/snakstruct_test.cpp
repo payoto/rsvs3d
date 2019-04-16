@@ -43,15 +43,21 @@ void PrintRSVSSnake2D(tecplotfile &outSnake, snake &testSnake, double totT,
 		outSnake.PrintMesh(triMesh,3,totT);
 		outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 		if (ii==0){
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,3);
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,3);
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,
+				rsvs3d::constants::tecplot::line);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,
+				rsvs3d::constants::tecplot::line);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,
+				rsvs3d::constants::tecplot::line);
 		}
-		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
-		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,
+			rsvs3d::constants::tecplot::line);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,
+			rsvs3d::constants::tecplot::line);
 		if (int(triRSVS.acttri.size())>0){
 			outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,
-				totT,3,triRSVS.acttri);
+				totT,
+				rsvs3d::constants::tecplot::line,triRSVS.acttri);
 		}
 		
 		vertList.clear();
@@ -63,7 +69,8 @@ void PrintRSVSSnake2D(tecplotfile &outSnake, snake &testSnake, double totT,
 		if(int(testSnake.isMeshVertIn.size())==0){
 			vertList.push_back(testSnake.snakemesh->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
+		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,
+			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 		outSnake.PrintSnake(testSnake, 10, totT);
 
@@ -90,15 +97,20 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
 		outSnake.PrintMesh(triMesh,3,totT);
 		outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,4,totT);
 		if (ii==0){
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,3);
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,3);
-			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,3);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,5,totT,
+				rsvs3d::constants::tecplot::line);	
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,6,totT,
+				rsvs3d::constants::tecplot::line);
+			outSnake.PrintTriangulation(triRSVS,&triangulation::dynatri,7,totT,
+				rsvs3d::constants::tecplot::line);
 		}
-		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,3);
-		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,3);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::intertri,5,totT,
+			rsvs3d::constants::tecplot::line);
+		outSnake.PrintTriangulation(triRSVS,&triangulation::trisurf,6,totT,
+			rsvs3d::constants::tecplot::line);
 		if (int(triRSVS.acttri.size())>0){
 			outSnake.PrintTriangulation(triRSVS,&triangulation::stattri,7,
-				totT,3,triRSVS.acttri);
+				totT,rsvs3d::constants::tecplot::line,triRSVS.acttri);
 		}
 		
 		vertList.clear();
@@ -110,7 +122,8 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
 		if(int(testSnake.isMeshVertIn.size())==0){
 			vertList.push_back(testSnake.snakemesh->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,4,vertList);
+		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,
+			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 		outSnake.PrintSnake(testSnake, 10, totT);
 
