@@ -258,6 +258,7 @@ public:
 	int OrderEdges(mesh *meshin);
 	int SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd);
 	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
+	vector<int> OrderedVerts(const mesh *meshin) const ;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
 	void FlipVolus();

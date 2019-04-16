@@ -238,6 +238,10 @@ int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, 
 bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);
 mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin);
 void FlattenBoundaryFaces(mesh &meshin);
+SurfCentroid SurfaceCentroid_TriangleSurf(const trianglesurf &surfin, 
+	const mesh& meshin,	const mesh& snakeconn);
+SurfCentroid SurfaceCentroid_SnakeSurf(const surf &surfin,
+	const mesh& meshin);
 
 int Test_snakeRSVS();
 int Test_surfcentre();

@@ -2838,6 +2838,11 @@ void surf::OrderedVerts(const mesh *meshin, vector<int> &vertList) const{
 		vertsPast[1]=verts[1];
 	}
 } 
+vector<int> surf::OrderedVerts(const mesh *meshin) const {
+	vector<int> vertList;
+	this->OrderedVerts(meshin, vertList);
+	return(vertList);
+}
 
 void surf::FlipVolus(){
 	int interm;
@@ -4734,6 +4739,9 @@ void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
 	int kk,ll,nEdge; 
 
 	nEdge=int(edgeind.size());
+	if (vertind.size()>0){
+		RSVS3D_ERROR_ARGUMENT("verting is expected to be an empty vector.");
+	}
 	vertind.reserve(nEdge);
 	ll=0;
 	kk=0;

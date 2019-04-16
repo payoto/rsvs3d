@@ -55,6 +55,7 @@ protected:
 public:
 	void assign(int nR,int nC, T newelem);
 	void size(int &nR, int &nC) const {nR=elems.size();if(nR>0){nC=elems[0].size();}};
+	int size() const {return(elems.size());}
 	void clear(){
 		for (int ii=0; ii<int(elems.size());ii++){
 			elems[ii].clear();

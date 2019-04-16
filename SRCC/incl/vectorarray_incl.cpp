@@ -23,4 +23,14 @@ template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)
 	dim.push_back(nC);
 }
 
+template <class T>
+void DisplayArray(const T &in){
+
+	for (int i; i< in.size();++i){
+		std::cout << i << " : ";
+		DisplayVector(in[i]);
+		std::cout << std::endl;
+	}
+}
+
 #endif // VECTORARRAY_INCL_H_INCLUDED
