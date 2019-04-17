@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
@@ -14,6 +15,7 @@
 #include "RSVSintegration.hpp"
 #include "warning.hpp"
 #include "tetgenrsvs.hpp"
+#include "matrixtools.hpp"
 
 using namespace std;
 
@@ -1591,3 +1593,82 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	MaintainTriangulateSnake(RSVStri);
 }
 
+int Test_SurfCentreDerivatives(){
+
+	std::vector<std::vector<double>> coords;
+	double pi = 3.14159265358979323846;
+	ofstream outfile;
+	double stepLength;
+
+	for (auto nCoords : {4,5,6,7}){
+
+		SurfCentroid surfCentre(nCoords);
+		std::ostringstream filename;
+		filename << "../TESTOUT/derivatives/surfcentre_jac" << nCoords << ".csv";
+		outfile.open(filename.str());
+		outfile.precision(16);
+
+		coords.assign(nCoords, {0.0,0.0,0.0});
+		for (int i = 0; i < nCoords; ++i)
+		{
+			surfCentre.assign(i,coords[i]);
+		}
+		for (int ord = 0; ord < 8; ++ord)
+		{
+			stepLength = pow(10.0, -ord);
+			for (int i = 0; i < nCoords; ++i)
+			{
+				double x = sin(2.0*pi/nCoords*i);
+				double y = cos(2.0*pi/nCoords*i);
+				double z = -(x);
+				coords[i][0] = x;
+				coords[i][1] = y;
+				coords[i][2] = z;
+			}
+
+			for (int i = 0; i < 3; ++i)
+			{
+				coords[0][i] = coords[1][i]+(coords[0][i]-coords[1][i])*stepLength;
+			}
+			for (int i = 0; i < nCoords; ++i)
+			{
+				std::cout << "coord vector " << i << ": ";
+				DisplayVector(coords[i]);
+				std::cout << std::endl;
+			}
+			for (int i = 0; i < nCoords; ++i)
+			{
+				for (int j = 0; j < 3; ++j)
+				{
+					outfile << coords[i][j] << ", ";
+				}
+				outfile << std::endl;
+			}
+			surfCentre.Calc();
+			surfCentre.jac_ptr().write(outfile);
+			outfile << std::endl;
+		}
+		outfile.close();
+	}
+	return 0;
+}
+
+int Test_Matrix3D(){
+	Eigen::MatrixXd array3d(2,4), vec(1,2), returnVec(2,2), expected(2,2);
+
+	array3d << 0 , 1 , 4 , 5,
+			   2 , 3 , 6 , 7;
+    vec << 1 , 2;
+    expected << 8 , 11,
+    			14, 17;
+    
+    std::cout << "3d:" << std::endl << array3d << std::endl;
+    std::cout << "vec:" << std::endl << vec << std::endl;
+    std::cout << "expected:" << std::endl << expected << std::endl;
+
+    VecBy3DimArray(vec,array3d,returnVec);
+
+    std::cout << "returnVec:" << std::endl << returnVec << std::endl;
+
+	return(0); 
+}

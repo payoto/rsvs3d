@@ -48,6 +48,9 @@ double StreamStatistics(const Eigen::VectorXd &&vec,
 void StreamOutVector(const Eigen::VectorXd &&vec, std::ofstream &out, 
 	const std::string &&sep=std::string(", "));
 
+int Test_Matrix3D();
+
+
 //==================================
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 

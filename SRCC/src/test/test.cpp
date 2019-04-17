@@ -13,8 +13,10 @@
 #include "snake.hpp"
 #include "snakeengine.hpp"
 #include "meshrefinement.hpp"
+#include "matrixtools.hpp"
 #include "triangulate.hpp"
 #include "RSVSalgorithm.hpp"
+#include "RSVSmath.hpp"
 #include "RSVSintegration.hpp"
 #include "parameters.hpp"
 #include "tetgenrsvs.hpp"
@@ -78,7 +80,8 @@ int rsvstest::maintest(){
 	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
 	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
 	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
-
+	gridTest.Run(Test_SurfCentreDerivatives,"Surf centroid"); 
+	
 	rsvstest::newtest();
 
 	return(0);
@@ -88,10 +91,10 @@ int rsvstest::newtest(){
 	customtest gridTest("3-D RSVS tests: New and breaking ");
 
 	#ifdef TEST_KNOWN_FAILURES
-	#endif
 	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
-
+	#endif
+	gridTest.Run(Test_Matrix3D,"Surf centroid"); 
 	return(0);
 }
 

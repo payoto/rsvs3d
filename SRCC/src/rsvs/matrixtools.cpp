@@ -4,6 +4,7 @@
 #include <Eigen>
 #include "vectorarray.hpp"
 #include "warning.hpp"
+#include "matrixtools.hpp"
 // #include "matrixtools.hpp"
 
 using namespace std;
@@ -47,12 +48,14 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	int ii,jj,kk;
 	nRow=arr3dim.rows();
 	nCol=arr3dim.cols();
-	nVec=vec.rows();
+	nVec=vec.cols();
 	nColFin=nCol/nVec;
 
 	#ifdef SAFE_ALGO
 	// size checks
 	if ((nVec*nColFin)!=nCol){
+		std::cerr << std::endl << "nVec (" << nVec 
+			<< ") ; nColFin (" << nColFin << ") ; nCol (" << nCol << ")";
 		RSVS3D_ERROR_ARGUMENT("Sizes do not match in 3D array collapse");
 	}
 	#endif
@@ -62,7 +65,7 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 	for (ii=0;ii<nRow;ii++){
 		for (jj=0;jj<nColFin;jj++){
 			for (kk=0;kk<nVec;kk++){
-				retArray(ii,jj)+=arr3dim(ii,jj*nVec+kk)*vec(0,kk);
+				retArray(ii,jj)+=arr3dim(ii,jj+kk*nColFin)*vec(0,kk);
 			}	
 		}	
 	}
@@ -70,14 +73,47 @@ void VecBy3DimArray(const MatrixXd &vec, const MatrixXd &arr3dim, MatrixXd &retA
 }
 
 
-void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, MatrixXd &dSdd){
+void Deriv1stChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd, 
+	MatrixXd &dSdd){
 	dSdd=dSdc*dcdd;
 }
 
-void Deriv2ndChainScalar(const MatrixXd &dSdc,const MatrixXd &dcdd,
-	const MatrixXd &HSc,const MatrixXd &Hcd,MatrixXd &HSd){
+void Deriv2ndChainScalar(const MatrixXd &dSdc, const MatrixXd &dcdd,
+	const MatrixXd &HSc, const MatrixXd &Hcd, MatrixXd &HSd){
 	
 	VecBy3DimArray(dSdc, Hcd, HSd);
+	#ifdef SAFE_ALGO
+	bool errFlag = false;
+	errFlag |= dcdd.rows() != HSc.cols();
+	errFlag |= dcdd.cols() != HSd.cols();
+	errFlag |= HSd.rows() != HSd.cols();
+	if(errFlag){
+		std::cerr << std::endl << "dSdc: [" << dSdc.rows() << ", "
+			<< dSdc.cols() << "]" << std::endl;
+		PrintMatrix(dSdc);
+		std::cerr << std::endl << "dcdd: [" << dcdd.rows() << ", "
+			<< dcdd.cols() << "]" << std::endl;
+		PrintMatrix(dcdd);
+		std::cerr << std::endl << "HSc: [" << HSc.rows() << ", " 
+			<< HSc.cols() << "]" << std::endl;
+		PrintMatrix(HSc);
+		std::cerr << std::endl << "HSd: [" << HSd.rows() << ", " 
+			<< HSd.cols() << "]" << std::endl;
+		PrintMatrix(HSd);
+
+		std::cerr << std::endl << "dSdc: [" << dSdc.rows() << ", "
+			<< dSdc.cols() << "]" ;
+		std::cerr << std::endl << "dcdd: [" << dcdd.rows() << ", " 
+			<< dcdd.cols() << "]";
+		std::cerr << std::endl << "HSc: [" << HSc.rows() << ", " 
+			<< HSc.cols() << "]";
+		std::cerr << std::endl << "HSd: [" << HSd.rows() << ", " 
+			<< HSd.cols() << "]" << std::endl;
+
+		RSVS3D_ERROR_LOGIC("Matrix sizes do not match");
+	}
+	#endif
+
 	HSd = HSd + (dcdd.transpose()*HSc*dcdd);
 
 }
@@ -161,4 +197,3 @@ void StreamOutVector(const VectorXd &&vec, ofstream &out, const string &&sep){
 	}
 	out << endl;
 }
-
