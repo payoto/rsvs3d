@@ -30,6 +30,7 @@
 // included dependencies
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 #include "warning.hpp"
 
@@ -62,6 +63,7 @@ public:
 		}
 		elems.clear();
 	}
+	void write(ofstream &streamout, const char* sep=", ") const;
 	vector<T>& operator[](const int a){ 
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode

@@ -10,6 +10,7 @@ compiled on its own.
 
 #ifndef VECTORARRAY_INCL_H_INCLUDED
 #define VECTORARRAY_INCL_H_INCLUDED
+#include <fstream>
 #include "vectorarray.hpp" // include guarded does nothing (needed for the linter)
 
 template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)  
@@ -21,6 +22,19 @@ template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)
 	dim.clear(); 
 	dim.push_back(nR); 
 	dim.push_back(nC);
+}
+template<class T> 
+void ArrayVec<T>::write(ofstream &streamout, const char* sep) const{
+	int nR, nC;
+	this->size(nR, nC);
+	for (int i = 0; i < nR; ++i)
+	{
+		for (int j = 0; j < nC; ++j)
+		{
+			streamout << this->elems[i][j] << sep;
+		}
+		streamout << std::endl;
+	}
 }
 
 template <class T>
