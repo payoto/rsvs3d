@@ -473,7 +473,6 @@ the jacobian is arranged :
 			 xc [                               ] 
 			 yc [                               ]
 			 zc [                               ]*/
-			 
 			x.assign(3,0);
 			y.assign(3,0);
 			z.assign(3,0);

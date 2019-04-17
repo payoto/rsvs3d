@@ -49,8 +49,10 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(const vector<double> &in0,const vector<double> &in1,const vector<double> &in2);
-	void assign(const vector<double> *in0,const vector<double> *in1,const vector<double> *in2);
+	void assign(const vector<double> &in0,const vector<double> &in1,
+		const vector<double> &in2);
+	void assign(const vector<double> *in0,const vector<double> *in1,
+		const vector<double> *in2);
 	void assign(int pRepI,const vector<double> &pRep);
 	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c) ;
 	virtual void Calc() = 0; // Virtual function that calculates 
@@ -225,5 +227,8 @@ public:
 		centroid.assign(nDim,0);
 	};
 };
+
+int Test_SurfCentreDerivatives();
+
 
 #endif
