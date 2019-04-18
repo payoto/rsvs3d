@@ -378,6 +378,38 @@ void LengthEdge::Calc(){
 // void SurfCentroid::Calcddf(){
 	
 // }
+
+void SurfCentroid::CalcFD(){
+	
+	this->Calc();
+	auto baseVal = this->funA;
+	std::vector<double> vtemp;
+	double fdStep=1e-6;
+
+	this->calcDeriv = false;
+	this->jac.assign(3,nCoord*3, 0.0);
+
+	for (int i = 0; i < nCoord; ++i)
+	{
+		auto saveVec = this->coords[i];
+		this->coords[i] = &vtemp;
+		for (int j = 0; j < 3; ++j)
+		{	
+			this->isCalc = false;
+			vtemp = *saveVec;
+			vtemp[j] = vtemp[j]+fdStep;
+			this->Calc();
+			for (int k = 0; k < 3; ++k)
+			{
+				this->jac[k][i+nCoord*j] = (this->funA[k][0] - baseVal[k][0])/fdStep;
+			}
+		}
+		this->coords[i] = saveVec;
+
+	}
+
+}
+
 void SurfCentroid::Calc(){
 /* This function calculates centroid Jacobian and Hessian using
 matlab automatically generated code
@@ -407,7 +439,6 @@ the jacobian is arranged :
 	ArrayVec<double> temp;
 	double currEdge;
 	int ii,ii1,ii2,jj,jj2,nR,nC,ind,ind2;
-	bool stopDeriv = false;
 
 	this->PreCalc();
 
@@ -420,7 +451,6 @@ the jacobian is arranged :
 			currEdge=0;
 			LengthEdge_f(*coords[jj],*coords[(jj+1)%nCoord],currEdge);
 			edgeLength+=currEdge;
-			stopDeriv |= currEdge<1e-6;
 			for(ii=0; ii<nDim; ++ii){
 				centroid[ii]+=currEdge*(
 					(*(coords[jj]))[ii]
@@ -439,9 +469,7 @@ the jacobian is arranged :
 				funA[ii][0]=centroid[ii]/edgeLength;
 			}
 		}
-		if(stopDeriv && false){
-			this->jac.assign(3,nCoord*3, 0.0);
-			this->hes.assign(nCoord*3,nCoord*3*3, 0.0);
+		if(!this->calcDeriv){
 			return;
 		}
 		if  (nCoord<4){

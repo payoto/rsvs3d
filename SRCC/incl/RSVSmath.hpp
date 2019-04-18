@@ -213,9 +213,11 @@ protected:
 
 	vector<double> centroid;
 	double edgeLength=0.0;
+	bool calcDeriv = true;
 public:
 	void Disp();
 	void Calc() override;
+	void CalcFD();
 	void assigncentroid(const vector<double> &vecin);
 
 	const ArrayVec<double>& jac_ptr() const {return((this->jac));};

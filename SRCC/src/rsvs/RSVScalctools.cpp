@@ -157,7 +157,9 @@ void TrianglePositionDerivatives(const triangle &triIn,
 								for (int l = 0; l < 3; ++l)
 								{
 									dPos(ii*3+k,dvSub) += cleanup(jacCentre[k][j+count*l]
-										*(toVert->coord[l]-fromVert->coord[l]));
+										*(toVert->coord[l]-fromVert->coord[l])) 
+										// * (1.0+(double(rand()) / RAND_MAX)*1e-4)
+										;
 								}
 							}
 						}
@@ -193,7 +195,9 @@ void TrianglePositionDerivatives(const triangle &triIn,
 								{
 									dPos(ii*3+k,dvSub) += 
 										cleanup(jacCentre[k][j+count*l]
-										*(toVert->coord[l]-fromVert->coord[l]));
+										*(toVert->coord[l]-fromVert->coord[l]))
+										// * (1.0+(double(rand()) / RAND_MAX)*1e-4)
+										;
 								}
 							}
 						}
