@@ -407,8 +407,9 @@ the jacobian is arranged :
 	ArrayVec<double> temp;
 	double currEdge;
 	int ii,ii1,ii2,jj,jj2,nR,nC,ind,ind2;
+	bool stopDeriv = false;
 
-	PreCalc();
+	this->PreCalc();
 
 	
 	if (!isCalc){
@@ -419,6 +420,7 @@ the jacobian is arranged :
 			currEdge=0;
 			LengthEdge_f(*coords[jj],*coords[(jj+1)%nCoord],currEdge);
 			edgeLength+=currEdge;
+			stopDeriv |= currEdge<1e-6;
 			for(ii=0; ii<nDim; ++ii){
 				centroid[ii]+=currEdge*(
 					(*(coords[jj]))[ii]
@@ -436,6 +438,11 @@ the jacobian is arranged :
 			for(ii=0; ii<nDim; ++ii){
 				funA[ii][0]=centroid[ii]/edgeLength;
 			}
+		}
+		if(stopDeriv && false){
+			this->jac.assign(3,nCoord*3, 0.0);
+			this->hes.assign(nCoord*3,nCoord*3*3, 0.0);
+			return;
 		}
 		if  (nCoord<4){
 			RSVS3D_ERROR_ARGUMENT("nCoord <= 3 surfCentroid Not implemented");

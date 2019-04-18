@@ -106,6 +106,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 		ArrayVec2MatrixXd(*dValpnt, dVal);
 		Deriv1stChainScalar(dVal, dPos,dConstrPart);
 		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
+		// HConstrPart = dConstrPart.transpose()*dConstrPart;
 
 		constrPart=*retVal;
 		// Assign Constraint
@@ -117,7 +118,8 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 			nj=subTempVec.size();
 			for(jj=0; jj< nj; ++jj){
 				if (subTempVec[jj]!=__notfound){
-					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
+					this->constr[subTempVec[jj]] += 
+						triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
 						for(kk=0; kk< nDvAct; ++kk){
 							this->dConstr(subTempVec[jj],
@@ -155,6 +157,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 		ArrayVec2MatrixXd(*dValpnt, dVal);
 		Deriv1stChainScalar(dVal, dPos,dObjPart);
 		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
+		// HObjPart = dObjPart.transpose()*dObjPart;
 		objPart=*retVal;
 
 		// Assign to main part of the object
@@ -247,7 +250,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 		ArrayVec2MatrixXd(*dValpnt, dVal);
 		Deriv1stChainScalar(dVal, dPos,dConstrPart);
 		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HConstrPart);
-
+		// HConstrPart = dConstrPart.transpose()*dConstrPart;
 		constrPart=*retVal;
 		// Assign Constraint
 		// and constraint derivative
@@ -293,6 +296,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 		ArrayVec2MatrixXd(*dValpnt, dVal);
 		Deriv1stChainScalar(dVal, dPos,dObjPart);
 		Deriv2ndChainScalar(dVal,dPos,HVal,HPos,HObjPart);
+		// HObjPart = dObjPart.transpose()*dObjPart;
 		objPart=*retVal;
 
 		// Assign to main part of the object

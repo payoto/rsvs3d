@@ -1,9 +1,11 @@
 #include <vector>
 #include <Eigen>
+#include <fstream>
 
 #include "arraystructures.hpp"
 #include "triangulate.hpp"
 #include "RSVScalctools.hpp"
+#include "matrixtools.hpp"
 #include "RSVScalc.hpp"
 #include "RSVSmath.hpp"
 
@@ -48,18 +50,18 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
 			switch (triRSVS.trivert.isearch(triIn.pointind[ii])->parentType){
 				case meshtypes::triangulation:
 				{
-					// // If parent surf is a trisurf
-					// auto surfCurr = triRSVS.trisurf.isearch(
-					// 	triRSVS.trivert.isearch(triIn.pointind[ii])->parentsurf);
-					// int nj=surfCurr->indvert.size();
-					// for(int jj=0;jj<nj;++jj){
-					// 	if (surfCurr->typevert[jj]==meshtypes::snake){
-					// 		if (objDvMap.find(surfCurr->indvert[jj])
-					// 			!=__notfound){
-					// 			dvList.push_back(surfCurr->indvert[jj]);
-					// 		}
-					// 	}
-					// }
+					// If parent surf is a trisurf
+					auto surfCurr = triRSVS.trisurf.isearch(
+						triRSVS.trivert.isearch(triIn.pointind[ii])->parentsurf);
+					int nj=surfCurr->indvert.size();
+					for(int jj=0;jj<nj;++jj){
+						if (surfCurr->typevert[jj]==meshtypes::snake){
+							if (objDvMap.find(surfCurr->indvert[jj])
+								!=__notfound){
+								dvList.push_back(surfCurr->indvert[jj]);
+							}
+						}
+					}
 				}
 				break;
 				case meshtypes::snake:
@@ -99,7 +101,16 @@ void TrianglePositionDerivatives(const triangle &triIn,
 
 	std::vector<int> vertsSurf;
 	int nDvAct=dvListMap.vec.size();
+	bool triggerPrint=false, triggerActive=false;
+	auto ifisnan0 = [&](double in) -> double {return isnan(in)?0.0:in;};
+	auto ifisapprox0 = [&](double in) -> double {return IsAproxEqual(in,0.0)?0.0:in;};
+	auto cleanup = [&](double in) -> double {return ifisnan0(ifisapprox0(in));};
 
+	static std::ofstream streamout;
+	if(triggerActive && !streamout.is_open()){
+		streamout.open("dbg/deriv_pos.txt",std::ios::app);
+		std::cout << "Debug stream opened";
+	}
 	// Positional Derivatives
 
 	// HERE -> function to calculate SurfCentroid (dc/dd)^T Hm (dc/dd)
@@ -115,43 +126,42 @@ void TrianglePositionDerivatives(const triangle &triIn,
 			auto toVert = triRSVS.meshDep->verts.isearch(tempSnax->tovert);
 			int dvSub = dvListMap.find(triIn.pointind[ii]);
 			for(int jj=0; jj<3; ++jj){
-				dPos(ii*3+jj, dvSub) 
-					+= (toVert->coord[jj] - fromVert->coord[jj]);
+				dPos(ii*3+jj, dvSub) += (toVert->coord[jj] - fromVert->coord[jj]);
 			}
 		} else if (triIn.pointtype[ii]==meshtypes::triangulation && true){
 			switch (triRSVS.trivert.isearch(triIn.pointind[ii])->parentType){
 				case meshtypes::triangulation:
 				{
-					// auto surfCurr=triRSVS.trisurf.isearch(
-					// 	triRSVS.trivert.isearch(triIn.pointind[ii])->parentsurf);
-					// auto surfCentre =  SurfaceCentroid_TriangleSurf(*surfCurr, 
-					// 	*(triRSVS.meshDep), triRSVS.snakeDep->snakeconn);
-					// surfCentre.Calc();
-					// auto jacCentre = surfCentre.jac_ptr();
-					// auto hesCentre = surfCentre.hes_ptr();
-					// int count = surfCurr->indvert.size();
-					// for (int j = 0; j < count; ++j)
-					// {
-					// 	int dvSub = dvListMap.find(surfCurr->indvert[j]);
-					// 	if (dvSub!=__notfound 
-					// 		&& surfCurr->typevert[j]==meshtypes::snake)
-					// 	{
-					// 		auto currSnax = triRSVS.snakeDep->snaxs.isearch(
-					// 			surfCurr->indvert[j]);
-					// 		auto fromVert = triRSVS.meshDep->verts.isearch(
-					// 			currSnax->fromvert);
-					// 		auto toVert = triRSVS.meshDep->verts.isearch(
-					// 			currSnax->tovert);
-					// 		for (int k = 0; k < 3; ++k)
-					// 		{
-					// 			for (int l = 0; l < 3; ++l)
-					// 			{
-					// 				dPos(ii*3+k,dvSub) += jacCentre[k][j+count*l]
-					// 					*(toVert->coord[l]-fromVert->coord[l]);
-					// 			}
-					// 		}
-					// 	}
-					// }
+					auto surfCurr=triRSVS.trisurf.isearch(
+						triRSVS.trivert.isearch(triIn.pointind[ii])->parentsurf);
+					auto surfCentre =  SurfaceCentroid_TriangleSurf(*surfCurr, 
+						*(triRSVS.meshDep), triRSVS.snakeDep->snakeconn);
+					surfCentre.Calc();
+					auto jacCentre = surfCentre.jac_ptr();
+					auto hesCentre = surfCentre.hes_ptr();
+					int count = surfCurr->indvert.size();
+					for (int j = 0; j < count; ++j)
+					{
+						int dvSub = dvListMap.find(surfCurr->indvert[j]);
+						if (dvSub!=__notfound 
+							&& surfCurr->typevert[j]==meshtypes::snake)
+						{
+							auto currSnax = triRSVS.snakeDep->snaxs.isearch(
+								surfCurr->indvert[j]);
+							auto fromVert = triRSVS.meshDep->verts.isearch(
+								currSnax->fromvert);
+							auto toVert = triRSVS.meshDep->verts.isearch(
+								currSnax->tovert);
+							for (int k = 0; k < 3; ++k)
+							{
+								for (int l = 0; l < 3; ++l)
+								{
+									dPos(ii*3+k,dvSub) += cleanup(jacCentre[k][j+count*l]
+										*(toVert->coord[l]-fromVert->coord[l]));
+								}
+							}
+						}
+					}
 				}
 				break;
 				case meshtypes::snake:
@@ -182,17 +192,86 @@ void TrianglePositionDerivatives(const triangle &triIn,
 								for (int l = 0; l < 3; ++l)
 								{
 									dPos(ii*3+k,dvSub) += 
-										(isnan(jacCentre[k][j+count*l])?
-											0.0:jacCentre[k][j+count*l])
-										*(toVert->coord[l]-fromVert->coord[l]);
+										cleanup(jacCentre[k][j+count*l]
+										*(toVert->coord[l]-fromVert->coord[l]));
 								}
 							}
-							// HPos(dvSub,dvSub) += 
 						}
+					}
+					// Fill the three layers of HPos which correspond to
+					// this vertex.
+					// hesCentre
+					MatrixXd dPosd(count*3,count);
+					dPosd.setZero(count*3,count);
+					for (int j = 0; j < count; ++j)
+					{
+						auto currSnax = triRSVS.snakeDep->snaxs.isearch(vertsSurf[j]);
+						auto fromVert = triRSVS.meshDep->verts.isearch(
+							currSnax->fromvert);
+						auto toVert = triRSVS.meshDep->verts.isearch(
+							currSnax->tovert);
+						for (int k = 0; k < 3; ++k)
+
+						{
+							dPosd(j+k*count,j) += (toVert->coord[k]-fromVert->coord[k]);
+						}
+					}
+					MatrixXd HVal(count*3, count*3*3), HPosTemp(count, count*3);
+					ArrayVec2MatrixXd(hesCentre, HVal);
+					for (int j = 0; j < 3; ++j)
+					{
+						HPosTemp.block(0, j*count , count, count) = 
+							dPosd.transpose()
+							* HVal.block(0,j*count*3,count*3,count*3) 
+							* dPosd;	
+					}
+					for (int j = 0; j < count; ++j)
+					{
+						int dvSub = dvListMap.find(vertsSurf[j]);
+						if (dvSub!=__notfound)
+						{
+							for (int j2 = 0; j2 < count; ++j2)
+							{
+								int dvSub2 = dvListMap.find(vertsSurf[j2]);
+								if (dvSub2!=__notfound)
+								{
+									for (int k = 0; k < 3; ++k)
+									{
+										HPos(dvSub, dvSub2+(ii*3+k)*nDvAct) +=
+											0.0*cleanup(HPosTemp(j,j2+k*count));
+									}
+								}
+							}
+						}
+					}
+					if (triggerActive){
+						triggerPrint =true; 
+					}
+					if(triggerPrint){
+						streamout << "triangle " << triIn.index 
+							<< " parent: surf : " << triIn.parentsurf
+							<< " parent: type : " << triIn.parenttype
+							<< " pnt-centroid: " << ii << std::endl;
+						streamout << "pointind" << std::endl;
+						PrintVector(triIn.pointind, streamout);
+						streamout << "" << std::endl;
+						streamout << "pointtype" << std::endl;
+						PrintVector(triIn.pointtype, streamout);
+						streamout << "" << std::endl;
+						streamout << "dPosd:" << std::endl;
+						PrintMatrixFile(dPosd,streamout);
 					}
 				}
 				break;
 			}
 		}
+	}
+	if(triggerPrint){
+
+		streamout << "HPos:" << std::endl;
+		PrintMatrixFile(HPos,streamout);
+		streamout << "dPos:" << std::endl;
+		PrintMatrixFile(dPos,streamout);
+
 	}
 }

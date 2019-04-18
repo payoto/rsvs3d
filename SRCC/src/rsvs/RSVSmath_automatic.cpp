@@ -2040,7 +2040,7 @@ double   t2,   t3,   t4,   t5,   t11,   t6,   t7,   t8,   t9,   t10,   t12,   t1
   t7 = t2*t2;
   t8 = t3*t3;
   t9 = t4*t4;
-  t10 = t7+t8+t9;
+  t10 = t7+t8+t9+rsvsmath_automatic_eps_centre2;
   t12 = 1.0/sqrt(rsvsmath_automatic_eps_centre+t10);
   t13 = x[3-1]-x[4-1];
   t14 = y[3-1]-y[4-1];
@@ -2053,7 +2053,7 @@ double   t2,   t3,   t4,   t5,   t11,   t6,   t7,   t8,   t9,   t10,   t12,   t1
   t21 = t16*t16;
   t22 = t17*t17;
   t23 = t18*t18;
-  t24 = t21+t22+t23;
+  t24 = t21+t22+t23+rsvsmath_automatic_eps_centre2;
   t31 = x[3-1]*2.0;
   t25 = t19-t31;
   t26 = x[3-1]*(1.0/2.0);
@@ -2067,7 +2067,7 @@ double   t2,   t3,   t4,   t5,   t11,   t6,   t7,   t8,   t9,   t10,   t12,   t1
   t33 = t13*t13;
   t34 = t14*t14;
   t35 = t15*t15;
-  t36 = t33+t34+t35;
+  t36 = t33+t34+t35+rsvsmath_automatic_eps_centre2;
   t37 = 1.0/sqrt(rsvsmath_automatic_eps_centre+t36);
   t39 = t29*t30*(1.0/2.0);
   t40 = t12*t25*(1.0/2.0);

@@ -91,7 +91,8 @@ bool RSVScalc::PrepareMatricesForSQP(
 
 	// DisplayVector(isDvAct);
 	// DisplayVector(isConstrAct);
-	HLag = HObjAct;
+	this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr;
+	HLag = HObjAct+HConstrAct;
 	return(nDvAct>0);
 }
 
