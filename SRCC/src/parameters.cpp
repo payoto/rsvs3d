@@ -135,6 +135,7 @@ void param::to_json(json& j, const snaking& p){
 		{"snaxdiststep", p.snaxdiststep},
 		{"initboundary", p.initboundary},
 		{"maxsteps", p.maxsteps},
+		{"spawnposition", p.spawnposition},
 	};
 }
 void param::from_json(const json& j, snaking& p){
@@ -144,6 +145,7 @@ void param::from_json(const json& j, snaking& p){
 	j.at("snaxdiststep").get_to(p.snaxdiststep);
 	j.at("initboundary").get_to(p.initboundary);
 	j.at("maxsteps").get_to(p.maxsteps);
+	j.at("spawnposition").get_to(p.spawnposition);
 }
 void param::snaking::PrepareForUse(){
 }
