@@ -91,6 +91,7 @@ namespace integrate {
 			const param::parameters &paramconf,
 			const param::parameters &origcong,
 			tecplotfile &outSnake,
+			tecplotfile &outgradientsnake,
 			std::ofstream &logFile,
 			std::ofstream &coutFile,
 			std::ofstream &cerrFile
@@ -141,6 +142,10 @@ namespace integrate {
 				tecplotfile &outSnake, snake &rsvsSnake,
 				triangulation &rsvsTri, mesh &voluMesh,
 				double totT, int nVoluZone, int stepNum);
+			void Gradients(const RSVScalc &calcObj, 
+				const triangulation &rsvsTri,
+				tecplotfile &outgradientsnake, 
+				double totT);
 		}
 
 		namespace postprocess{
@@ -159,6 +164,10 @@ namespace integrate {
 				tecplotfile &outSnake, snake &rsvsSnake,
 				triangulation &rsvsTri, mesh &voluMesh,
 				double totT, int nVoluZone, int stepNum);
+			void Gradients(const RSVScalc &calcObj, 
+				const triangulation &rsvsTri,
+				tecplotfile &outgradientsnake, 
+				double totT);
 		}
 
 		namespace exporting {

@@ -53,6 +53,7 @@ public:
 	Eigen::MatrixXd HObj;
 	/// Lagrangian Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HLag;
+	Eigen::RowVectorXd dLag;
 	/// Objective Jacobian, size: [1, nDv].
 	Eigen::RowVectorXd dObj;
 	/// Constraint value vector, size: [nConstr, 1].
@@ -332,6 +333,8 @@ public:
 	 */
 	void ReturnVelocities(triangulation &triRSVS);
 	void ReturnSensitivities(const triangulation &triRSVS, 
+		std::vector<double> &sensVec, int constrNum) const;
+	void ReturnGradient(const triangulation &triRSVS, 
 		std::vector<double> &sensVec, int constrNum) const;
 	/**
 	 * @brief      Getter for the number of constraints.

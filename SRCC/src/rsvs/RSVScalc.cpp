@@ -140,8 +140,62 @@ void RSVScalc::ReturnSensitivities(const triangulation &triRSVS,
 	sensVec.assign(ni, 0);
 	for(ii=0; ii<ni; ii++){
 		temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-		sensVec[ii] = temp!=-1 ?
+		sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
 				this->sensDv(temp, constrNum) : 0;
+	}
+}
+
+void RSVScalc::ReturnGradient(const triangulation &triRSVS, 
+	std::vector<double> &sensVec, int constrNum) const {
+
+	int ii, ni, temp;
+	int nNegOpts = 5;
+	if(constrNum>=this->nConstr || constrNum < -nNegOpts){
+		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
+	}
+	ni=triRSVS.snakeDep->snaxs.size();
+	sensVec.assign(ni, 0);
+	int nNegTest = -nNegOpts;
+	if (constrNum==nNegTest++) {
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					this->dObj[temp] : 0.0;
+		}
+	} else if (constrNum==nNegTest++) {
+		auto dLagTemp = this->dObj + this->lagMult.transpose()*this->dConstr;
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					dLagTemp[temp] : 0.0;
+		}
+	} else if (constrNum==nNegTest++) {
+
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					this->HObj(temp,temp) : 0.0;
+		}
+	} else if (constrNum==nNegTest++) {
+
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					this->HConstr(temp,temp) : 0.0;
+		}
+	} else if (constrNum==nNegTest++) {
+		auto HLagTemp = this->HConstr + this->HObj;
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					HLagTemp(temp,temp) : 0.0;
+		}
+	} else {
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					this->dConstr(constrNum, temp) : 0;
+		}
 	}
 }
 
@@ -357,7 +411,7 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 	
 	// residual and delta are summary with:
 	// mean median max min std
-	double normConstr, normVel; 
+	double normConstr, normVel, normObjDeriv; 
 	if (loglvl>0){
 		out << "> constraint residual :, ";
 		normConstr= StreamStatistics(abs(this->constr.array()-this->constrTarg.array()),
@@ -371,8 +425,11 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		out << "> objective delta :, ";
 		normVel= StreamStatistics(this->deltaDV.array(),
 			out, string(", "));
+		out << "> objective derivative :, ";
+		normObjDeriv = StreamStatistics(this->dObj.array(), out, string(", "));
 		out << "> objective value:," << this->obj << std::endl;
-		std::cout << " conv: (vol) " << normConstr << " (vel) " << normVel << "; ";
+		std::cout << " conv: (vol) " << normConstr << " (vel) " << normVel
+			<< " (Dobj) " << normObjDeriv <<  "; ";
 	}
 	// Same as res but with all the constraint values
 	if (loglvl>1){

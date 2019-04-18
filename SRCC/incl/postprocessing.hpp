@@ -148,9 +148,14 @@ public:
 		int strandID=0, double timeStep=0,
 		int forceOutType=rsvs3d::constants::tecplot::autoselect, 
 		const vector<int> &vertList={});
-	int SensitivityDataBlock(const triangulation& triRSVS, 
-		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0);
+	int RSVScalcDataBlock(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0,
+		int methodProcess=1);
 	int PrintSnakeSensitivityTime(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const vector<int> &vertList={});
+	int PrintSnakeGradients(const triangulation& triRSVS,
 		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const vector<int> &vertList={});

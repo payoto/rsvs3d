@@ -38,6 +38,7 @@ namespace integrate {
 	public:
 		param::parameters paramconf;
 		tecplotfile outSnake;
+		tecplotfile outgradientsnake;
 		snake rsvsSnake;
 		mesh snakeMesh;
 		mesh voluMesh;
