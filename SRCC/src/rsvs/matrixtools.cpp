@@ -131,11 +131,20 @@ void PrintMatrix(const MatrixXd &mat){
 	}
 }
 void PrintMatrixFile(const MatrixXd &mat, const char * name){
-	int ii,jj, ni, nj;
+
 	ofstream myfile;
+	myfile.open(name, ios::app);
+	PrintMatrixFile(mat, myfile);
+	myfile.close();
+
+}
+
+void PrintMatrixFile(const MatrixXd &mat, ofstream& myfile){
+	int ii,jj, ni, nj;
+
 	ni=mat.rows();
 	nj=mat.cols();
-	myfile.open(name, ios::app);
+
 	for(ii=0;ii<ni;++ii){
 		for(jj=0;jj<nj;++jj){
 			myfile  << mat(ii,jj) << " ";
@@ -143,7 +152,7 @@ void PrintMatrixFile(const MatrixXd &mat, const char * name){
 		myfile  << endl;
 	}
 	myfile  << endl;
-	myfile.close();
+
 
 }
 

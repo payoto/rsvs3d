@@ -39,6 +39,16 @@ template<class T> void DisplayVector(vector<T> vec)
 	}
 	cout << " | " ;
 }
+template<class T> void PrintVector(vector<T> vec, std::ofstream &streamout)
+{
+	streamout << int(vec.size()) << " - "; 
+	for (int i = 0; i < int(vec.size()); ++i)
+	{
+		streamout << vec[i] << " ";
+	}
+	streamout << " | " ;
+}
+
 template<class T> void DisplayVectorStatistics(vector<T> vec)
 {
 	cout << int(vec.size()) << " - "; 

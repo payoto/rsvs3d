@@ -40,6 +40,7 @@ void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn,
 void PrintMatrix(const Eigen::MatrixXd &mat);
 void PrintMatrixFile(const Eigen::MatrixXd &mat,
 	const char * name);
+void PrintMatrixFile(const Eigen::MatrixXd &mat, ofstream& myfile);
 void PrintMatrix(const Eigen::RowVectorXd &mat);
 void PrintMatrix(const Eigen::VectorXd &mat);
 double StreamStatistics(const Eigen::VectorXd &&vec,
