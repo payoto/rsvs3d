@@ -555,7 +555,7 @@ void integrate::prepare::Output(
 void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 
 	auto coutbuff=std::cout.rdbuf();
-	auto cerrbuff=std::cout.rdbuf();
+	auto cerrbuff=std::cerr.rdbuf();
 	std::cout << "Start RSVS preparation" << std::endl;
 	integrate::Prepare(RSVSobj);
 
