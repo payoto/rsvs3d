@@ -40,13 +40,13 @@ void ArrayVec2MatrixXd(const ArrayVec<double> &arrayIn,
 void PrintMatrix(const Eigen::MatrixXd &mat);
 void PrintMatrixFile(const Eigen::MatrixXd &mat,
 	const char * name);
-void PrintMatrixFile(const Eigen::MatrixXd &mat, ofstream& myfile);
+void PrintMatrixFile(const Eigen::MatrixXd &mat, std::ostream& myfile);
 void PrintMatrix(const Eigen::RowVectorXd &mat);
 void PrintMatrix(const Eigen::VectorXd &mat);
 double StreamStatistics(const Eigen::VectorXd &&vec,
-	std::ofstream &out, 
+	std::ostream &out, 
 	const std::string &&sep=std::string(", "));
-void StreamOutVector(const Eigen::VectorXd &&vec, std::ofstream &out, 
+void StreamOutVector(const Eigen::VectorXd &&vec, std::ostream &out, 
 	const std::string &&sep=std::string(", "));
 
 int Test_Matrix3D();

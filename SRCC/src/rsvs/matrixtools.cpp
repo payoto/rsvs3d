@@ -139,7 +139,7 @@ void PrintMatrixFile(const MatrixXd &mat, const char * name){
 
 }
 
-void PrintMatrixFile(const MatrixXd &mat, ofstream& myfile){
+void PrintMatrixFile(const MatrixXd &mat, std::ostream& myfile){
 	int ii,jj, ni, nj;
 
 	ni=mat.rows();
@@ -176,7 +176,7 @@ void PrintMatrix(const RowVectorXd &mat){
 	cout << endl;
 }
 
-double StreamStatistics(const VectorXd &&vec, ofstream &out, const string &&sep){
+double StreamStatistics(const VectorXd &&vec, ostream &out, const string &&sep){
 	/*
 	Uses a rvalue reference to allow operations to be passed 
 	directly in the statistics
@@ -194,7 +194,7 @@ double StreamStatistics(const VectorXd &&vec, ofstream &out, const string &&sep)
 }
 
 
-void StreamOutVector(const VectorXd &&vec, ofstream &out, const string &&sep){
+void StreamOutVector(const VectorXd &&vec, std::ostream &out, const string &&sep){
 	/*
 	Uses a rvalue reference to allow operations to be passed 
 	directly in the statistics
