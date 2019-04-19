@@ -247,7 +247,8 @@ public:
 	vector<int> edgeind;
 	vector<int> voluind;
 	 // reserves 2 as this is the size of the array
-
+	
+	std::vector<int> vertind(const mesh &meshin) const;
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);

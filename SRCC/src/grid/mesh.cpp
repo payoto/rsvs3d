@@ -1360,6 +1360,21 @@ std::vector<int> volu::vertind(const mesh &meshin) const {
 	unique(vertind);
 	return vertind;
 }
+std::vector<int> surf::vertind(const mesh &meshin) const {
+	std::vector<int> vertind;
+	vertind.reserve(30);
+
+	for(auto edgeInd : this->edgeind){
+		for(auto vertInd : meshin.edges.isearch(edgeInd)->vertind){
+			vertind.push_back(vertInd);
+		}
+	}
+
+	sort(vertind);
+	unique(vertind);
+	return vertind;
+}
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
