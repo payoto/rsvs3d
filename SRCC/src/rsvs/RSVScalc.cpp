@@ -149,7 +149,7 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 	std::vector<double> &sensVec, int constrNum) const {
 
 	int ii, ni, temp;
-	int nNegOpts = 5;
+	int nNegOpts = 6;
 	if(constrNum>=this->nConstr || constrNum < -nNegOpts){
 		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
 	}
@@ -189,6 +189,12 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
 			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
 					HLagTemp(temp,temp) : 0.0;
+		}
+	} else if (constrNum==nNegTest++) {
+		for(ii=0; ii<ni; ii++){
+			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
+					this->deltaDV[temp] : 0.0;
 		}
 	} else {
 		for(ii=0; ii<ni; ii++){

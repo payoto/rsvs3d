@@ -1526,7 +1526,7 @@ int tecplotfile::PrintSnakeGradients(const triangulation& triRSVS,
 	if(nVert==0){ // Don't print mesh
 		return(1);
 	}
-	int nPreConstr =5;
+	int nPreConstr =6;
 	if(nZones==0){
 		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"" );
 		fprintf(fid, ", \"dObj\"");
@@ -1534,6 +1534,7 @@ int tecplotfile::PrintSnakeGradients(const triangulation& triRSVS,
 		fprintf(fid, ", \"HObj\"");
 		fprintf(fid, ", \"HConstr\"");
 		fprintf(fid, ", \"HLag\"");
+		fprintf(fid, ", \"deltaDV\"");
 		for (int i = 0; i < calcObj.numConstr(); ++i)
 		{
 			fprintf(fid, ", \"dConstr_%i\"",i);
