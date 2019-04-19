@@ -65,6 +65,7 @@ private:
 	FILE *fid;
 	int lengthLine;
 	int nZones=0;
+	bool isloud;
 public:
 	int OpenFile(const char *str, const char *mode="w");
 	void CloseFile();
@@ -160,17 +161,29 @@ public:
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const vector<int> &vertList={});
 
-		tecplotfile(){
+	tecplotfile(){
+		this->fid=NULL;
+		this->lengthLine=0;
+		this->isloud = false;
+	}
+	tecplotfile(bool isloudIn){
 		fid=NULL;
 		lengthLine=0;
-		cout << "tecplot file object created" << endl;
+		this->isloud = isloudIn;
+		if (this->isloud){
+			cout << "tecplot file object created" << endl;
+		}
 	}
 	~tecplotfile(){
 		if (fid!=NULL){
 			this->CloseFile();
-			cout << "Object deleted - File Closed" << endl;
+			if (this->isloud){
+				cout << "Object deleted - File Closed" << endl;
+			}
 		} else {
-			cout << "Object deleted - No File Closed" << endl;
+			if (this->isloud){
+				cout << "Object deleted - No File Closed" << endl;
+			}
 		}
 	}
 

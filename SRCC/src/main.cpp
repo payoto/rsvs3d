@@ -17,6 +17,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char* argv[]){
+	std::cout << argc << std::endl;
 	#ifndef RSVSTEST
 	return RSVSExecution(argc, argv);
 	#elif defined(TEST_ALL)
@@ -191,4 +192,25 @@ void parse::config::loadconfig(const std::string &confCase,
 
 	param::io::read(confCase, paramconf);
 
+}
+
+parse::ParserOutput parse::StringParser(std::vector<std::string> &commands,
+	param::parameters &paramconf){
+
+	int argc = commands.size();
+	char **argv;
+	argv = new char*[argc];
+	for (int i = 0; i < argc; ++i)
+	{
+		argv[i] = new char[commands[i].length()+1];
+		strcpy(argv[i], commands[i].c_str());
+	}
+
+	auto parseOut = parse::CommandLineParser(argc, argv, paramconf);
+
+	for (int i = 0; i < argc; ++i)
+	{
+		delete [] argv[i];
+	}
+	return(parseOut);
 }

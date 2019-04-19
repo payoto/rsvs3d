@@ -22,7 +22,7 @@ namespace parse {
 // included dependencies
 
 #include <string>
-
+#include <vector>
 //=================================
 // Code
 // 
@@ -43,7 +43,8 @@ namespace parse {
 
 	ParserOutput CommandLineParser(int argc, char* argv[],
 		param::parameters &paramconf);
-
+	ParserOutput StringParser(std::vector<std::string> &commands,
+		param::parameters &paramconf);
 	namespace config{
 		void useconfig(const std::string &confCase, param::parameters &paramconf);
 		void loadconfig(const std::string &confCase, param::parameters &paramconf);
