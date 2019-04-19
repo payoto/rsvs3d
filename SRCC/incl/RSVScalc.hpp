@@ -44,6 +44,8 @@ protected:
 	int falseaccess=0;
 	/// Return the derivatives (obsolete/unused)
 	bool returnDeriv=true;
+	/// Enable or disable surfcentroid derivatives
+	bool useSurfCentreDeriv = true;
 public:
 	/// Constraint Jacobian, size: [nConstr, nDv].
 	Eigen::MatrixXd dConstr;
@@ -361,6 +363,9 @@ public:
 	 *                     snaxel velocity vector.
 	 */
 	void ConvergenceLog(ofstream &out, int loglvl=3) const;
+	
+	void SetUseSurfCentreDeriv(bool in){this->useSurfCentreDeriv = in;}
+	bool GetUseSurfCentreDeriv() const{return(this->useSurfCentreDeriv);}
 };
 
 //==================================

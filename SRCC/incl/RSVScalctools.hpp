@@ -56,12 +56,14 @@ vector<vector<double> const *> TrianglePointerCoordinates(const triangle &triIn,
  * @param[in]  triRSVS   The triangulation containing the triangle.
  * @param[in]  objDvMap  The calculation (RSVScalc) object's design variable
  *                       map.
- *
+ * @param[in]  useSurfCentreDeriv  The Use the surface centroid derivative in
+ *                                 the calculation of dPos and HPos.
  * @return     A hashed vector of the active design variables from the triangle
  *             object.
  */
 HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
-	const triangulation& triRSVS, const HashedVector<int, int> &objDvMap);
+	const triangulation& triRSVS, const HashedVector<int, int> &objDvMap,
+	bool useSurfCentreDeriv=true);
 
 /**
  * Calculate the positional derivatives of a triangle object.
@@ -69,19 +71,23 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
  * This computes the partial derivatives $\frac{\partial coord}{\partial d}$
  * derivatives of snaxels and pseudo-centroids.
  *
- * @param[in]  triIn      The triangle for which the quantities need to be
- *                        computed.
- * @param[in]  triRSVS    The triangulation object from which this object is
- *                        part.
- * @param[in]  dvListMap  A hashed vector containing a list of active design
- *                        variables in the otriangle object as defined by
- *                        function TriangeActiveDesignVariables().
- * @param      dPos       The jacobian of the position derivatives.
- * @param      HPos       The Hessian of the position derivatives.
+ * @param[in]  triIn               The triangle for which the quantities need to
+ *                                 be computed.
+ * @param[in]  triRSVS             The triangulation object from which this
+ *                                 object is part.
+ * @param[in]  dvListMap           A hashed vector containing a list of active
+ *                                 design variables in the otriangle object as
+ *                                 defined by function
+ *                                 TriangeActiveDesignVariables().
+ * @param      dPos                The jacobian of the position derivatives.
+ * @param      HPos                The Hessian of the position derivatives.
+ * @param[in]  useSurfCentreDeriv  The Use the surface centroid derivative in
+ *                                 the calculation of dPos and HPos.
  */
 void TrianglePositionDerivatives(const triangle &triIn, 
 	const triangulation &triRSVS, const HashedVector<int,int> &dvListMap,
-	Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos);
+	Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos,
+	bool useSurfCentreDeriv=true);
 
 
 

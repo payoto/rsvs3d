@@ -84,8 +84,10 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 
 	// Prepare calculation steps
 	veccoord = TrianglePointerCoordinates(triIn, triRSVS);
-	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap);
-	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos);
+	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
+		this->useSurfCentreDeriv);
+	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
+		this->useSurfCentreDeriv);
 
 	// Total
 
@@ -230,8 +232,10 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 
  	// Prepare calculation steps
 	veccoord = TrianglePointerCoordinates(triIn, triRSVS);
-	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap);
-	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos);
+	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
+		this->useSurfCentreDeriv);
+	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
+		this->useSurfCentreDeriv);
 
 	// Constr and objective
 	nDvAct=dvListMap.vec.size();
@@ -367,8 +371,10 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 
  	// Prepare calculation steps
 	veccoord = TrianglePointerCoordinates(triIn, triRSVS);
-	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap);
-	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos);
+	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
+		this->useSurfCentreDeriv);
+	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
+		this->useSurfCentreDeriv);
 
 	// Constr and objective
 	nDvAct=dvListMap.vec.size();

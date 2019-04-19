@@ -32,9 +32,10 @@ vector<vector<double> const *> TrianglePointerCoordinates(const triangle &triIn,
 
 	return veccoord;
 }
-
+ 
 HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
-	const triangulation& triRSVS, const HashedVector<int, int> &objDvMap){
+	const triangulation& triRSVS, const HashedVector<int, int> &objDvMap, 
+	bool useSurfCentreDeriv){
 	
 	HashedVector<int,int> dvListMap;
 	vector<int> vertsSurf;
@@ -46,7 +47,7 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
 		if (triIn.pointtype[ii]==meshtypes::snake 
 			&& objDvMap.find(triIn.pointind[ii])!=__notfound){
 			dvList.push_back(triIn.pointind[ii]);
-		} else if (triIn.pointtype[ii]==meshtypes::triangulation && true){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && useSurfCentreDeriv){
 			switch (triRSVS.trivert.isearch(triIn.pointind[ii])->parentType){
 				case meshtypes::triangulation:
 				{
@@ -97,7 +98,7 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
  */
 void TrianglePositionDerivatives(const triangle &triIn, 
 	const triangulation &triRSVS, const HashedVector<int,int> &dvListMap,
-	MatrixXd &dPos, MatrixXd &HPos){
+	MatrixXd &dPos, MatrixXd &HPos, bool useSurfCentreDeriv){
 
 	std::vector<int> vertsSurf;
 	int nDvAct=dvListMap.vec.size();
@@ -128,7 +129,7 @@ void TrianglePositionDerivatives(const triangle &triIn,
 			for(int jj=0; jj<3; ++jj){
 				dPos(ii*3+jj, dvSub) += (toVert->coord[jj] - fromVert->coord[jj]);
 			}
-		} else if (triIn.pointtype[ii]==meshtypes::triangulation && true){
+		} else if (triIn.pointtype[ii]==meshtypes::triangulation && useSurfCentreDeriv){
 			switch (triRSVS.trivert.isearch(triIn.pointind[ii])->parentType){
 				case meshtypes::triangulation:
 				{
