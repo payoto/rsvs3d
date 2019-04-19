@@ -232,5 +232,4 @@ public:
 
 int Test_SurfCentreDerivatives();
 
-
 #endif

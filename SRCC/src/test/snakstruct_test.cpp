@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
@@ -16,6 +17,7 @@
 #include "warning.hpp"
 #include "tetgenrsvs.hpp"
 #include "matrixtools.hpp"
+#include "main.hpp"
 
 using namespace std;
 
@@ -1672,3 +1674,4 @@ int Test_Matrix3D(){
 
 	return(0); 
 }
+

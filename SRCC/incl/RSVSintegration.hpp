@@ -182,8 +182,11 @@ namespace integrate {
 	namespace test {
 		int Prepare();
 		int All();
+		int CompareSurfCentreDerivatives();
+		int CompareDerivativesSpike();
 	}
 }
+
 
 //==================================
 // Code

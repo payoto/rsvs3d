@@ -6,9 +6,9 @@
 #include "vectorarray.hpp" 
 using namespace std; 
 
-static const double rsvsmath_automatic_eps_edge = 1e-15;
-static const double rsvsmath_automatic_eps_surf = 1e-15;
-static const double rsvsmath_automatic_eps_volu = 1e-15;
+static const double rsvsmath_automatic_eps_edge = 0.0;
+static double rsvsmath_automatic_eps_surf = 1e-15;
+static const double rsvsmath_automatic_eps_volu = 0.0;
 static const double rsvsmath_automatic_eps_centre = 0.0;
 static const double rsvsmath_automatic_eps_centre2 = 0.0;
 
