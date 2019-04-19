@@ -105,7 +105,7 @@ void TrianglePositionDerivatives(const triangle &triIn,
 	bool triggerPrint=false, triggerActive=false;
 	auto ifisnan0 = [&](double in) -> double {return isnan(in)?0.0:in;};
 	auto ifisapprox0 = [&](double in) -> double {return IsAproxEqual(in,0.0)?0.0:in;};
-	auto cleanup = [&](double in) -> double {return ifisnan0(ifisapprox0(in));};
+	auto cleanup = [&](double in) -> double {return ifisnan0((in));};
 
 	static std::ofstream streamout;
 	if(triggerActive && !streamout.is_open()){

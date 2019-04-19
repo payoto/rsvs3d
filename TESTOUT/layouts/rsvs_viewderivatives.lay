@@ -1,6 +1,6 @@
 #!MC 1410
-$!VarSet |LFDSFN1| = '"rsvsgradients3D_190418T212835_.plt"'
-$!VarSet |LFDSVL1| = '"X" "Y" "Z" "v1" "v2" "v3" "dObj" "dLag" "HObj" "HConstr" "HLag" "dConstr_0" "dConstr_1" "dConstr_2" "dConstr_3" "dConstr_4" "dConstr_5" "dConstr_6" "dConstr_7" "dConstr_8" "dConstr_9" "dConstr_10" "dConstr_11" "dConstr_12" "dConstr_13" "dConstr_14" "dConstr_15" "dConstr_16" "dConstr_17" "dConstr_18" "dConstr_19" "dConstr_20" "dConstr_21" "dConstr_22" "dConstr_23" "dConstr_24" "dConstr_25" "dConstr_26" "dConstr_27" "dConstr_28" "dConstr_29" "dConstr_30" "dConstr_31" "dConstr_32" "dConstr_33" "dConstr_34" "dConstr_35" "dConstr_36" "dConstr_37" "dConstr_38" "dConstr_39"'
+$!VarSet |LFDSFN1| = '"rsvsgradients3D_190419T213325_.plt"'
+$!VarSet |LFDSVL1| = '"X" "Y" "Z" "v1" "v2" "v3" "dObj" "dLag" "HObj" "HConstr" "HLag" "deltaDV" "dConstr_0" "dConstr_1" "dConstr_2" "dConstr_3" "dConstr_4" "dConstr_5" "dConstr_6" "dConstr_7" "dConstr_8" "dConstr_9" "dConstr_10" "dConstr_11" "dConstr_12" "dConstr_13" "dConstr_14" "dConstr_15" "dConstr_16" "dConstr_17" "dConstr_18" "dConstr_19" "dConstr_20" "dConstr_21" "dConstr_22" "dConstr_23" "dConstr_24" "dConstr_25" "dConstr_26" "dConstr_27" "dConstr_28" "dConstr_29" "dConstr_30" "dConstr_31" "dConstr_32" "dConstr_33" "dConstr_34" "dConstr_35" "dConstr_36" "dConstr_37" "dConstr_38" "dConstr_39"'
 $!SETSTYLEBASE FACTORY
 $!CREATECOLORMAP 
   NAME = 'Large Rainbow modified (1)'
@@ -250,8 +250,773 @@ $!GLOBALPAPER
 $!SETAUXDATA 
   AUXDATALOCATION = LAYOUT
   NAME = 'UI.FirstPageOffset'
-  VALUESTRING = '6'
+  VALUESTRING = '7'
 ### Page Number 1 ###
+$!PAGE 
+  NAME = 'delta design variable'
+  PAPERATTRIBUTES
+    {
+    BACKGROUNDCOLOR = WHITE
+    ISTRANSPARENT = YES
+    ORIENTPORTRAIT = NO
+    SHOWGRID = YES
+    SHOWRULER = NO
+    SHOWPAPER = NO
+    PAPERSIZE = LETTER
+    RULERSPACING = ONEINCH
+    PAPERGRIDSPACING = HALFINCH
+    REGIONINWORKAREA
+      {
+      X1 = 1
+      Y1 = 0.25
+      X2 = 10
+      Y2 = 8.25
+      }
+    }
+### Frame Number 1, Page Number 1 ###
+$!READDATASET  '|LFDSFN1|'
+  INITIALPLOTTYPE = CARTESIAN3D
+  INCLUDETEXT = NO
+  INCLUDEGEOM = NO
+  ASSIGNSTRANDIDS = YES
+  VARLOADMODE = BYNAME
+  VARNAMELIST = '|LFDSVL1|'
+$!REMOVEVAR |LFDSVL1|
+$!REMOVEVAR |LFDSFN1|
+$!FRAMELAYOUT 
+  SHOWHEADER = NO
+  HEADERCOLOR = RED
+  XYPOS
+    {
+    X = 1
+    Y = 0.25
+    }
+  WIDTH = 9
+  HEIGHT = 8
+$!THREEDAXIS 
+  ASPECTRATIOLIMIT = 25
+  BOXASPECTRATIOLIMIT = 25
+$!PLOTTYPE  = CARTESIAN3D
+$!FRAMENAME  = 'Frame 001'
+$!GLOBALTIME 
+  SOLUTIONTIME = 21.300000000000001
+$!ACTIVEFIELDMAPS  =  [1]
+$!GLOBALRGB 
+  REDCHANNELVAR = 4
+  GREENCHANNELVAR = 4
+  BLUECHANNELVAR = 4
+  RANGEMIN = 0
+  RANGEMAX = 1
+$!GLOBALCONTOUR  1
+  VAR = 12
+  COLORMAPNAME = 'Diverging - Pink/Yellow/Green modified (1)'
+  DEFNUMLEVELS = 21
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 98.012
+      Y = 70.862
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 9.07445541649E-005
+    RANGEMAX = 0.000272233662495
+    }
+  COLORMAPFILTER
+    {
+    COLORMAPDISTRIBUTION = CONTINUOUS
+    CONTINUOUSCOLOR
+      {
+      CMIN = -0.1
+      CMAX = 0.1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 1
+  RAWDATA
+21
+-0.1
+-0.09
+-0.08
+-0.07
+-0.06
+-0.05
+-0.04
+-0.03
+-0.02
+-0.01
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+0.08
+0.09
+0.1
+$!GLOBALCONTOUR  2
+  VAR = 5
+  COLORMAPNAME = 'Diverging - Orange/Purple'
+  DEFNUMLEVELS = 10
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 70.359
+      Y = 96.016
+      }
+    ISVERTICAL = NO
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 0.0122652584785
+    RANGEMAX = 0.152392461052
+    }
+  COLORMAPFILTER
+    {
+    COLORMAPDISTRIBUTION = CONTINUOUS
+    CONTINUOUSCOLOR
+      {
+      CMIN = -0.01
+      CMAX = 0.01
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 2
+  RAWDATA
+10
+-2
+-1.5
+-1
+-0.5
+0
+0.5
+1
+1.5
+2
+2.5
+$!GLOBALCONTOUR  3
+  VAR = 12
+  DEFNUMLEVELS = 1
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 77.113
+      Y = 12.957
+      }
+    }
+  COLORCUTOFF
+    {
+    RANGEMIN = 9.07445541649E-005
+    RANGEMAX = 0.000272233662495
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 0.000362978216659
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 3
+  RAWDATA
+1
+0
+$!GLOBALCONTOUR  4
+  VAR = 7
+  DEFNUMLEVELS = 1
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 4
+  RAWDATA
+1
+0
+$!GLOBALCONTOUR  5
+  VAR = 8
+  DEFNUMLEVELS = 12
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 5
+  RAWDATA
+12
+5E-005
+0.0001
+0.00015
+0.0002
+0.00025
+0.0003
+0.00035
+0.0004
+0.00045
+0.0005
+0.00055
+0.0006
+$!GLOBALCONTOUR  6
+  VAR = 4
+  DEFNUMLEVELS = 10
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 6
+  RAWDATA
+10
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+$!GLOBALCONTOUR  7
+  VAR = 4
+  DEFNUMLEVELS = 10
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 7
+  RAWDATA
+10
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+$!GLOBALCONTOUR  8
+  VAR = 4
+  DEFNUMLEVELS = 10
+  LEGEND
+    {
+    SHOW = YES
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  COLORMAPFILTER
+    {
+    CONTINUOUSCOLOR
+      {
+      CMIN = 0
+      CMAX = 1
+      }
+    }
+$!CONTOURLEVELS NEW
+  CONTOURGROUP = 8
+  RAWDATA
+10
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+$!GLOBALSCATTER 
+  VAR = 4
+  RELATIVESIZE = 0.08496
+  LEGEND
+    {
+    XYPOS
+      {
+      X = 95
+      }
+    }
+  REFSCATSYMBOL
+    {
+    COLOR = RED
+    FILLCOLOR = RED
+    }
+$!FIELDMAP  [1]
+  MESH
+    {
+    COLOR = BLACK
+    }
+  CONTOUR
+    {
+    CONTOURTYPE = BOTHLINESANDFLOOD
+    LINECONTOURGROUP = 3
+    COLOR = RED
+    LINETHICKNESS = 0.4
+    USELIGHTINGEFFECT = YES
+    }
+  VECTOR
+    {
+    COLOR = BLACK
+    }
+  SCATTER
+    {
+    SYMBOLSHAPE
+      {
+      GEOMSHAPE = SPHERE
+      }
+    COLOR = MULTI2
+    FRAMESIZE = 1
+    }
+  SHADE
+    {
+    COLOR = CUSTOM2
+    }
+  EDGELAYER
+    {
+    SHOW = YES
+    COLOR = BLACK
+    LINETHICKNESS = 0.1
+    }
+  POINTS
+    {
+    POINTSTOPLOT = SURFACENODES
+    }
+  SURFACES
+    {
+    SURFACESTOPLOT = BOUNDARYFACES
+    IRANGE
+      {
+      MAX = 1
+      }
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!THREEDAXIS 
+  XDETAIL
+    {
+    VARNUM = 1
+    }
+  YDETAIL
+    {
+    VARNUM = 2
+    }
+  ZDETAIL
+    {
+    VARNUM = 3
+    }
+$!VIEW FIT
+$!THREEDAXIS 
+  AXISMODE = XYZDEPENDENT
+  XYDEPXTOYRATIO = 1
+  DEPXTOYRATIO = 1
+  DEPXTOZRATIO = 1
+$!THREEDAXIS 
+  XDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = 0.017375000000000002
+    RANGEMAX = 0.98262499999999997
+    GRSPACING = 0.2
+    AXISLINE
+      {
+      EDGE = 3
+      }
+    }
+$!THREEDAXIS 
+  YDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = 0.017375000000000002
+    RANGEMAX = 0.98262499999999997
+    GRSPACING = 0.2
+    AXISLINE
+      {
+      EDGE = 2
+      }
+    }
+$!THREEDAXIS 
+  ZDETAIL
+    {
+    SHOWAXIS = NO
+    RANGEMIN = 0.017375000000000002
+    RANGEMAX = 0.98262499999999997
+    GRSPACING = 0.2
+    AXISLINE
+      {
+      EDGE = 2
+      }
+    }
+$!ISOSURFACEATTRIBUTES  1
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 9.07445541649E-005
+  ISOVALUE2 = 0.00018148910833
+  ISOVALUE3 = 0.000272233662495
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  2
+  DEFINITIONCONTOURGROUP = 2
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 0.0122652584785
+  ISOVALUE2 = 0.0823288597654
+  ISOVALUE3 = 0.152392461052
+  CONTOUR
+    {
+    LINECONTOURGROUP = 2
+    FLOODCOLORING = GROUP2
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  3
+  DEFINITIONCONTOURGROUP = 3
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  ISOVALUE1 = 9.07445541649E-005
+  ISOVALUE2 = 0.00018148910833
+  ISOVALUE3 = 0.000272233662495
+  CONTOUR
+    {
+    LINECONTOURGROUP = 3
+    FLOODCOLORING = GROUP3
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  4
+  DEFINITIONCONTOURGROUP = 4
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 4
+    FLOODCOLORING = GROUP4
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  5
+  DEFINITIONCONTOURGROUP = 5
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 5
+    FLOODCOLORING = GROUP5
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  6
+  DEFINITIONCONTOURGROUP = 6
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 6
+    FLOODCOLORING = GROUP6
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  7
+  DEFINITIONCONTOURGROUP = 7
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 7
+    FLOODCOLORING = GROUP7
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!ISOSURFACEATTRIBUTES  8
+  DEFINITIONCONTOURGROUP = 8
+  ISOSURFACESELECTION = ONESPECIFICVALUE
+  CONTOUR
+    {
+    LINECONTOURGROUP = 8
+    FLOODCOLORING = GROUP8
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    }
+$!SLICEATTRIBUTES  1
+  PRIMARYPOSITION
+    {
+    X = 0
+    Y = 0
+    Z = 0
+    I = 1
+    J = 1
+    K = 1
+    }
+  STARTPOSITION
+    {
+    X = 0.162501125
+    Y = 0.162501125
+    Z = 0.162501125
+    }
+  ENDPOSITION
+    {
+    X = 0.837498875
+    Y = 0.837498875
+    Z = 0.837498875
+    }
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+  SLICECONSTRAINT
+    {
+    INCLUDE = NO
+    ORIGIN
+      {
+      X = 0
+      Y = 0
+      Z = 0
+      }
+    BOXDIMENSION
+      {
+      X = 0
+      Y = 0
+      Z = 0
+      }
+    }
+$!SLICEATTRIBUTES  2
+  SLICESURFACE = YPLANES
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  3
+  SLICESURFACE = ZPLANES
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  4
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  5
+  SLICESURFACE = YPLANES
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  6
+  SLICESURFACE = ZPLANES
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  7
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!SLICEATTRIBUTES  8
+  SLICESURFACE = YPLANES
+  EDGELAYER
+    {
+    SHOW = NO
+    }
+  EFFECTS
+    {
+    LIGHTINGEFFECT = GOURAUD
+    SURFACETRANSLUCENCY = 10
+    }
+$!STREAMATTRIBUTES 
+  STREAMTIMING
+    {
+    MARKSIZE = 1
+    MARKSYMBOL
+      {
+      GEOMSHAPE = SPHERE
+      }
+    }
+  RODRIBBON
+    {
+    EFFECTS
+      {
+      LIGHTINGEFFECT = GOURAUD
+      }
+    }
+  MAXSTEPS = 10000
+$!GLOBALTHREED 
+  AXISSCALEFACT
+    {
+    X = 1
+    Y = 1
+    Z = 1
+    }
+  ROTATEORIGIN
+    {
+    X = 0.5
+    Y = 0.5
+    Z = 0.5
+    }
+  LIGHTSOURCE
+    {
+    XYZDIRECTION
+      {
+      X = -0.2
+      Y = -0.2
+      Z = 0.9591663046625438
+      }
+    INTENSITY = 75
+    BACKGROUNDLIGHT = 25
+    INCLUDESPECULAR = YES
+    SPECULARINTENSITY = 40
+    SPECULARSHININESS = 60
+    }
+  LINELIFTFRACTION = 0.2
+  SYMBOLLIFTFRACTION = 0.6
+  VECTORLIFTFRACTION = 0.7
+  NEARPLANEFRACTION = 0.1
+$!THREEDVIEW 
+  PSIANGLE = 104.424
+  THETAANGLE = 19.9155
+  ALPHAANGLE = 178.098
+  VIEWERPOSITION
+    {
+    X = -2.509896532553114
+    Y = -7.524481283002263
+    Z = -1.753489606183584
+    }
+  VIEWWIDTH = 1.0682
+$!FIELDLAYERS 
+  SHOWMESH = NO
+  SHOWCONTOUR = YES
+  SHOWSCATTER = YES
+  SHOWSHADE = YES
+  SHOWEDGE = NO
+$!STREAMTRACELAYERS 
+  SHOW = NO
+$!ATTACHGEOM 
+  POSITIONCOORDSYS = FRAME
+  ANCHORPOS
+    {
+    X = 63.2785763175907
+    Y = 2.977412731006162
+    }
+  COLOR = RED
+  LINETHICKNESS = 0.4
+  RAWDATA
+1
+2
+-2.56614107741E-006 2.18009776898E-008 
+7.20967426896 2.18009776898E-008 
+$!FRAMECONTROL ACTIVATEBYNUMBER
+  FRAME = 1
+### Page Number 2 ###
+$!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'distance'
   PAPERATTRIBUTES
@@ -273,7 +1038,7 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 1 ###
+### Frame Number 1, Page Number 2 ###
 $!FRAMELAYOUT 
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -306,17 +1071,11 @@ $!SKETCHAXIS
     RANGEMAX = 1.0001
     GRSPACING = 0.2
     }
-### Frame Number 2, Page Number 1 ###
+### Frame Number 2, Page Number 2 ###
 $!CREATENEWFRAME 
-$!READDATASET  '|LFDSFN1|'
-  INITIALPLOTTYPE = CARTESIAN3D
-  INCLUDETEXT = NO
-  INCLUDEGEOM = NO
-  ASSIGNSTRANDIDS = YES
-  VARLOADMODE = BYNAME
-  VARNAMELIST = '|LFDSVL1|'
-$!REMOVEVAR |LFDSVL1|
-$!REMOVEVAR |LFDSFN1|
+$!ATTACHDATASET 
+  PAGENUM = 2
+  FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -344,7 +1103,7 @@ $!GLOBALRGB
 $!GLOBALCONTOUR  1
   VAR = 4
   COLORMAPNAME = 'Diverging - Pink/Yellow/Green modified (1)'
-  DEFNUMLEVELS = 21
+  DEFNUMLEVELS = 19
   LEGEND
     {
     SHOW = YES
@@ -1047,7 +1806,7 @@ $!ATTACHGEOM
 7.20967426896 2.18009776898E-008 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 2
-### Page Number 2 ###
+### Page Number 3 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'objective'
@@ -1070,7 +1829,7 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 2 ###
+### Frame Number 1, Page Number 3 ###
 $!FRAMELAYOUT 
   SHOWHEADER = NO
   HEADERCOLOR = RED
@@ -1103,10 +1862,10 @@ $!SKETCHAXIS
     RANGEMAX = 1.0001
     GRSPACING = 0.2
     }
-### Frame Number 2, Page Number 2 ###
+### Frame Number 2, Page Number 3 ###
 $!CREATENEWFRAME 
 $!ATTACHDATASET 
-  PAGENUM = 2
+  PAGENUM = 3
   FRAME = 2
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -1838,7 +2597,7 @@ $!ATTACHGEOM
 6.57083913684 -7.64947064025E-009 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 2
-### Page Number 3 ###
+### Page Number 4 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'lagrangian'
@@ -1861,9 +2620,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 3 ###
+### Frame Number 1, Page Number 4 ###
 $!ATTACHDATASET 
-  PAGENUM = 3
+  PAGENUM = 4
   FRAME = 2
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -2596,7 +3355,7 @@ $!ATTACHGEOM
 6.57083913684 -7.64947064025E-009 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 4 ###
+### Page Number 5 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'constraint Hessian'
@@ -2619,9 +3378,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 4 ###
+### Frame Number 1, Page Number 5 ###
 $!ATTACHDATASET 
-  PAGENUM = 4
+  PAGENUM = 5
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -3355,7 +4114,7 @@ $!ATTACHGEOM
 6.57083913684 -7.64947064025E-009 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 5 ###
+### Page Number 6 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'Lagrangian Hessian'
@@ -3378,9 +4137,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 5 ###
+### Frame Number 1, Page Number 6 ###
 $!ATTACHDATASET 
-  PAGENUM = 5
+  PAGENUM = 6
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -4114,7 +4873,7 @@ $!ATTACHGEOM
 6.57083913684 -7.64947064025E-009 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 6 ###
+### Page Number 7 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'objective Hessian'
@@ -4137,9 +4896,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 6 ###
+### Frame Number 1, Page Number 7 ###
 $!ATTACHDATASET 
-  PAGENUM = 6
+  PAGENUM = 7
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -4873,7 +5632,7 @@ $!ATTACHGEOM
 6.57083913684 -7.64947064025E-009 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
-### Page Number 7 ###
+### Page Number 8 ###
 $!PAGECONTROL CREATE
 $!PAGE 
   NAME = 'constraint'
@@ -4896,9 +5655,9 @@ $!PAGE
       Y2 = 8.25
       }
     }
-### Frame Number 1, Page Number 7 ###
+### Frame Number 1, Page Number 8 ###
 $!ATTACHDATASET 
-  PAGENUM = 7
+  PAGENUM = 8
   FRAME = 1
 $!FRAMELAYOUT 
   SHOWHEADER = NO
@@ -4925,7 +5684,7 @@ $!GLOBALRGB
   RANGEMIN = 0
   RANGEMAX = 1
 $!GLOBALCONTOUR  1
-  VAR = 14
+  VAR = 15
   COLORMAPNAME = 'Diverging - Pink/Yellow/Green modified (1)'
   DEFNUMLEVELS = 21
   LEGEND
@@ -5019,7 +5778,7 @@ $!CONTOURLEVELS NEW
 2
 2.5
 $!GLOBALCONTOUR  3
-  VAR = 14
+  VAR = 15
   DEFNUMLEVELS = 1
   LEGEND
     {

@@ -82,6 +82,7 @@ int rsvstest::maintest(){
 	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
 	gridTest.Run(Test_SurfCentreDerivatives,"Surf centroid"); 
 	gridTest.Run(Test_Matrix3D,"'3D' matrix maths"); 
+	gridTest.Run(integrate::test::CompareSurfCentreDerivatives,"Test Surf centroid");
 	
 	rsvstest::newtest();
 
@@ -95,7 +96,7 @@ int rsvstest::newtest(){
 	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	#endif
-	gridTest.Run(integrate::test::CompareSurfCentreDerivatives,"Test Surf centroid"); 
+	gridTest.Run(integrate::test::CompareDerivativesSpike,"Test spike issues"); 
 	return(0);
 }
 

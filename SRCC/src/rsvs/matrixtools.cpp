@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <fstream>
 #include <Eigen>
@@ -184,10 +185,11 @@ double StreamStatistics(const VectorXd &&vec, ostream &out, const string &&sep){
 	double norm=vec.norm();
 	out << norm << sep;
 	if (vec.size()>0){
-		out << vec.mean() << sep;
-		out << sqrt((vec.array() - vec.mean()).square().sum()/(vec.size()-1))<< sep;
-		out << vec.maxCoeff() << sep;
-		out << vec.minCoeff() << sep;
+		out << std::setw(out.precision()+7) << vec.mean() << sep;
+		out << std::setw(out.precision()+7) 
+			<<sqrt((vec.array() - vec.mean()).square().sum()/(vec.size()-1))<< sep;
+		out << std::setw(out.precision()+7) <<vec.maxCoeff() << sep;
+		out << std::setw(out.precision()+7) <<vec.minCoeff() << sep;
 	}
 	out << endl;
 	return(norm);
