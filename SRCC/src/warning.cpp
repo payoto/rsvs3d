@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <cmath>
 #include "warning.hpp"
 
 
@@ -26,3 +27,17 @@ void ThrowWarning(const char * message){
 	cerr << message << endl;
 }
 
+double rsvs3d::SignedLogScale(double in){
+
+	double out = sign(in);
+
+	if(out == 0){
+		// Do nothing
+	} else if (fabs(in)>__DBL_EPSILON__){
+		out = out * (log10(fabs(in))-log10(__DBL_EPSILON__)+1.0);
+	} else {
+		out = -out * 1.0/(log10(fabs(in))-log10(__DBL_EPSILON__)+1.0);
+	}
+
+	return out;
+}

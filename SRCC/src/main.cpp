@@ -17,7 +17,6 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char* argv[]){
-	std::cout << argc << std::endl;
 	#ifndef RSVSTEST
 	return RSVSExecution(argc, argv);
 	#elif defined(TEST_ALL)

@@ -74,8 +74,32 @@ namespace rsvs3d {
 	template <class E=rsvs_exception>
 	void error(const char* message="", const char* caller="",
 		const char *file="", int line=0, bool throwError=true);
-
+	/**
+	 * @brief      Returns the sign of a type comparable to 0.
+	 *
+	 * @param[in]  val   	The value in.
+	 *
+	 * @tparam     T     	Any type comparable and with a 0 type.
+	 *
+	 * @return     	-1 for negative, 0 for 0, 1 for positive.
+	 */
+	template <typename T> int sign(T val);
 	int TimeStamp(const char* str,int start_s);
+	/**
+	 * Returns a signed logscale useful for plotting data.
+	 *
+	 * This mathematical function is geared towards plotting of data with wildly
+	 * varying orders of magnitude and has the following properties:
+	 *  + Order preserving
+	 *  + 0 preserving
+	 *  + logarithmic for R not including [-DBL_EPSILON, DBL_EPSILON]
+	 *  + 1/log10 in that range
+	 *
+	 * @param[in]  in    A double to scale.
+	 *
+	 * @return     Scaled value of the double.
+	 */
+	double SignedLogScale(double in);
 
 }
 /**
@@ -168,6 +192,9 @@ namespace rsvs3d {
 		} else {
 			std::cerr << "Exception (not thrown)" << message << std::endl;
 		}
+	}
+	template <typename T> int sign(T val) {
+	    return (T(0) < val) - (val < T(0));
 	}
 
 }

@@ -133,6 +133,11 @@ void RSVScalc::ReturnSensitivities(const triangulation &triRSVS,
 	std::vector<double> &sensVec, int constrNum) const {
 
 	int ii, ni, temp;
+
+	auto tosensvec = [&](double val, int ind) -> double
+		{return rsvs3d::SignedLogScale(
+			(ind!=rsvs3d::constants::__notfound?val:0.0));};
+
 	if(constrNum>=this->nConstr){
 		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
 	}
@@ -140,8 +145,7 @@ void RSVScalc::ReturnSensitivities(const triangulation &triRSVS,
 	sensVec.assign(ni, 0);
 	for(ii=0; ii<ni; ii++){
 		temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-		sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-				this->sensDv(temp, constrNum) : 0;
+		sensVec[ii] = tosensvec(this->sensDv(temp, constrNum) ,temp);
 	}
 }
 
@@ -150,6 +154,11 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 
 	int ii, ni, temp;
 	int nNegOpts = 6;
+
+	auto tosensvec = [&](double val, int ind) -> double
+		{return rsvs3d::SignedLogScale(
+			(ind!=rsvs3d::constants::__notfound?val:0.0));};
+
 	if(constrNum>=this->nConstr || constrNum < -nNegOpts){
 		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
 	}
@@ -159,48 +168,41 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 	if (constrNum==nNegTest++) {
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					this->dObj[temp] : 0.0;
+			sensVec[ii] = tosensvec(this->dObj[temp],temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		auto dLagTemp = this->dObj + this->lagMult.transpose()*this->dConstr;
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					dLagTemp[temp] : 0.0;
+			sensVec[ii] = tosensvec(dLagTemp[temp] ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					this->HObj(temp,temp) : 0.0;
+			sensVec[ii] = tosensvec(this->HObj(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					this->HConstr(temp,temp) : 0.0;
+			sensVec[ii] = tosensvec(this->HConstr(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		auto HLagTemp = this->HConstr + this->HObj;
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					HLagTemp(temp,temp) : 0.0;
+			sensVec[ii] = tosensvec(HLagTemp(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					this->deltaDV[temp] : 0.0;
+			sensVec[ii] = tosensvec(this->deltaDV[temp] ,temp);
 		}
 	} else {
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = temp!=rsvs3d::constants::__notfound ?
-					this->dConstr(constrNum, temp) : 0;
+			sensVec[ii] = tosensvec(this->dConstr(constrNum, temp) ,temp);
 		}
 	}
 }
