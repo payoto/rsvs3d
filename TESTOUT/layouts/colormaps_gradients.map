@@ -1,0 +1,231 @@
+#!MC 1410
+$!CREATECOLORMAP 
+  NAME = 'Diverging - Pink/white - blue/green Pos compressed'
+  NUMCONTROLPOINTS = 7
+  CONTROLPOINT 1
+    {
+    COLORMAPFRACTION = 0
+    LEADRGB
+      {
+      R = 197
+      G = 27
+      B = 125
+      }
+    TRAILRGB
+      {
+      R = 197
+      G = 27
+      B = 125
+      }
+    }
+  CONTROLPOINT 2
+    {
+    COLORMAPFRACTION = 0.1667
+    LEADRGB
+      {
+      R = 233
+      G = 163
+      B = 201
+      }
+    TRAILRGB
+      {
+      R = 233
+      G = 163
+      B = 201
+      }
+    }
+  CONTROLPOINT 3
+    {
+    COLORMAPFRACTION = 0.3333
+    LEADRGB
+      {
+      R = 253
+      G = 224
+      B = 239
+      }
+    TRAILRGB
+      {
+      R = 253
+      G = 224
+      B = 239
+      }
+    }
+  CONTROLPOINT 4
+    {
+    COLORMAPFRACTION = 0.5
+    LEADRGB
+      {
+      R = 0
+      G = 85
+      B = 255
+      }
+    TRAILRGB
+      {
+      R = 255
+      G = 255
+      B = 255
+      }
+    }
+  CONTROLPOINT 5
+    {
+    COLORMAPFRACTION = 0.8191
+    LEADRGB
+      {
+      R = 98
+      G = 245
+      B = 201
+      }
+    TRAILRGB
+      {
+      R = 98
+      G = 245
+      B = 201
+      }
+    }
+  CONTROLPOINT 6
+    {
+    COLORMAPFRACTION = 0.9072
+    LEADRGB
+      {
+      R = 255
+      G = 255
+      B = 127
+      }
+    TRAILRGB
+      {
+      R = 255
+      G = 255
+      B = 127
+      }
+    }
+  CONTROLPOINT 7
+    {
+    COLORMAPFRACTION = 1
+    LEADRGB
+      {
+      R = 77
+      G = 146
+      B = 33
+      }
+    TRAILRGB
+      {
+      R = 77
+      G = 146
+      B = 33
+      }
+    }
+$!CREATECOLORMAP 
+  NAME = 'Diverging - Pink/white - blue/green Pos'
+  NUMCONTROLPOINTS = 7
+  CONTROLPOINT 1
+    {
+    COLORMAPFRACTION = 0
+    LEADRGB
+      {
+      R = 197
+      G = 27
+      B = 125
+      }
+    TRAILRGB
+      {
+      R = 197
+      G = 27
+      B = 125
+      }
+    }
+  CONTROLPOINT 2
+    {
+    COLORMAPFRACTION = 0.1667
+    LEADRGB
+      {
+      R = 233
+      G = 163
+      B = 201
+      }
+    TRAILRGB
+      {
+      R = 233
+      G = 163
+      B = 201
+      }
+    }
+  CONTROLPOINT 3
+    {
+    COLORMAPFRACTION = 0.3333
+    LEADRGB
+      {
+      R = 253
+      G = 224
+      B = 239
+      }
+    TRAILRGB
+      {
+      R = 253
+      G = 224
+      B = 239
+      }
+    }
+  CONTROLPOINT 4
+    {
+    COLORMAPFRACTION = 0.5
+    LEADRGB
+      {
+      R = 0
+      G = 85
+      B = 255
+      }
+    TRAILRGB
+      {
+      R = 255
+      G = 255
+      B = 255
+      }
+    }
+  CONTROLPOINT 5
+    {
+    COLORMAPFRACTION = 0.6667
+    LEADRGB
+      {
+      R = 98
+      G = 245
+      B = 201
+      }
+    TRAILRGB
+      {
+      R = 98
+      G = 245
+      B = 201
+      }
+    }
+  CONTROLPOINT 6
+    {
+    COLORMAPFRACTION = 0.8333
+    LEADRGB
+      {
+      R = 161
+      G = 215
+      B = 106
+      }
+    TRAILRGB
+      {
+      R = 161
+      G = 215
+      B = 106
+      }
+    }
+  CONTROLPOINT 7
+    {
+    COLORMAPFRACTION = 1
+    LEADRGB
+      {
+      R = 77
+      G = 146
+      B = 33
+      }
+    TRAILRGB
+      {
+      R = 77
+      G = 146
+      B = 33
+      }
+    }

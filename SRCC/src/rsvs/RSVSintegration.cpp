@@ -507,43 +507,37 @@ void integrate::prepare::Output(
 		filesystem::create_directories(paramconf.files.ioout.outdir);
 	}
 
-	outSnakeName = paramconf.files.ioout.outdir + "/";
-	outSnakeName += "rsvs3D_" + paramconf.files.ioout.pattern + ".plt";
+	outSnakeName = utils::OutputFileName(paramconf, constants::tecplotsnake,".plt");
 	outSnake.OpenFile(outSnakeName.c_str());
 
 	if(paramconf.files.ioout.logginglvl>3){
-		outSnakeName = paramconf.files.ioout.outdir + "/";
-		outSnakeName += "rsvsgradients3D_" + paramconf.files.ioout.pattern + ".plt";
+		outSnakeName = utils::OutputFileName(paramconf, constants::tecplotgradient,".plt");
 		outgradientsnake.OpenFile(outSnakeName.c_str());
 	}
 
-	outSnakeName =  paramconf.files.ioout.outdir + "/";
-	outSnakeName += "config_call_" + paramconf.files.ioout.pattern + ".json";
+	outSnakeName = utils::OutputFileName(paramconf, "config_call_",".json");
 	param::io::writeflat(outSnakeName, origconf);
-	outSnakeName =  paramconf.files.ioout.outdir + "/";
-	outSnakeName += "config_active_" + paramconf.files.ioout.pattern + ".json";
+
+	outSnakeName = utils::OutputFileName(paramconf, "config_active_",".json");
 	param::io::writeflat(outSnakeName, paramconf);
 	// Open a text log file
-	outSnakeName =  paramconf.files.ioout.outdir + "/";
-	outSnakeName += "convergence_" + paramconf.files.ioout.pattern + ".log";
+
+	outSnakeName = utils::OutputFileName(paramconf, "convergence_",".log");
 	logFile.open(outSnakeName);
 	logFile.precision(16);
 	logFile << std::scientific;
 
 	if (paramconf.files.ioout.redirectcout){
-		// auto ;
-		outSnakeName =  paramconf.files.ioout.outdir + "/";
-		outSnakeName += "cout_" + paramconf.files.ioout.pattern + ".txt";
+		outSnakeName = utils::OutputFileName(paramconf, "cout_",".txt");
 		coutFile.open(outSnakeName);
 		std::cout.rdbuf(coutFile.rdbuf());
 	}
 	if (paramconf.files.ioout.redirectcerr){
-		// auto ;
-		outSnakeName =  paramconf.files.ioout.outdir + "/";
-		outSnakeName += "cerr_" + paramconf.files.ioout.pattern + ".txt";
+		outSnakeName = utils::OutputFileName(paramconf, "cerr_",".txt");
 		cerrFile.open(outSnakeName);
 		std::cerr.rdbuf(cerrFile.rdbuf());
 	}
+	integrate::utils::SpecialiseTemplateFiles(paramconf);
 }
 
 
@@ -707,8 +701,8 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 
 	RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
 	auto &paramconf = RSVSobj.paramconf;
-	auto outSnakeName = paramconf.files.ioout.outdir + "/";
-	outSnakeName += "rsvs3D_export_" + paramconf.files.ioout.pattern + ".plt";
+	auto outSnakeName =  utils::OutputFileName(paramconf, "rsvs3D_export_",".plt");
+
 	tecplotfile outSnake;
 	outSnake.OpenFile(outSnakeName.c_str());
 
@@ -730,12 +724,9 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 		}  else if(exportType.first.compare("snake")==0) 
 		{
 			RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.domain);
-			auto fileToOpen=paramconf.files.ioout.outdir + "/";
-			fileToOpen += "SnakeConnExport_" + paramconf.files.ioout.pattern
-				+ ".msh";
-			auto tecFileToOpen=paramconf.files.ioout.outdir + "/";
-			tecFileToOpen += "SnakeSensitivity_" + paramconf.files.ioout.pattern
-				+ ".plt";
+			auto fileToOpen= utils::OutputFileName(paramconf, "SnakeConnExport_",".msh");
+			auto tecFileToOpen = utils::OutputFileName(paramconf, "SnakeSensitivity_",".plt");
+
 			RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
 			tecplotfile tecsens;
 			tecsens.OpenFile(tecFileToOpen.c_str());
@@ -860,23 +851,27 @@ void integrate::execute::postprocess::Log(
 void integrate::execute::postprocess::Snake(
 	snake &rsvsSnake, mesh &voluMesh, param::parameters &paramconf){
 
-	string fileToOpen;
-
-	fileToOpen=paramconf.files.ioout.outdir + "/";
-	fileToOpen += "VoluMesh_" + paramconf.files.ioout.pattern + ".msh";
+	std::string fileToOpen;
+	
+	fileToOpen= utils::OutputFileName(paramconf, "VoluMesh_",".msh");
 	voluMesh.write(fileToOpen.c_str());
+	paramconf.files.ioin.volumeshname = fileToOpen;
 
-	fileToOpen=paramconf.files.ioout.outdir + "/";
-	fileToOpen += "SnakeMesh_" + paramconf.files.ioout.pattern + ".msh";
+	fileToOpen= utils::OutputFileName(paramconf, "SnakeMesh_",".msh");
 	rsvsSnake.snakemesh->write(fileToOpen.c_str());
+	paramconf.files.ioin.snakemeshname = fileToOpen;
 
-	fileToOpen=paramconf.files.ioout.outdir + "/";
-	fileToOpen += "SnakeConn_" + paramconf.files.ioout.pattern + ".msh";
+	fileToOpen= utils::OutputFileName(paramconf, "SnakeConn_",".msh");
 	rsvsSnake.snakeconn.write(fileToOpen.c_str());
 
-	fileToOpen=paramconf.files.ioout.outdir + "/";
-	fileToOpen += "Snake_" + paramconf.files.ioout.pattern + ".3snk";
+	fileToOpen= utils::OutputFileName(paramconf, "Snake_",".3snk");
 	rsvsSnake.write(fileToOpen.c_str());
+	paramconf.files.ioin.snakefile = fileToOpen;
+
+	paramconf.files.ioin.casename = "restart_" + paramconf.files.ioout.pattern;
+	fileToOpen= utils::OutputFileName(paramconf, "config_restart_",".json");
+	param::io::writeflat(fileToOpen, paramconf);
+	
 }
 
 void integrate::execute::postprocess::FullTecplot(
@@ -924,6 +919,100 @@ void integrate::execute::exporting::SU2(std::string su2ConfStr,
 	tetgen::apiparam su2MeshParam(su2ConfStr.substr(su2ConfStr.find(",")+1));
 	tetgen::SnakeToSU2(rsvsSnake, su2Path, su2MeshParam);
 }
+
+
+// ====================
+// 
+//  Utilities
+// 
+// ====================
+
+void integrate::utils::WriteModifiedTemplate(const std::string &fileIn, 
+	const std::string &fileOut,	const std::string &oldLine,
+	const std::string newLine){
+
+	ifstream in(fileIn, ios::in);
+	if(in.fail()){
+		RSVS3D_ERROR_NOTHROW((fileIn + " was not found, template could not be"
+			" specialised.").c_str());
+		return;
+	}
+	ofstream out(fileOut, ios::out);
+	std::string tempString;
+	while (!in.eof()){
+		getline(in,tempString);
+		auto pos = tempString.find(oldLine);
+		if(pos!=std::string::npos){
+			out << tempString.substr(0, pos) << newLine << std::endl;
+			break;
+		} else {
+			out << tempString << std::endl;
+		}
+	}
+
+	out << in.rdbuf();
+
+}
+
+void integrate::utils::SpecialiseTemplateFiles(const param::parameters &paramconf){
+
+	// param::tecplottemplate& 
+	auto& tecconfig = paramconf.files.ioout.tecplot;
+	int loglvl = paramconf.files.ioout.logginglvl;
+
+	if (loglvl<=3){
+		SpecialiseTemplateFile(tecconfig, loglvl, paramconf.files.ioout, 
+			constants::tecplotsnake);
+	} else if (loglvl!=5){
+		SpecialiseTemplateFile(tecconfig, 3, paramconf.files.ioout, 
+			constants::tecplotsnake);
+	}
+	if(loglvl>=4){
+		SpecialiseTemplateFile(tecconfig, 5, paramconf.files.ioout, 
+			constants::tecplotgradient);
+	}
+	if (loglvl>5){
+		SpecialiseTemplateFile(tecconfig, loglvl, paramconf.files.ioout, 
+			constants::tecplotsnake);
+	}
+
+}
+
+void integrate::utils::SpecialiseTemplateFile(const param::tecplottemplate &tecconfig, 
+	int logLvl,
+	const param::ioout &ioout, std::string fileName){
+
+	// Build the name of the correct file from logging lvl and 
+	std::string templateLayout, outputLayout; 
+	templateLayout = tecconfig.TemplateLogging(logLvl);
+	outputLayout = ioout.outdir + "/";
+	outputLayout += tecconfig.TemplateLogging(logLvl,
+		false,std::string("_") + ioout.pattern);
+	std::string lineOut = tecconfig.filenameregex +"'\""+
+		integrate::utils::OutputFileName("", ioout.pattern, 
+			fileName, ".plt")+"\"'";
+	integrate::utils::WriteModifiedTemplate(templateLayout, outputLayout,
+		tecconfig.filenameregex, lineOut);
+	
+
+}
+
+std::string integrate::utils::OutputFileName(const param::parameters &paramconf, 
+	std::string fileName, std::string extension){
+	return OutputFileName(paramconf.files.ioout.outdir,
+		paramconf.files.ioout.pattern, fileName, extension);
+}
+
+std::string integrate::utils::OutputFileName(const std::string rootDirectory, 
+	const std::string &filePattern,	std::string fileName, 
+	std::string extension){
+
+	if (rootDirectory.compare("")==0){
+		return fileName + filePattern + extension;
+	}
+	return rootDirectory + "/" + fileName + filePattern + extension;
+}
+
 
 // ===================
 // Tests

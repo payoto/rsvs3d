@@ -30,6 +30,8 @@ namespace param {
 	class voxel;
 	class voronoi;
 	class ioin;
+	class ioout;
+	class tecplottemplate;
 }
 
 //=================================
@@ -52,6 +54,10 @@ void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact);
 double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
 	double snaxtimestep, double snaxdiststep);
 namespace integrate {
+	namespace constants {
+		static const std::string tecplotsnake = "rsvs3D_";
+		static const std::string tecplotgradient = "rsvsgradients3D_";
+	}
 	class iteratereturns {
 	public:
 		int nVoluZone=0;
@@ -178,12 +184,51 @@ namespace integrate {
 
 		}
 	}
+	namespace utils {
 
+		/**
+		 * @brief      Convenience function to generate file names for RSVS
+		 *
+		 * @param[in]  paramconf  The current parameter configuration
+		 * @param[in]  fileName   The start of the file name
+		 * @param[in]  extension  The file extension
+		 *
+		 * @return     Returns a file path by adding the root directory and the
+		 *             file pattern
+		 */
+		std::string OutputFileName(const param::parameters &paramconf, 
+			std::string fileName, std::string extension);
+		/**
+		 * @brief      Convenience function to generate file names for RSVS
+		 *
+		 * @param[in]  rootDirectory  The root directory in which the file will
+		 *                            be stored.
+		 * @param[in]  filePattern    The file diferentiating pattern
+		 * @param[in]  fileName       The core file name to be placed at teh
+		 *                            start of the basename
+		 * @param[in]  extension      The file extension
+		 *
+		 * @return     A string with a file path for RSVS output.
+		 */
+		std::string OutputFileName(const std::string rootDirectory, 
+			const std::string &filePattern,
+			std::string fileName, std::string extension);
+
+
+		void WriteModifiedTemplate(const std::string &fileIn, 
+			const std::string &fileOut, const std::string &oldLine, 
+			const std::string newLine);
+
+		void SpecialiseTemplateFiles(const param::parameters &paramconf);
+		void SpecialiseTemplateFile(const param::tecplottemplate &tecconfig, int logLvl,
+			const param::ioout &ioout, std::string fileName);
+	}
 	namespace test {
 		int Prepare();
 		int All();
 		int CompareSurfCentreDerivatives();
 		int CompareDerivativesSpike();
+		int CompareDerivativesSpikeNoDPos();
 	}
 }
 

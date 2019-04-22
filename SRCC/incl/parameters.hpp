@@ -37,11 +37,37 @@ namespace param {
 	/// Collects the export settings which is a vector of pairs of strings.
 	/// Each pair is: ["valid export type", "export config string"]
 	typedef std::vector<std::pair<std::string,std::string>> exports;
+	typedef std::vector<std::pair<int,std::string>> varconfig;
 	/// The input type of fill information.
 	template <class T>
 	struct filltype {
 		bool active=false;
 		T fill;
+	};
+
+	/**
+	 * @brief      Template for generating the correct processing file for the outputs.
+	 * 
+	 * Originally develloped for tecplot files.
+	 * 
+	 */
+	class outputtemplate {
+	public:
+		std::string directory;
+		std::string templateregex;
+		std::string filenameregex;
+		varconfig loglvlspecialisation;
+
+		outputtemplate();
+
+	};
+
+	class tecplottemplate : public outputtemplate {
+	public:
+		using outputtemplate::outputtemplate;
+
+		std::string TemplateLogging(int lvl, bool withPath=true,
+			std::string pattern="") const;
 	};
 	/**
 	Parameters related to the Velocity calculation and VOS steps
@@ -192,6 +218,8 @@ namespace param {
 
 		int logginglvl;
 		int outputlvl;
+
+		tecplottemplate tecplot;
 
 		ioout();
 		void PrepareForUse();

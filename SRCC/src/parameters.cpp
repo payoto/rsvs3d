@@ -35,6 +35,51 @@ void param::from_json(const json& j, filltype<T>& p){
 }
 
 //===========================================
+// outputtemplate json interface
+//===========================================
+
+param::outputtemplate::outputtemplate(){
+	this->directory = "../TESTOUT/layouts";
+	this->templateregex = "RSVS_";
+	this->filenameregex = "VarSet |LFDSFN1| =";
+	this->loglvlspecialisation = {{0, ""}};
+}
+
+void param::to_json(json& j, const outputtemplate& p){
+	j = json{
+		{"directory", p.directory},
+		{"templateregex", p.templateregex},
+		{"filenameregex", p.filenameregex},
+		{"loglvlspecialisation", p.loglvlspecialisation},
+	};
+}
+void param::from_json(const json& j, outputtemplate& p){
+	j.at("directory").get_to(p.directory);
+	j.at("templateregex").get_to(p.templateregex);
+	j.at("filenameregex").get_to(p.filenameregex);
+	p.loglvlspecialisation=j.at("loglvlspecialisation").get<param::varconfig>();
+
+}
+
+std::string param::tecplottemplate::TemplateLogging(int lvl, bool withPath,
+	std::string pattern) const {
+	std::string fileBaseName = this->templateregex + "loglvl" 
+		+ std::to_string(lvl) + pattern + ".lay";
+
+	for (auto spec : this->loglvlspecialisation){
+		if(spec.first==lvl){
+			fileBaseName = spec.second + pattern + ".lay";
+		}
+	}
+
+	if(withPath){
+		return this->directory + "/" + fileBaseName;
+	} else {
+		return fileBaseName;
+	}
+}
+
+//===========================================
 // voxel class method definitions
 //===========================================
 
@@ -313,6 +358,7 @@ void param::to_json(json& j, const ioout& p){
 		{"redirectcerr", p.redirectcerr},
 		{"logginglvl", p.logginglvl},
 		{"outputlvl", p.outputlvl},
+		{"tecplot", p.tecplot},
 	};
 }
 void param::from_json(const json& j, ioout& p){
@@ -326,6 +372,7 @@ void param::from_json(const json& j, ioout& p){
 	j.at("redirectcerr").get_to(p.redirectcerr);
 	j.at("logginglvl").get_to(p.logginglvl);
 	j.at("outputlvl").get_to(p.outputlvl);
+	j.at("tecplot").get_to(p.tecplot);
 }
 
 param::files::files(){

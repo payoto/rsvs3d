@@ -16,6 +16,7 @@
 // 		and to avoid circular dependencies
 namespace param{
 	template <class T> struct filltype;
+	class outputtemplate;
 	class rsvs;
 	class snaking;
 	class voxel;
@@ -53,7 +54,10 @@ namespace param {
 	template<class T>
 	void to_json(rsvsjson::json& j, const filltype<T>& p);
 	template<class T>
-	void from_json(const rsvsjson::json& j, filltype<T>& p); 
+	void from_json(const rsvsjson::json& j, filltype<T>& p);
+
+	void to_json(rsvsjson::json& j, const outputtemplate& p);
+	void from_json(const rsvsjson::json& j, outputtemplate& p); 	 
 
 	void to_json(rsvsjson::json& j, const rsvs& p);
 	void from_json(const rsvsjson::json& j, rsvs& p); 	
