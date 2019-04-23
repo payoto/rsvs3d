@@ -24,7 +24,7 @@
 
 class triangulation;
 class triangle;
-
+class RSVScalc;
 // Includes
 
 #include <vector>
@@ -89,6 +89,11 @@ void TrianglePositionDerivatives(const triangle &triIn,
 	Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos,
 	bool useSurfCentreDeriv=true);
 
-
+void AssignConstraintDerivativesFullMath(RSVScalc &calc, const triangle &triIn,
+	const HashedVector<int,int> &dvListMap,const Eigen::MatrixXd &dConstrPart,
+	const Eigen::MatrixXd &HConstrPart, int constrPos, int cellTarg);
+void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn,
+	const HashedVector<int,int> &dvListMap,const Eigen::MatrixXd &dConstrPart,
+	const Eigen::MatrixXd &HConstrPart, int constrPos, int cellTarg);
 
 #endif // RSVSCALCTOOLS_HPP

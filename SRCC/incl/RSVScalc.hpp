@@ -26,7 +26,7 @@
 #include <Eigen>
 
 using namespace std; 
-
+typedef Eigen::SparseMatrix<double, Eigen::ColMajor> MatrixXd_sparse;
 /**
  * Class to handle the RSVS calculation.
  * 
@@ -42,6 +42,10 @@ protected:
 	int nConstr=0;
 	/// Number of false access operations
 	int falseaccess=0;
+	/// Number of design variables to start using sparse mathematics
+	int sparseDVcutoff = 200;
+	///
+	int nonZeroPerDV = 10;
 	/// Return the derivatives (obsolete/unused)
 	bool returnDeriv=true;
 	/// Enable or disable surfcentroid derivatives
@@ -49,12 +53,16 @@ protected:
 public:
 	/// Constraint Jacobian, size: [nConstr, nDv].
 	Eigen::MatrixXd dConstr;
+	Eigen::SparseMatrix<double, Eigen::ColMajor> dConstr_sparse;
 	/// Constraint Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HConstr;
+	Eigen::SparseMatrix<double, Eigen::ColMajor> HConstr_sparse;
 	/// Objective Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HObj;
+	Eigen::SparseMatrix<double, Eigen::ColMajor> HObj_sparse;
 	/// Lagrangian Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HLag;
+	Eigen::SparseMatrix<double, Eigen::ColMajor> HLag_sparse;
 	Eigen::RowVectorXd dLag;
 	/// Objective Jacobian, size: [1, nDv].
 	Eigen::RowVectorXd dObj;
@@ -90,6 +98,14 @@ public:
 	/// keeps pairs with parentindex and voluindex
 	std::vector<pair<int,int>> constrList;
 
+	/**
+	 * @brief      Decides wether full or sparse math should be used.
+	 *
+	 * @return     True if the number of design variable is small enought to
+	 *             allow full matrix operations and false if the sparse maths
+	 *             should be used.
+	 */
+	bool UseFullMath() const {return(this->nDv<this->sparseDVcutoff);}
 	/**
 	 * @brief      Builds mathematics arrays.
 	 *
@@ -296,6 +312,9 @@ public:
 		Eigen::MatrixXd &dConstrAct,
 		Eigen::MatrixXd &HConstrAct, 
 		Eigen::MatrixXd &HObjAct,
+		MatrixXd_sparse &dConstrAct_sparse,
+		MatrixXd_sparse &HConstrAct_sparse,
+		MatrixXd_sparse &HObjAct_sparse,
 		Eigen::RowVectorXd &dObjAct,
 		Eigen::VectorXd &constrAct,
 		Eigen::VectorXd &lagMultAct

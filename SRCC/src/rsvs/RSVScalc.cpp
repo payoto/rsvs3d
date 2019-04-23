@@ -359,28 +359,39 @@ void RSVScalc::ReturnConstrToMesh(mesh &meshin, double volu::*mp) const {
 void RSVScalc::BuildMathArrays(int nDvIn, int nConstrIn){
 	// Builds the target math arrays
 	
-	nDv=nDvIn;
-	nConstr=nConstrIn;
-	isConstrAct.clear();
-	isDvAct.clear();
-	isConstrAct.assign(nConstr,false);
-	isDvAct.assign(nDv,false);
+	this->nDv=nDvIn;
+	this->nConstr=nConstrIn;
+	this->isConstrAct.clear();
+	this->isDvAct.clear();
+	this->isConstrAct.assign(nConstr,false);
+	this->isDvAct.assign(nDv,false);
 
 
-	constr.setZero(nConstr);
-	dConstr.setZero(nConstr,nDv);
-	HConstr.setZero(nDv,nDv); 
+	this->constr.setZero(nConstr);
 
-	obj=0.0;
-	dObj.setZero(nDv);
-	HObj.setZero(nDv,nDv); 
+	this->obj=0.0;
+	this->dObj.setZero(nDv);
 
-	if(nConstr!=lagMult.size()){
-		lagMult.setZero(nConstr);
+
+	if(this->nConstr!=this->lagMult.size()){
+		this->lagMult.setZero(nConstr);
 	}
-	deltaDV.setZero(nDv);
+	this->deltaDV.setZero(nDv);
 
-	dvCallConstr.setZero(nDv,1);
+	this->dvCallConstr.setZero(nDv,1);
+
+	if(this->UseFullMath()){
+		this->dConstr.setZero(nConstr,nDv);
+		this->HConstr.setZero(nDv,nDv); 
+		this->HObj.setZero(nDv,nDv); 
+	} else {
+		dConstr_sparse.resize(nConstr,nDv);
+		dConstr_sparse.reserve(nDv*2);
+		HConstr_sparse.resize(nDv,nDv);
+		HConstr_sparse.reserve(nDv*13);
+		HObj_sparse.resize(nDv,nDv);
+		HObj_sparse.reserve(nDv*13);
+	}
 }
 
 void RSVScalc::BuildConstrMap(const triangulation &triangleRSVS){

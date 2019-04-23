@@ -280,3 +280,50 @@ void TrianglePositionDerivatives(const triangle &triIn,
 
 	}
 }
+
+void AssignConstraintDerivativesFullMath(RSVScalc &calc, const triangle &triIn,
+	const HashedVector<int,int> &dvListMap,const MatrixXd &dConstrPart,
+	const MatrixXd &HConstrPart, int constrPos, int cellTarg){
+	int nDvAct = dvListMap.vec.size();
+	int ii = cellTarg;
+	for(int kk=0; kk< nDvAct; ++kk){
+		calc.dConstr(constrPos,
+			calc.dvMap.find(dvListMap.vec[kk])) += 
+			triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+		calc.dvCallConstr(calc.dvMap.find(dvListMap.vec[kk]),0)++;
+		for(int ll=0; ll< nDvAct; ++ll){
+			// TODO cross product with lagrangian
+			calc.HConstr(calc.dvMap.find(dvListMap.vec[ll]),
+				 calc.dvMap.find(dvListMap.vec[kk])) += 
+				 triIn.connec.constrinfluence[ii]*
+				 HConstrPart(ll,kk)
+				 *calc.lagMult[constrPos]
+				 // /calc.constrTarg[constrPos]
+				 ;
+		}
+	}
+}
+
+void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn,
+	const HashedVector<int,int> &dvListMap,const MatrixXd &dConstrPart,
+	const MatrixXd &HConstrPart, int constrPos, int cellTarg){
+	
+	int nDvAct = dvListMap.vec.size();
+	int ii = cellTarg;
+	for(int kk=0; kk< nDvAct; ++kk){
+		calc.dConstr_sparse.coeffRef(constrPos,
+			calc.dvMap.find(dvListMap.vec[kk])) += 
+			triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+		calc.dvCallConstr(calc.dvMap.find(dvListMap.vec[kk]),0)++;
+		for(int ll=0; ll< nDvAct; ++ll){
+			// TODO cross product with lagrangian
+			calc.HConstr_sparse.coeffRef(calc.dvMap.find(dvListMap.vec[ll]),
+				 calc.dvMap.find(dvListMap.vec[kk])) += 
+				 triIn.connec.constrinfluence[ii]*
+				 HConstrPart(ll,kk)
+				 *calc.lagMult[constrPos]
+				 // /calc.constrTarg[constrPos]
+				 ;
+		}
+	}
+}

@@ -66,7 +66,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	bool isObj, bool isConstr, bool isDeriv){
 
 
-	int ii,jj,nj,kk,ll,nCellTarg;
+	int ii,jj,nj,nCellTarg;
 	int nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
@@ -123,21 +123,12 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 					this->constr[subTempVec[jj]] += 
 						triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
-						for(kk=0; kk< nDvAct; ++kk){
-							this->dConstr(subTempVec[jj],
-								this->dvMap.find(dvListMap.vec[kk])) += 
-								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
-							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
-							for(ll=0; ll< nDvAct; ++ll){
-								// TODO cross product with lagrangian
-								this->HConstr(this->dvMap.find(dvListMap.vec[ll]),
-									 this->dvMap.find(dvListMap.vec[kk])) += 
-									 triIn.connec.constrinfluence[ii]*
-									 HConstrPart(ll,kk)
-									 *this->lagMult[subTempVec[jj]]
-									 // /this->constrTarg[subTempVec[jj]]
-									 ;
-							}
+						if(this->UseFullMath()){
+							AssignConstraintDerivativesFullMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
+						} else {
+							AssignConstraintDerivativesSparseMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
 						}
 					}
 				} else {
@@ -169,18 +160,20 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 		if(isDeriv){
 			for(ii=0; ii< nDvAct; ++ii){
 				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-				for(jj=0; jj< nDvAct; ++jj){
-					this->HObj(dvMap.find(dvListMap.vec[jj]),
-						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				if(this->UseFullMath()){
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
+
+				} else {
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
 				}
 			}
 		}
-
-		// if(objPart==0 && isDeriv && isConstr){
-		// 	CalcTriangleEdgeLength(triIn, triRSVS,
-		// 		isObj, false, isDeriv);
-		// 	cout << "%" ;
-		// }
 	}
 	// Update active lists of design variables
 	for(ii=0; ii< nDvAct; ++ii){
@@ -213,7 +206,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	helps isolate errors in RSVSmath.
 	*/
 
-	int ii,jj,nj,kk,ll,nCellTarg;
+	int ii,jj,nj,nCellTarg;
 	int nDvAct;
 	SurfCentroid centreCalc;
 	Volume VolumeCalc;
@@ -267,18 +260,12 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 				if (subTempVec[jj]!=__notfound){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
-						for(kk=0; kk< nDvAct; ++kk){
-							this->dConstr(subTempVec[jj],this->dvMap.find(dvListMap.vec[kk])) += 
-								triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
-							dvCallConstr(this->dvMap.find(dvListMap.vec[kk]),0)++;
-							for(ll=0; ll< nDvAct; ++ll){
-								// TODO cross product with lagrangian
-								this->HConstr(this->dvMap.find(dvListMap.vec[ll]),
-									 this->dvMap.find(dvListMap.vec[kk])) += 
-									 triIn.connec.constrinfluence[ii]*
-									 HConstrPart(ll,kk)
-									 *this->lagMult[subTempVec[jj]];
-							}
+						if(this->UseFullMath()){
+							AssignConstraintDerivativesFullMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
+						} else {
+							AssignConstraintDerivativesSparseMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
 						}
 					}
 				} else {
@@ -310,9 +297,17 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 		if(isDeriv){
 			for(ii=0; ii< nDvAct; ++ii){
 				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-				for(jj=0; jj< nDvAct; ++jj){
-					this->HObj(dvMap.find(dvListMap.vec[jj]),
-						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				if(this->UseFullMath()){
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
+
+				} else {
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
 				}
 			}
 		}
@@ -348,7 +343,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	helps isolate errors on dPos.
 	*/
 
-	int ii,ni,jj,nj,kk,ll,nCellTarg;
+	int ii,ni,jj,nj,nCellTarg;
 	int subTemp,nDvAct;
 	SurfCentroid centreCalc;
 	Volume2 VolumeCalc2;
@@ -459,23 +454,12 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 				if (subTempVec[jj]!=__notfound){
 					this->constr[subTempVec[jj]] += triIn.connec.constrinfluence[ii]*constrPart;
 					if(isDeriv){
-						for(kk=0; kk< 3; ++kk){
-							if(dvOrder[kk]!=0){
-
-								this->dConstr(subTempVec[jj],this->dvMap.find(dvOrder[kk])) += 
-									triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
-								dvCallConstr(this->dvMap.find(dvOrder[kk]),0)++;
-								for(ll=0; ll< 3; ++ll){
-									if(dvOrder[ll]!=0){
-									// TODO cross product with lagrangian
-										this->HConstr(this->dvMap.find(dvOrder[ll]),
-											 this->dvMap.find(dvOrder[kk])) += 
-											 triIn.connec.constrinfluence[ii]*
-											 HConstrPart(ll,kk)
-											 *this->lagMult[subTempVec[jj]];
-									}
-								}
-							}
+						if(this->UseFullMath()){
+							AssignConstraintDerivativesFullMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
+						} else {
+							AssignConstraintDerivativesSparseMath(*this, triIn,
+								dvListMap, dConstrPart, HConstrPart, subTempVec[jj], ii);
 						}
 					}
 				} else {
@@ -506,9 +490,17 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 		if(isDeriv){
 			for(ii=0; ii< nDvAct; ++ii){
 				this->dObj[this->dvMap.find(dvListMap.vec[ii])] += dObjPart(0,ii);
-				for(jj=0; jj< nDvAct; ++jj){
-					this->HObj(dvMap.find(dvListMap.vec[jj]),
-						 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+				if(this->UseFullMath()){
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
+
+				} else {
+					for(jj=0; jj< nDvAct; ++jj){
+						this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
+							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+					}
 				}
 			}
 		}

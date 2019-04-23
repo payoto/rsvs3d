@@ -29,12 +29,16 @@ bool RSVScalc::PrepareMatricesForSQP(
 	MatrixXd &dConstrAct,
 	MatrixXd &HConstrAct, 
 	MatrixXd &HObjAct,
+	MatrixXd_sparse &dConstrAct_sparse,
+	MatrixXd_sparse &HConstrAct_sparse,
+	MatrixXd_sparse &HObjAct_sparse,
 	RowVectorXd &dObjAct,
 	VectorXd &constrAct,
 	VectorXd &lagMultAct
 	){
 
 	int ii, jj, nDvAct, nConstrAct;
+
 
 	subDvAct.reserve(nDv);
 	subDvAct.clear();
@@ -56,43 +60,74 @@ bool RSVScalc::PrepareMatricesForSQP(
 		}
 	}
 
+	if(this->UseFullMath()){
+		// Full maths
+		dConstrAct.setZero(nConstrAct,nDvAct);
+		for(ii=0; ii<nConstrAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				dConstrAct(ii,jj)=dConstr(subConstrAct[ii],subDvAct[jj])
+					// /constrTarg[subConstrAct[ii]]
+					;
+			}
+		}
+		HConstrAct.setZero(nDvAct,nDvAct); 
+		for(ii=0; ii<nDvAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				HConstrAct(ii,jj)=HConstr(subDvAct[ii],subDvAct[jj]);
+			}
+		}
+		HObjAct.setZero(nDvAct,nDvAct);  
+		for(ii=0; ii<nDvAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				HObjAct(ii,jj)=HObj(subDvAct[ii],subDvAct[jj]);
+			}
+		}
+	} else {
+		// Sparse maths
+		dConstrAct_sparse.resize(nConstrAct,nDvAct);
+		dConstrAct_sparse.reserve(this->nonZeroPerDV*nDvAct);
+		for(ii=0; ii<nConstrAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				dConstrAct_sparse.coeffRef(ii,jj)=
+					dConstr_sparse(subConstrAct[ii],subDvAct[jj]);
+			}
+		}
+		HConstrAct_sparse.resize(nDvAct,nDvAct); 
+		HConstrAct_sparse.reserve(this->nonZeroPerDV*nDvAct); 
+		for(ii=0; ii<nDvAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				HConstrAct_sparse.coeffRef(ii,jj)=
+					HConstr_sparse(subDvAct[ii],subDvAct[jj]);
+			}
+		}
+		HObjAct_sparse.resize(nDvAct,nDvAct);  
+		HObjAct_sparse.reserve(this->nonZeroPerDV*nDvAct);  
+		for(ii=0; ii<nDvAct;++ii){
+			for(jj=0; jj<nDvAct;++jj){
+				HObjAct_sparse.coeffRef(ii,jj)=
+					HObj_sparse(subDvAct[ii],subDvAct[jj]);
+			}
+		}
+	}
 
-	dConstrAct.setZero(nConstrAct,nDvAct);
-	for(ii=0; ii<nConstrAct;++ii){
-		for(jj=0; jj<nDvAct;++jj){
-			dConstrAct(ii,jj)=dConstr(subConstrAct[ii],subDvAct[jj])
-				// /constrTarg[subConstrAct[ii]]
-				;
-		}
-	}
-	HConstrAct.setZero(nDvAct,nDvAct); 
-	for(ii=0; ii<nDvAct;++ii){
-		for(jj=0; jj<nDvAct;++jj){
-			HConstrAct(ii,jj)=HConstr(subDvAct[ii],subDvAct[jj]);
-		}
-	}
-	HObjAct.setZero(nDvAct,nDvAct);  
-	for(ii=0; ii<nDvAct;++ii){
-		for(jj=0; jj<nDvAct;++jj){
-			HObjAct(ii,jj)=HObj(subDvAct[ii],subDvAct[jj]);
-		}
-	}
 	dObjAct.setZero(nDvAct);
 	for(jj=0; jj<nDvAct;++jj){
 		dObjAct[jj]=dObj[subDvAct[jj]];
 	}
 	constrAct.setZero(nConstrAct);
 	for(jj=0; jj<nConstrAct;++jj){
-		constrAct[jj]=(constr[subConstrAct[jj]] -constrTarg[subConstrAct[jj]])
-			// /constrTarg[subConstrAct[jj]]
-			;
+		constrAct[jj]=(constr[subConstrAct[jj]] -constrTarg[subConstrAct[jj]]);
 	}
 	lagMultAct.setZero(nConstrAct);
 
-	// DisplayVector(isDvAct);
-	// DisplayVector(isConstrAct);
-	this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr;
-	HLag = HObjAct+HConstrAct;
+	if(this->UseFullMath()){
+		this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr;
+		this->HLag = HObjAct+HConstrAct;
+	} else {
+		this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr_sparse;
+		this->HLag_sparse = HObjAct_sparse+HConstrAct_sparse;
+	}
+
 	return(nDvAct>0);
 }
 
@@ -139,18 +174,19 @@ void RSVScalc::CheckAndCompute(int calcMethod, bool sensCalc){
 	int ii;
 	bool computeFlag;
 	MatrixXd dConstrAct,HConstrAct, HObjAct;
+	MatrixXd_sparse dConstrAct_sparse,HConstrAct_sparse, HObjAct_sparse;
 	RowVectorXd dObjAct;
 	VectorXd constrAct, lagMultAct, deltaDVAct;
 	computeFlag = PrepareMatricesForSQP(
-		dConstrAct,HConstrAct, HObjAct,dObjAct,
-		constrAct,lagMultAct
+		dConstrAct,HConstrAct, HObjAct,
+		dConstrAct_sparse,HConstrAct_sparse, HObjAct_sparse,
+		dObjAct,constrAct,lagMultAct
 		);
 	// computeFlag=true;
 	if (computeFlag){
 		ComputeSQPstep(calcMethod,
 			dConstrAct,dObjAct,
-			constrAct,lagMultAct
-			);
+			constrAct,lagMultAct);
 	} else {
 		for (ii=0; ii<nDv; ++ii){
 			deltaDV[ii]=0.0;
