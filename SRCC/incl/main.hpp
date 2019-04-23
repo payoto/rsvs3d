@@ -33,6 +33,9 @@ namespace parse {
 
 int RSVSExecution(int argc, char* argv[]);
 void NoExecution(parse::ParserOutput execFlow, param::parameters &paramconf);
+#ifdef LIB_RSVS
+int main_rsvs3d(int argc, char* argv[]);
+#endif
 namespace parse {
 	
 	class ParserOutput {
