@@ -95,8 +95,11 @@ int rsvstest::newtest(){
 	#ifdef TEST_KNOWN_FAILURES
 	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
-	#endif
 	gridTest.Run(integrate::test::CompareDerivativesSpike,"Test spike issues"); 
+	gridTest.Run(integrate::test::CompareDerivativesSpikeNoDPos,"Test spike issues no dPos"); 
+	#endif
+	gridTest.Run(integrate::test::StudyDerivatives,"Generate Derivative study"); 
+
 	return(0);
 }
 

@@ -229,6 +229,7 @@ namespace integrate {
 		int CompareSurfCentreDerivatives();
 		int CompareDerivativesSpike();
 		int CompareDerivativesSpikeNoDPos();
+		int StudyDerivatives();
 	}
 }
 

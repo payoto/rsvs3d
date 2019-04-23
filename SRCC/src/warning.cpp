@@ -30,13 +30,13 @@ void ThrowWarning(const char * message){
 double rsvs3d::SignedLogScale(double in){
 
 	double out = sign(in);
-
+	double logeps = -15; // aprox log10(__DBL_EPSILON__)
 	if(out == 0){
 		// Do nothing
 	} else if (fabs(in)>__DBL_EPSILON__){
-		out = out * (log10(fabs(in))-log10(__DBL_EPSILON__)+1.0);
+		out = out * (log10(fabs(in))-logeps+1.0);
 	} else {
-		out = -out * 1.0/(log10(fabs(in))-log10(__DBL_EPSILON__)+1.0);
+		out = -out * 1.0/(log10(fabs(in))-logeps+1.0);
 	}
 
 	return out;

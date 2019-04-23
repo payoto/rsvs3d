@@ -9,6 +9,18 @@
 #include "RSVScalc.hpp"
 #include "matrixtools.hpp"
 
+/**
+ * Tests if data is accessible then scales it if it can.
+ *
+ * @param      val   The value to access
+ * @param      ind   The index to access the data is not accessed if the indes
+ *                   is equal to rsvs3d::constants::__notfound.
+ *
+ * @return     the scaled log scale (see rsvs3d::SignedLogScale)
+ */
+#define TOSENSVEC(val,ind) rsvs3d::SignedLogScale(\
+		(ind!=rsvs3d::constants::__notfound?val:0.0))
+
 using namespace std; 
 
 //silent functions
@@ -134,10 +146,6 @@ void RSVScalc::ReturnSensitivities(const triangulation &triRSVS,
 
 	int ii, ni, temp;
 
-	auto tosensvec = [&](double val, int ind) -> double
-		{return rsvs3d::SignedLogScale(
-			(ind!=rsvs3d::constants::__notfound?val:0.0));};
-
 	if(constrNum>=this->nConstr){
 		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
 	}
@@ -145,7 +153,7 @@ void RSVScalc::ReturnSensitivities(const triangulation &triRSVS,
 	sensVec.assign(ni, 0);
 	for(ii=0; ii<ni; ii++){
 		temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-		sensVec[ii] = tosensvec(this->sensDv(temp, constrNum) ,temp);
+		sensVec[ii] = TOSENSVEC(this->sensDv(temp, constrNum) ,temp);
 	}
 }
 
@@ -155,9 +163,10 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 	int ii, ni, temp;
 	int nNegOpts = 6;
 
-	auto tosensvec = [&](double val, int ind) -> double
-		{return rsvs3d::SignedLogScale(
-			(ind!=rsvs3d::constants::__notfound?val:0.0));};
+	
+	// auto TOSENSVEC = [&](double val, int ind) -> double
+	// 	{return rsvs3d::SignedLogScale(
+	// 		(ind!=rsvs3d::constants::__notfound?val:0.0));};
 
 	if(constrNum>=this->nConstr || constrNum < -nNegOpts){
 		RSVS3D_ERROR_RANGE("Constraint is beyond the available range.");
@@ -168,41 +177,45 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 	if (constrNum==nNegTest++) {
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(this->dObj[temp],temp);
+			sensVec[ii] = TOSENSVEC(this->dObj[temp],temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		auto dLagTemp = this->dObj + this->lagMult.transpose()*this->dConstr;
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(dLagTemp[temp] ,temp);
+			sensVec[ii] = TOSENSVEC(dLagTemp[temp] ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(this->HObj(temp,temp) ,temp);
+			sensVec[ii] = TOSENSVEC(this->HObj(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(this->HConstr(temp,temp) ,temp);
+			sensVec[ii] = TOSENSVEC(this->HConstr(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		auto HLagTemp = this->HConstr + this->HObj;
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(HLagTemp(temp,temp) ,temp);
+			sensVec[ii] = TOSENSVEC(HLagTemp(temp,temp) ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(this->deltaDV[temp] ,temp);
+			sensVec[ii] = TOSENSVEC(this->deltaDV[temp] ,temp);
 		}
 	} else {
+		if(constrNum<0){
+			RSVS3D_ERROR_LOGIC("Negative ''constraints'' should be handled in"
+				" before this case.");
+		}
 		for(ii=0; ii<ni; ii++){
 			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = tosensvec(this->dConstr(constrNum, temp) ,temp);
+			sensVec[ii] = TOSENSVEC(this->dConstr(constrNum, temp) ,temp);
 		}
 	}
 }

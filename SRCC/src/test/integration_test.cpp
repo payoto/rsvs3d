@@ -1,3 +1,9 @@
+/**
+ * Tests for the full integration of the project.
+ *  
+ *@file
+ */
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -23,6 +29,9 @@
 #include "parameters.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSmath_automatic.hpp"
+
+
+using namespace integrate::test;
 
 typedef std::tuple<double, Eigen::MatrixXd, double, double> processed_derivative;
 
@@ -240,9 +249,12 @@ int integrate::test::CompareSurfCentreDerivatives(){
 }
 
 
-void CompareDerivativesSpikeStepNum(std::string numstr){
+void CompareDerivativesSpikeStepNum(std::string numstr, 
+	bool useSurfCentreDeriv=true){
 	integrate::RSVSclass RSVSobj;
 	std::vector<std::string> commands;
+
+	RSVSobj.calcObj.SetUseSurfCentreDeriv(useSurfCentreDeriv);
 
 	commands.push_back("CompareDerivativesSpike"+numstr);
 	commands.push_back("-l");
@@ -256,6 +268,8 @@ void CompareDerivativesSpikeStepNum(std::string numstr){
 	/*Perform tests, compare */
 	// Choose a snaxel pass all  it through the RSVScalc object
 	// double fdStep = 1e-6;
+	if (RSVSobj.rsvsSnake.snaxs.size()>543){
+
 	int testVert = RSVSobj.rsvsSnake.snaxs(543)->index;
 	std::stringstream sumarries;
 	auto coutbuff = std::cout.rdbuf(sumarries.rdbuf());
@@ -281,6 +295,7 @@ void CompareDerivativesSpikeStepNum(std::string numstr){
 	std::cout << RSVSobj.calcObj.lagMult.transpose();
 	std::cout << std::endl << "-------------------------------------------" 
 		<< std::endl;
+	}
 }
 
 int integrate::test::CompareDerivativesSpike(){
@@ -290,4 +305,91 @@ int integrate::test::CompareDerivativesSpike(){
 	CompareDerivativesSpikeStepNum("97");
 	CompareDerivativesSpikeStepNum("98");
 	return 0;
+}
+int integrate::test::CompareDerivativesSpikeNoDPos(){
+
+	double  rsvsmath_automatic_eps_surfprev = rsvsmath_automatic_eps_surf;
+	
+	CompareDerivativesSpikeStepNum("100",false);
+	CompareDerivativesSpikeStepNum("100",true);
+	
+	rsvsmath_automatic_eps_surf = 0.0;
+	CompareDerivativesSpikeStepNum("100",false);
+	CompareDerivativesSpikeStepNum("100",true);
+
+	rsvsmath_automatic_eps_surf = 1e-6;
+	CompareDerivativesSpikeStepNum("100",false);
+	CompareDerivativesSpikeStepNum("100",true);
+
+	rsvsmath_automatic_eps_surf=rsvsmath_automatic_eps_surfprev;
+	return 0;
+}
+
+void GenerateDerivatives(bool useSurfCentreDeriv, double eps_overwrite, 
+	double spawn_step, ostream &outPutDeriv=std::cout){
+	integrate::RSVSclass RSVSobj;
+	std::vector<std::string> commands;
+	std::stringstream nameCommand, posCommand;
+	RSVSobj.calcObj.SetUseSurfCentreDeriv(useSurfCentreDeriv);
+	double  rsvsmath_automatic_eps_surfprev = rsvsmath_automatic_eps_surf;
+
+	rsvsmath_automatic_eps_surf = eps_overwrite;
+	nameCommand << "GenerateDerivatives " << std::endl
+		<< "useSurfCentreDeriv " << useSurfCentreDeriv << std::endl 
+		<<  "eps_overwrite " <<  eps_overwrite << std::endl 
+		<< "spawn_step " << spawn_step;
+
+	commands.push_back(nameCommand.str());
+	commands.push_back("-l");
+	commands.push_back("config/restart_spike_issue.json");
+	commands.push_back("-p");
+	commands.push_back("/files/ioout/logginglvl:5");
+	commands.push_back("-p");
+	posCommand << "/snak/spawnposition:" << spawn_step;
+	commands.push_back(posCommand.str());
+	RunCommandFromString(RSVSobj, commands);
+	rsvsmath_automatic_eps_surf=rsvsmath_automatic_eps_surfprev;
+
+	auto&  c = RSVSobj.calcObj;
+	outPutDeriv.precision(16);
+	outPutDeriv << nameCommand.str() << std::endl;
+	outPutDeriv << "dObj," << c.dObj.size() << std::endl;
+	PrintMatrixFile(c.dObj, outPutDeriv);
+	outPutDeriv << std::endl;
+	outPutDeriv << "dConstr," << c.dConstr.size() << std::endl;
+	PrintMatrixFile(c.dConstr, outPutDeriv);
+	outPutDeriv << std::endl;
+	outPutDeriv << "HObj," << c.HObj.size() << std::endl;
+	PrintMatrixFile(c.HObj, outPutDeriv);
+	outPutDeriv << std::endl;
+	outPutDeriv << "HConstr," << c.HConstr.size() << std::endl;
+	PrintMatrixFile(c.HConstr, outPutDeriv);
+	outPutDeriv << std::endl;
+	outPutDeriv << "deltaDV," << c.deltaDV.size() << std::endl;
+	PrintMatrixFile(c.deltaDV, outPutDeriv);
+	outPutDeriv << std::endl;
+}
+
+int integrate::test::StudyDerivatives(){
+
+	// Load the spike test and do one step at different values of step size and
+	// rsvsmath_automatic_eps
+	int k = 0; 
+	for(auto useSurfCentreDeriv : {true, false}){
+		for(auto eps_overwrite : {0.0, 1e-15, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 
+			1e-4, 1e-3, 1e-2, 1e-1, 1e-0}){
+			k++;
+			std::stringstream fileName;
+			fileName << "dbg/processed_derivative/derivative_"<< k << ".dat";
+			ofstream outPutDeriv(fileName.str());
+			for(auto spawn_step : {0.0, 1e-15, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 
+				1e-4, 1e-3, 1e-2, 1e-1, 2e-1}){
+				GenerateDerivatives(useSurfCentreDeriv, eps_overwrite, 
+					spawn_step, outPutDeriv);
+			}
+		}
+	}
+
+	return 0;
+
 }

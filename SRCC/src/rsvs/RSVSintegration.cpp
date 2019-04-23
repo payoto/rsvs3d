@@ -665,20 +665,23 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 
 	
 	int logLvl = RSVSobj.paramconf.files.ioout.outputlvl;
+	if (RSVSobj.paramconf.files.ioout.logginglvl!=5){
+		logLvl = max(RSVSobj.paramconf.files.ioout.outputlvl,
+			RSVSobj.paramconf.files.ioout.logginglvl);
+	}
 
-	if (RSVSobj.paramconf.files.ioout.outputlvl>1){
+	if (logLvl>1){
 		integrate::execute::postprocess::Snake(
 			RSVSobj.rsvsSnake,
 			RSVSobj.voluMesh,
 			RSVSobj.paramconf);
 	}
 
-	if (0 < RSVSobj.paramconf.files.ioout.outputlvl){
+	if (0 < logLvl){
 		RSVSobj.logFile << "> final step" << stepNum << " :," ;
 			RSVSobj.logFile << totT << endl;
 		integrate::execute::postprocess::Log(
-			RSVSobj.logFile, RSVSobj.calcObj,
-			RSVSobj.paramconf.files.ioout.outputlvl
+			RSVSobj.logFile, RSVSobj.calcObj,logLvl
 			);
 	}
 	if (logLvl==2 || logLvl==5){
