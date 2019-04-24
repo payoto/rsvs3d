@@ -224,9 +224,9 @@ bool RSVScalc::PrepareMatricesForSQPSensitivity(
 	const MatrixXd_sparse &dConstrAct,
 	const MatrixXd_sparse &HConstrAct, 
 	MatrixXd_sparse &HObjAct,
-	MatrixXd_sparse &sensMult,
+	Eigen::MatrixXd &sensMult,
 	MatrixXd_sparse &sensInv,
-	MatrixXd_sparse &sensRes) const {
+	Eigen::MatrixXd &sensRes) const {
 
 	int nDvAct, nConstrAct;
 
@@ -260,14 +260,10 @@ bool RSVScalc::PrepareMatricesForSQPSensitivity(
 		}
 	}
 
-	// sensInv << HConstrAct+HObjAct , dConstrAct.transpose(), 
-	// 	dConstrAct, MatrixXd::Zero(nConstrAct, nConstrAct);
-
 	sensMult.setZero();
-	sensMult.reserve(nConstrAct);
 	for (int i = 0; i < nConstrAct; ++i)
 	{
-		sensMult.insert(nDvAct+i, i) = this->lagMult[this->subConstrAct[i]];
+		sensMult(nDvAct+i, i) = this->lagMult[this->subConstrAct[i]];
 	}
 	sensRes.setZero();
 
@@ -313,12 +309,14 @@ void RSVScalc::CheckAndCompute(int calcMethod, bool sensCalc){
 				this->ComputeSQPsens(calcMethod, sensMult, sensInv, sensRes);
 			}
 		} else {
-			MatrixXd_sparse sensMult, sensInv, sensRes;
+			MatrixXd_sparse sensInv;
+			MatrixXd sensRes, sensMult;
 			bool computeSens = this->PrepareMatricesForSQPSensitivity(
 				dConstrAct_sparse, HConstrAct_sparse, HObjAct_sparse,
 				sensMult, sensInv, sensRes);
 			if (computeSens)
 			{
+				sensInv.makeCompressed();
 				this->ComputeSQPsens(calcMethod, sensMult, sensInv, sensRes);
 			}
 		}
@@ -527,12 +525,29 @@ void RSVScalc::ComputeSQPsens(
 	}
 }
 
+bool SQPsens_sparse2(
+	const Eigen::MatrixXd &sensMult,
+	const MatrixXd_sparse &sensInv,
+	Eigen::MatrixXd &sensRes){
+
+	Eigen::SparseLU<MatrixXd_sparse> HLagSystem;
+	HLagSystem.compute(sensInv);
+	if(HLagSystem.info()!=Eigen::Success) {
+		// decomposition failed
+		RSVS3D_ERROR_NOTHROW("Failed to decompose sensitivity system.");
+		return(false);
+	}
+
+	sensRes = - (HLagSystem.solve(sensMult));
+
+	return(true);
+}
+
 void RSVScalc::ComputeSQPsens(
 	int calcMethod,
-	const MatrixXd_sparse &sensMult,
-	const MatrixXd_sparse &sensInv,
-	MatrixXd_sparse &sensRes
-	){
+	Eigen::MatrixXd &sensMult,
+	MatrixXd_sparse &sensInv,
+	Eigen::MatrixXd &sensRes){
 
 
 	switch(calcMethod){
@@ -543,11 +558,15 @@ void RSVScalc::ComputeSQPsens(
 	}
 
 	this->sensDv.setZero(this->nDv, this->nConstr);
-	for (int k=0; k<sensRes.outerSize(); ++k){
-		for (SparseMatrix<double>::InnerIterator it(sensRes,k); it; ++it)
+	int nConstrAct, nDvAct;
+	nConstrAct = this->subConstrAct.size();
+	nDvAct = this->subDvAct.size();
+	for (int i = 0; i < nDvAct; ++i)
+	{
+		for (int j = 0; j < nConstrAct; ++j)
 		{
-			this->sensDv(this->subDvAct[it.row()],this->subConstrAct[it.col()]) = 
-				it.value();
+			this->sensDv(this->subDvAct[i],this->subConstrAct[j]) = 
+				sensRes(i,j);
 		}
 	}
 }

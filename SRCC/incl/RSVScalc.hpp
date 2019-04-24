@@ -19,13 +19,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector> 
+#include <Eigen>
 
 #include "warning.hpp"
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
 #include "triangulate.hpp"
-#include <Eigen>
 
 using namespace std; 
 typedef Eigen::SparseMatrix<double, Eigen::ColMajor> MatrixXd_sparse;
@@ -364,9 +364,9 @@ public:
 		Eigen::MatrixXd &sensRes);
 	void ComputeSQPsens(
 		int calcMethod,
-		const MatrixXd_sparse &sensMult,
-		const MatrixXd_sparse &sensInv,
-		MatrixXd_sparse &sensRes);
+		Eigen::MatrixXd &sensMult,
+		MatrixXd_sparse &sensInv,
+		Eigen::MatrixXd &sensRes);
 
 	/**
 	 * @brief      Prepares the matrices needed for the SQP step calculation.
@@ -428,10 +428,9 @@ public:
 		const MatrixXd_sparse &dConstrAct,
 		const MatrixXd_sparse &HConstrAct, 
 		MatrixXd_sparse &HObjAct,
-		MatrixXd_sparse &sensMult,
+		Eigen::MatrixXd &sensMult,
 		MatrixXd_sparse &sensInv,
-		MatrixXd_sparse &sensRes
-		) const;
+		Eigen::MatrixXd &sensRes) const;
 	
 	/**
 	 * @brief      Returns velocities to the snaxels.
@@ -584,8 +583,9 @@ bool SQPstep(const RSVScalc &calcobj,
  * @return     true.
  */
 template<class T>
-bool SQPsens_sparse(MatrixXd_sparse &sensMult, const MatrixXd_sparse &sensInv,
-	MatrixXd_sparse &sensRes);
+bool SQPsens_sparse(const Eigen::MatrixXd &sensMult,
+	const MatrixXd_sparse &sensInv,
+	Eigen::MatrixXd &sensRes);
 
 template<class T>
 bool SQPsens(
@@ -728,15 +728,20 @@ bool SQPsens(
 
 template<class T>
 bool SQPsens_sparse(
-	const MatrixXd_sparse &sensMult,
+	const Eigen::MatrixXd &sensMult,
 	const MatrixXd_sparse &sensInv,
-	MatrixXd_sparse &sensRes){
+	Eigen::MatrixXd &sensRes){
 
 	T HLagSystem;
 	HLagSystem.compute(sensInv);
-
-	sensRes = -HLagSystem.solve(sensMult);
+	if(HLagSystem.info()!=Eigen::Success) {
+		// decomposition failed
+		RSVS3D_ERROR_NOTHROW("Failed to decompose sensitivity system.");
+		return(false);
+	}
+	sensRes = - (HLagSystem.solve(sensMult));
 	return(true);
 }
+
 
 #endif

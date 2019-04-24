@@ -92,28 +92,27 @@
  //        "SublimeLinter.linters.gcc.selector": "source.c++"
  //    },
  
- "settings":
- {
- 	"sublimegdb_workingdir": "${folder:${project_path:test_RSVS3D.exe}}",
-         // NOTE: You MUST provide --interpreter=mi for the plugin to work
-         "sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
+	 "settings":
+	 {
+		"sublimegdb_workingdir": "${folder:${project_path:test_RSVS3D.exe}}",
+		// NOTE: You MUST provide --interpreter=mi for the plugin to work
+		"sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
 
-   //       "ecc_common_flags": ["-ISRCC",
-			//     // some example includes
-			//     "-I/usr/include",
-			//     "-I$project_base_path/src",
-			//     // this is needed to include the correct headers for clang
-			//     "-I/usr/lib/clang/$clang_version/include",
-			// ],
-         // "easy_clang_complete_verbose": true,
-         "SublimeLinter.linters.gcc.include_dirs": [
-                   "C:\\ap1949include\\Eigen_all\\Eigen\\",
-                   "C:\\ap1949include\\json\\single_include\\nlohmann",
-                   "C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
-                   "C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\modules\\tetgen",
-                   "C:\\ap1949include\\boost_1_67_0",
-                   "C:\\ap1949include\\cxxopts-2.1.1\\include",
-               ],
-         
-     }
+		"SublimeLinter.linters.gcc.include_dirs": [
+			"C:\\ap1949include\\Eigen_all\\Eigen\\",
+			"C:\\ap1949include\\json\\single_include\\nlohmann",
+			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
+			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\modules\\tetgen",
+			"C:\\ap1949include\\boost_1_67_0",
+			"C:\\ap1949include\\cxxopts-2.1.1\\include",
+		],
+
+		"SublimeLinter.linters.gcc.c++_extra_flags": [
+	          "-fsyntax-only",
+	          "-std=c++11",
+            "-DTETLIBRARY",
+            "-DEIGEN_NO_DEBUG","-DEIGEN_NO_STATIC_ASSERT",
+		],
+
+	}
  }
