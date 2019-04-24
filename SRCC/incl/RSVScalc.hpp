@@ -20,6 +20,8 @@
 #include <fstream>
 #include <vector> 
 
+#include "warning.hpp"
+#include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
 #include "triangulate.hpp"
@@ -27,6 +29,58 @@
 
 using namespace std; 
 typedef Eigen::SparseMatrix<double, Eigen::ColMajor> MatrixXd_sparse;
+typedef HashedVectorPair<int,int,int, double> TripletMap;
+
+template<typename T>
+class sparsetripletelement {
+public:
+	int row = 0;
+	int col = 0;
+	T value = 0;
+
+	sparsetripletelement<T>(int r, int c, T v){
+		this->row = r;
+		this->col = c;
+		this->value = v;
+	}
+};
+
+class SparseMatrixTriplet : protected TripletMap {
+	int nRow=0;
+	int nCol=0;
+public:
+	double& operator()(int a, int b){
+		#ifdef SAFE_ACCESS
+		if(a<0 || a>=this->nRow || b<0 || b>=this->nCol){
+			RSVS3D_ERROR_RANGE("Indices out of range.");
+		}
+		#endif
+		return TripletMap::operator()(a+this->nRow*b);
+	}
+	sparsetripletelement<double> operator[](int a){
+		#ifdef SAFE_ACCESS
+		if(a<0 || a>=int(this->TripletMap::size())){
+			RSVS3D_ERROR_RANGE("Indices out of range.");
+		}
+		#endif
+		sparsetripletelement<double> out(this->vec[a]-this->vec[a]/this->nRow,
+										 this->vec[a]/this->nRow,
+										 this->targ[a]);
+		return out;
+	}
+	void resize(int row, int col){
+		this->nRow = row;
+		this->nCol = col;
+	}
+	void SetZero(){
+		this->TripletMap::clear();
+	}
+	int NonZero(){
+		return this->TripletMap::size();
+	}
+	void reserve(size_t a);
+}; 
+
 /**
  * Class to handle the RSVS calculation.
  * 

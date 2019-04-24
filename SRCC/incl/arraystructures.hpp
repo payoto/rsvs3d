@@ -290,7 +290,18 @@ public:
 	inline vector<int> find_list(const vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
+	T& operator[](const int a){return this->vec[a];}
+	const T& operator[](const int a) const {return this->vec[a];}
 
+	void reserve(const size_t a){this->vec.reserve(a);}
+	void assign(const size_t a, const T &elm){this->vec.assign(a, elm);}
+	void push_back(const T &elm){
+		this->vec.push_back(elm);
+		R t = this->vec.size()-1;
+		this->hashTable.emplace(elm,t);
+	}
+	void clear(){this->vec.clear();}
+	size_t size() const {return this->vec.size();}
 };
 
 template <class T,class Q, class R>  
@@ -303,6 +314,41 @@ public:
 	vector<R> targ;
 	inline void GenerateHash();
 
+};
+
+template <class T,class Q, class R, class S>
+class HashedVectorPair : public HashedVector<T,Q, R> {
+public:
+	using HashedVector<T,Q,R>::hashTable;
+	using HashedVector<T,Q,R>::vec;
+	using HashedVector<T,Q,R>::isHash;
+
+	vector<S> targ;
+
+	S& operator()(const T& elm){
+		int pos = this->HashedVector<T,Q,R>::find(elm);
+		if(pos==rsvs3d::constants::__notfound){
+			this->push_back(elm,S(0));
+			pos = this->size()-1;
+		}
+		return this->targ[pos];
+	}
+	void reserve(const size_t a){
+		this->HashedVector<T,Q,R>::reserve(a);
+		this->vec.reserve(a);
+	}
+	void assign(const size_t a, const T &elmVec, const S &elmTarg){
+		this->HashedVector<T,Q,R>::assign(a, elmVec);
+		this->targ.assign(a, elmTarg);
+	}
+	void push_back(const T &elmVec, const S &elmTarg){
+		this->HashedVector<T,Q,R>::push_back(elmVec);
+		this->targ.push_back(elmTarg);
+	}
+	void clear(){
+		this->HashedVector<T,Q,R>::clear();
+		this->targ.clear();
+	}
 };
 
 template <class T,class Q, class R=int>  
