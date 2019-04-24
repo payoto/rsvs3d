@@ -300,7 +300,10 @@ public:
 		R t = this->vec.size()-1;
 		this->hashTable.emplace(elm,t);
 	}
-	void clear(){this->vec.clear();}
+	void clear(){this->vec.clear();
+		this->isHash=false;
+		this->hashTable.clear();
+	}
 	size_t size() const {return this->vec.size();}
 };
 

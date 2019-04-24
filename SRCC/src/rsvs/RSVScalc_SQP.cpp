@@ -125,50 +125,55 @@ void RSVScalc::PrepareMatricesForSQPSparse(
 	MatrixXd_sparse &HConstrAct_sparse,
 	MatrixXd_sparse &HObjAct_sparse){
 
-	int ii, jj;
+	int ii, jj, count;
 	int nConstrAct = this->subConstrAct.size();
 	int nDvAct = this->subDvAct.size();
-	// Sparse maths
+	// Sparse maths 
 	dConstrAct_sparse.resize(nConstrAct,nDvAct);
-	dConstrAct_sparse.reserve(this->nonZeroPerDV*nDvAct);
-	for (int k=0; k<dConstr_sparse.outerSize(); ++k){
-		for (SparseMatrix<double>::InnerIterator it(dConstr_sparse,k); it; ++it)
-		{
-			if(isConstrAct[it.row()] && isDvAct[it.col()]){
-				ii = subConstrAct.find(it.row());
-				jj = subDvAct.find(it.col());
-				dConstrAct_sparse.coeffRef(ii,jj) = it.value();
+	count = this->dConstr_sparse.nonZeros();
+	dConstrAct_sparse.reserve(count);
+	for (int k=0; k<count; ++k){
+		auto it = dConstr_sparse[k];
+		if(isConstrAct[it.row()] && isDvAct[it.col()]){
+			ii = subConstrAct.find(it.row());
+			jj = subDvAct.find(it.col());
+			if(ii==rsvs3d::constants::__notfound 
+				|| jj==rsvs3d::constants::__notfound){
+				std::cerr << std::endl << "rows " << it.row()
+					<< ", cols " << it.col()
+					<< ", value " << it.value() << std::endl;
+				RSVS3D_ERROR_LOGIC("It should not be possible to get here.");
 			}
+
+			dConstrAct_sparse.insert(ii,jj) = it.value();
 		}
 	}
 
 	HConstrAct_sparse.resize(nDvAct,nDvAct); 
-	HConstrAct_sparse.reserve(this->nonZeroPerDV*nDvAct); 
-	for (int k=0; k<HConstr_sparse.outerSize(); ++k){
-		for (SparseMatrix<double>::InnerIterator it(HConstr_sparse,k); it; ++it)
-		{
-			if(isDvAct[it.row()] && isDvAct[it.col()]){
-				ii = subDvAct.find(it.row());
-				jj = subDvAct.find(it.col());
-				HConstrAct_sparse.coeffRef(ii,jj) = it.value();
-			}
+	count = this->HConstr_sparse.nonZeros();
+	HConstrAct_sparse.reserve(count);
+	for (int k=0; k<count; ++k){
+		auto it = HConstr_sparse[k];
+		if(isDvAct[it.row()] && isDvAct[it.col()]){
+			ii = subDvAct.find(it.row());
+			jj = subDvAct.find(it.col());
+			HConstrAct_sparse.insert(ii,jj) = it.value();
 		}
 	}
 
 	HObjAct_sparse.resize(nDvAct,nDvAct);  
-	HObjAct_sparse.reserve(this->nonZeroPerDV*nDvAct);  
-	for (int k=0; k<HObj_sparse.outerSize(); ++k){
-		for (SparseMatrix<double>::InnerIterator it(HObj_sparse,k); it; ++it)
-		{
-			if(isDvAct[it.row()] && isDvAct[it.col()]){
-				ii = subDvAct.find(it.row());
-				jj = subDvAct.find(it.col());
-				HObjAct_sparse.coeffRef(ii,jj) = it.value();
-			}
+	count = this->HObj_sparse.nonZeros();
+	HObjAct_sparse.reserve(count);
+	for (int k=0; k<count; ++k){
+		auto it = HObj_sparse[k];
+		if(isDvAct[it.row()] && isDvAct[it.col()]){
+			ii = subDvAct.find(it.row());
+			jj = subDvAct.find(it.col());
+			HObjAct_sparse.insert(ii,jj) = it.value();
 		}
 	}
-
-	this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr_sparse;
+	this->dConstr_sparse.SetEqual(this->dConstr);
+	this->dLag = this->dObj + this->lagMult.transpose()*this->dConstr;
 	this->HLag_sparse = HObjAct_sparse+HConstrAct_sparse;
 
 }
@@ -531,11 +536,9 @@ void RSVScalc::ComputeSQPsens(
 
 
 	switch(calcMethod){
-		case 1:
-			RSVS3D_ERROR("Not coded");
-		break;
 		default:
-			RSVS3D_ERROR("Not coded");
+			SQPsens_sparse<Eigen::SparseLU<MatrixXd_sparse>>
+				(sensMult, sensInv, sensRes);
 		break;
 	}
 

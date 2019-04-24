@@ -89,13 +89,11 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 
 	int ii,ni;
 
-	auto start_s=rsvs3d::TimeStamp(NULL, 0);
-
 	this->returnDeriv=true;
 
 	// prepare the SQP object
 	this->PrepTriangulationCalc(triRSVS);
-	start_s=rsvs3d::TimeStamp("(prep) ", start_s);
+
 	// Calculate the SQP object
 	this->ZeroTimers();
 	auto calcTriFunc=&RSVScalc::CalcTriangle;
@@ -112,21 +110,17 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.dynatri(ii)), triRSVS, true, true, true);
 	} 
-	this->PrintTimers();
-	start_s=rsvs3d::TimeStamp("(dyna) ", start_s);
 
 	ni=triRSVS.intertri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.intertri(ii)), triRSVS, false, true, true);
 	}
-	start_s=rsvs3d::TimeStamp("(inter) ", start_s);
 
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, 
 			false, true, false);
 	}
-	start_s=rsvs3d::TimeStamp("(stat) ", start_s);
 
 	// Output some data to check it makes sense
 }
@@ -394,13 +388,6 @@ void RSVScalc::BuildMathArrays(int nDvIn, int nConstrIn){
 		this->HConstr.setZero(nDv,nDv); 
 		this->HObj.setZero(nDv,nDv); 
 	} else {
-		std::cout << std::endl;
-		std::cout << this->dConstr_sparse.nonZeros() << " ";
-		std::cout << this->HConstr_sparse.nonZeros() << " ";
-		std::cout << this->HObj_sparse.nonZeros() << " ";
-		std::cout << this->HLag_sparse.nonZeros() << " ";
-		std::cout << std::endl;
-
 		this->dConstr_sparse.setZero();
 		this->HConstr_sparse.setZero();
 		this->HObj_sparse.setZero();
@@ -488,7 +475,7 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		out << "> constraint residuals :, ";
 		StreamOutVector(abs(this->constr.array()-this->constrTarg.array()),
 			out, string(", "));
-
+ 
 		out << "> volume values :, ";
 		StreamOutVector(this->constr.array(),
 			out, string(", "));
@@ -508,4 +495,43 @@ void RSVScalc::PrintTimers() const {
 	std::cout << " t1 " << rsvs3d::Clock2ms(this->timer1) << ",";
 	std::cout << " t2 " << rsvs3d::Clock2ms(this->timer2) << ",";
 	std::cout << " t3 " << rsvs3d::Clock2ms(this->timer3) << ",";
+}
+
+void SparseMatrixTriplet::SetEqual(MatrixXd_sparse &targ){
+	int n = this->nonZeros();
+	targ.setZero();
+	targ.resize(this->nRow, this->nCol);
+	targ.reserve(n);
+	for (int i = 0; i < n; ++i)
+	{
+		auto it = this->operator[](i);
+		targ.insert(it.row(),it.col()) = it.value();
+	}
+}
+
+void SparseMatrixTriplet::SetEqual(Eigen::MatrixXd &targ){
+	int n = this->nonZeros();
+	targ.resize(this->nRow, this->nCol);
+	targ.setZero(this->nRow, this->nCol);
+	for (int i = 0; i < n; ++i)
+	{
+		auto it = this->operator[](i);
+		targ(it.row(),it.col()) = it.value();
+	}
+}
+
+void SparseMatrixTriplet::reserve(size_t a){
+	this->TripletMap::reserve(a);
+}
+
+sparsetripletelement<double> SparseMatrixTriplet::operator[](int a){
+	#ifdef SAFE_ACCESS
+	if(a<0 || a>=int(this->TripletMap::size())){
+		RSVS3D_ERROR_RANGE("Indices out of range.");
+	}
+	#endif
+	sparsetripletelement<double> out(this->vec[a]%this->nRow,
+									 this->vec[a]/this->nRow,
+									 this->targ[a]);
+	return out;
 }

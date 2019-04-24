@@ -33,16 +33,24 @@ typedef HashedVectorPair<int,int,int, double> TripletMap;
 
 template<typename T>
 class sparsetripletelement {
-public:
-	int row = 0;
-	int col = 0;
-	T value = 0;
+	int rowVal = 0;
+	int colVal = 0;
+	T valueVal = 0;
 
+public:
 	sparsetripletelement<T>(int r, int c, T v){
-		this->row = r;
-		this->col = c;
-		this->value = v;
+		#ifdef SAFE_ACCESS
+		if(r<0 || c<0){
+			RSVS3D_ERROR_RANGE("Indices out of range.");
+		}
+		#endif
+		this->rowVal = r;
+		this->colVal = c;
+		this->valueVal = v;
 	}
+	int row() const{return this->rowVal;}
+	int col() const{return this->colVal;}
+	T value() const{return this->valueVal;}
 };
 
 class SparseMatrixTriplet : protected TripletMap {
@@ -57,28 +65,23 @@ public:
 		#endif
 		return TripletMap::operator()(a+this->nRow*b);
 	}
-	sparsetripletelement<double> operator[](int a){
-		#ifdef SAFE_ACCESS
-		if(a<0 || a>=int(this->TripletMap::size())){
-			RSVS3D_ERROR_RANGE("Indices out of range.");
-		}
-		#endif
-		sparsetripletelement<double> out(this->vec[a]-this->vec[a]/this->nRow,
-										 this->vec[a]/this->nRow,
-										 this->targ[a]);
-		return out;
+	sparsetripletelement<double> operator[](int a);
+	double& coeffRef(int a, int b){
+		return this->operator()(a,b);
 	}
 	void resize(int row, int col){
 		this->nRow = row;
 		this->nCol = col;
 	}
-	void SetZero(){
+	void setZero(){
 		this->TripletMap::clear();
 	}
-	int NonZero(){
+	int nonZeros() const {
 		return this->TripletMap::size();
 	}
 	void reserve(size_t a);
+	void SetEqual(MatrixXd_sparse &targ);
+	void SetEqual(Eigen::MatrixXd &targ);
 }; 
 
 /**
@@ -113,16 +116,16 @@ protected:
 public:
 	/// Constraint Jacobian, size: [nConstr, nDv].
 	Eigen::MatrixXd dConstr;
-	Eigen::SparseMatrix<double, Eigen::ColMajor> dConstr_sparse;
+	SparseMatrixTriplet dConstr_sparse;
 	/// Constraint Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HConstr;
-	Eigen::SparseMatrix<double, Eigen::ColMajor> HConstr_sparse;
+	SparseMatrixTriplet HConstr_sparse;
 	/// Objective Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HObj;
-	Eigen::SparseMatrix<double, Eigen::ColMajor> HObj_sparse;
+	SparseMatrixTriplet HObj_sparse;
 	/// Lagrangian Hessian, size: [nDv, nDv].
 	Eigen::MatrixXd HLag;
-	Eigen::SparseMatrix<double, Eigen::ColMajor> HLag_sparse;
+	MatrixXd_sparse HLag_sparse;
 	Eigen::RowVectorXd dLag;
 	/// Objective Jacobian, size: [1, nDv].
 	Eigen::RowVectorXd dObj;
@@ -567,6 +570,22 @@ bool SQPstep(const RSVScalc &calcobj,
 	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
 	bool attemptConstrOnly=true);
 
+/**
+ * Calculation for the sparse SQP sensitivity.
+ *
+ * @param      sensMult  The sensitivity multiplier.
+ * @param[in]  sensInv   The Matrix to invert.
+ * @param      sensRes   The sensitivity result.
+ *
+ * @tparam     T         The Eigen object type to use. Should take a
+ *                       RSVScalc::HLag as a constructor and support a solve
+ *                       method.
+ *
+ * @return     true.
+ */
+template<class T>
+bool SQPsens_sparse(MatrixXd_sparse &sensMult, const MatrixXd_sparse &sensInv,
+	MatrixXd_sparse &sensRes);
 
 template<class T>
 bool SQPsens(
@@ -702,6 +721,19 @@ bool SQPsens(
 	Eigen::MatrixXd &sensRes){
 
 	T HLagSystem(sensInv);
+
+	sensRes = -HLagSystem.solve(sensMult);
+	return(true);
+}
+
+template<class T>
+bool SQPsens_sparse(
+	const MatrixXd_sparse &sensMult,
+	const MatrixXd_sparse &sensInv,
+	MatrixXd_sparse &sensRes){
+
+	T HLagSystem;
+	HLagSystem.compute(sensInv);
 
 	sensRes = -HLagSystem.solve(sensMult);
 	return(true);
