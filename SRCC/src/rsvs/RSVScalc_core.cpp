@@ -82,6 +82,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	ArrayVec<double>* HValpnt=NULL, *dValpnt=NULL;
 	double * retVal;
 
+	auto clock1 = rsvs3d::TimeStamp(NULL, 0);
 	// Prepare calculation steps
 	veccoord = TrianglePointerCoordinates(triIn, triRSVS);
 	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
@@ -89,6 +90,9 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
 		this->useSurfCentreDeriv);
 
+	auto clock2 = rsvs3d::TimeStamp(NULL, clock1);
+	this->timer1 += (clock2-clock1);
+	clock1 = clock2;
 	// Total
 
 	// Constr and objective
@@ -138,6 +142,9 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 		}
 
 	}
+	clock2 = rsvs3d::TimeStamp(NULL, clock1);
+	this->timer2 += (clock2-clock1);
+	clock1 = clock2;
 
 	HVal.setZero(9,9);
 	dVal.setZero(1,9);
@@ -168,13 +175,19 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 
 				} else {
 					for(jj=0; jj< nDvAct; ++jj){
-						this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
-							 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+						if(!IsAproxEqual(HObjPart(jj,ii),0.0)){
+
+							this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
+								 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);
+						}
 					}
 				}
 			}
 		}
 	}
+	clock2 = rsvs3d::TimeStamp(NULL, clock1);
+	this->timer3 += (clock2-clock1);
+	clock1 = clock2;
 	// Update active lists of design variables
 	for(ii=0; ii< nDvAct; ++ii){
 		this->isDvAct.at(dvMap.find(dvListMap.vec[ii])) = true;

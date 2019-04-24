@@ -100,7 +100,7 @@ namespace rsvs3d {
 	 * @return     Scaled value of the double.
 	 */
 	double SignedLogScale(double in);
-
+	double Clock2ms(int clockCycles);
 }
 /**
  * @brief      Throw generic rsvs errors.

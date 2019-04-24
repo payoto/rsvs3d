@@ -7,6 +7,10 @@
 
 
 using namespace std;
+double rsvs3d::Clock2ms(int clockCycles)
+{
+	return(double(clockCycles)/double(CLOCKS_PER_SEC)*1000.0);
+}
 
 #ifndef TIME_EXEC
 	#pragma GCC diagnostic push
@@ -15,7 +19,9 @@ using namespace std;
 int rsvs3d::TimeStamp(const char* str,int start_s){
 	int stop_s=clock();
 	#ifdef TIME_EXEC
-	cout << str << " " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms; ";
+	if(str!=NULL){
+		cout << str << " " << Clock2ms(stop_s-start_s) << "ms; ";
+	}
 	#endif
 	return(stop_s);
 }

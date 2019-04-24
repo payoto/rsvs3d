@@ -240,7 +240,8 @@ public:
 
 // Function prototypes
 double SnaxImpactDt(const snax &snax1,const snax &snax2);
-inline bool IsAproxEqual(double d1,double d2) {return(fabs(d1-d2)<DBL_EPSILON);}
+inline bool IsAproxEqual(double d1,double d2, double tol=DBL_EPSILON)
+	{return(fabs(d1-d2)<tol);}
 int CompareSnakeInternalStatus(const vector<bool> & thisVec,bool thisFlipped,
 	 const vector<bool> & otherVec, bool otherFlipped);
 // Test Function prototypes

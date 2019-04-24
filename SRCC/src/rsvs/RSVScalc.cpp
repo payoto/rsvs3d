@@ -89,14 +89,15 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 
 	int ii,ni;
 
+	auto start_s=rsvs3d::TimeStamp(NULL, 0);
 
 	this->returnDeriv=true;
 
 	// prepare the SQP object
 	this->PrepTriangulationCalc(triRSVS);
-
+	start_s=rsvs3d::TimeStamp("(prep) ", start_s);
 	// Calculate the SQP object
-	
+	this->ZeroTimers();
 	auto calcTriFunc=&RSVScalc::CalcTriangle;
 	switch(derivMethod){
 		case 1:
@@ -106,19 +107,27 @@ void RSVScalc::CalculateTriangulation(const triangulation &triRSVS, int derivMet
 		calcTriFunc = &RSVScalc::CalcTriangleDirectVolume;
 		break;
 	}
+	this->ZeroTimers();
 	ni=triRSVS.dynatri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.dynatri(ii)), triRSVS, true, true, true);
 	} 
+	this->PrintTimers();
+	start_s=rsvs3d::TimeStamp("(dyna) ", start_s);
+
 	ni=triRSVS.intertri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.intertri(ii)), triRSVS, false, true, true);
 	}
+	start_s=rsvs3d::TimeStamp("(inter) ", start_s);
+
 	ni=triRSVS.acttri.size();
 	for(ii = 0; ii< ni ; ii++){
 		(this->*calcTriFunc)(*(triRSVS.stattri.isearch(triRSVS.acttri[ii])), triRSVS, 
 			false, true, false);
-	} 
+	}
+	start_s=rsvs3d::TimeStamp("(stat) ", start_s);
+
 	// Output some data to check it makes sense
 }
 
@@ -385,12 +394,23 @@ void RSVScalc::BuildMathArrays(int nDvIn, int nConstrIn){
 		this->HConstr.setZero(nDv,nDv); 
 		this->HObj.setZero(nDv,nDv); 
 	} else {
-		dConstr_sparse.resize(nConstr,nDv);
-		dConstr_sparse.reserve(nDv*2);
-		HConstr_sparse.resize(nDv,nDv);
-		HConstr_sparse.reserve(nDv*13);
-		HObj_sparse.resize(nDv,nDv);
-		HObj_sparse.reserve(nDv*13);
+		std::cout << std::endl;
+		std::cout << this->dConstr_sparse.nonZeros() << " ";
+		std::cout << this->HConstr_sparse.nonZeros() << " ";
+		std::cout << this->HObj_sparse.nonZeros() << " ";
+		std::cout << this->HLag_sparse.nonZeros() << " ";
+		std::cout << std::endl;
+
+		this->dConstr_sparse.setZero();
+		this->HConstr_sparse.setZero();
+		this->HObj_sparse.setZero();
+		this->HLag_sparse.setZero();
+		this->dConstr_sparse.resize(nConstr,nDv);
+		this->dConstr_sparse.reserve(nDv*2);
+		this->HConstr_sparse.resize(nDv,nDv);
+		this->HConstr_sparse.reserve(nDv*13);
+		this->HObj_sparse.resize(nDv,nDv);
+		this->HObj_sparse.reserve(nDv*13);
 	}
 }
 
@@ -482,4 +502,10 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		StreamOutVector(move(deltaDV),
 			out, string(", "));
 	}
+}
+
+void RSVScalc::PrintTimers() const {
+	std::cout << " t1 " << rsvs3d::Clock2ms(this->timer1) << ",";
+	std::cout << " t2 " << rsvs3d::Clock2ms(this->timer2) << ",";
+	std::cout << " t3 " << rsvs3d::Clock2ms(this->timer3) << ",";
 }

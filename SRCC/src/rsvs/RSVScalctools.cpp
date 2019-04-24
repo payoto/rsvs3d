@@ -310,20 +310,23 @@ void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn
 	
 	int nDvAct = dvListMap.vec.size();
 	int ii = cellTarg;
+	
 	for(int kk=0; kk< nDvAct; ++kk){
-		calc.dConstr_sparse.coeffRef(constrPos,
-			calc.dvMap.find(dvListMap.vec[kk])) += 
-			triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+		if(!IsAproxEqual(dConstrPart(0,kk),0.0)){
+			calc.dConstr_sparse.coeffRef(constrPos,
+				calc.dvMap.find(dvListMap.vec[kk])) += 
+				triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
+		}
 		calc.dvCallConstr(calc.dvMap.find(dvListMap.vec[kk]),0)++;
 		for(int ll=0; ll< nDvAct; ++ll){
-			// TODO cross product with lagrangian
-			calc.HConstr_sparse.coeffRef(calc.dvMap.find(dvListMap.vec[ll]),
-				 calc.dvMap.find(dvListMap.vec[kk])) += 
-				 triIn.connec.constrinfluence[ii]*
-				 HConstrPart(ll,kk)
-				 *calc.lagMult[constrPos]
-				 // /calc.constrTarg[constrPos]
-				 ;
+			double HconstrLag = HConstrPart(ll,kk)
+					*calc.lagMult[constrPos];
+			if(!IsAproxEqual(HconstrLag,0.0)){
+				// TODO cross product with lagrangian
+				calc.HConstr_sparse.coeffRef(calc.dvMap.find(dvListMap.vec[ll]),
+					calc.dvMap.find(dvListMap.vec[kk])) += 
+					triIn.connec.constrinfluence[ii]*HconstrLag;
+			}
 		}
 	}
 }

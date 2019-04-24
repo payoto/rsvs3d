@@ -50,6 +50,12 @@ protected:
 	bool returnDeriv=true;
 	/// Enable or disable surfcentroid derivatives
 	bool useSurfCentreDeriv = true;
+
+	int timer1=0;
+	int timer2=0;
+	int timer3=0;
+	void ZeroTimers(){this->timer1=0; this->timer2=0; this->timer3=0;}
+	void PrintTimers() const ;
 public:
 	/// Constraint Jacobian, size: [nConstr, nDv].
 	Eigen::MatrixXd dConstr;
@@ -88,9 +94,9 @@ public:
 	/// Is the corresponding design variable active?
 	std::vector<bool> isDvAct;
 	/// Vector of subscripts of the active constraints
-	std::vector<int> subConstrAct;
+	HashedVector<int, int> subConstrAct;
 	/// Vector of subscripts of the active design variables
-	std::vector<int> subDvAct;
+	HashedVector<int, int> subDvAct;
 	/// Maps the snake indices to the position in the design variable vector
 	HashedVector<int, int> dvMap;
 	/// maps snakemesh volu onto constr
@@ -288,14 +294,23 @@ public:
 		Eigen::VectorXd &constrAct,
 		Eigen::VectorXd &lagMultAct
 		);
+	void ComputeSQPstep(int calcMethod,
+		MatrixXd_sparse &dConstrAct,
+		Eigen::RowVectorXd &dObjAct,
+		Eigen::VectorXd &constrAct,
+		Eigen::VectorXd &lagMultAct);
 
 	void ComputeSQPsens(
 		int calcMethod,
 		const Eigen::MatrixXd &sensMult,
 		const Eigen::MatrixXd &sensInv,
-		Eigen::MatrixXd &sensRes
-		);
-	
+		Eigen::MatrixXd &sensRes);
+	void ComputeSQPsens(
+		int calcMethod,
+		const MatrixXd_sparse &sensMult,
+		const MatrixXd_sparse &sensInv,
+		MatrixXd_sparse &sensRes);
+
 	/**
 	 * @brief      Prepares the matrices needed for the SQP step calculation.
 	 *
@@ -317,9 +332,16 @@ public:
 		MatrixXd_sparse &HObjAct_sparse,
 		Eigen::RowVectorXd &dObjAct,
 		Eigen::VectorXd &constrAct,
-		Eigen::VectorXd &lagMultAct
-		);
+		Eigen::VectorXd &lagMultAct);
 
+	void PrepareMatricesForSQPFull(
+		Eigen::MatrixXd &dConstrAct,
+		Eigen::MatrixXd &HConstrAct, 
+		Eigen::MatrixXd &HObjAct);
+	void PrepareMatricesForSQPSparse(
+		MatrixXd_sparse &dConstrAct_sparse,
+		MatrixXd_sparse &HConstrAct_sparse,
+		MatrixXd_sparse &HObjAct_sparse);
 	/**
 	 * @brief      Prepares the matrices needed for the calculation of 
 	 * the sensitivity of the SQP.
@@ -344,6 +366,14 @@ public:
 		Eigen::MatrixXd &sensMult,
 		Eigen::MatrixXd &sensInv,
 		Eigen::MatrixXd &sensRes
+		) const;
+	bool PrepareMatricesForSQPSensitivity(
+		const MatrixXd_sparse &dConstrAct,
+		const MatrixXd_sparse &HConstrAct, 
+		MatrixXd_sparse &HObjAct,
+		MatrixXd_sparse &sensMult,
+		MatrixXd_sparse &sensInv,
+		MatrixXd_sparse &sensRes
 		) const;
 	
 	/**
@@ -542,6 +572,59 @@ bool SQPstep(const RSVScalc &calcobj,
 		std::cout << "(constrmov) " ;
 	 	deltaDVAct = -dConstrAct.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV)
 	 		.solve(constrAct);
+	} else {
+		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
+						+ dConstrAct.transpose()*lagMultAct));
+	}
+	return(isLarge || isNan);
+}
+
+
+template<class T>
+bool SQPstep_sparse(const RSVScalc &calcobj,
+	const MatrixXd_sparse &dConstrAct, const Eigen::RowVectorXd &dObjAct,
+	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
+	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
+	bool attemptConstrOnly){
+
+
+	T HLagSystem;
+	HLagSystem.compute(calcobj.HLag_sparse);
+	if(HLagSystem.info()!=Eigen::Success) {
+		// decomposition failed
+		RSVS3D_ERROR_NOTHROW("Failed to decompose Hessian of lagrangian.");
+		isNan = true;
+		return(isLarge || isNan);
+	}
+	T LagMultSystem;
+	MatrixXd_sparse temp1 = dConstrAct.transpose();
+	temp1.makeCompressed();
+	MatrixXd_sparse temp2 = dConstrAct*HLagSystem.solve(temp1);
+	temp2.makeCompressed();
+	LagMultSystem.compute(temp2);
+	if(LagMultSystem.info()!=Eigen::Success) {
+		// decomposition failed
+		RSVS3D_ERROR_NOTHROW("Failed to decompose Lagrangian multiplier system.");
+		isNan = true;
+		return(isLarge || isNan);
+	}
+	lagMultAct = LagMultSystem.solve(
+			constrAct - (dConstrAct* HLagSystem.solve(dObjAct.transpose()))
+		);
+
+	ResizeLagrangianMultiplier(calcobj, lagMultAct, isLarge, isNan);
+	isLarge=false;
+	if(!attemptConstrOnly && (isLarge || isNan)){
+		std::cout << "(early sqp return) ";
+		return(isLarge || isNan);
+	}
+	if(isLarge || isNan) {
+		// Use a least squared solver if only using the constraint
+		std::cout << "(constrmov) " ;
+		Eigen::SparseQR<MatrixXd_sparse, Eigen::COLAMDOrdering<int>> 
+			gradOnlySolver;
+		gradOnlySolver.compute(dConstrAct);
+	 	deltaDVAct = -gradOnlySolver.solve(constrAct);
 	} else {
 		deltaDVAct = - (HLagSystem.solve(dObjAct.transpose() 
 						+ dConstrAct.transpose()*lagMultAct));
