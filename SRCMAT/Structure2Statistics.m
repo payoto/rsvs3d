@@ -1,4 +1,4 @@
-function [statsout]=StatisticsDerivatives(resin, folderIn, derivFileName)
+function [statsout]=Structure2Statistics(resin, folderIn, derivFileName)
     %     resout = repmat(struct(),[0,1]);
     if ~exist('folderIn','var')
         folderIn = '';
@@ -67,9 +67,9 @@ function [stats]=ProcessNumeric(arr, basefieldname)
             case 'norm'
                 stats.([basefieldname,calc]) = norm(arr);
             case 'eig'
-                stats.([basefieldname,calc]) = eig(arr);
-                stats2 = ProcessNumeric(stats.([basefieldname,calc]),...
-                    [calc,'_']);
+                eigs = eig(arr);
+                stats.([basefieldname,calc]) = eigs;
+                stats2 = ProcessNumeric(eigs, [calc,'_']);
                 fields = fieldnames(stats2);
                 for jj = 1:numel(fields)
                     field = fields{jj};

@@ -10,10 +10,10 @@ classdef RSVS3D_DerivativeStudy < handle
         % derivFileName
         derivFileName;
         % Figure plots
-        figs = repmat(struct('handle',[],'type','','data',[],'stats',[],'links',[]),[0,1]);
+        figs = repmat(struct('handle',[],'type','','data',[],'stats',[],'links',[],'varargin',{}),[0,1]);
         
     end
-    properties(Access=private)
+    properties(Access=protected)
         % list of indices
         indexList = [];
         % is the list of indices stale?
@@ -27,18 +27,18 @@ classdef RSVS3D_DerivativeStudy < handle
         staleLayout = true;
     end
     
-    % function [resout]=RSVS3D_DerivativeStudy(entryPoint, varargin)
-    %
-    %     switch entryPoint
-    %         case 'parse'
-    %             [resout] = ParseFiles(varargin{:});
-    %         case 'stats'
-    %             [resout]=StatisticsDerivatives(varargin{:});
-    %         case 'plot'
-    %         otherwise
-    %             error('Unrecognised entry point.')
-    %     end
-    % end
+    methods(Access=protected)
+        
+        function BuildStructure(obj,varargin)
+            % Function which builds the data structure at the core of the
+            % object.
+            % This function should be overriden in subclasses to specialise
+            % how the structure is built
+            [obj.resout] = ParseFiles(obj.derivDirectory, ...
+                obj.derivFileName);
+        end
+    end
+    
     methods
 %% Interfaces
         function obj = RSVS3D_DerivativeStudy(derivDirectory, derivFileName)
@@ -46,17 +46,18 @@ classdef RSVS3D_DerivativeStudy < handle
             obj.derivFileName = derivFileName;
         end
         
-        function Parse(obj)
-            [obj.resout] = obj.ParseFiles(obj.derivDirectory, ...
-                obj.derivFileName);
+        
+        function Parse(obj,varargin)
+            % 
+            obj.BuildStructure(varargin{:})
             obj.MakeStale();
             if isempty(obj.layoutFields)
-                
+                obj.setLayoutFields();
             end
         end
         
         function Stats(obj)
-            [obj.statsout]=StatisticsDerivatives(obj.resout, obj.derivDirectory,...
+            [obj.statsout]=Structure2Statistics(obj.resout, obj.derivDirectory,...
                 obj.derivFileName);
         end % function
         
@@ -73,26 +74,35 @@ classdef RSVS3D_DerivativeStudy < handle
                 objlight.derivFileName,'.mat'];
             save(fileOut,'objlight');
         end
-%% Internals
-    %% Parser
-    % See ParseFiles.m
-   %% Statisitics
-   % see StatisticsDerivatives.m
+
    %% Plotting
-        function []=PlotOptions(obj)
+        function []=Plot(obj, plotType, varargin)
             
             obj.figs(end+1).type = plotType;
             switch plotType
                 case 'sparsity'
                     % Spy the hessians and look at the matrix structures
-                    PlotSparsity(obj, indices, figindex);
+                    obj.PlotSparsity(varargin{1}, numel(obj.figs));
                 case 'matsort'
                     % look at all the elements of a matrix sorted
-                    % Distributions?
+                    % or Distributions?
                 case 'stat3d'
                     % 3D 'surface' for a statistic
+                    obj.PlotStat3D(varargin{:})
             end
-            
+            obj.figs(end).varargin = varargin; 
+        end
+        
+        function RePlot(obj)
+            for ii = 1:numel(obj.figs)
+                obj.Plot(obj.figs(ii).type,obj.figs(ii).varargin{:});
+            end
+        end
+        
+        function ClearPlots(obj)
+            if numel(obj.figs)>1
+                obj.figs = repmat(obj.figs(1),[0,1]);
+            end
         end
         
         function []=PlotSparsity(obj, indices, figindex)
@@ -134,25 +144,33 @@ classdef RSVS3D_DerivativeStudy < handle
             legend(l(:,2))
         end
         
-        function []=PlotStat3D(obj, statList ,figindex)
-            % Plots surfaces associated with the 
-            if ~exist('figindex','var')
-                figindex = numel(obj.figs);
-                if figindex == 0
-                    figindex = 1;
-                end
+        function [ax]=PlotStat3D(obj, statList, varargin)
+            % Plots surfaces associated with the statistics
+            p = inputParser;
+            addRequired(p,'statList',@iscell);
+            addOptional(p,'figindex',max(numel(obj.figs),1));
+            addParameter(p,'axesSettings',{}, @(x) iscell(x) && ~mod(numel(x),2));
+            addParameter(p,'surfSettings',{}, @(x) iscell(x) && ~mod(numel(x),2));
+            parse(p,statList,varargin{:});
+            inputVars = fieldnames(p.Results);
+            for ii = 1:numel(inputVars)
+                eval([inputVars{ii},'=p.Results.(inputVars{ii});']);
             end
             
             obj.figs(figindex).stat = statList;
             
+            % PreProcessing of statList, these can be "packed" to have a recursive
+            % pattern definition.
+            statList = RSVS3D_DerivativeStudy.ParseStatLists(statList);
+            
             nAx = numel(statList);
             obj.figs(figindex).handle = figure;
-            
+            % Build the plots
             for ii = 1:nAx
                 ax(ii) = subplot(1,nAx,ii);
                 hold on;
             end
-            
+            % Prepare calculations
             nExtraDim = numel(obj.layoutCoeffs)-2;
             layerThickness = cumprod(cellfun(@numel,obj.layoutCoeffs(3:end)));
             layerSize  = cellfun(@numel,obj.layoutCoeffs(3:end));
@@ -165,28 +183,11 @@ classdef RSVS3D_DerivativeStudy < handle
             
             escape_= @(str)regexprep(str,'_','\\_');
             for ii = 1:nAx
-                tempArray = nan(size(obj.resout));
-                currStat = statList{ii};
-                if ~iscell(currStat)
-                    currStat = regexp(currStat,'\.','split');
-                end
-                for jj = 1:numel(tempArray)
-                    tempField = obj.statsout(jj);
-                    
-                    for kk = 1:numel(currStat)
-                        tempField = tempField.(currStat{kk});
-                    end
-                    if numel(tempField)~=1 || ~isnumeric(tempField)
-                        error(['The requested data did not reduce to a '...
-                            'single number. Cannot compute surface.'])
-                    end
-                    tempArray(jj) = tempField;
-                end
-                varName = '';
-                for kk = 1:numel(currStat)
-                    varName= [varName , currStat{kk},'.'];
-                end
-                varName = escape_(varName(1:end-1));
+                % Concatenates a nested structure field
+                [tempArray,varName] = GetNestedStructureField(...
+                    obj.statsout,statList{ii});
+                varName = escape_(varName);
+                
                 s=[];
                 for jj = 1:nLayers
                     extraDimSub = num2cell(mod(floor(...
@@ -209,10 +210,19 @@ classdef RSVS3D_DerivativeStudy < handle
                 ax(ii).XAxis.Label.String = escape_(obj.layoutFields{1});
                 ax(ii).YAxis.Label.String = escape_(obj.layoutFields{2});
                 legend(s)
+                for jj= 1:numel(s)
+                    SetNestedStructureField(s(jj),surfSettings{:}); %#ok<IDISVAR,USENS>
+                end
             end
             TightenAxes(ax,'auto');
+            for ii= 1:numel(ax)
+                SetNestedStructureField(ax(ii),axesSettings{:}); %#ok<IDISVAR,USENS>
+            end
+            
             obj.figs(figindex).links=linkprop(ax,{'XLim','YLim','CameraPosition'});
         end
+        
+        
     %% Getters Setters and accessors
         function [pos]=recordpos(obj,indices, recalc)
             if ~exist('recalc','var')
@@ -230,6 +240,16 @@ classdef RSVS3D_DerivativeStudy < handle
         end
         
         function setLayoutFields(obj,varargin)
+            
+            if numel(varargin)==0
+                fields = fieldnames(obj.resout);
+                for ii=1:numel(fields)
+                    if numel(obj.resout(1).(fields{ii}))==1
+                        varargin{end+1} = fields{ii};
+                    end
+                end
+            end
+            
             obj.layoutFields=varargin;
             obj.staleLayout = true;
         end
@@ -251,6 +271,7 @@ classdef RSVS3D_DerivativeStudy < handle
                 end
                 sizeLayout = zeros(1,3);
                 flatLayout = cell(size(obj.layoutFields));
+                obj.layoutCoeffs = cell(size(obj.layoutFields));
                 for ii = 1:numel(obj.layoutFields)
                     [obj.layoutCoeffs{ii},~, flatLayout{ii}] = ...
                         unique([obj.resout(:).(obj.layoutFields{ii})]);
@@ -283,6 +304,58 @@ classdef RSVS3D_DerivativeStudy < handle
             mkdir(newDir)
             
         end
+    end
+    methods(Static)
+        function [statList] = ParseStatLists(statList)
+            ii = 1;
+            while ii<=numel(statList)
+                if(iscell(statList{ii}))
+                    nCell = numel(statList{ii});
+                    if nCell>1
+                        if ischar(statList{ii}{1}) && ischar(statList{ii}{2})
+                            statList{ii}{1} = [statList{ii}{1},statList{ii}{2}];
+                            statList{ii}(2) = [];
+                        elseif ischar(statList{ii}{1})
+                            temp = cell(numel(statList{ii}{2}),1);
+                            for jj = 1:numel(statList{ii}{2})
+                                temp{jj}=[statList{ii}{1},statList{ii}{2}{jj}];
+                            end
+                            statList{ii}{1}=temp;
+                            statList{ii}(2) = [];
+                        elseif ischar(statList{ii}{2})
+                            temp = cell(numel(statList{ii}{1}),1);
+                            for jj = 1:numel(statList{ii}{1})
+                                temp{jj}=[statList{ii}{1}{jj},statList{ii}{2}];
+                            end
+                            statList{ii}{1}=temp;
+                            statList{ii}(2) = [];
+                        else
+                            n1 = numel(statList{ii}{1});
+                            n2 = numel(statList{ii}{2});
+                            temp = cell(n1*n2,1);
+                            for j1 = 1:n1
+                            for j2 = 1:n2
+                                jj = j1+(j2-1)*n1;
+                                temp{jj}=[statList{ii}{1}{j1},statList{ii}{2}{j2}];
+                            end
+                            end
+                            if(numel(temp)~=n1*n2)
+                                error('Should not happen')
+                            end
+                            statList{ii}{1}=temp;
+                            statList{ii}(2) = [];
+                        end
+                    else
+                        nCell = numel(statList{ii}{1});
+                        statList(end+1:end+nCell-1)= statList{ii}{1}(2:end);
+                        statList{ii} = statList{ii}{1}{1};
+                    end
+                else
+                    ii = ii+1;
+                end
+            end
+        end
+
     end % methods
 end % classdef
 
