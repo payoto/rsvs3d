@@ -65,6 +65,14 @@ public:
 		#endif
 		return TripletMap::operator()(a+this->nRow*b);
 	}
+	const double& operator()(int a, int b) const {
+		#ifdef SAFE_ACCESS
+		if(a<0 || a>=this->nRow || b<0 || b>=this->nCol){
+			RSVS3D_ERROR_RANGE("Indices out of range.");
+		}
+		#endif
+		return TripletMap::operator()(a+this->nRow*b);
+	}
 	sparsetripletelement<double> operator[](int a);
 	double& coeffRef(int a, int b){
 		return this->operator()(a,b);

@@ -189,27 +189,51 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS,
 			sensVec[ii] = TOSENSVEC(dLagTemp[temp] ,temp);
 		}
 	} else if (constrNum==nNegTest++) {
-
-		for(ii=0; ii<ni; ii++){
-			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = TOSENSVEC(this->HObj(temp,temp) ,temp);
+		if(this->UseFullMath()){
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(this->HObj(temp,temp) ,temp);
+			}
+		} else {
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(this->HObj_sparse(temp,temp) ,temp);
+			}
 		}
 	} else if (constrNum==nNegTest++) {
-
-		for(ii=0; ii<ni; ii++){
-			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = TOSENSVEC(this->HConstr(temp,temp) ,temp);
+		if(this->UseFullMath()){
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(this->HConstr(temp,temp) ,temp);
+			}
+		} else {
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(this->HConstr_sparse(temp,temp) ,temp);
+			}
+		}
+	} else if (constrNum==nNegTest++) {		
+		if(this->UseFullMath()){
+			auto HLagTemp = this->HConstr + this->HObj;
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(HLagTemp(temp,temp) ,temp);
+			}
+		} else {
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC((this->HConstr_sparse(temp,temp) 
+					+ this->HObj_sparse(temp,temp)),temp); 
+			}
 		}
 	} else if (constrNum==nNegTest++) {
-		auto HLagTemp = this->HConstr + this->HObj;
-		for(ii=0; ii<ni; ii++){
-			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = TOSENSVEC(HLagTemp(temp,temp) ,temp);
-		}
-	} else if (constrNum==nNegTest++) {
-		for(ii=0; ii<ni; ii++){
-			temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
-			sensVec[ii] = TOSENSVEC(this->deltaDV[temp] ,temp);
+		if(this->UseFullMath()){
+			for(ii=0; ii<ni; ii++){
+				temp = this->dvMap.find(triRSVS.snakeDep->snaxs(ii)->index);
+				sensVec[ii] = TOSENSVEC(this->deltaDV[temp] ,temp);
+			}
+		} else {
+			
 		}
 	} else {
 		if(constrNum<0){

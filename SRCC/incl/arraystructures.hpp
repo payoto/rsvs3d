@@ -321,11 +321,11 @@ public:
 
 template <class T,class Q, class R, class S>
 class HashedVectorPair : public HashedVector<T,Q, R> {
+	S defaultVal = S(0);
 public:
 	using HashedVector<T,Q,R>::hashTable;
 	using HashedVector<T,Q,R>::vec;
 	using HashedVector<T,Q,R>::isHash;
-
 	vector<S> targ;
 
 	S& operator()(const T& elm){
@@ -333,6 +333,13 @@ public:
 		if(pos==rsvs3d::constants::__notfound){
 			this->push_back(elm,S(0));
 			pos = this->size()-1;
+		}
+		return this->targ[pos];
+	}
+	const S& operator()(const T& elm) const {
+		int pos = this->HashedVector<T,Q,R>::find(elm);
+		if(pos==rsvs3d::constants::__notfound){
+			return this->defaultVal;
 		}
 		return this->targ[pos];
 	}
