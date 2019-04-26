@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <cmath>
 
 #include "parameters.hpp"
 #include "rsvsjson.hpp"
@@ -422,6 +423,9 @@ void param::to_json(json& j, const parameters& p){
 		{"snak", p.snak},
 		{"grid", p.grid},
 		{"files", p.files}
+		#ifdef RSVS_ACCESS_DEVELOPMENT_PARAMETERS
+		,{"dev", p.dev}
+		#endif
 	};
 }
 void param::from_json(const json& j, parameters& p){
@@ -429,6 +433,63 @@ void param::from_json(const json& j, parameters& p){
 	j.at("snak").get_to(p.snak);
 	j.at("grid").get_to(p.grid);
 	j.at("files").get_to(p.files);
+	#ifdef RSVS_ACCESS_DEVELOPMENT_PARAMETERS
+	j.at("dev").get_to(p.dev);
+	#endif
+}
+
+//===========================================
+// DEV namespace class method definitions
+//===========================================
+
+param::dev::rsvseps::rsvseps(){
+	this->rsvsmath_automatic_eps_edge = 0.0;
+	this->rsvsmath_automatic_eps_surf = 1e-10;
+	this->rsvsmath_automatic_eps_volu = 0.0;
+	this->rsvsmath_automatic_eps_centre = 1e-10;
+	this->rsvsmath_automatic_eps_centre2 = 1e-10;
+}
+
+void param::dev::to_json(json& j, const rsvseps& p){
+	j = json{
+		{"rsvsmath_automatic_eps_edge", p.rsvsmath_automatic_eps_edge},
+		{"rsvsmath_automatic_eps_surf", p.rsvsmath_automatic_eps_surf},
+		{"rsvsmath_automatic_eps_volu", p.rsvsmath_automatic_eps_volu},
+		{"rsvsmath_automatic_eps_centre", p.rsvsmath_automatic_eps_centre},
+		{"rsvsmath_automatic_eps_centre2", p.rsvsmath_automatic_eps_centre2}
+	};
+}
+void param::dev::from_json(const json& j, rsvseps& p){
+	j.at("rsvsmath_automatic_eps_edge").get_to(p.rsvsmath_automatic_eps_edge);
+	j.at("rsvsmath_automatic_eps_surf").get_to(p.rsvsmath_automatic_eps_surf);
+	j.at("rsvsmath_automatic_eps_volu").get_to(p.rsvsmath_automatic_eps_volu);
+	j.at("rsvsmath_automatic_eps_centre").get_to(p.rsvsmath_automatic_eps_centre);
+	j.at("rsvsmath_automatic_eps_centre2").get_to(p.rsvsmath_automatic_eps_centre2);
+}
+
+param::dev::devparam::devparam(){
+	this->limitlagrangian = 1e+308; // Close to infinity but parsable by JSON
+	this->mindesvarsparse = 200;
+	this->surfcentrejacobian = true;
+	this->surfcentrehessian = false;
+}
+
+void param::dev::to_json(json& j, const devparam& p){
+	j = json{
+		{"limitlagrangian", p.limitlagrangian},
+		{"mindesvarsparse", p.mindesvarsparse},
+		{"surfcentrejacobian", p.surfcentrejacobian},
+		{"surfcentrehessian", p.surfcentrehessian},
+		{"rsvsepsilons", p.rsvsepsilons}
+	};
+}
+void param::dev::from_json(const json& j, devparam& p){
+	j.at("limitlagrangian").get_to(p.limitlagrangian);
+	j.at("mindesvarsparse").get_to(p.mindesvarsparse);
+	j.at("surfcentrejacobian").get_to(p.surfcentrejacobian);
+	j.at("surfcentrehessian").get_to(p.surfcentrehessian);
+	j.at("rsvsepsilons").get_to(p.rsvsepsilons);
+
 }
 
 //================================

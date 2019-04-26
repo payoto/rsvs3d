@@ -26,6 +26,11 @@ namespace param{
 	class ioin;
 	class ioout;
 	class files;
+
+	namespace dev {
+		class rsvseps;
+		class devparam;
+	}
 }
 
 namespace tetgen{
@@ -84,7 +89,14 @@ namespace param {
 	void from_json(const rsvsjson::json& j, ioout& p); 
 
 	void to_json(rsvsjson::json& j, const files& p);
-	void from_json(const rsvsjson::json& j, files& p); 
+	void from_json(const rsvsjson::json& j, files& p);
+
+	namespace dev {
+		void to_json(rsvsjson::json& j, const devparam& p);
+		void from_json(const rsvsjson::json& j, devparam& p); 
+		void to_json(rsvsjson::json& j, const rsvseps& p);
+		void from_json(const rsvsjson::json& j, rsvseps& p); 
+	}
 }
 namespace rsvsjson {
 	void flatupdate(json& jfin, json& jnew,

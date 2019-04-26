@@ -1,4 +1,17 @@
 {
+  "dev": {
+    "limitlagrangian": 1e+308,
+    "mindesvarsparse": 200.0,
+    "rsvsepsilons": {
+      "rsvsmath_automatic_eps_centre": 1e-10,
+      "rsvsmath_automatic_eps_centre2": 1e-10,
+      "rsvsmath_automatic_eps_edge": 0.0,
+      "rsvsmath_automatic_eps_surf": 1e-10,
+      "rsvsmath_automatic_eps_volu": 0.0
+    },
+    "surfcentrehessian": false,
+    "surfcentrejacobian": true
+  },
   "files": {
     "appcasename2outdir": true,
     "exportconfig": [
@@ -23,7 +36,18 @@
       "pathpattern": "Archive_%Y_%m/Day_%y-%m-%d",
       "pattern": "",
       "redirectcerr": false,
-      "redirectcout": false
+      "redirectcout": false,
+      "tecplot": {
+        "directory": "../TESTOUT/layouts",
+        "filenameregex": "VarSet |LFDSFN1| =",
+        "loglvlspecialisation": [
+          [
+            0,
+            ""
+          ]
+        ],
+        "templateregex": "RSVS_"
+      }
     }
   },
   "grid": {
@@ -57,7 +81,7 @@
       ]
     ],
     "voronoi": {
-      "distancebox": 0.1,
+      "distancebox": 0.51,
       "inputpoints": [
         0.0
       ],
@@ -99,6 +123,7 @@
     "maxsteps": 50,
     "multiarrivaltolerance": 0.01,
     "snaxdiststep": 0.9,
-    "snaxtimestep": 0.9
+    "snaxtimestep": 0.9,
+    "spawnposition": 1e-05
   }
 }

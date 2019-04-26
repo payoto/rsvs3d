@@ -241,6 +241,48 @@ namespace param {
 	};
 
 
+
+	/**
+	 * Namespace containing parameters used for development only, these are
+	 * disabled in distributions of the code and can be reenabled by defining the
+	 * compilation variable: "RSVS_ACCESS_DEVELOPMENT_PARAMETERS"
+	 * 
+	 * (On the command line use "-DRSVS_ACCESS_DEVELOPMENT_PARAMETERS" to allow
+	 * setting these parameters).
+	 * 
+	 * These are always visible in the output json files.
+	 */
+	namespace dev {
+		
+		/**
+		 * @brief      Class for control of rsvs epsilon.
+		 */
+		class rsvseps 
+		{
+		public:
+			double rsvsmath_automatic_eps_edge;
+			double rsvsmath_automatic_eps_surf;
+			double rsvsmath_automatic_eps_volu;
+			double rsvsmath_automatic_eps_centre;
+			double rsvsmath_automatic_eps_centre2;
+
+			rsvseps();
+		};
+
+		/**
+		 * @brief      Class for development parameters.
+		 */
+		class devparam
+		{
+		public:
+			double limitlagrangian;
+			double mindesvarsparse;
+			bool surfcentrejacobian;
+			bool surfcentrehessian;
+			rsvseps rsvsepsilons;
+			devparam();
+		};
+	}
 	/**
 	 * @brief      Root class for all the parameters.
 	 */
@@ -251,6 +293,8 @@ namespace param {
 		snaking snak;
 		grid grid;
 		files files;
+
+		dev::devparam dev;
 
 		void PrepareForUse();
 	};
