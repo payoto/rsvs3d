@@ -994,8 +994,6 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault,
 	double newMindDt=dtDefault;
 	nSnax=snaxs.size();
 	isSnaxDone.assign(nSnax,false);
-	dt.assign(nSnax,dtDefault);
-	dt.resize(nSnax);
 
 	if(!snaxs.checkready()){
 		snaxs.PrepareForUse();
@@ -1008,11 +1006,14 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault,
 			dtDefault =newMindDt<dtDefault ? newMindDt : dtDefault;
 		}
 	}
+	
+	dt.assign(nSnax,dtDefault);
+	dt.resize(nSnax);
+
 	for(ii=0;ii<nSnax;++ii){
 		if(!isSnaxDone[ii]){
 			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
 			if (nEdge==1){
-				//dt[ii]=dtDefault;
 				isSnaxDone[ii]=true;
 			} else if (nEdge>1){
 				snaxs.CalculateTimeStepOnEdge(dt,isSnaxDone,snaxs(ii)->edgeind);
