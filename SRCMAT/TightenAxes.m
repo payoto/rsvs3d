@@ -16,8 +16,7 @@ function TightenAxes(ax, m, n, concatenateFigure)
     if ~exist('concatenateFigure','var')
         concatenateFigure =false;
     end
-    
-    
+
     mrgn = 0.005; %effectively applied to the right and to the top of each axes
     ax = findobj(ax, 'type', 'axes');
     %check that the dimensions and number of axes is equivalent
@@ -29,8 +28,8 @@ function TightenAxes(ax, m, n, concatenateFigure)
         [ax] = ConcatenateFigures(ax);
     end
     %initialise w and h to their largest possible values
-    w = 1-mrgn;
-    h = 1-mrgn;
+    w = 1;
+    h = 1;
     hOffset = 0;
     vOffset = 0;
     %work out what width and height we are allowed

@@ -13,7 +13,7 @@ classdef RSVS3D_DerivativeStudy < handle
         figs = repmat(struct('handle',[],'type','','data',[],'stats',[],'links',[],'varargin',{}),[0,1]);
         
     end
-    properties(Access=protected)
+    properties %(Access=protected)
         % list of indices
         indexList = [];
         % is the list of indices stale?
@@ -36,6 +36,10 @@ classdef RSVS3D_DerivativeStudy < handle
             % how the structure is built
             [obj.resout] = ParseFiles(obj.derivDirectory, ...
                 obj.derivFileName);
+            for ii = 1 : numel(obj.resout)
+                obj.resout(ii).HLag = obj.resout(ii).HObj ...
+                    + obj.resout(ii).HConstr;
+            end
         end
     end
     
@@ -76,8 +80,8 @@ classdef RSVS3D_DerivativeStudy < handle
         end
 
    %% Plotting
-        function []=Plot(obj, plotType, varargin)
-            
+        function [ax]=Plot(obj, plotType, varargin)
+            ax = struct();
             obj.figs(end+1).type = plotType;
             switch plotType
                 case 'sparsity'
@@ -88,7 +92,7 @@ classdef RSVS3D_DerivativeStudy < handle
                     % or Distributions?
                 case 'stat3d'
                     % 3D 'surface' for a statistic
-                    obj.PlotStat3D(varargin{:})
+                    ax=obj.PlotStat3D(varargin{:});
             end
             obj.figs(end).varargin = varargin; 
         end
@@ -171,13 +175,13 @@ classdef RSVS3D_DerivativeStudy < handle
                 hold on;
             end
             % Prepare calculations
+            layout = obj.getLayout();
             nExtraDim = numel(obj.layoutCoeffs)-2;
             layerThickness = cumprod(cellfun(@numel,obj.layoutCoeffs(3:end)));
             layerSize  = cellfun(@numel,obj.layoutCoeffs(3:end));
-            nLayers = layerThickness(end);
             layerThickness = [1, layerThickness];
+            nLayers = layerThickness(end);
             [X,Y] = meshgrid(obj.layoutCoeffs{1:2});
-            layout = obj.getLayout();
             colors = get(gca,'ColorOrder');
             colorcycle = @(x) colors(mod(x-1,size(colors,1))+1,:);
             
@@ -244,7 +248,8 @@ classdef RSVS3D_DerivativeStudy < handle
             if numel(varargin)==0
                 fields = fieldnames(obj.resout);
                 for ii=1:numel(fields)
-                    if numel(obj.resout(1).(fields{ii}))==1
+                    if numel(obj.resout(1).(fields{ii}))==1 ...
+                            && ~strcmp('index',fields{ii})
                         varargin{end+1} = fields{ii};
                     end
                 end
@@ -261,7 +266,7 @@ classdef RSVS3D_DerivativeStudy < handle
             obj.MakeStale();
         end
         
-        function  layout = getLayout(obj)
+        function layout = getLayout(obj)
             if obj.staleLayout
                 if isempty(obj.layoutFields)
                     errstruct.message = ['layoutFields not set please set ' , ...

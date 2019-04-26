@@ -1,5 +1,5 @@
 function [statsout]=Structure2Statistics(resin, folderIn, derivFileName)
-    %     resout = repmat(struct(),[0,1]);
+    % Function for the processing of standard metric 
     if ~exist('folderIn','var')
         folderIn = '';
         isSave = false;
@@ -9,24 +9,46 @@ function [statsout]=Structure2Statistics(resin, folderIn, derivFileName)
     if ~exist('derivFileName','var')
         derivFileName = 'derivatives';
     end
-    for ii=1:numel(resin)
-        statsout(ii) = AnalyseDerivativeRecord(resin(ii));
-    end
+    [statsout]=AnalyseAnyFormat(resin);
     if isSave
         save([folderIn,filesep,'stats_',derivFileName,'.mat'],'statsout')
     end
 end% function
 
-function [statsstruct]=AnalyseDerivativeRecord(derivIn)
+
+function [statsstruct]=AnalyseAnyFormat(derivIn)
+    
+    if isnumeric(derivIn)
+        if numel(derivIn)>1
+            statsstruct = ProcessNumeric(derivIn);
+        else
+            statsstruct = derivIn;
+        end
+    elseif isstruct(derivIn)
+        %statsstruct = struct();
+        if numel(derivIn)>0
+            statsstruct = AnalyseScalarStructure(derivIn(1));
+            statsstruct = repmat(statsstruct,[numel(derivIn),1]);
+            for jj=2:numel(derivIn)
+                statsstruct(jj) = AnalyseScalarStructure(derivIn(jj));
+            end
+        end
+    elseif iscell(derivIn)
+        statsstruct = cell(size(derivIn));
+        for ii = 1:numel(derivIn)
+            [statsstruct{ii}]=AnalyseAnyFormat(derivIn{ii});
+        end
+    end
+    
+    
+end
+
+function [statsstruct]=AnalyseScalarStructure(derivIn)
     statsstruct = struct();
     fields = fieldnames(derivIn)';
     for ii = 1:numel(fields)
         field = fields{ii};
-        if numel(derivIn.(field))>1
-            statsstruct.(field) = ProcessNumeric(derivIn.(field));
-        else
-            statsstruct.(field) = derivIn.(field);
-        end
+        [statsstruct.(field)]=AnalyseAnyFormat(derivIn.(field));
     end
 end % function
 
@@ -42,6 +64,7 @@ function [stats]=ProcessNumeric(arr, basefieldname)
         'std_no0abs', 'mean_no0abs','norm'};
     if dim==2 && siz(1)==siz(2)
         calcs{end+1} = 'eig';
+        calcs{end+1} = 'rcond';
     end
     
     stats = struct();
@@ -66,6 +89,8 @@ function [stats]=ProcessNumeric(arr, basefieldname)
                 stats.([basefieldname,calc]) =  mean(abs(arr(arr(:)~=0)));
             case 'norm'
                 stats.([basefieldname,calc]) = norm(arr);
+            case 'rcond'
+                stats.([basefieldname,calc]) = rcond(arr);
             case 'eig'
                 eigs = eig(arr);
                 stats.([basefieldname,calc]) = eigs;
