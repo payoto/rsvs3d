@@ -88,6 +88,9 @@ public:
 
 class snake  {
 private:
+
+	bool snaxDistanceLimit_conserveShape = true;
+
 	bool is3D=true;
 	void SetLastIndex(); // Baaaad function do not use if you're not sure.
 	bool isFlipped=false;
@@ -152,6 +155,9 @@ public:
 	void write(FILE *fid) const;
 	int read(const char *str);
 	int write(const char *str) const;
+	void SetSnaxDistanceLimit_conserveShape(bool in){
+		this->snaxDistanceLimit_conserveShape = in;
+	}
 };
 
  

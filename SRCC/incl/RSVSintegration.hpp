@@ -73,6 +73,7 @@ namespace integrate {
 	};
 
 	void Prepare(RSVSclass &RSVSobj);
+	void ApplyDevSettings(RSVSclass &RSVSobj);
 	namespace prepare {
 		void Mesh(
 			const param::grid &gridconf,

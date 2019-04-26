@@ -87,7 +87,7 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
 void TrianglePositionDerivatives(const triangle &triIn, 
 	const triangulation &triRSVS, const HashedVector<int,int> &dvListMap,
 	Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos,
-	bool useSurfCentreDeriv=true);
+	bool useSurfCentreDeriv=true, bool useSurfCentreHessian=false);
 
 void AssignConstraintDerivativesFullMath(RSVScalc &calc, const triangle &triIn,
 	const HashedVector<int,int> &dvListMap,const Eigen::MatrixXd &dConstrPart,

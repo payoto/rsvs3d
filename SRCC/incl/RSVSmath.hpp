@@ -11,6 +11,12 @@
 #define RSVSMATH_H_INCLUDED 
 
 
+namespace param {
+	namespace dev {
+		class rsvseps;
+	}
+}
+
 //=================================
 // included dependencies
 #include <vector> 
@@ -229,6 +235,8 @@ public:
 		centroid.assign(nDim,0);
 	};
 };
+
+void SetEnvironmentEpsilon(const param::dev::rsvseps &rsvsEpsilons);
 
 int Test_SurfCentreDerivatives();
 

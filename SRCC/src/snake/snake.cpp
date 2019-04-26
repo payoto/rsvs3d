@@ -998,17 +998,19 @@ void snake::CalculateTimeStep(vector<double> &dt, double dtDefault,
 	if(!snaxs.checkready()){
 		snaxs.PrepareForUse();
 	}
-
-	for (int i = 0; i < nSnax; ++i)
-	{
-		if(fabs(snaxs(i)->v >__DBL_EPSILON__)){
-			newMindDt = distDefault/fabs(snaxs(i)->v);
-			dtDefault =newMindDt<dtDefault ? newMindDt : dtDefault;
+	if(this->snaxDistanceLimit_conserveShape){
+		for (int i = 0; i < nSnax; ++i)
+		{
+			if(fabs(snaxs(i)->v >__DBL_EPSILON__)){
+				newMindDt = distDefault/fabs(snaxs(i)->v);
+				dtDefault =newMindDt<dtDefault ? newMindDt : dtDefault;
+			}
 		}
 	}
-	
+
 	dt.assign(nSnax,dtDefault);
 	dt.resize(nSnax);
+	
 
 	for(ii=0;ii<nSnax;++ii){
 		if(!isSnaxDone[ii]){

@@ -67,8 +67,8 @@ processed_derivative test_RSVScalcvsFD(
 	auto fdDconstr = (constrPostFD-constrPreFD)/fdStep;
 
 	double diffDObj = (analyticalDObj[dvNum]-fdDObj)/analyticalDObj[dvNum];
-	Eigen::VectorXd diffDConstr = (analyticalDConstr.block(0,dvNum,RSVSobj.calcObj.numConstr(),1)
-		-fdDconstr).array()
+	Eigen::VectorXd diffDConstr = (analyticalDConstr.block(0,dvNum, 
+		RSVSobj.calcObj.numConstr(),1) - fdDconstr).array()
 		/ analyticalDConstr.block(0,dvNum,RSVSobj.calcObj.numConstr(),1).array();
 
 	int nRows = diffDConstr.size();

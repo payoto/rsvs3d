@@ -9,6 +9,7 @@
       "rsvsmath_automatic_eps_surf": 1e-10,
       "rsvsmath_automatic_eps_volu": 0.0
     },
+    "snaxDistanceLimit_conserveShape": false,
     "surfcentrehessian": false,
     "surfcentrejacobian": true
   },

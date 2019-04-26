@@ -97,9 +97,17 @@ int rsvstest::newtest(){
 	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
 	gridTest.Run(integrate::test::CompareDerivativesSpike,"Test spike issues"); 
 	gridTest.Run(integrate::test::CompareDerivativesSpikeNoDPos,"Test spike issues no dPos"); 
-	#endif
 	gridTest.Run(integrate::test::StudyDerivatives,"Generate Derivative study"); 
-
+	#endif
+	// Parameter and JSON tests
+	gridTest.RunSilent(param::test::base,"parameter implementation");
+	gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
+	gridTest.RunSilent(param::test::io,"parameter read write");
+	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
+	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
+		" write flat format");
+	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
+		"determination of flat json");
 	return(0);
 }
 

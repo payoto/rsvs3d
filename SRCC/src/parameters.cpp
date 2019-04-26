@@ -472,6 +472,7 @@ param::dev::devparam::devparam(){
 	this->mindesvarsparse = 200;
 	this->surfcentrejacobian = true;
 	this->surfcentrehessian = false;
+	this->snaxDistanceLimit_conserveShape = false;
 }
 
 void param::dev::to_json(json& j, const devparam& p){
@@ -480,6 +481,7 @@ void param::dev::to_json(json& j, const devparam& p){
 		{"mindesvarsparse", p.mindesvarsparse},
 		{"surfcentrejacobian", p.surfcentrejacobian},
 		{"surfcentrehessian", p.surfcentrehessian},
+		{"snaxDistanceLimit_conserveShape", p.snaxDistanceLimit_conserveShape},
 		{"rsvsepsilons", p.rsvsepsilons}
 	};
 }
@@ -488,6 +490,7 @@ void param::dev::from_json(const json& j, devparam& p){
 	j.at("mindesvarsparse").get_to(p.mindesvarsparse);
 	j.at("surfcentrejacobian").get_to(p.surfcentrejacobian);
 	j.at("surfcentrehessian").get_to(p.surfcentrehessian);
+	j.at("snaxDistanceLimit_conserveShape").get_to(p.snaxDistanceLimit_conserveShape);
 	j.at("rsvsepsilons").get_to(p.rsvsepsilons);
 
 }

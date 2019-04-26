@@ -3,6 +3,7 @@
 #include "RSVSmath_automatic.hpp"
 #include "arraystructures.hpp" // for use of DisplayVector
 #include "warning.hpp"
+#include "parameters.hpp"
 
 using namespace std;
 
@@ -663,3 +664,11 @@ void Volume2::Calc(){
 	}
 }
 
+
+void SetEnvironmentEpsilon(const param::dev::rsvseps &rsvsEpsilons){
+	rsvsmath_automatic_eps_edge = rsvsEpsilons.rsvsmath_automatic_eps_edge;
+	rsvsmath_automatic_eps_surf = rsvsEpsilons.rsvsmath_automatic_eps_surf;
+	rsvsmath_automatic_eps_volu = rsvsEpsilons.rsvsmath_automatic_eps_volu;
+	rsvsmath_automatic_eps_centre = rsvsEpsilons.rsvsmath_automatic_eps_centre;
+	rsvsmath_automatic_eps_centre2 = rsvsEpsilons.rsvsmath_automatic_eps_centre2;
+}

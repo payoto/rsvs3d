@@ -115,6 +115,8 @@ protected:
 	bool returnDeriv=true;
 	/// Enable or disable surfcentroid derivatives
 	bool useSurfCentreDeriv = true;
+	/// Enable or disable surfcentroid derivatives
+	bool useSurfCentreHessian = false;
 
 	int timer1=0;
 	int timer2=0;
@@ -477,8 +479,12 @@ public:
 	 */
 	void ConvergenceLog(ofstream &out, int loglvl=3) const;
 	
-	void SetUseSurfCentreDeriv(bool in){this->useSurfCentreDeriv = in;}
+	void SetUseSurfCentreDeriv(int in){this->useSurfCentreDeriv = in;}
 	bool GetUseSurfCentreDeriv() const{return(this->useSurfCentreDeriv);}
+	void SetUseSurfCentreHessian(int in){this->useSurfCentreHessian = in;}
+	bool SetUseSurfCentreHessian() const{return(this->useSurfCentreHessian);}
+	void SetSparseDVcutoff(int in){this->sparseDVcutoff = in;}
+	int GetSparseDVcutoff() const{return(this->sparseDVcutoff);}
 };
 
 //==================================

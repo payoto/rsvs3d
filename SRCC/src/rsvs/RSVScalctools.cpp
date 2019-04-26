@@ -98,13 +98,14 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
  */
 void TrianglePositionDerivatives(const triangle &triIn, 
 	const triangulation &triRSVS, const HashedVector<int,int> &dvListMap,
-	MatrixXd &dPos, MatrixXd &HPos, bool useSurfCentreDeriv){
+	MatrixXd &dPos, MatrixXd &HPos, bool useSurfCentreDeriv,
+	bool useSurfCentreHessian){
 
 	std::vector<int> vertsSurf;
 	int nDvAct=dvListMap.vec.size();
 	bool triggerPrint=false, triggerActive=false;
 	auto ifisnan0 = [&](double in) -> double {return isnan(in)?0.0:in;};
-	auto ifisapprox0 = [&](double in) -> double {return IsAproxEqual(in,0.0)?0.0:in;};
+	// auto ifisapprox0 = [&](double in) -> double {return IsAproxEqual(in,0.0)?0.0:in;};
 	auto cleanup = [&](double in) -> double {return ifisnan0((in));};
 
 	static std::ofstream streamout;
@@ -206,65 +207,67 @@ void TrianglePositionDerivatives(const triangle &triIn,
 					// Fill the three layers of HPos which correspond to
 					// this vertex.
 					// hesCentre
-					MatrixXd dPosd(count*3,count);
-					dPosd.setZero(count*3,count);
-					for (int j = 0; j < count; ++j)
-					{
-						auto currSnax = triRSVS.snakeDep->snaxs.isearch(vertsSurf[j]);
-						auto fromVert = triRSVS.meshDep->verts.isearch(
-							currSnax->fromvert);
-						auto toVert = triRSVS.meshDep->verts.isearch(
-							currSnax->tovert);
-						for (int k = 0; k < 3; ++k)
+					if (useSurfCentreHessian){
+						MatrixXd dPosd(count*3,count);
+						dPosd.setZero(count*3,count);
+						for (int j = 0; j < count; ++j)
+						{
+							auto currSnax = triRSVS.snakeDep->snaxs.isearch(vertsSurf[j]);
+							auto fromVert = triRSVS.meshDep->verts.isearch(
+								currSnax->fromvert);
+							auto toVert = triRSVS.meshDep->verts.isearch(
+								currSnax->tovert);
+							for (int k = 0; k < 3; ++k)
 
-						{
-							dPosd(j+k*count,j) += (toVert->coord[k]-fromVert->coord[k]);
-						}
-					}
-					MatrixXd HVal(count*3, count*3*3), HPosTemp(count, count*3);
-					ArrayVec2MatrixXd(hesCentre, HVal);
-					for (int j = 0; j < 3; ++j)
-					{
-						HPosTemp.block(0, j*count , count, count) = 
-							dPosd.transpose()
-							* HVal.block(0,j*count*3,count*3,count*3) 
-							* dPosd;	
-					}
-					for (int j = 0; j < count; ++j)
-					{
-						int dvSub = dvListMap.find(vertsSurf[j]);
-						if (dvSub!=__notfound)
-						{
-							for (int j2 = 0; j2 < count; ++j2)
 							{
-								int dvSub2 = dvListMap.find(vertsSurf[j2]);
-								if (dvSub2!=__notfound)
+								dPosd(j+k*count,j) += (toVert->coord[k]-fromVert->coord[k]);
+							}
+						}
+						MatrixXd HVal(count*3, count*3*3), HPosTemp(count, count*3);
+						ArrayVec2MatrixXd(hesCentre, HVal);
+						for (int j = 0; j < 3; ++j)
+						{
+							HPosTemp.block(0, j*count , count, count) = 
+								dPosd.transpose()
+								* HVal.block(0,j*count*3,count*3,count*3) 
+								* dPosd;	
+						}
+						for (int j = 0; j < count; ++j)
+						{
+							int dvSub = dvListMap.find(vertsSurf[j]);
+							if (dvSub!=__notfound)
+							{
+								for (int j2 = 0; j2 < count; ++j2)
 								{
-									for (int k = 0; k < 3; ++k)
+									int dvSub2 = dvListMap.find(vertsSurf[j2]);
+									if (dvSub2!=__notfound)
 									{
-										HPos(dvSub, dvSub2+(ii*3+k)*nDvAct) +=
-											0.0*cleanup(HPosTemp(j,j2+k*count));
+										for (int k = 0; k < 3; ++k)
+										{
+											HPos(dvSub, dvSub2+(ii*3+k)*nDvAct) +=
+												cleanup(HPosTemp(j,j2+k*count));
+										}
 									}
 								}
 							}
 						}
-					}
-					if (triggerActive){
-						triggerPrint =true; 
-					}
-					if(triggerPrint){
-						streamout << "triangle " << triIn.index 
-							<< " parent: surf : " << triIn.parentsurf
-							<< " parent: type : " << triIn.parenttype
-							<< " pnt-centroid: " << ii << std::endl;
-						streamout << "pointind" << std::endl;
-						PrintVector(triIn.pointind, streamout);
-						streamout << "" << std::endl;
-						streamout << "pointtype" << std::endl;
-						PrintVector(triIn.pointtype, streamout);
-						streamout << "" << std::endl;
-						streamout << "dPosd:" << std::endl;
-						PrintMatrixFile(dPosd,streamout);
+						if (triggerActive){
+							triggerPrint =true; 
+						}
+						if(triggerPrint){
+							streamout << "triangle " << triIn.index 
+								<< " parent: surf : " << triIn.parentsurf
+								<< " parent: type : " << triIn.parenttype
+								<< " pnt-centroid: " << ii << std::endl;
+							streamout << "pointind" << std::endl;
+							PrintVector(triIn.pointind, streamout);
+							streamout << "" << std::endl;
+							streamout << "pointtype" << std::endl;
+							PrintVector(triIn.pointtype, streamout);
+							streamout << "" << std::endl;
+							streamout << "dPosd:" << std::endl;
+							PrintMatrixFile(dPosd,streamout);
+						}
 					}
 				}
 				break;

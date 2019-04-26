@@ -15,13 +15,14 @@
 #include "meshrefinement.hpp"
 #include "meshprocessing.hpp"
 #include "RSVScalc.hpp"
+#include "RSVSmath.hpp"
 #include "RSVSalgorithm.hpp"
 #include "postprocessing.hpp"
 #include "warning.hpp"
 #include "tetgenrsvs.hpp"
 
 #include "filesystem.hpp"
-  
+
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
 
@@ -289,6 +290,9 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	// triangulation rsvsTri;
 	// tecplotfile outSnake;
 	// Locally defined
+
+	integrate::ApplyDevSettings(RSVSobj);
+
 	param::parameters origconf;
 
 	origconf = RSVSobj.paramconf;
@@ -303,6 +307,18 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake,
 		RSVSobj.outgradientsnake, RSVSobj.logFile, RSVSobj.coutFile,
 		RSVSobj.cerrFile);
+}
+
+void integrate::ApplyDevSettings(integrate::RSVSclass &RSVSobj){
+	auto& devset = RSVSobj.paramconf.dev;
+
+	RSVSobj.calcObj.limLag = devset.limitlagrangian;
+	RSVSobj.calcObj.SetUseSurfCentreDeriv(devset.surfcentrejacobian);
+	RSVSobj.calcObj.SetUseSurfCentreHessian(devset.surfcentrehessian);
+	RSVSobj.calcObj.SetSparseDVcutoff(devset.mindesvarsparse);
+	RSVSobj.rsvsSnake.SetSnaxDistanceLimit_conserveShape(
+		devset.snaxDistanceLimit_conserveShape);
+	SetEnvironmentEpsilon(devset.rsvsepsilons);
 }
 
 void integrate::prepare::Mesh(

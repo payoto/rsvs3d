@@ -6,6 +6,7 @@
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_edge": 0.0,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_surf": 1e-10,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_volu": 0.0,
+  "/dev/snaxDistanceLimit_conserveShape": false,
   "/dev/surfcentrehessian": false,
   "/dev/surfcentrejacobian": true,
   "/files/appcasename2outdir": true,

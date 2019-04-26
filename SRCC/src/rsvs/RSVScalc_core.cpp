@@ -88,7 +88,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
 		this->useSurfCentreDeriv);
 	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
-		this->useSurfCentreDeriv);
+		this->useSurfCentreDeriv, this->useSurfCentreHessian);
 
 	auto clock2 = rsvs3d::TimeStamp(NULL, clock1);
 	this->timer1 += (clock2-clock1);
@@ -241,7 +241,8 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
 		this->useSurfCentreDeriv);
 	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
-		this->useSurfCentreDeriv);
+		this->useSurfCentreDeriv, this->useSurfCentreHessian);
+
 
 	// Constr and objective
 	nDvAct=dvListMap.vec.size();
@@ -382,7 +383,8 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	dvListMap = TriangleActiveDesignVariables(triIn, triRSVS, this->dvMap,
 		this->useSurfCentreDeriv);
 	TrianglePositionDerivatives(triIn, triRSVS, dvListMap, dPos, HPos,
-		this->useSurfCentreDeriv);
+		this->useSurfCentreDeriv, this->useSurfCentreHessian);
+
 
 	// Constr and objective
 	nDvAct=dvListMap.vec.size();

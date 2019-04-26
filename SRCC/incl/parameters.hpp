@@ -276,9 +276,10 @@ namespace param {
 		{
 		public:
 			double limitlagrangian;
-			double mindesvarsparse;
+			int mindesvarsparse;
 			bool surfcentrejacobian;
 			bool surfcentrehessian;
+			bool snaxDistanceLimit_conserveShape;
 			rsvseps rsvsepsilons;
 			devparam();
 		};
