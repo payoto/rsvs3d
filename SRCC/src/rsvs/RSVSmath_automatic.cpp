@@ -411,9 +411,9 @@ double   t2,   t3,   t4,   t5,   t6,   t7,   t8,   t9,   t10;
  
 } 
 
-void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ) { 
+void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ,double eps) { 
 double   t3,   t4,   t6,   t9,   t2,   t7,   t8,   t5,   t10;
-double eps = rsvsmath_automatic_eps_surf;
+// double eps = 0.0;
   t3 = p0[1-1]-p1[1-1];
   t4 = p0[1-1]-p2[1-1];
   t6 = p0[2-1]-p1[2-1];
@@ -428,9 +428,9 @@ double eps = rsvsmath_automatic_eps_surf;
 } 
 
 
-void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
+void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ,double eps) { 
 double   t2,   t3,   t4,   t5,   t6,   t13,   t7,   t8,   t9,   t10,   t18,   t11,   t14,   t15,   t12,   t16,   t17,   t19,   t20,   t21,   t22,   t23,   t24,   t25;
-double eps = rsvsmath_automatic_eps_surf;
+// double eps = rsvsmath_automatic_eps_surf;
   t2 = p0[1-1]-p1[1-1];
   t3 = p0[1-1]-p2[1-1];
   t4 = p0[2-1]-p2[2-1];
@@ -468,9 +468,9 @@ double eps = rsvsmath_automatic_eps_surf;
 } 
 
 
-void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ) { 
+void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 , double eps) { 
 
-double eps = rsvsmath_automatic_eps_surf;
+// double eps = rsvsmath_automatic_eps_surf;
 double   t2,   t3,   t5,   t6,   t8,   t11,   t13,   t14,   t4,   t9,   t10,   t15,   t16,   t7,   t20,   t21,   t12,   t19,   t23,   t24,   t17,   t18,   t22,   t25,   t26,   t27,   t28,   t29,   t30,   t31,   t32,   t37,   t33,   t34,   t35,   t36,   t38,   t39,   t40,   t41,   t42,   t43,   t44,   t45,   t46,   t70,   t47,   t48,   t49,   t50,   t51,   t52,   t53,   t54,   t55,   t56,   t75,   t57,   t58,   t59,   t60,   t61,   t62,   t63,   t64,   t65,   t66,   t67,   t68,   t69,   t71,   t72,   t73,   t74,   t76,   t77,   t78,   t79,   t80,   t81,   t82,   t83,   t84,   t85,   t86,   t87,   t88,   t89,   t90,   t91,   t92,   t93,   t94,   t95,   t96,   t97,   t98,   t99,   t100,   t101,   t102,   t103,   t104,   t105,   t106,   t107,   t108,   t109,   t110,   t111,   t112,   t113,   t114,   t115,   t116,   t117,   t118,   t119,   t120,   t121,   t122,   t123,   t124,   t125,   t126,   t127,   t128,   t129,   t130,   t131,   t132,   t133,   t134,   t135,   t136,   t137,   t138,   t139,   t140,   t141,   t142,   t143,   t144,   t145,   t146,   t147,   t148,   t149,   t150,   t151,   t152,   t153,   t154,   t155,   t156,   t157,   t158,   t159,   t160,   t161,   t162,   t163,   t164,   t165,   t166,   t167,   t168,   t169,   t170,   t171,   t172,   t173,   t174,   t175,   t176;
   t2 = p1[2-1]-p2[2-1];
   t3 = p1[3-1]-p2[3-1];

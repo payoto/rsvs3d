@@ -6,11 +6,14 @@
 #include "vectorarray.hpp" 
 using namespace std; 
 
-static const double rsvsmath_automatic_eps_edge = 0.0;
-static double rsvsmath_automatic_eps_surf = 1e-15;
-static const double rsvsmath_automatic_eps_volu = 0.0;
-static const double rsvsmath_automatic_eps_centre = 0.0;
-static const double rsvsmath_automatic_eps_centre2 = 0.0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+static double rsvsmath_automatic_eps_edge = 0.0;
+static double rsvsmath_automatic_eps_surf = 1e-10;
+static double rsvsmath_automatic_eps_volu = 0.0;
+static double rsvsmath_automatic_eps_centre = 1e-10;
+static double rsvsmath_automatic_eps_centre2 = 1e-10;
+#pragma GCC diagnostic pop
 
 void Volume_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ); 
 void Volume_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
@@ -21,9 +24,9 @@ void Volume2_df(double  d0 , double  d1 , double  d2 , const vector<double>& g0s
 void Volume2_ddf(double  d0 , double  d1 , double  d2 , const vector<double>& g0s , const vector<double>& g1s , const vector<double>& g2s , const vector<double>& g0e , const vector<double>& g1e , const vector<double>& g2e , ArrayVec<double> &   A0 ) ;
 
 
-void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 ); 
-void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
-void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0 ); 
+void Area_f(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , double &   t0 , double eps=0.0); 
+void Area_df(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0, double eps = rsvsmath_automatic_eps_surf); 
+void Area_ddf(const vector<double>& p0 , const vector<double>& p1 , const vector<double>& p2 , ArrayVec<double> &   A0, double eps = rsvsmath_automatic_eps_surf); 
 void LengthEdge_f(const vector<double>& p0 , const vector<double>& p1 , double &   t0 ); 
 void LengthEdge_df(const vector<double>& p0 , const vector<double>& p1 , ArrayVec<double> &   A0 ); 
 void LengthEdge_ddf(const vector<double>& p0 , const vector<double>& p1 , ArrayVec<double> &   A0 ); 
