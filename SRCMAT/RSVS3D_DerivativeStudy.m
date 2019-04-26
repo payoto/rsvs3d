@@ -45,9 +45,15 @@ classdef RSVS3D_DerivativeStudy < handle
     
     methods
 %% Interfaces
+
         function obj = RSVS3D_DerivativeStudy(derivDirectory, derivFileName)
-            obj.derivDirectory = derivDirectory;
-            obj.derivFileName = derivFileName;
+            if nargin==2
+                obj.derivDirectory = derivDirectory;
+                obj.derivFileName = derivFileName;
+            else
+                obj.derivDirectory = '';
+                obj.derivFileName = '';
+            end
         end
         
         

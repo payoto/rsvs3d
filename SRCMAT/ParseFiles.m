@@ -22,6 +22,7 @@ function [resout]=ReadDerivativeIn(fileIn, resout)
         elseif ~isempty(regexp(str(1),'[a-zA-Z]', 'once'))
             % new variable
             varNames = regexp(str,'[ ,]*','split');
+            varNames{1} = matlab.lang.makeValidName(varNames{1});
             if isempty(regexp(str,',', 'once'))
                 % Read single number
                 resout(end).(varNames{1}) = str2double(varNames{2});
