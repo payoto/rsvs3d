@@ -60,7 +60,7 @@ function [stats]=ProcessNumeric(arr, basefieldname)
     end
     siz = size(arr);
     dim = numel(siz);
-    calcs = {'min','max','std', 'mean','std_no0', 'mean_no0',...
+    calcs = {'min','max','std', 'mean','median','std_no0', 'mean_no0',...
         'std_no0abs', 'mean_no0abs','norm'};
     if dim==2 && siz(1)==siz(2)
         calcs{end+1} = 'eig';
@@ -79,6 +79,8 @@ function [stats]=ProcessNumeric(arr, basefieldname)
                 stats.([basefieldname,calc]) = std(arr(:));
             case 'mean'
                 stats.([basefieldname,calc]) = mean(arr(:));
+            case 'median'
+                stats.([basefieldname,calc]) = median(arr(:));
             case 'std_no0'
                 stats.([basefieldname,calc]) = std(arr(arr(:)~=0));
             case 'mean_no0'

@@ -99,6 +99,8 @@ classdef RSVS3D_DerivativeStudy < handle
                 case 'stat3d'
                     % 3D 'surface' for a statistic
                     ax=obj.PlotStat3D(varargin{:});
+                otherwise
+                    return;
             end
             obj.figs(end).varargin = varargin; 
         end
