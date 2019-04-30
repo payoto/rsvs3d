@@ -902,16 +902,158 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt,
 	}
 }
 
+std::pair<double,double> EquilibrateEdge(snake &snakein, int spawnVert,
+	int snaxA, int snaxB, int vertA, int vertB){
+
+	// calculate centre of edge.
+	coordvec c, del1;
+	c = snakein.snakeconn.verts.isearch(snaxA)->coord;
+	c.add(snakein.snakeconn.verts.isearch(snaxB)->coord);
+	c.div(2.0);
+
+	del1 = snakein.snakeconn.verts.isearch(vertA)->coord;
+	c.substract(snakein.snakeconn.verts.isearch(vertB)->coord);
+	del1.substract(snakein.snakeconn.verts.isearch(vertB)->coord);
+	c = del1.cross(c.usedata());
+
+	// c is the plane normal at this point;
+	double d = c.dot(snakein.snakeconn.verts.isearch(vertA)->coord);
+	double dg0 = c.dot(snakein.snakemesh->verts.isearch(spawnVert)->coord);
+
+	// Vertex A
+	del1 = snakein.snakemesh->verts.isearch(snakein.snaxs.isearch(snaxA)->tovert)->coord;
+	del1.substract(snakein.snakemesh->verts.isearch(
+		snakein.snaxs.isearch(snaxA)->fromvert)->coord);
+	double dga = c.dot(del1.usedata());
+	double da = (d-dg0)/dga;
+	// Vertex B
+	del1 = snakein.snakemesh->verts.isearch(snakein.snaxs.isearch(snaxB)->tovert)->coord;
+	del1.substract(snakein.snakemesh->verts.isearch(
+		snakein.snaxs.isearch(snaxB)->fromvert)->coord);
+	double dgb = c.dot(del1.usedata());
+	double db = (d-dg0)/dgb;
+	
+
+	return {da, db};
+}
+
+void SmoothStep(int spawnVert, snake &snakein, double spawnDist){
+
+	// identify snaxels
+
+	HashedVector<int, int> snaxInds;
+	double spawnDistTol = spawnDist * 1.1;
+	snaxInds.reserve(20); 
+	for (auto parentEdge : snakein.snakemesh->verts.isearch(spawnVert)->edgeind)
+	{
+		std::vector<int> snaxIndsTemp;
+		snaxIndsTemp.reserve(20); 
+		snakein.snaxs.findsiblings(parentEdge,snaxIndsTemp);
+
+		for (auto snaxCandidate : snaxIndsTemp){
+			auto currSnax = snakein.snaxs(snaxCandidate);
+			if(currSnax->CloseToVertex()==spawnVert 
+				&& snaxInds.find(currSnax->index)==rsvs3d::constants::__notfound
+				&& (currSnax->d<spawnDistTol || (1-spawnDistTol)<currSnax->d)){
+				snaxInds.push_back(currSnax->index);
+			}
+		}
+	}
+	if (snaxInds.size()<2){
+		return;
+	}
+	// Consistancy of this list can be checked making sure all the snaxels come
+	// from the same vertex or go to the same vertex.
+	HashedVector<int,int> externalPts;
+	std::vector<std::array<int,2>> externalLinks;
+	externalPts.reserve(snaxInds.size());
+	externalLinks.reserve(snaxInds.size());
+	for (auto iSnax : snaxInds.vec){
+		for (auto iEdge : snakein.snakeconn.verts.isearch(iSnax)->edgeind){
+			for (auto iVert : snakein.snakeconn.edges.isearch(iEdge)->vertind){
+				if(snaxInds.find(iVert)==rsvs3d::constants::__notfound){
+					externalPts.push_back(iSnax);
+					externalLinks.push_back({iEdge,iVert});
+				}
+			}
+		}
+	}
+	// Compute the two distances
+	std::vector<int> edgeProcess;
+	edgeProcess.reserve(externalPts.size());
+	for (auto iSnax : snaxInds.vec){
+		for (auto iEdge : snakein.snakeconn.verts.isearch(iSnax)->edgeind){
+			int iVert1 = snakein.snakeconn.edges.isearch(iEdge)->vertind[0];
+			int iVert2 = snakein.snakeconn.edges.isearch(iEdge)->vertind[1];
+			if(externalPts.find(iVert1)!=rsvs3d::constants::__notfound
+				&& externalPts.find(iVert2)!=rsvs3d::constants::__notfound){
+				edgeProcess.push_back(iEdge);
+			}
+		}
+	}
+	sort(edgeProcess);
+	unique(edgeProcess);
+	std::vector<double>  newD;
+	newD.assign(externalPts.size(), 0.0);
+
+	for(auto iEdge : edgeProcess){
+		// pass the edge index, the two snaxels, the two vertices
+		int snaxA = snakein.snakeconn.edges.isearch(iEdge)->vertind[0];
+		int snaxB = snakein.snakeconn.edges.isearch(iEdge)->vertind[1];
+		int vertA = externalLinks[externalPts.find(snaxA)][1];
+		int vertB = externalLinks[externalPts.find(snaxB)][1];
+		auto tempD = EquilibrateEdge(snakein, spawnVert, snaxA, snaxB,
+			vertA, vertB);
+		newD[externalPts.find(snaxA)] +=tempD.first;
+		newD[externalPts.find(snaxB)] += tempD.second;
+	}
+	// How to set all the values not set by the border algorithm?
+
+
+
+	// Set the values
+	int count = externalPts.size();
+	for (int i = 0; i < count; ++i)
+	{
+		if(newD[i]<__DBL_EPSILON__){
+			DisplayVector(newD);
+			RSVS3D_ERROR_NOTHROW("Negative d was calculated");
+		}
+		snakein.snaxs[snakein.snaxs.find(externalPts[i], true)].d = newD[i]/2.0;
+	}
+}
+
 void snake::TakeSpawnStep(int minIndex, double stepLength){
 
 	int nSnax = this->snaxs.size();
+	std::vector<int> spawnVerts;
+	spawnVerts.reserve(nSnax);
 	for (int i = 0; i < nSnax; ++i)
 	{
 		if(this->snaxs(i)->index>minIndex){
 			this->snaxs.elems[i].TakeSpawnStep(*this, stepLength);
 		}
 	}
+}
 
+void snake::TakeSmoothSpawnStep(int minIndex, double stepLength){
+
+	int nSnax = this->snaxs.size();
+	std::vector<int> spawnVerts;
+	spawnVerts.reserve(nSnax);
+	for (int i = 0; i < nSnax; ++i)
+	{
+		if(this->snaxs(i)->index>minIndex){
+			spawnVerts.push_back(this->snaxs(i)->CloseToVertex());
+		}
+	}
+	sort(spawnVerts);
+	unique(spawnVerts);
+
+	for (auto spawnVert : spawnVerts){
+		SmoothStep(spawnVert, *this, stepLength);
+		this->snaxs.ForceArrayReady();
+	}
 }
 
 void snax::TakeSpawnStep(snake &snakein, double stepLength){
@@ -969,7 +1111,6 @@ void snax::TakeSpawnStep(snake &snakein, double stepLength){
 	} else {
 		RSVS3D_ERROR_RANGE("Parent hashing returned a number <=0");
 	}
-
 }
 
 // Snake operations

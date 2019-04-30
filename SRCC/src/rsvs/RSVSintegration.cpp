@@ -207,14 +207,18 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	start_s=rsvs3d::TimeStamp("Clean: ", start_s);
 	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
+
 void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength){
 	// double stepLength = 1e-5;
 
 	snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
-
+	snakein.TakeSmoothSpawnStep(maxIndPreSpawn, stepLength);
+	snakein.UpdateCoord();
+	snakein.PrepareForUse();
 }
+
 void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
 	/*
 	Performs the snake step except the movement of the snake.

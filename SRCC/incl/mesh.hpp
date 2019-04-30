@@ -53,6 +53,7 @@
 #include <functional>
 #include <cmath>
 
+#include "warning.hpp"
 #include "arraystructures.hpp"
 
 //------------------------------------------------------------------------------
@@ -140,8 +141,8 @@ public:
 	}
 	void operator=(const vector<double> &a){
 		if(int(a.size())!=3){
-			cout << "Warning : Coordinate vector is being a "
-				"vector other than 3 long" << endl;
+			RSVS3D_ERROR_NOTHROW("Warning : Coordinate vector is being a "
+				"vector other than 3 long");
 		}
 		elems=a;
 		isuptodate=0;

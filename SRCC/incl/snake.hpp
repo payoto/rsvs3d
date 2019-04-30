@@ -146,7 +146,7 @@ public:
 	void AssignInternalVerts();
 	void CheckConnectivity() const; 
 	void TakeSpawnStep(int minIndex, double stepLength);
-
+	void TakeSmoothSpawnStep(int minIndex, double stepLength);
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
 	bool ReturnFlip()const{return(isFlipped);}
@@ -192,6 +192,7 @@ public:
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
 	void TightenConnectivity(){}
 	void TakeSpawnStep(snake &snakein, double stepLength);
+	int CloseToVertex() const {return d<0.5? fromvert : tovert;}
 };
 
 

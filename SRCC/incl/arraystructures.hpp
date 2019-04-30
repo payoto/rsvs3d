@@ -280,7 +280,7 @@ class HashedVector { // container for
 public:
 	vector<T> vec;
 	unordered_multimap<T,R> hashTable;
-	bool isHash=false;
+	bool isHash=true;
 
 	inline void GenerateHash();
 	inline int find(const T key) const;
@@ -294,14 +294,15 @@ public:
 	const T& operator[](const int a) const {return this->vec[a];}
 
 	void reserve(const size_t a){this->vec.reserve(a);}
-	void assign(const size_t a, const T &elm){this->vec.assign(a, elm);}
+	void assign(const size_t a, const T &elm){this->vec.assign(a, elm);
+		this->isHash=false;}
 	void push_back(const T &elm){
 		this->vec.push_back(elm);
 		R t = this->vec.size()-1;
 		this->hashTable.emplace(elm,t);
 	}
 	void clear(){this->vec.clear();
-		this->isHash=false;
+		this->isHash=true;
 		this->hashTable.clear();
 	}
 	size_t size() const {return this->vec.size();}
