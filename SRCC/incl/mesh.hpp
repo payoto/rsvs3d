@@ -135,6 +135,8 @@ public:
 	void div(double scalin);
 	void mult(const vector<double> &vecin);
 	void mult(double scalin);
+	void swap(vector<double> &vecin);
+	void swap(coordvec &coordin);
 	vector<double> cross(const vector<double> &vecin) const ;
 	double dot(const vector<double> &vecin) const ;
 	double angle(const coordvec &coordin) const ;
@@ -620,6 +622,9 @@ public:
 	void Crop(vector<int> indList, int indType=1);
 	vector<int> AddBoundary(const vector<double> &lb, const vector<double> &ub);
 	void CropAtBoundary(const vector<double> &lb, const vector<double> &ub);
+	// Mesh traversal convenience functions
+	int EdgeFromVerts(int v1, int v2) const;
+	// Destructor
 	~mesh(){
 		RemoveFromFamily();
 	}
@@ -636,6 +641,8 @@ void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 int OrderEdgeList(vector<int> &edgeind, const mesh &meshin, bool warn=true,
 	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL,
 	const surf* surfin=NULL);
+int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn=true,
+	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL);
 double VertexDistanceToPlane(const vector<double> &planeVert1, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
@@ -665,6 +672,10 @@ double PlanesDotProduct(const vector<double> &planeVert1,
 	const vector<double> &planeVert6, 
 	bool normalize=true);
 void PlaneNormal(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1);
+double PlaneNormalAndAngle(const vector<double> &planeVert1, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1);

@@ -990,7 +990,7 @@ void DisplayVectorArray(const std::vector< std::array<int,2>> &in){
 	std::cout << " | ";
 }
 
-int SmoothStep(int spawnVert, snake &snakein, double spawnDist){
+int SmoothStep3(int spawnVert, snake &snakein, double spawnDist){
 
 	// identify snaxels
 
@@ -1178,6 +1178,134 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist){
 			}
 		}
 	}
+	return(noissue);
+}
+
+
+std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
+	const std::vector<const std::vector<double>&> &vecPts){
+
+	// Calculates a normal for each face
+	// and an angle
+	// Need to make sure it is inward pointing
+	// 
+
+	if(vecPts.empty()){
+		RSVS3D_ERROR_ARGUMENT("Attempted to define a smooth step for an empty"
+			"vector of points.");
+	}
+
+	coordvec planeCurr, planePrev, normal, temp;
+	double totalNormalAngle=0.0;
+	double totalTangentAngle=0.0;
+	double currAngle;
+	int count = vecPts.size();
+	currAngle = PlaneNormalAndAngle(centre, vecPts.back(), vecPts[0], planeCurr, temp);
+	planeCurr.Normalize();
+	for (int i = 0; i < count; ++i)
+	{
+		planePrev.swap(planeCurr);
+		currAngle = PlaneNormalAndAngle(centre, vecPts[i], vecPts[(i+1)%count],
+			planeCurr, temp);
+		planeCurr.Normalize();
+		totalNormalAngle += currAngle;
+		planeCurr.mult(currAngle);
+		normal.add(planeCurr.usedata());
+		planeCurr.Normalize();
+		totalTangentAngle += planeCurr.angle(planePrev);
+	}
+	normal.div(totalNormalAngle);
+	return std::make_tuple(normal,totalTangentAngle);
+}
+
+int SmoothStep(int spawnVert, snake &snakein, double spawnDist){
+
+	// identify snaxels
+
+	HashedVector<int, int> snaxInds;
+	double spawnDistTol = spawnDist * 1.1;
+	snaxInds.reserve(20); 
+	for (auto parentEdge : snakein.snakemesh->verts.isearch(spawnVert)->edgeind)
+	{
+		std::vector<int> snaxIndsTemp;
+		snaxIndsTemp.reserve(20); 
+		snakein.snaxs.findsiblings(parentEdge,snaxIndsTemp);
+
+		for (auto snaxCandidate : snaxIndsTemp){
+			auto currSnax = snakein.snaxs(snaxCandidate);
+			if(currSnax->CloseToVertex()==spawnVert 
+				&& snaxInds.find(currSnax->index)==rsvs3d::constants::__notfound
+				&& (currSnax->d<spawnDistTol || (1-spawnDistTol)<currSnax->d)){
+				snaxInds.push_back(currSnax->index);
+			}
+		}
+	}
+	if (snaxInds.size()<2){
+		return 0;
+	}
+
+	// Consistancy of this list can be checked making sure all the snaxels come
+	// from the same vertex or go to the same vertex.
+
+	std::vector<int> externalEdges, externalPts, externalSurfsPairs, 
+		externalEdgesOrder, internalPts, internalPtsOrdered;
+	externalPts.reserve(snaxInds.size());
+	externalEdges.reserve(snaxInds.size());
+	internalPts.reserve(snaxInds.size());
+	externalSurfsPairs.reserve(snaxInds.size()*2);
+	int k = 0;
+	for (auto iSnax : snaxInds.vec){
+		for (auto iEdge : snakein.snakeconn.verts.isearch(iSnax)->edgeind){
+			auto currEdge = snakein.snakeconn.edges.isearch(iEdge);
+			for (auto iVert : currEdge->vertind){
+				if(snaxInds.find(iVert)==rsvs3d::constants::__notfound){
+					internalPts.push_back(iSnax);
+					externalEdges.push_back(iEdge);
+					externalPts.push_back(iVert);
+					externalSurfsPairs.push_back(currEdge->surfind[0]);
+					externalSurfsPairs.push_back(currEdge->surfind[1]);
+					externalEdgesOrder.push_back(k++);
+				}
+			}
+		}
+	}
+	int retValue = OrderList(externalEdgesOrder, externalSurfsPairs, false, true);
+	if(retValue != rsvs3d::constants::ordering::ordered){
+		RSVS3D_ERROR_LOGIC("Failed to order the list of edges.");
+	}
+	int nVerts = externalEdgesOrder.size();
+	std::vector<const std::vector<double>&> vecPts;
+	vecPts.reserve(nVerts);
+	internalPtsOrdered.reserve(nVerts);
+	for (int i = 0; i < nVerts; ++i)
+	{
+		vecPts.push_back(
+			snakein.snakeconn.verts.isearch(
+				externalPts[externalEdgesOrder[i]])->coord
+			);
+	}
+	auto& centre = snakein.snakemesh->verts.isearch(spawnVert)->coord;
+	auto centreData = VertexNormal(centre, vecPts);
+	// Figure out if the normal is inward facing or outward facing.
+	// Order the internal edges
+	internalPtsOrdered.reserve(nVerts);
+	for (int i = 0; i < nVerts; ++i){
+		internalPtsOrdered.push_back(internalPts[externalEdgesOrder[i]]);
+	}
+	// Extract a surface that is between two points (on an edge)
+	//EdgeFromVerts(int v1, int v2)
+	// Compare the list orders
+	unique(internalPtsOrdered);
+	if(internalPtsOrdered.size()<2){
+		RSVS3D_ERROR_LOGIC("Only one point was left, cannot define direction.");
+	}
+	// int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+	// int p1, int p2)
+	// compares the list vec1 and vec2 returning 
+	// 1 if indices p1 and p2 appear in the same order 
+	// -1 if indices p1 and p2 appear in opposite orders
+
+	int noissue=0;
 	return(noissue);
 }
 

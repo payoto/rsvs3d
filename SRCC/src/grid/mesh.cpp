@@ -40,6 +40,28 @@ double coordvec::operator()(int a) const
 	return(elems[a]);
 }
 
+void coordvec::swap(vector<double> &vecin){
+	if(int(vecin.size())!=3){
+		RSVS3D_ERROR_NOTHROW("Warning : Coordinate vector is being a "
+			"vector other than 3 long");
+	}
+	this->elems.swap(vecin);
+	this->isuptodate = false;
+}
+void coordvec::swap(coordvec &coordin){
+	this->elems.swap(coordin.elems);
+	{
+		auto temp = this->norm;
+		this->norm = coordin.norm;
+		coordin.norm = temp;
+	}{
+		auto temp = this->isuptodate;
+		this->isuptodate = coordin.isuptodate;
+		coordin.isuptodate = temp;
+	}
+}
+
+
 coordvec coordvec::Unit() const 
 {
 	coordvec unitCoordVec=*this;
@@ -75,14 +97,14 @@ double coordvec::Unit(const int a) const
 
 double coordvec::GetNorm(){
 	// TEST_RANGE
-	if (~isuptodate){
+	if (!isuptodate){
 		this->CalcNorm();
 	}
 	return(norm);
 }
 double coordvec::GetNorm() const {
 	// TEST_RANGE
-	if (~isuptodate){
+	if (!isuptodate){
 		RSVS3D_ERROR_ARGUMENT("coordvec is not ready for norm return");
 	}
 	return(norm);
@@ -164,11 +186,7 @@ void coordvec::mult(const vector<double> &vecin){
 } 
 
 void coordvec::div(double scalin){
-	int n=int(elems.size());
-	for (int ii = 0; ii < n; ++ii)
-	{
-		elems[ii]=elems[ii]/scalin;
-	}
+	this->mult(1.0/scalin);
 }
 void coordvec::mult(double scalin){
 	int n=int(elems.size());
@@ -176,6 +194,7 @@ void coordvec::mult(double scalin){
 	{
 		elems[ii]=elems[ii]*scalin;
 	}
+	this->norm = scalin*this->norm;
 }
 
 vector<double> coordvec::cross(const std::vector<double> &vecin) const {
@@ -233,6 +252,31 @@ void PlaneNormal(const vector<double> &planeVert1,
 
 	normal = temp1.cross(normal.usedata()); // causes allocation
 
+}
+/**
+ * @brief      Calculates a plane's normal vector
+ *
+ * @param[in]  planeVert1  The plane vertex 1
+ * @param[in]  planeVert2  The plane vertex 2
+ * @param[in]  planeVert3  The plane vertex 3
+ * @param      normal      The normal
+ * @param      temp1       The temporary 1
+ *
+ * @return     returns the angle between the two vectors defining the plane
+ *             <[v2-v1] , [v3-v1]>
+ */
+double PlaneNormalAndAngle(const vector<double> &planeVert1, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1){
+
+	temp1 = planeVert1;
+	normal = planeVert1;
+	temp1.substractfrom(planeVert2);
+	normal.substractfrom(planeVert3);
+	double angle = temp1.angle(normal); 
+	normal = temp1.cross(normal.usedata()); // causes allocation
+	return angle;
 }
 /**
  * @brief      Calculates the distance from a vertex to a plane.
@@ -2674,6 +2718,21 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 	return rsvsorder::ordered;
 }
 
+/**
+ * Orders a list of elements defined by pairs of indices
+ * 
+ * Each element is defined by 1 index in edgeind and 2 indices in edge2Vert.
+ * The two indices are then matched to the next element chaining equal indices
+ * together.
+ *
+ * @param      edgeind         The edgeind
+ * @param[in]  edge2Vert       The edge 2 vertical
+ * @param[in]  warn            The warning
+ * @param[in]  errout          The errout
+ * @param[in]  edgeIndOrigPtr  The edge ind original pointer
+ *
+ * @return     { description_of_the_return_value }
+ */
 int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn,
 	bool errout, const vector<int>* edgeIndOrigPtr){
 
@@ -4792,6 +4851,26 @@ void mesh::CropAtBoundary(const vector<double> &lb, const vector<double> &ub){
 	this->Crop(vecDel, 1);
 }
 
+int mesh::EdgeFromVerts(int v1, int v2) const {
+
+	int vExp = this->verts.isearch(v1)->edgeind.size() 
+		< this->verts.isearch(v2)->edgeind.size() 
+		? v1 : v2;
+	auto& el = this->verts.isearch(vExp)->edgeind;
+
+	int retEdge = rsvs3d::constants::__notfound;
+
+	for (auto e : el){
+		auto& vinds = this->edges.isearch(e)->vertind;
+		if((vinds[0]==v1 && vinds[1]==v2)
+			|| (vinds[1]==v1 && vinds[0]==v2)){
+			retEdge = e;
+		break;
+		}
+	}
+
+	return retEdge;
+}
 
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	int p1, int p2){
