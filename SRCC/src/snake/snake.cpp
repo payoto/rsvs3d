@@ -902,6 +902,32 @@ void snaxarray::CalculateTimeStepOnEdge(vector<double> &dt,
 	}
 }
 
+double ValidateEquilibrateD(double newD, double oldD, double stepLength){
+
+	double maxLim = pow(stepLength,1.5);
+	double minLim = pow(stepLength,0.5);
+	if (oldD<0.5){
+		if (!isfinite(newD)){
+			newD = oldD;
+		} else if (newD<minLim){
+			newD = minLim;
+		} else if (newD>maxLim) {
+			newD = maxLim;
+		}
+	} else {
+
+		if (!isfinite(newD)){
+			newD = oldD;
+		} else if (newD<(1.0-maxLim)){
+			newD = (1.0-maxLim);
+		} else if (newD>(1.0-minLim)) {
+			newD = (1.0-minLim);
+		}
+	}
+
+	return newD;
+}
+
 std::pair<double,double> EquilibrateEdge(snake &snakein,
 	int snaxA, int snaxB, int vertA, int vertB){
 
@@ -928,6 +954,9 @@ std::pair<double,double> EquilibrateEdge(snake &snakein,
 		snakein.snaxs.isearch(snaxA)->fromvert)->coord);
 	double dga = vec.dot(del1.usedata());
 	double da = (d-dg0)/dga;
+
+
+
 	// Vertex B
 	dg0 = vec.dot(snakein.snakemesh->verts.isearch(
 		snakein.snaxs.isearch(snaxB)->fromvert)->coord);
@@ -937,6 +966,7 @@ std::pair<double,double> EquilibrateEdge(snake &snakein,
 	double dgb = vec.dot(del1.usedata());
 	double db = (d-dg0)/dgb;
 	
+
 
 	return {da, db};
 }
@@ -1110,9 +1140,14 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist){
 		auto tempD = EquilibrateEdge(snakein, snaxA, snaxB, vertA, vertB);
 		posA = snaxInds.find(snaxA);
 		posB = snaxInds.find(snaxB);
-		newD[posA] += tempD.first;
+		ValidateEquilibrateD(tempD.first, snakein.snaxs.isearch(snaxA)->d, spawnDist);
+		// newD[posA] += tempD.first;
+		newD[posA] += ValidateEquilibrateD(tempD.first, 
+			snakein.snaxs.isearch(snaxA)->d, spawnDist);
 		countAccess[posA]++;
-		newD[posB] += tempD.second;
+		// newD[posB] += tempD.second;
+		newD[posB] += ValidateEquilibrateD(tempD.second, 
+			snakein.snaxs.isearch(snaxB)->d, spawnDist);
 		countAccess[posB]++;
 	}
 	// How to set all the values not set by the border algorithm?
@@ -1125,7 +1160,8 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist){
 	for (int i = 0; i < count; ++i)
 	{
 		if(countAccess[i]>0){
-			if(newD[i]<0.0 || countAccess[i]!=2 || newD[i]/countAccess[i]>1.0){
+			if((newD[i]<0.0 || countAccess[i]!=2 || newD[i]/countAccess[i]>1.0)
+				&& false){
 				DisplayVector(newD);
 				DisplayVector(countAccess);
 				std::cout << endl;

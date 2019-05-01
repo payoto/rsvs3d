@@ -86,6 +86,15 @@ namespace grid {
 	typedef std::array<std::array<double, 3>,3> transformation;
 }
 
+namespace rsvs3d {
+	namespace constants {
+		namespace ordering {
+			const int ordered=0;
+			const int truncated=1;
+			const int open=-1;
+		}
+	}
+}
 
 
 /**

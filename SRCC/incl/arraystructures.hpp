@@ -293,7 +293,8 @@ public:
 	T& operator[](const int a){return this->vec[a];}
 	const T& operator[](const int a) const {return this->vec[a];}
 
-	void reserve(const size_t a){this->vec.reserve(a);}
+	void reserve(const size_t a){
+		this->vec.reserve(a);this->hashTable.reserve(a);}
 	void assign(const size_t a, const T &elm){this->vec.assign(a, elm);
 		this->isHash=false;}
 	void push_back(const T &elm){

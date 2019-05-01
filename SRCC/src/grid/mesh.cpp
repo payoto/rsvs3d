@@ -13,7 +13,7 @@
 // Class function definitions
 // Mesh Linking methods
 using namespace std;
-
+namespace rsvsorder = rsvs3d::constants::ordering;
 
 // --------------------------------------------------------------------------
 // Implementatation of coordvec 
@@ -2561,10 +2561,8 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 	vector<int> edgeIndOrig;
 	int vertCurr, edgeCurr, ii, jj, endsExpl=0;
 
-	int return_ordered=0, return_truncated=1, return_open=-1;
-
 	if (edgeind.size()<=0){
-		return(return_ordered);
+		return(rsvsorder::ordered);
 	}
 	// edgeIndOrig2=edgeind;
 	if(edgeIndOrigPtr==NULL){
@@ -2608,7 +2606,7 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 				range=vert2Edge.equal_range(vertCurr);
 			} else { // Exit
 
-				return return_open*ii;
+				return rsvsorder::open*ii;
 			}
 		}
 	 	#ifdef SAFE_ACCESS
@@ -2646,7 +2644,7 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 			vertCurr=edge2Vert[((it->second)/2)*2+jj];
 			edgeind[ii]=edgeCurr;
 		} else if (endsExpl) {
-			return return_open*ii;
+			return rsvsorder::open*ii;
 		} else {
 		 	#ifdef RSVS_DIAGNOSTIC_FIXED
 			cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ 
@@ -2669,11 +2667,108 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 			surfin->disptree(meshin,1);
 			#endif //RSVS_DIAGNOSTIC
 
-			return return_truncated;
+			return rsvsorder::truncated;
 			break; // Unnecessary
 		}
 	}
-	return return_ordered;
+	return rsvsorder::ordered;
+}
+
+int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn,
+	bool errout, const vector<int>* edgeIndOrigPtr){
+
+	unordered_multimap<int,int> vert2Edge;
+	vector<bool> isDone;
+	vector<int> edgeIndOrig;
+	int vertCurr, edgeCurr, ii, jj, endsExpl=0;
+
+	if (edgeind.size()<=0){
+		return(rsvsorder::ordered);
+	}
+	// edgeIndOrig2=edgeind;
+	if(edgeIndOrigPtr==NULL){
+		// edgeInOrigPtr is not defined and there is no need
+		sort(edgeind);
+		unique(edgeind);
+		edgeIndOrig = edgeind;
+		edgeIndOrigPtr = &edgeIndOrig;
+	} 
+
+	isDone.assign(edgeIndOrigPtr->size(),false);	
+	
+	HashVector(edge2Vert, vert2Edge);
+
+	vertCurr=edge2Vert[0];
+	edgeCurr=edgeind[0];
+	isDone[0]=true;
+	auto it=vert2Edge.end();
+	for(ii=1;ii<int(edgeind.size());++ii){
+		auto range=vert2Edge.equal_range(vertCurr);
+		if (vert2Edge.count(vertCurr)==1){
+			if(warn || errout){
+				if(errout){
+					cerr << "Error";
+				} else {
+					cerr << "Warning";
+				}
+				cerr 	<< " in :" << __PRETTY_FUNCTION__ ;
+				cerr << " - edgeind is not closed (single vertex "<<
+					 vertCurr <<")" << endl;
+				if(errout){
+					RSVS3D_ERROR_ARGUMENT("edgelist is not closed");
+				}
+			}
+			if(!endsExpl){ // explore the one way chain the other way
+				endsExpl++;
+				vertCurr=edge2Vert[1];
+				edgeCurr=edgeind[0];
+				range=vert2Edge.equal_range(vertCurr);
+			} else { // Exit
+
+				return rsvsorder::open*ii;
+			}
+		}
+	 	#ifdef SAFE_ACCESS
+		if (range.first==vert2Edge.end()){
+
+			cerr << ii << " vert " << vertCurr << "  ";
+			DisplayVector(edge2Vert);
+			DisplayVector(edgeind);
+			cout << it->second << " " << 1/2 << 2/3 <<  endl;
+			cerr << "Error in :" << __PRETTY_FUNCTION__ << endl;
+			RSVS3D_ERROR_RANGE("unordered_multimap went beyond its "
+				"range in OrderEdges");
+		}
+	 	#ifdef RSVS_DIAGNOSTIC
+		if (vert2Edge.count(vertCurr)!=2){
+			cerr << "DIAGNOSTIC in " << __PRETTY_FUNCTION__ << endl;
+			cerr << " current vertex " << vertCurr << " appears " 
+				<< vert2Edge.count(vertCurr) 
+				<< " in the surf::edgeind ...->vertind" << endl;
+		}
+		#endif //RSVS_DIAGNOSTIC
+	 	#endif // SAFE_ACCESS
+		jj=(*edgeIndOrigPtr)[(range.first->second)/2]==edgeCurr;
+
+		it=range.first;
+		if (jj){++it;}
+		if (!isDone[(it->second)/2]){
+			isDone[(it->second)/2]=true;
+			edgeCurr=(*edgeIndOrigPtr)[(it->second)/2];
+			// Warning ((x/2)*2) not necessarily equal x
+			// Done to round down to the nearest even
+			jj=edge2Vert[((it->second)/2)*2]==vertCurr; 
+			vertCurr=edge2Vert[((it->second)/2)*2+jj];
+			edgeind[ii]=edgeCurr;
+		} else if (endsExpl) {
+			return rsvsorder::open*ii;
+		} else {
+			edgeind.erase(edgeind.begin()+ii, edgeind.end());
+			return rsvsorder::truncated;
+			break; // Unnecessary
+		}
+	}
+	return rsvsorder::ordered;
 }
 
 
@@ -2705,7 +2800,7 @@ int surf::OrderEdges(mesh *meshin)
 	int retFlag = OrderEdgeList(this->edgeind, *meshin,true, true, 
 		&edgeIndOrig, this);
 
-	isTruncated = retFlag==1;
+	isTruncated = retFlag==rsvsorder::truncated;
 	
 	if(!isTruncated){
 		newSurfInd = -1; // No new surface index
@@ -4938,7 +5033,7 @@ namespace meshhelp {
 		int outFlag=OrderEdgeList(edgeindNew, meshin,
 			false, false, &edgeOrig);
 		// trim edgeind
-		if(outFlag!=1){
+		if(outFlag!=rsvsorder::truncated){
 			edgeindNew.erase(
 				edgeindNew.begin()-outFlag,
 				edgeindNew.end()
