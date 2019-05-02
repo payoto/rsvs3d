@@ -4,8 +4,8 @@
 #include <cmath> 
 #include <Eigen>
 
-#include "snake.hpp"
-#include "triangulate.hpp"
+// #include "snake.hpp"
+// #include "triangulate.hpp"
 #include "vectorarray.hpp"
 #include "RSVScalc.hpp"
 #include "matrixtools.hpp"

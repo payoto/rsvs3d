@@ -126,6 +126,7 @@ public:
 	const vector<double>& usedata() const {return(elems);}
 	const vector<double>* retPtr() const {return(&elems);}
 	// Math and logical operations (element wise)
+	void flipsign();
 	void max(const vector<double> &vecin);
 	void min(const vector<double> &vecin);
 	void add(const vector<double> &vecin);

@@ -61,6 +61,11 @@ void coordvec::swap(coordvec &coordin){
 	}
 }
 
+void coordvec::flipsign(){
+	for (int ii=0;ii<3;++ii){
+		this->elems[ii]=-this->elems[ii];
+	}
+}
 
 coordvec coordvec::Unit() const 
 {
@@ -274,6 +279,8 @@ double PlaneNormalAndAngle(const vector<double> &planeVert1,
 	normal = planeVert1;
 	temp1.substractfrom(planeVert2);
 	normal.substractfrom(planeVert3);
+	normal.CalcNorm();
+	temp1.CalcNorm();
 	double angle = temp1.angle(normal); 
 	normal = temp1.cross(normal.usedata()); // causes allocation
 	return angle;
@@ -4894,10 +4901,14 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	if(ord1>1){ord1=-1;}
 	if(ord1<-1){ord1=1;}
 	if (kk!=2) {
+		cerr << endl;
+		DisplayVector(vec1);
+		DisplayVector(vec2);
+		cerr << endl << "p " << p1 << "," << p2 << endl;
 		cerr << "Error : indices were not found in lists " << endl;
 		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
 		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
-		RSVS3D_ERROR_ARGUMENT("Incaompatible list and index");
+		RSVS3D_ERROR_ARGUMENT("Incompatible list and index");
 	}
 
 	ord2=0;kk=0;
@@ -4914,10 +4925,14 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	if(ord2>1){ord2=-1;}
 	if(ord2<-1){ord2=1;}
 	if (kk!=2) {
+		cerr << endl;
+		DisplayVector(vec1);
+		DisplayVector(vec2);
+		cerr << endl << "p " << p1 << "," << p2 << endl;
 		cerr << "Error : indices were not found in lists " << endl;
 		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
 		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
-		RSVS3D_ERROR_ARGUMENT("Incaompatible list and index");
+		RSVS3D_ERROR_ARGUMENT("Incompatible list and index");
 	}
 
 	retVal=(ord1==ord2)*2-1;

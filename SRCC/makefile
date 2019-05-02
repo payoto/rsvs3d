@@ -73,7 +73,7 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 WARNFLAGS= -Wall -Wextra -pedantic
 # -Werror
 #
-OPTIMLVL=3
+OPTIMLVL=g
 CCPSTD=11
 
 # O3 comes with spurious warnings which is ugly to deal in the code

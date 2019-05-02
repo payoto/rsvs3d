@@ -192,7 +192,8 @@ public:
 	void SwitchIndex(int typeInd, int oldInd, int newInd);
 	void TightenConnectivity(){}
 	void TakeSpawnStep(snake &snakein, double stepLength);
-	int CloseToVertex() const {return d<0.5? fromvert : tovert;}
+	int CloseToVertex(bool far=false) const {
+		return ((d<0.5) ^ far)? fromvert : tovert;}
 };
 
 
