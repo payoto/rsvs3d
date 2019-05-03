@@ -194,6 +194,7 @@ public:
 	void TakeSpawnStep(snake &snakein, double stepLength);
 	int CloseToVertex(bool far=false) const {
 		return ((d<0.5) ^ far)? fromvert : tovert;}
+	void ValidateDistance(snake &snakein);
 };
 
 

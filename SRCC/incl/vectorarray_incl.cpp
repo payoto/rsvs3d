@@ -25,7 +25,7 @@ template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)
 }
 template<class T> 
 void ArrayVec<T>::write(ofstream &streamout, const char* sep) const{
-	int nR, nC;
+	int nR=0, nC=0;
 	this->size(nR, nC);
 	for (int i = 0; i < nR; ++i)
 	{

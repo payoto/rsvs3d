@@ -625,6 +625,7 @@ public:
 	void CropAtBoundary(const vector<double> &lb, const vector<double> &ub);
 	// Mesh traversal convenience functions
 	int EdgeFromVerts(int v1, int v2) const;
+	int SurfFromEdges(int e1, int e2, int repetitionBehaviour=-1) const;
 	// Destructor
 	~mesh(){
 		RemoveFromFamily();
@@ -635,6 +636,7 @@ public:
 
 void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
 	vector<int> &vertind);
+std::pair<int, int> OrderMatchLists(const vector<int> &vec1, int p1, int p2);
 int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	int p1, int p2);
 void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,

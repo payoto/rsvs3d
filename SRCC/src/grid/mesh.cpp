@@ -509,7 +509,8 @@ coordvec volu::PseudoCentroid(const mesh &meshin) const {
 	coordvec coordVolu, coordSurf;
 	double surfLength, voluLength;
 	coordVolu.assign(0,0,0);
-
+	surfLength=0.0;
+	voluLength=0.0;
 	for (auto surfInd : this->surfind){
 		surfLength = meshin.surfs.isearch(surfInd)
 			->PseudoCentroid(meshin, coordSurf);
@@ -3815,7 +3816,7 @@ int mesh::ConnectedVolumes(vector<int> &voluBlock,
 	vector<bool> volStatus; // 1 explored 0 not explored
 
 	vector<int> currQueue, nextQueue; // Current and next queues of indices
-	bool boundConstrAct;
+	bool boundConstrAct = false;
 	// Preparation of the arrays;
 	nVolus=volus.size();
 	nSurfs=surfs.size();
@@ -4329,7 +4330,7 @@ void mesh::LoadTargetFill(const std::string &fileName){
 	
 	file.open(fileName);
 	CheckFStream(file, __PRETTY_FUNCTION__, fileName);
-
+	nElms = 0;
 	if (this->WhatDim()==3){
 		nElms = this->volus.size();
 	} else if(this->WhatDim()==2){
@@ -4879,7 +4880,74 @@ int mesh::EdgeFromVerts(int v1, int v2) const {
 	return retEdge;
 }
 
-int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+/**
+ * @brief      Returns the index of the surface connecting two edges.
+ *
+ * @param[in]  e1       Index of the first edge
+ * @param[in]  e2       Index of the second edge
+ * @param[in]  flagRep  Handles the possibility of multiple surfaces connecting
+ *                      two edges.
+ *
+ * @return     The index of the connecting surface.
+ */
+int mesh::SurfFromEdges(int e1, int e2, int repetitionBehaviour) const{
+
+	bool e1Smaller = this->edges.isearch(e1)->surfind.size() 
+		< this->edges.isearch(e2)->surfind.size();
+	int eExp =  e1Smaller ? e1 : e2;
+	int eNoExp = !e1Smaller ? e1 : e2;
+	auto& sl = this->edges.isearch(eExp)->surfind;
+
+	int retSurf = rsvs3d::constants::__notfound;
+	bool prevFind = false;
+	for (auto s : sl){
+		auto& einds = this->surfs.isearch(s)->edgeind;
+		for (auto e : einds) {
+			if(e == eNoExp){
+				if (prevFind){ // if a repetition is detected
+					if (repetitionBehaviour == 1){
+						return rsvs3d::constants::__notfound;
+					} else {
+						stringstream errstr;
+						errstr << "Two or more surfaces connect edges e1 ("
+							<< e1 << ") and e2 (" << e2 << ")";
+						RSVS3D_ERROR(errstr.str().c_str());
+					}
+				}
+				retSurf = s;
+				prevFind = true;
+				if (repetitionBehaviour==0){ // No check for repetition
+					return retSurf;
+				} else {
+					break;
+				}
+			}
+		}
+	}
+
+	return retSurf;
+}
+
+std::pair<int, int> OrderMatchLists(const vector<int> &vec1, int p1, int p2){
+	int ord1=0;
+	int kk=0;
+	int n=vec1.size();
+	for(int ii=0; ii<n; ++ii){
+		if (vec1[ii]==p1) {
+			ord1+=ii;
+			kk++;
+		} else if (vec1[ii]==p2) {
+			ord1+=-ii;
+			kk++;
+		}
+	}
+	if(ord1>1){ord1=-1;}
+	if(ord1<-1){ord1=1;}
+	return {ord1, kk};
+}
+
+
+int OrderMatchLists_old(const vector<int> &vec1, const vector<int> &vec2,
 	int p1, int p2){
 	// compares the list vec1 and vec2 returning 
 	// 1 if indices p1 and p2 appear in the same order 
@@ -4936,9 +5004,63 @@ int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
 	}
 
 	retVal=(ord1==ord2)*2-1;
-
+	
 	return(retVal);
 }
+
+int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+	int p1, int p2){
+	// compares the list vec1 and vec2 returning 
+	// 1 if indices p1 and p2 appear in the same order 
+	// -1 if indices p1 and p2 appear in opposite orders
+	int ord1, ord2, retVal, kk;
+
+	
+	auto pair1 = OrderMatchLists(vec1, p1, p2);
+	ord1 = pair1.first;
+	kk = pair1.second;
+	if (kk!=2) {
+		cerr << endl;
+		DisplayVector(vec1);
+		DisplayVector(vec2);
+		cerr << endl << "p " << p1 << "," << p2 << endl;
+		cerr << "Error : indices were not found in lists " << endl;
+		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
+		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
+		RSVS3D_ERROR_ARGUMENT("Incompatible list and index");
+	}
+
+	
+	auto pair2 = OrderMatchLists(vec2, p1, p2);
+	ord2 = pair2.first;
+	kk = pair2.second;
+	if (kk!=2) {
+		cerr << endl;
+		DisplayVector(vec1);
+		DisplayVector(vec2);
+		cerr << endl << "p " << p1 << "," << p2 << endl;
+		cerr << "Error : indices were not found in lists " << endl;
+		cerr << " 	p1 and/or p2 did not appear in vec " << endl;
+		cerr << " 	in " << __PRETTY_FUNCTION__ << endl;
+		RSVS3D_ERROR_ARGUMENT("Incompatible list and index");
+	}
+
+	retVal=(ord1==ord2)*2-1;
+	#ifdef SAFE_ALGO
+	int retValOld = OrderMatchLists_old(vec1, vec2, p1, p2);
+	if(retVal!=retValOld){
+		cerr << endl;
+		DisplayVector(vec1);
+		DisplayVector(vec2);
+		cerr << endl << "p " << p1 << "," << p2 << endl;
+		cerr << endl << "retVal (new,old): " << retVal << "," << retValOld << endl;
+		RSVS3D_ERROR_LOGIC("Legacy and new versions do not match.");
+	}
+	#endif
+	return(retVal);
+}
+
+
 
 void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
 	vector<int> &vertind){

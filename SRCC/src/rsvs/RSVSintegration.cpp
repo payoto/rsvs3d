@@ -214,6 +214,7 @@ void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength){
 	snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
+	snakein.OrientFaces();
 	snakein.TakeSmoothSpawnStep(maxIndPreSpawn, stepLength);
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
