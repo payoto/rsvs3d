@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 
 #include <iostream>
 #include <stdexcept>
@@ -225,16 +226,63 @@ double coordvec::dot(const std::vector<double> &vecin) const {
 }
 double coordvec::angle(const coordvec &coordin) const {
 
-	return acos(
+	double angle = acos(
 		this->dot(coordin.usedata())
 		/(coordin.GetNorm()*this->GetNorm())
 		);
+	if(!isfinite(angle)){
+		if (rsvs3d::sign(coordin(0))==rsvs3d::sign(this->operator()(0))){
+			angle = 0.0;
+		} else {
+			angle = M_PI;
+		}
+	}
+	return angle;
 }
 
 //// ----------------------------------------
 // Implementation of point location
 //// ----------------------------------------
 // Detects which volume (if any a point is in)
+
+/**
+ * @brief      Computes vector between vertices to then compute angles and plane
+ * normals.
+ *
+ * @param[in]  vert1      The first vertex
+ * @param[in]  vert2      the second vertex
+ * @param      diffVerts  The difference : vert2 - vert1
+ */
+void DiffPoints(const vector<double> &vert1,
+	const vector<double> &vert2, coordvec &diffVerts){
+
+	diffVerts = vert1;
+	diffVerts.substractfrom(vert2);
+	diffVerts.CalcNorm();
+}
+
+/**
+ * @brief      Computes vector between vertices to then compute angles and plane
+ * normals.
+ *
+ * @param[in]  centre     The starting vertex for all vertices
+ * @param[in]  vert1      The first vertex
+ * @param[in]  vert2      the second vertex
+ * @param      diffVert1  The difference : vert1 - centre
+ * @param      diffVert2  The difference : vert2 - centre
+ */
+void DiffPointsFromCentre(const vector<double> &centre, 
+	const vector<double> &vert1,
+	const vector<double> &vert2,
+	coordvec &diffVert1, coordvec &diffVert2){
+
+	diffVert1 = centre;
+	diffVert2 = centre;
+	diffVert1.substractfrom(vert1);
+	diffVert2.substractfrom(vert2);
+	diffVert1.CalcNorm();
+	diffVert2.CalcNorm();
+}
 
 /**
  * @brief      Calculates a plane's normal vector
@@ -250,11 +298,7 @@ void PlaneNormal(const vector<double> &planeVert1,
 	const vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1){
 
-	temp1 = planeVert1;
-	normal = planeVert1;
-	temp1.substractfrom(planeVert2);
-	normal.substractfrom(planeVert3);
-
+	DiffPointsFromCentre(planeVert1, planeVert2, planeVert3,normal, temp1);
 	normal = temp1.cross(normal.usedata()); // causes allocation
 
 }
@@ -275,14 +319,31 @@ double PlaneNormalAndAngle(const vector<double> &planeVert1,
 	const vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1){
 
-	temp1 = planeVert1;
-	normal = planeVert1;
-	temp1.substractfrom(planeVert2);
-	normal.substractfrom(planeVert3);
-	normal.CalcNorm();
-	temp1.CalcNorm();
+	DiffPointsFromCentre(planeVert1, planeVert2, planeVert3,normal, temp1);
 	double angle = temp1.angle(normal); 
 	normal = temp1.cross(normal.usedata()); // causes allocation
+	return angle;
+}
+
+/**
+ * @brief      Calculates a plane's normal vector
+ *
+ * @param[in]  planeVert1  The plane vertex 1
+ * @param[in]  planeVert2  The plane vertex 2
+ * @param[in]  planeVert3  The plane vertex 3
+ * @param      normal      The normal
+ * @param      temp1       The temporary 1
+ *
+ * @return     returns the angle between the two vectors defining the plane
+ *             <[v2-v1] , [v3-v1]>
+ */
+double Angle3Points(const vector<double> &centre, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1){
+
+	DiffPointsFromCentre(centre, planeVert2, planeVert3,normal, temp1);
+	double angle = temp1.angle(normal); 
 	return angle;
 }
 /**

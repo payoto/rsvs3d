@@ -646,6 +646,16 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin, bool warn=true,
 	const surf* surfin=NULL);
 int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn=true,
 	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL);
+void DiffPointsFromCentre(const vector<double> &centre, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1);
+void DiffPoints(const vector<double> &vert1,
+	const vector<double> &vert2, coordvec &diffVerts);
+double Angle3Points(const vector<double> &centre, 
+	const vector<double> &planeVert2,
+	const vector<double> &planeVert3,
+	coordvec &normal, coordvec &temp1);
 double VertexDistanceToPlane(const vector<double> &planeVert1, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
