@@ -32,35 +32,35 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	unordered_multimap<int,int> hashEdgeInds,hashVoluInds,hashSurfInds;
 
 
-	is3D=snakein.snakemesh->volus.size()>0;
+	is3D=snakein.snakemesh()->volus.size()>0;
 	// Extract Data corresponding to vertex from Mesh
-	subVert=snakein.snakemesh->verts.find(indVert);
+	subVert=snakein.snakemesh()->verts.find(indVert);
 
 	
-	edgeInds=snakein.snakemesh->verts(subVert)->edgeind;
-	edgeSubs=snakein.snakemesh->edges.find_list(edgeInds);
-	surfInds=ConcatenateVectorField(snakein.snakemesh->edges, &edge::surfind, edgeSubs);
+	edgeInds=snakein.snakemesh()->verts(subVert)->edgeind;
+	edgeSubs=snakein.snakemesh()->edges.find_list(edgeInds);
+	surfInds=ConcatenateVectorField(snakein.snakemesh()->edges, &edge::surfind, edgeSubs);
 	sort(surfInds);
 	unique(surfInds);
 
-	surfSubs=snakein.snakemesh->surfs.find_list(surfInds);
-	voluInds=ConcatenateVectorField(snakein.snakemesh->surfs, &surf::voluind, surfSubs);
+	surfSubs=snakein.snakemesh()->surfs.find_list(surfInds);
+	voluInds=ConcatenateVectorField(snakein.snakemesh()->surfs, &surf::voluind, surfSubs);
 	sort(voluInds);
 	unique(voluInds);
 	if(is3D){
-		voluSubs=snakein.snakemesh->volus.find_list(voluInds);
+		voluSubs=snakein.snakemesh()->volus.find_list(voluInds);
 	} else {
 
-		voluSubs=snakein.snakemesh->volus.find_list(voluInds);
+		voluSubs=snakein.snakemesh()->volus.find_list(voluInds);
 	}
-	//OperArrayStructMethod(snakein.snakemesh->surfs, surfSubs, &surf::isready, 
+	//OperArrayStructMethod(snakein.snakemesh()->surfs, surfSubs, &surf::isready, 
 	//	ii, std::logical_and<bool>());
 	nVert=edgeInds.size();
 	nEdge=surfInds.size();
 	nSurf=voluInds.size();
 	nVolu=int(is3D);
 
-	newsnake.Init(snakein.snakemesh,nVert,nEdge,nSurf,nVolu);
+	newsnake.Init(snakein.snakemesh(),nVert,nEdge,nSurf,nVolu);
 	newsnake.VertIsIn(indVert);
 	// Generates snaxels and vertices
 	SpawnAtVertexVert(newsnake,nVert, indVert,subVert, surfInds,edgeInds,
@@ -96,14 +96,14 @@ void SpawnAtVertexVert(snake& newsnake, int nVert,int indVert, int subVert,
 	newsnake.snaxs.PopulateIndices(); 
 	for (ii=0;ii<nVert;++ii){
 		// Finds the to vertex
-		jj=int(newsnake.snakemesh->edges(edgeSubs[ii])->vertind[0]==indVert);
+		jj=int(newsnake.snakemesh()->edges(edgeSubs[ii])->vertind[0]==indVert);
 		newsnake.snaxs[ii].set(newsnake.snaxs(ii)->index,0.0,0.5,indVert,
-			newsnake.snakemesh->edges(edgeSubs[ii])->vertind[jj],edgeInds[ii],0,-1);
+			newsnake.snakemesh()->edges(edgeSubs[ii])->vertind[jj],edgeInds[ii],0,-1);
 
-		edgeSubsTemp=FindSubList(newsnake.snakemesh->edges(edgeSubs[ii])->surfind,
+		edgeSubsTemp=FindSubList(newsnake.snakemesh()->edges(edgeSubs[ii])->surfind,
 			surfInds,hashSurfInds);
 		newsnake.snakeconn.verts[ii].edgeind=edgeSubsTemp;
-		newsnake.snakeconn.verts[ii].coord=newsnake.snakemesh->verts(subVert)->coord;
+		newsnake.snakeconn.verts[ii].coord=newsnake.snakemesh()->verts(subVert)->coord;
 	}
 	newsnake.snakeconn.verts.ChangeIndices(0,1,0,0);
 }
@@ -121,7 +121,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
 		for (ii=0;ii<nEdge;++ii){
 			newsnake.snaxedges[ii].surfind=surfInds[ii];
 			if(newsnake.Check3D()){
-				surfSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->voluind,
+				surfSubsTemp=FindSubList(newsnake.snakemesh()->surfs(surfSubs[ii])->voluind,
 					voluInds,hashVoluInds);
 				newsnake.snakeconn.edges[ii].surfind=surfSubsTemp;
 				for(jj=0;jj<int(surfSubsTemp.size());++jj){
@@ -132,7 +132,7 @@ void SpawnAtVertexEdge(snake& newsnake,int nEdge,const vector<int> &surfInds,
 			}
 			// Assign vertind (can be done WAY more efficiently the other way round)
 			// But liek this we can check the logic
-			vertSubsTemp=FindSubList(newsnake.snakemesh->surfs(surfSubs[ii])->edgeind,
+			vertSubsTemp=FindSubList(newsnake.snakemesh()->surfs(surfSubs[ii])->edgeind,
 				edgeInds,hashEdgeInds);
 			kk=0;
 			for(jj=0;jj<int(vertSubsTemp.size());++jj){
@@ -165,7 +165,7 @@ void SpawnAtVertexSurf3D(snake& newsnake,int nSurf,const vector<int> &surfInds, 
 		newsnake.snakeconn.surfs[ii].voluind[0]=1;
 		// Assign edgeind (can be done WAY more efficiently the other way round)
 		// But like this we can check the logic
-		surfSubsTemp=FindSubList(newsnake.snakemesh->volus(voluSubs[ii])->surfind,
+		surfSubsTemp=FindSubList(newsnake.snakemesh()->volus(voluSubs[ii])->surfind,
 			surfInds,hashSurfInds);
 		// Needs to be modified to work with 2D (surfSubsTemps does not come out right) 
 		for(jj=0;jj<int(surfSubsTemp.size());++jj){
@@ -265,8 +265,8 @@ void SpawnArrivedSnaxels(snake &fullsnake,const vector<int> &isImpact){
 	snake fwdSnake, bwdSnake;
 	HashedVector<int,int> vertNoSpawn;
 
-	fwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
-	bwdSnake.Init(fullsnake.snakemesh,0,0,0,0);
+	fwdSnake.Init(fullsnake.snakemesh(),0,0,0,0);
+	bwdSnake.Init(fullsnake.snakemesh(),0,0,0,0);
 
 	// Generate fwd spawn
 	
@@ -327,18 +327,18 @@ void SpawnArrivedSnaxelsDir(snake &fullsnake,snake &partSnake,const vector<int> 
 	for(ii=0;ii<int(isImpact.size());ii=ii+2){
 		if(isImpact[ii+1]==dir){
 			jj=fullsnake.snaxs.find(isImpact[ii]);
-			if(!fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->isBorder){
+			if(!fullsnake.snakemesh()->verts.isearch(fullsnake.snaxs(jj)->*mp)->isBorder){
 				jj=fullsnake.snaxs.find(isImpact[ii]);
 				vertSpawn.push_back(fullsnake.snaxs(jj)->*mp);
 				nVolu++;
-				nVert=nVert+fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind.size();
+				nVert=nVert+fullsnake.snakemesh()->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind.size();
 
 
-				subList=fullsnake.snakemesh->edges.find_list(
-					fullsnake.snakemesh->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind);
+				subList=fullsnake.snakemesh()->edges.find_list(
+					fullsnake.snakemesh()->verts.isearch(fullsnake.snaxs(jj)->*mp)->edgeind);
 
 				for(kk=0;kk<int(subList.size());kk++){
-					nEdge=nEdge+fullsnake.snakemesh->edges(subList[kk])->surfind.size();
+					nEdge=nEdge+fullsnake.snakemesh()->edges(subList[kk])->surfind.size();
 				}
 			} else {
 				fullsnake.snaxs[jj].isfreeze=1;
@@ -776,7 +776,7 @@ void CleanupSnakeConnec(snake &snakein){
 					// if(int(snakein.snakeconn.verts.isearch(indRmvVert[ii])->edgeind.size())>2){
 					// 	snakein.snakeconn.verts.isearch(indRmvVert[ii])->disp();
 					// }
-					if(snakein.snakemesh->edges.isearch(
+					if(snakein.snakemesh()->edges.isearch(
 						snakein.snaxs.isearch(
 							indRmvVert[ii])->edgeind
 							)->surfind.size()

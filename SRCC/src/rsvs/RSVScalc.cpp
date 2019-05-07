@@ -429,7 +429,7 @@ void RSVScalc::BuildConstrMap(const triangulation &triangleRSVS){
 
 	// explore parents of mesh adding 1 by 1 elemind
 	// for each parent
-	// for each snakemesh.volu
+	// for each snakemesh().volu
 	// Assign to constrMap.targ = the position in parent.volu of the parentconn
 	vector<double> voluVals;
 	triangleRSVS.meshDep->ReturnParentMap(constrMap.vec,constrMap.targ,constrList,voluVals);

@@ -1500,7 +1500,7 @@ void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh,
 	voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
 	snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
 	// snakein.snakeconn.read("../TESTOUT/testtetgen/SnakeConn_181205T193158_sphere2.msh");
-	snakein.snakemesh = &snakeMesh;
+	snakein.SetSnakeMesh(&snakeMesh);
 	
 	snakeMesh.PrepareForUse();
 	// snakeMesh.displight();

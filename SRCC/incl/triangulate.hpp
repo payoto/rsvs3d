@@ -125,7 +125,7 @@ public:
 
 	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
 	vector<int> pointind;
-	int parentsurf=0; // Surface in the snakemesh needs to be converted to constr
+	int parentsurf=0; // Surface in the snakemesh() needs to be converted to constr
 	int parenttype=0;
 
 	//double constrinfluence=0; //usually 1 or -1 to do with the ordering

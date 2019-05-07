@@ -121,9 +121,9 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	vector<int> voluSnaxDelete;
 	vector<int> isImpact; 
 	vector<double> dt;
-	snakein.snakemesh->SetBorders();
-	// snakein.snakemesh->disp();
-	borderVertSpawn = FindSpawnVerts(*(snakein.snakemesh), 
+	snakein.snakemesh()->SetBorders();
+	// snakein.snakemesh()->disp();
+	borderVertSpawn = FindSpawnVerts(*(snakein.snakemesh()), 
 		vertSpawn,voluSnaxDelete,outerBorder);
 	ni=vertSpawn.size();
 	// cout << "vertices to output " << ni << endl;

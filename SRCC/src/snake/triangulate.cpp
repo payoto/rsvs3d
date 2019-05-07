@@ -231,7 +231,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 		triangleEdge.connec.celltarg=surfin.voluind;
 		triangleEdge.connec.constrinfluence={-1.0, 1.0};
 	} else {
-		// Need to map onto snakemesh
+		// Need to map onto snakemesh()
 		// Do it outside in triangulate snake?
 		triangleEdge.connec.celltarg={};
 		triangleEdge.connec.constrinfluence={};

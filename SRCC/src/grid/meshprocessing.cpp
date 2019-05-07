@@ -148,7 +148,7 @@ std::vector<int> FindHolesInSnake(const snake &snakein,
 					vertAct = snakein.snaxs.isearch( 
 						snakein.snakeconn.edges(surfEdgeind[kk])->vertind[ll]
 						)->fromvert;
-					holeInd = FindVertexHole(vertAct, *(snakein.snakemesh), 
+					holeInd = FindVertexHole(vertAct, *(snakein.snakemesh()), 
 						snakein.isMeshVertIn, uncertainVert, vertExplored);
 					if(holeInd!=-1){break;}
 				}
@@ -225,7 +225,7 @@ void PrepareSnakeForCFD(const snake &snakein, double distanceTol,
 	// Assign the holes
 	for (int i = 0; i < nHoles; ++i){
 		for (int j =0; j<3; ++j){
-			holeCoords[i*3+j] = snakein.snakemesh->verts.isearch(
+			holeCoords[i*3+j] = snakein.snakemesh()->verts.isearch(
 				holeIndices[i])->coord[j];
 		}
 	}

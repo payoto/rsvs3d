@@ -166,7 +166,7 @@ public:
 	HashedVector<int, int> subDvAct;
 	/// Maps the snake indices to the position in the design variable vector
 	HashedVector<int, int> dvMap;
-	/// maps snakemesh volu onto constr
+	/// maps snakemesh() volu onto constr
 	HashedMap<int,int,int> constrMap;
 	/// keeps pairs with parentindex and voluindex
 	std::vector<pair<int,int>> constrList;

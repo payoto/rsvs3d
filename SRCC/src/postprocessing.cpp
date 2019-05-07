@@ -661,13 +661,13 @@ int tecplotfile::PrintSnakeInternalPts(const snake &snakein,int strandID,
 	vertList.clear();
 		for(jj=0;jj<int(snakein.isMeshVertIn.size()); ++jj){
 			if(snakein.isMeshVertIn[jj]){
-				vertList.push_back(snakein.snakemesh->verts(jj)->index);
+				vertList.push_back(snakein.snakemesh()->verts(jj)->index);
 			}
 		}
 		if(int(snakein.isMeshVertIn.size())==0){
-			vertList.push_back(snakein.snakemesh->verts(0)->index);
+			vertList.push_back(snakein.snakemesh()->verts(0)->index);
 		}
-		jj=PrintMesh(*(snakein.snakemesh),strandID,timeStep,4,vertList);
+		jj=PrintMesh(*(snakein.snakemesh()),strandID,timeStep,4,vertList);
 		return(jj);
 }
 

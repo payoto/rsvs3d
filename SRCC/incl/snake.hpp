@@ -87,13 +87,17 @@ public:
 
 
 class snake  {
+	// NOTE: *this=other; when adding attributes do not forget to add it to 
+	// the assignement operator.
+
 private:
-
+	mesh *privatesnakemesh=NULL;
 	bool snaxDistanceLimit_conserveShape = true;
-
+	bool isSetStepLimit = false;
 	bool is3D=true;
-	void SetLastIndex(); // Baaaad function do not use if you're not sure.
 	bool isFlipped=false;
+
+	void SetLastIndex(); // Baaaad function do not use if you're not sure.
 	void OrientSurfaceVolume();
 	void OrientEdgeSurface();
 public:
@@ -104,15 +108,17 @@ public:
 	// Using the mesh container to store connectivity
 	mesh snakeconn;
 	// pointer to snaking mesh
-	mesh *snakemesh=NULL;
+	// mesh* const & snakemesh()=this->privatesnakemesh;
 	vector<bool> isMeshVertIn;
+	vector<double> edgeStepLimit;
 	// basic operations grouped from each field
 	void disp() const;
-
+	mesh* snakemesh() const {return this->privatesnakemesh;};
 	void displight() const;
 	bool isready() const ;
 	void PrepareForUse(bool needOrder=true);
-	void Init(mesh *snakemesh,int nSnax, int nEdge, int nSurf, int nVolu);
+	void Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu);
+	void SetSnakeMesh(mesh *snakemeshin);
 	void reserve(int nSnax, int nEdge, int nSurf, int nVolu);
 	inline void GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const;
 	void HashArray(); // Not really needed as handled by PrepareForUse
@@ -133,6 +139,8 @@ public:
 	void UpdateDistance(const vector<double> &dt,  double maxDstep=1.0);
 	void CalculateTimeStep(vector<double> &dt, double dtDefault, 
 		double distDefault=1.0);
+	double SnaxStepLimit(int snaxSub) const;
+	void SetEdgeStepLimits();
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
@@ -141,7 +149,7 @@ public:
 	grid::limits Scale(const grid::limits &newSize);
 	// Snake connectivity operations
 	void OrderEdges();
-	void SetSnaxSurfs() {}
+	void SetSnaxSurfs(){}
 	void OrientFaces();
 	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
 	void AssignInternalVerts();
@@ -160,7 +168,9 @@ public:
 	void SetSnaxDistanceLimit_conserveShape(bool in){
 		this->snaxDistanceLimit_conserveShape = in;
 	}
+
 };
+
 
  
 class snax : public meshpart , public snakpart {	
@@ -170,7 +180,7 @@ public:
 	double v=0.0;
 	int fromvert=0; 	// root vertex of *snakemesh
 	int tovert=0; 	// destination vertex of *snakemesh
-	int edgeind=0; 	// edge of snakemesh
+	int edgeind=0; 	// edge of snakemesh()
 	int isfreeze=0; 	// freeze status 
 	int orderedge=0;	// order on the edge
 
@@ -279,10 +289,9 @@ inline void snax::set(int indexin, double din, double vin, int fromvertin,
 	v=vin;
 	fromvert=fromvertin; 	// root vertex of *snakemesh
 	tovert=tovertin; 	// destination vertex of *snakemesh
-	edgeind=edgeindin; 	// edge of snakemesh
+	edgeind=edgeindin; 	// edge of snakemesh()
 	isfreeze=isfreezein; 	// freeze status 
 	orderedge=orderedgein;
 }
-
 
 #endif //SNAKSTRUCT_H_INCLUDED

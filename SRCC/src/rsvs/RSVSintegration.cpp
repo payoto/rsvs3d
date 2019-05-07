@@ -483,10 +483,10 @@ void integrate::prepare::Snake(
 	voluMesh.PrepareForUse();
 
 
-	rsvsSnake.snakemesh = &snakeMesh;
+	rsvsSnake.Init(&snakeMesh,100,100,100,100);
 	if(!ioinconf.snakefile.empty()){
 		rsvsSnake.read(ioinconf.snakefile.c_str());
-		rsvsSnake.snakemesh = &snakeMesh;
+		rsvsSnake.SetSnakeMesh(&snakeMesh);
 		rsvsSnake.PrepareForUse(true);
 		rsvsSnake.OrientFaces();
 		rsvsSnake.AssignInternalVerts();
@@ -735,7 +735,7 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 	outSnake.OpenFile(outSnakeName.c_str());
 
 	outSnake.PrintSnake(RSVSobj.rsvsSnake);
-	outSnake.PrintMesh(*RSVSobj.rsvsSnake.snakemesh);
+	outSnake.PrintMesh(*RSVSobj.rsvsSnake.snakemesh());
 	outSnake.PrintMesh(RSVSobj.voluMesh);
 
 	for (auto exportType : RSVSobj.paramconf.files.exportconfig){
@@ -841,13 +841,13 @@ void integrate::execute::logging::FullTecplot(
 		vertList.clear();
 		for(jj=0;jj<int(rsvsSnake.isMeshVertIn.size()); ++jj){
 			if(rsvsSnake.isMeshVertIn[jj]){
-				vertList.push_back(rsvsSnake.snakemesh->verts(jj)->index);
+				vertList.push_back(rsvsSnake.snakemesh()->verts(jj)->index);
 			}
 		}
 		if(int(rsvsSnake.isMeshVertIn.size())==0){
-			vertList.push_back(rsvsSnake.snakemesh->verts(0)->index);
+			vertList.push_back(rsvsSnake.snakemesh()->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(rsvsSnake.snakemesh),6,totT,
+		outSnake.PrintMesh(*(rsvsSnake.snakemesh()),6,totT,
 			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,7,totT);
 		outSnake.PrintSnake(rsvsSnake, 8, totT);
@@ -886,7 +886,7 @@ void integrate::execute::postprocess::Snake(
 	paramconf.files.ioin.volumeshname = fileToOpen;
 
 	fileToOpen= utils::OutputFileName(paramconf, "SnakeMesh_",".msh");
-	rsvsSnake.snakemesh->write(fileToOpen.c_str());
+	rsvsSnake.snakemesh()->write(fileToOpen.c_str());
 	paramconf.files.ioin.snakemeshname = fileToOpen;
 
 	fileToOpen= utils::OutputFileName(paramconf, "SnakeConn_",".msh");

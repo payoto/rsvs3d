@@ -67,13 +67,13 @@ void PrintRSVSSnake2D(tecplotfile &outSnake, snake &testSnake, double totT,
 		vertList.clear();
 		for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
 			if(testSnake.isMeshVertIn[jj]){
-				vertList.push_back(testSnake.snakemesh->verts(jj)->index);
+				vertList.push_back(testSnake.snakemesh()->verts(jj)->index);
 			}
 		}
 		if(int(testSnake.isMeshVertIn.size())==0){
-			vertList.push_back(testSnake.snakemesh->verts(0)->index);
+			vertList.push_back(testSnake.snakemesh()->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,
+		outSnake.PrintMesh(*(testSnake.snakemesh()),8,totT,
 			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 		outSnake.PrintSnake(testSnake, 10, totT);
@@ -120,13 +120,13 @@ void PrintRSVSSnake(tecplotfile &outSnake, snake &testSnake, double totT,
 		vertList.clear();
 		for(jj=0;jj<int(testSnake.isMeshVertIn.size()); ++jj){
 			if(testSnake.isMeshVertIn[jj]){
-				vertList.push_back(testSnake.snakemesh->verts(jj)->index);
+				vertList.push_back(testSnake.snakemesh()->verts(jj)->index);
 			}
 		}
 		if(int(testSnake.isMeshVertIn.size())==0){
-			vertList.push_back(testSnake.snakemesh->verts(0)->index);
+			vertList.push_back(testSnake.snakemesh()->verts(0)->index);
 		}
-		outSnake.PrintMesh(*(testSnake.snakemesh),8,totT,
+		outSnake.PrintMesh(*(testSnake.snakemesh()),8,totT,
 			rsvs3d::constants::tecplot::point,vertList);
 		outSnake.PrintVolumeDat(voluMesh,nVoluZone,9,totT);
 		outSnake.PrintSnake(testSnake, 10, totT);
@@ -143,7 +143,7 @@ void PrepareMultiLvlSnake(mesh &snakeMesh, mesh &voluMesh, snake &testSnake,
 	snakeMesh.PrepareForUse();
 	snakeMesh.OrientFaces();
 	///// Generate Coarser Volume Mesh
-	testSnake.snakemesh=&snakeMesh;
+	testSnake.SetSnakeMesh(&snakeMesh);
 	//testSnake.disp();
 	if(snakeMesh.WhatDim()==3){
 		for (ii=0;ii<snakeMesh.volus.size();++ii){
@@ -189,7 +189,7 @@ void PrepareMultiLvlSnakeNoVoluGen(mesh &snakeMesh, mesh &voluMesh, snake &testS
 	snakeMesh.PrepareForUse();
 	snakeMesh.OrientFaces();
 	///// Generate Coarser Volume Mesh
-	testSnake.snakemesh=&snakeMesh;
+	testSnake.SetSnakeMesh(&snakeMesh);
 	//testSnake.disp();
 
 	voluMesh.PrepareForUse();
@@ -443,8 +443,8 @@ int Test_snakeinit(){
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
-		testSnake.snakemesh=&snakeMesh;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		testSnake.SetSnakeMesh(&snakeMesh);
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		
 		snakeMesh.OrientFaces();
 		start_s=clock();
@@ -531,8 +531,8 @@ int Test_snakeinit_MC(){
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
-		testSnake.snakemesh=&snakeMesh;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		testSnake.SetSnakeMesh(&snakeMesh);
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		
 		snakeMesh.OrientFaces();
 		start_s=clock();
@@ -622,8 +622,8 @@ int Test_snakeinitflat(){
 		snakeMesh.SetBorders();
 		snakeMesh.PrepareForUse();
 
-		testSnake.snakemesh=&snakeMesh;
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		testSnake.SetSnakeMesh(&snakeMesh);
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 
 		start_s=clock();
 		testSnake.PrepareForUse();
@@ -880,7 +880,7 @@ int Test_RSVSalgo_init(){
 		voluMesh.volus[3].target=0.0;
 		voluMesh.volus[4].target=1.0;
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		// nVoluZone=outSnake.ZoneNum();
 		
@@ -960,7 +960,7 @@ int Test_RSVSvoro_init(){
 		}
 		// voluMesh.volus[3].target=0.0;
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		// nVoluZone=outSnake.ZoneNum();
 		
@@ -1031,7 +1031,7 @@ int Test_RSVSalgo(){
 		voluMesh.volus[3].target=0.0;
 		voluMesh.volus[4].target=1.0;
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		nVoluZone=outSnake.ZoneNum();
 		
@@ -1117,7 +1117,7 @@ int Test_RSVSalgoflat(){
 
 		calcObj.BuildMathArrays(1,1);
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		int nVoluZone;
 		nVoluZone=outSnake.ZoneNum();
@@ -1199,7 +1199,7 @@ int Test_snakeRSVS(){
 		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		nVoluZone=outSnake.ZoneNum();
 		
@@ -1313,7 +1313,7 @@ int Test_RSVSalgo_singlevol(){
 		// voluMesh.volus[5].target=1;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		int nVoluZone;
 		nVoluZone=outSnake.ZoneNum();
@@ -1412,7 +1412,7 @@ int Test_snakeRSVS_singlevol(){
 		PrepareMultiLvlSnake(snakeMesh,voluMesh,testSnake,dims,triRSVS);
 		voluMesh.volus[0].target=0.01;
 		voluMesh.volus.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 		nVoluZone=outSnake.ZoneNum();
 		
@@ -1492,7 +1492,7 @@ int Test_MeshOrient(){
 		voluMesh.volus[2].target=1;//0.05;//0.0001;
 		// voluMesh.volus[3].target=1;//0.05;//0.0001;
 		voluMesh.PrepareForUse();
-		outSnake.PrintMesh(*(testSnake.snakemesh));
+		outSnake.PrintMesh(*(testSnake.snakemesh()));
 		outSnake.PrintMesh(voluMesh);
 
 		fileToOpen = "../TESTOUT/volumesh6612.dat";
@@ -1557,9 +1557,9 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	// Check if impact detect crossovers
 	start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	// calcObj.limLag=10000.0;
-	// for(int ii=0; ii<testSnake.snakemesh->verts.size();++ii){
+	// for(int ii=0; ii<testSnake.snakemesh()->verts.size();++ii){
 	// 	for(int jj=0; jj<3;++jj){
-	// 		testSnake.snakemesh->verts[ii].coord[jj] +=1;
+	// 		testSnake.snakemesh()->verts[ii].coord[jj] +=1;
 	// 	}
 	// }
 	// testSnake.PrepareForUse();
