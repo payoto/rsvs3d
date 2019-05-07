@@ -304,7 +304,9 @@ void snake::PrepareForUse(bool needOrder) {
 		snakemesh()->PrepareForUse();
 	} else {
 		cerr << endl << "Warning: Mesh containing snake unset in snake"
-			" object.\n Set attribute `snakemesh` to a mesh pointer" << endl;
+			" object.\n use `SetSnakeMesh(mesh *snakemeshin)` to set attribute"
+			" `snakemesh` to a mesh pointer" << endl;
+		return;
 	}
 
 	is3D=int(snakemesh()->volus.size())>0;
@@ -390,16 +392,13 @@ void snake::Init(mesh *snakemeshin,int nSnax, int nEdge, int nSurf, int nVolu){
 
 	snakeconn.Init(nSnax, nEdge, nSurf, nVolu);
 
-	this->privatesnakemesh=snakemeshin;
-	isMeshVertIn.assign(snakemeshin->verts.size(), false);
-	edgeStepLimit.assign(snakemeshin->edges.size(), 1.0);
-	this->isSetStepLimit = false;
+	this->SetSnakeMesh(snakemeshin);
 }
 
 void snake::SetSnakeMesh(mesh *snakemeshin){
 	this->privatesnakemesh=snakemeshin;
 	this->isSetStepLimit = false;
-
+	this->isMeshVertIn.assign(snakemeshin->verts.size(), false);
 	this->edgeStepLimit.assign(this->snakemesh()->edges.size(),1.0);
 
 }
@@ -735,46 +734,190 @@ void snake::OrderEdges(){
 }
 
 // Snake Movement
-void snake::UpdateDistance(double dt, double maxDstep){
+void snake::UpdateDistance(double dt, double maxDstep, bool scaledStep){
 	int ii;
-	double dStep;
-	for (ii = 0; ii < int(snaxs.size()); ++ii)
+	double dStep=0.0;
+	int nSnax = int(snaxs.size());
+
+	if(!this->isSetStepLimit && scaledStep){
+		this->SetEdgeStepLimits();
+	}
+	
+	for (ii = 0; ii < nSnax; ++ii)
 	{
-		if(snaxs[ii].v*dt>maxDstep){
-			dStep = maxDstep;
-		} else if (snaxs[ii].v*dt<-maxDstep){
-			dStep = -maxDstep;
+
+		double indivMaxDstep = 1.0*maxDstep;
+		if(scaledStep){
+			indivMaxDstep = this->SnaxStepLimit(ii)*indivMaxDstep;
+		}
+		if(snaxs[ii].v*dt>indivMaxDstep){
+			dStep = indivMaxDstep;
+		} else if (snaxs[ii].v*dt<-indivMaxDstep){
+			dStep = -indivMaxDstep;
 		} else{
 			dStep = snaxs[ii].v*dt; 
 		}
 		snaxs[ii].d=snaxs[ii].d+dStep;
-		snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
+		// Make sure d is in [0.0, 1.0]
+		snaxs[ii].d = min(max(snaxs[ii].d, 0.0), 1.0);
 		
 	}
 }
-void snake::UpdateDistance(const vector<double> &dt,  double maxDstep){
-	int ii;
-	double dStep;
 
-	if (int(dt.size())==snaxs.size()){
-		for (ii = 0; ii < int(snaxs.size()); ++ii)
-		{
-			if(snaxs[ii].v*dt[ii]>maxDstep){
-			dStep = maxDstep;
-		} else if (snaxs[ii].v*dt[ii]<-maxDstep){
-			dStep = -maxDstep;
+void snake::UpdateDistance(const vector<double> &dt,  double maxDstep, 
+	bool scaledStep){
+	int ii;
+	double dStep=0.0;
+	if (int(dt.size())!=snaxs.size()){
+		RSVS3D_ERROR_TYPE("Mismatching sizes passed to Update distance of snake"
+			"Snake and Dt had mismatched sizes at snake::UpdateDistance",
+			length_error);
+	}
+
+	if(!this->isSetStepLimit && scaledStep){
+		this->SetEdgeStepLimits();
+	}
+
+	int nSnax = int(snaxs.size());
+	for (ii = 0; ii < nSnax; ++ii)
+	{
+		double indivMaxDstep = 1.0*maxDstep;
+		if(scaledStep){
+			indivMaxDstep = this->SnaxStepLimit(ii)*indivMaxDstep;
+		}
+		if(snaxs[ii].v*dt[ii]>indivMaxDstep){
+			dStep = indivMaxDstep;
+		} else if (snaxs[ii].v*dt[ii]<-indivMaxDstep){
+			dStep = -indivMaxDstep;
 		} else{
 			dStep = snaxs[ii].v*dt[ii]; 
 		}
 		snaxs[ii].d=snaxs[ii].d+dStep;
-			snaxs[ii].d=snaxs[ii].d<0.0 ? 0.0 : (snaxs[ii].d>1.0 ? 1.0 : snaxs[ii].d);
-
-		}
-	} else {
-		cerr << "Error : Mismatching sizes passed to Uptdate distance of snake"  << endl;
-		cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
-		throw length_error("Snake and Dt had mismatched sizes at snake::UpdateDistance");
+		// Make sure d is in [0.0, 1.0]
+		snaxs[ii].d = min( max(snaxs[ii].d, 0.0), 1.0);
 	}
+}
+
+/**
+ * @brief      Sets the relative edge step limits.
+ * 
+ * These are the dependant on the relative edge lengths and ensure consistant
+ * real step size limits inside a single design variable.
+ */
+void snake::SetEdgeStepLimits(){
+
+	int nEdges = this->snakemesh()->edges.size();
+	int numParents = this->snakemesh()->meshtree.NumberOfParents();
+	std::vector<int>  edgeAccess;
+	HashedVector<int, int> edgeInds;
+	edgeAccess.assign(nEdges, 0);
+	this->edgeStepLimit.assign(nEdges,0.0);
+	edgeInds.reserve(nEdges);
+
+	for (int i = 0; i < numParents; ++i)
+	{
+		// go through each Parent volus
+		auto parentmesh = this->snakemesh()->meshtree.ParentPointer(i);
+		// identify all the child volumes 
+		// identify the edges they touch
+		int nParentVolus = parentmesh->volus.size();
+		for (int j = 0; j < nParentVolus; ++j)
+		{
+			double minEdgeLength = INFINITY;
+			auto snakeMeshVolus = this->snakemesh()->meshtree.ChildIndices(
+				i, parentmesh->volus(j)->index);
+			edgeInds.clear();
+			for (auto iVolu : snakeMeshVolus){
+				for (auto iSurf : this->snakemesh()->volus(iVolu)->surfind){
+					for (auto iEdge : this->snakemesh()->surfs.isearch(iSurf)->edgeind){
+						if(edgeInds.find(iEdge)==rsvs3d::constants::__notfound){
+							minEdgeLength = min(minEdgeLength,
+								this->snakemesh()->edges.isearch(iEdge)->GetLength());
+							edgeInds.push_back(iEdge);
+						}
+					}
+				}
+			}
+
+			for(auto iEdge : edgeInds.vec){
+				int iEdgePos = this->snakemesh()->edges.find(iEdge);
+				edgeAccess[iEdgePos]++;
+				this->edgeStepLimit[iEdgePos] += minEdgeLength /
+					this->snakemesh()->edges(iEdgePos)->GetLength();
+			}
+		}
+	}
+	for (int i = 0; i < nEdges; ++i)
+	{
+		if(edgeAccess[i]>1){
+			this->edgeStepLimit[i] = this->edgeStepLimit[i] / double(edgeAccess[i]);
+		} else if (edgeAccess[i]<1) {
+			this->edgeStepLimit[i] = 1.0;
+		}
+	}
+	if (numParents>0){
+		this->isSetStepLimit=true;
+	}
+}
+
+void WrongApproach(snake* those){
+	int nEdges = those->snakemesh()->edges.size();
+	int numParents = those->snakemesh()->meshtree.NumberOfParents();
+	std::vector<int> voluinds;
+	std::vector<HashedVector<int,int>> edge2ParentsVolus;
+	edge2ParentsVolus.reserve(numParents);
+	for (int i = 0; i < numParents; ++i)
+	{
+		edge2ParentsVolus[i].assign(2*nEdges, rsvs3d::constants::__notfound);
+	}
+	for (int i = 0; i < nEdges; ++i)
+	{
+		voluinds.clear();
+		for(auto surfInd : those->snakemesh()->edges(i)->surfind){
+			voluinds.push_back(those->snakemesh()->surfs.isearch(surfInd)->voluind[0]);
+			voluinds.push_back(those->snakemesh()->surfs.isearch(surfInd)->voluind[1]);
+		}
+		sort(voluinds);
+		unique(voluinds);
+		int count = voluinds.size();
+		for (int nP = 0; nP < numParents; ++nP)
+		{
+			int posEdgeParent = 0; // 0 or 1 as each edge has two positions per parent
+			for (int j = 0; j < count; ++j)
+			{
+				int tempParentInd = those->snakemesh()->ParentElementIndex(voluinds[j], nP);
+				if(posEdgeParent==0){
+					edge2ParentsVolus[nP][i*2+posEdgeParent] = tempParentInd;
+					posEdgeParent++;
+				} else if(edge2ParentsVolus[nP][i*2+posEdgeParent-1]!=tempParentInd) {
+					edge2ParentsVolus[nP][i*2+posEdgeParent]=tempParentInd;
+					posEdgeParent++;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < numParents; ++i)
+	{
+		edge2ParentsVolus[i].GenerateHash();
+	}
+
+	// those->isSetStepLimit=true;
+}
+
+double snake::SnaxStepLimit(int snaxSub) const {
+	int iEdge = this->snakemesh()->edges.find(this->snaxs(snaxSub)->edgeind);
+	#ifdef SAFE_ACCESS
+	// this->disp();
+	if(iEdge==rsvs3d::constants::__notfound 
+		|| iEdge>=int(this->edgeStepLimit.size())){
+		std::cerr << snaxSub << "," << this->snaxs.size() 
+			<< "," << this->edgeStepLimit.size() << "," 
+			<< iEdge<< "," << this->snaxs(snaxSub)->edgeind;
+		RSVS3D_ERROR("Attemp to access an edge which was not found in "
+			"snake::snakemesh into snake::edgeStepLimit.");
+	}
+	#endif
+	return this->edgeStepLimit[iEdge];
 }
 
 void snake::UpdateCoord(){
@@ -783,13 +926,13 @@ void snake::UpdateCoord(){
 	int nSnax = int(snaxs.size());
 	for (ii = 0; ii < nSnax; ++ii)
 	{
-		fromVertSub=snakemesh->verts.find(snaxs(ii)->fromvert);
-		toVertSub=snakemesh->verts.find(snaxs(ii)->tovert);
+		fromVertSub=snakemesh()->verts.find(snaxs(ii)->fromvert);
+		toVertSub=snakemesh()->verts.find(snaxs(ii)->tovert);
 
 		for(jj=0;jj<3;++jj){
-			snakeconn.verts.elems[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
-				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
-				+snakemesh->verts(fromVertSub)->coord[jj];
+			snakeconn.verts.elems[ii].coord[jj]=(snakemesh()->verts(toVertSub)->coord[jj]
+				-snakemesh()->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
+				+snakemesh()->verts(fromVertSub)->coord[jj];
 		}
 		for(auto iEdge : snakeconn.verts(ii)->edgeind){
 			this->snakeconn.InvalidateEdgeLength(iEdge);

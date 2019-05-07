@@ -497,7 +497,10 @@ protected:
 	void RemoveParent(mesh* meshin);
 
 public:
-
+	int NumberOfParents() const {return this->nParents;}
+	const mesh* ParentPointer(int a) const {return this->parentmesh.at(a);}
+	vector<int> ChildIndices(int parent, int parentVoluIndex) const {
+		return this->parentconn.at(parent).findall(parentVoluIndex);}
 };
 
 

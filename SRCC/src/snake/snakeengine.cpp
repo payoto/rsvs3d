@@ -50,7 +50,6 @@ void SpawnAtVertex(snake& snakein,int indVert){
 	if(is3D){
 		voluSubs=snakein.snakemesh()->volus.find_list(voluInds);
 	} else {
-
 		voluSubs=snakein.snakemesh()->volus.find_list(voluInds);
 	}
 	//OperArrayStructMethod(snakein.snakemesh()->surfs, surfSubs, &surf::isready, 

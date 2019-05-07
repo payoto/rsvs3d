@@ -276,7 +276,7 @@ double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
 	double snaxtimestep, double snaxdiststep){
 
 	rsvsSnake.CalculateTimeStep(dt, snaxtimestep, snaxdiststep);
-	rsvsSnake.UpdateDistance(dt,snaxdiststep);
+	rsvsSnake.UpdateDistance(dt,snaxdiststep, true);
 	
 	rsvsSnake.UpdateCoord();
 	rsvsSnake.PrepareForUse();
@@ -483,7 +483,7 @@ void integrate::prepare::Snake(
 	voluMesh.PrepareForUse();
 
 
-	rsvsSnake.Init(&snakeMesh,100,100,100,100);
+	rsvsSnake.SetSnakeMesh(&snakeMesh);
 	if(!ioinconf.snakefile.empty()){
 		rsvsSnake.read(ioinconf.snakefile.c_str());
 		rsvsSnake.SetSnakeMesh(&snakeMesh);

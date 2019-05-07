@@ -664,7 +664,7 @@ void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	vector<double> dt;
 	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.9);
-	testSnake.UpdateDistance(dt,0.9);
+	testSnake.UpdateDistance(dt,0.9,true);
 	testSnake.PrepareForUse(); 
 	testSnake.UpdateCoord();
 	SnakeConnectivityUpdate(testSnake,  isImpact);
@@ -1533,7 +1533,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	CalculateNoNanSnakeVel(testSnake);
 	outSnake2.PrintSnake(testSnake, 1, totT);  
 	testSnake.CalculateTimeStep(dt,0.9);
-	testSnake.UpdateDistance(dt,0.9);
+	testSnake.UpdateDistance(dt,0.9,true);
 	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();
 
@@ -1589,7 +1589,7 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	// calcObj.Print2Screen(2);
 	CalculateNoNanSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.5);
-	testSnake.UpdateDistance(dt,0.34);
+	testSnake.UpdateDistance(dt,0.34,true);
 	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();
 

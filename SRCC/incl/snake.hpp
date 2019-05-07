@@ -108,12 +108,12 @@ public:
 	// Using the mesh container to store connectivity
 	mesh snakeconn;
 	// pointer to snaking mesh
-	// mesh* const & snakemesh()=this->privatesnakemesh;
+	mesh* snakemesh() const {return this->privatesnakemesh;};
+
 	vector<bool> isMeshVertIn;
 	vector<double> edgeStepLimit;
 	// basic operations grouped from each field
 	void disp() const;
-	mesh* snakemesh() const {return this->privatesnakemesh;};
 	void displight() const;
 	bool isready() const ;
 	void PrepareForUse(bool needOrder=true);
@@ -135,8 +135,9 @@ public:
 	void ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu);
 	void ForceCloseContainers();
 	// Snake Movement
-	void UpdateDistance(double dt,  double maxDstep=1.0);
-	void UpdateDistance(const vector<double> &dt,  double maxDstep=1.0);
+	void UpdateDistance(double dt,  double maxDstep=1.0, bool scaledStep=false);
+	void UpdateDistance(const vector<double> &dt,  double maxDstep=1.0, 
+		bool scaledStep=false);
 	void CalculateTimeStep(vector<double> &dt, double dtDefault, 
 		double distDefault=1.0);
 	double SnaxStepLimit(int snaxSub) const;

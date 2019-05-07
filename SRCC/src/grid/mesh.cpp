@@ -300,8 +300,8 @@ void PlaneNormal(const vector<double> &planeVert1,
 
 	DiffPointsFromCentre(planeVert1, planeVert2, planeVert3,normal, temp1);
 	normal = temp1.cross(normal.usedata()); // causes allocation
-
 }
+
 /**
  * @brief      Calculates a plane's normal vector
  *
@@ -346,6 +346,7 @@ double Angle3Points(const vector<double> &centre,
 	double angle = temp1.angle(normal); 
 	return angle;
 }
+
 /**
  * @brief      Calculates the distance from a vertex to a plane.
  * calculates the distance from a plane to a vertex, with the plane
@@ -382,6 +383,7 @@ double VertexDistanceToPlane(const vector<double> &planeVert1,
 
 	return planeDistance;
 }
+
 /**
  * Calculates the distance from a set of vertices to a plane.
  * 
@@ -441,6 +443,7 @@ double VertexDistanceToPlane(const vector<double> &planeVert1,
 	return VertexDistanceToPlane(planeVert1, planeVert2, 
 		planeVert3, testVertex, temp1, temp2);
 }
+
 vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
