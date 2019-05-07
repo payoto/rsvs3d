@@ -1171,6 +1171,9 @@ double edge::LengthSquared(const mesh &meshin) const {
  * @return     the length of the edge
  */
 double edge::Length(const mesh &meshin) const {
+	if (rsvs3d::constants::__issetlength(this->length)){
+		return this->length;
+	}
 	return sqrt(this->LengthSquared(meshin));
 }
 /**
@@ -1183,6 +1186,9 @@ double edge::Length(const mesh &meshin) const {
  * @return     Wether Length squared is below eps squared.
  */
 bool edge::IsLength0(const mesh &meshin, double eps) const {
+	if(rsvs3d::constants::__issetlength(this->length)){
+		return fabs(this->length)< fabs(eps);
+	}
 	return this->LengthSquared(meshin)< pow(eps,2.0);
 }
 
@@ -2447,7 +2453,16 @@ void mesh::ArraysAreHashed(){
 	this->surfs.isHash=1;
 	this->volus.isHash=1;
 }
-
+void mesh::SetEdgeLengths(){
+	int nEdges = int(this->edges.size());
+	for (int ii = 0; ii < nEdges; ++ii){
+		if(!rsvs3d::constants::__issetlength(this->edges(ii)->GetLength(false)))
+		{
+			this->edges.elems[ii].SetLength(*this);
+		}
+	}
+	this->edgesLengthsAreSet = true;
+}
 void mesh::PrepareForUse(bool needOrder){
 
 	verts.isInMesh=true;
@@ -2487,6 +2502,18 @@ void mesh::PrepareForUse(bool needOrder){
 	edges.ForceArrayReady();
 	surfs.ForceArrayReady();
 	volus.ForceArrayReady();
+	if(!this->edgesLengthsAreSet){
+		this->SetEdgeLengths();
+	}
+
+}
+void mesh::InvalidateEdgeLength(int iEdge){
+	if(!this->edges.isHash){
+		this->edges.HashArray();
+	}
+	int eSub = this->edges.find(iEdge);
+	this->edges.elems[eSub].InvalidateLength();
+	this->edgesLengthsAreSet=false;
 }
 
 void mesh::GetMaxIndex(int *nVert,int *nEdge,int *nSurf,int *nVolu) const{
@@ -2667,7 +2694,6 @@ void mesh::PopulateIndices(){
 int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 	bool errout, const vector<int>* edgeIndOrigPtr,
 	const surf* surfin){
-#pragma GCC diagnostic pop
 
 	unordered_multimap<int,int> vert2Edge;
 	vector<bool> isDone;
@@ -2786,6 +2812,7 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 	}
 	return rsvsorder::ordered;
 }
+#pragma GCC diagnostic pop
 
 /**
  * Orders a list of elements defined by pairs of indices
@@ -2899,16 +2926,40 @@ int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn,
 	return rsvsorder::ordered;
 }
 
+int vert::OrderEdges(mesh *meshin){
+	int retVal = 0;
+	vector<int> edge2Vert;
+
+	sort(this->edgeind);
+	unique(this->edgeind);
+	vector<int> edgeIndOrig = this->edgeind;
+
+	edge2Vert.reserve(this->edgeind.size()*2);
+	for (auto iEdge : this->edgeind){
+		auto edgeC = meshin->edges.isearch(iEdge);
+		if (edgeC->surfind.size()!=2){
+			return rsvs3d::constants::ordering::error;
+		}
+		edge2Vert.push_back(edgeC->surfind[0]);
+		edge2Vert.push_back(edgeC->surfind[1]);
+	}
+
+	retVal = OrderList(this->edgeind, edge2Vert, false, false, &edgeIndOrig);
+
+	if(retVal != rsvs3d::constants::ordering::ordered){
+		this->edgeind = edgeIndOrig;
+	}
+
+	return retVal;
+}
 
 int surf::OrderEdges(mesh *meshin)
 {
-	unordered_multimap<int,int> vert2Edge;
 	vector<int> edgeIndOrig;
 	vector<bool> isDone;
 	bool isTruncated;
 	int  newSurfInd;
 
-	unordered_multimap<int,int>::iterator it;
 	isTruncated=false;
 	newSurfInd=-1; 
 	// do nothing if edgeind is empty
@@ -4987,6 +5038,35 @@ int mesh::SurfFromEdges(int e1, int e2, int repetitionBehaviour) const{
 	}
 
 	return retSurf;
+}
+
+/**
+ * Returns the vertex in edges.isearch(e)->vertind which does not match v.
+ *
+ * @param[in]  v     vertex index
+ * @param[in]  e     edgeindex
+ *
+ * @return     { description_of_the_return_value }
+ */
+int mesh::VertFromVertEdge(int v, int e) const{
+
+	auto& edgeVerts = this->edges.isearch(e)->vertind;
+
+	return edgeVerts[int(edgeVerts[0]==v)];
+}
+void mesh::VerticesVector(int v1, int v2, coordvec &vec) const{
+	vec = this->verts.isearch(v2)->coord;
+	vec.substract(this->verts.isearch(v1)->coord);
+}
+void mesh::EdgeVector(int edgeIndex, coordvec &vec) const{
+
+	auto e = this->edges.isearch(edgeIndex);
+	int smallV = int(e->vertind[0] > e->vertind[1]);
+	this->VerticesVector(e->vertind[smallV], e->vertind[abs(smallV-1)], vec);
+}
+
+int mesh::OrderVertexEdges(int vertIndex){
+	return this->verts.elems[this->verts.find(vertIndex)].OrderEdges(this);
 }
 
 std::pair<int, int> OrderMatchLists(const vector<int> &vec1, int p1, int p2){

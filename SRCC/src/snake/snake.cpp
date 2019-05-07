@@ -781,7 +781,36 @@ void snake::UpdateCoord(){
 				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
 			+snakemesh->verts(fromVertSub)->coord[jj];
 		}
+		for(auto iEdge : snakeconn.verts(ii)->edgeind){
+			this->snakeconn.InvalidateEdgeLength(iEdge);
+		}
 	}
+	
+	this->snakeconn.SetEdgeLengths();
+
+}
+
+
+void snake::UpdateCoord(const vector<int> &snaxInds){
+	int fromVertSub,toVertSub;
+	int ii,jj;
+	for (auto iSnax : snaxInds)
+	{
+		ii = this->snaxs.find(iSnax);
+		fromVertSub=snakemesh->verts.find(snaxs(ii)->fromvert);
+		toVertSub=snakemesh->verts.find(snaxs(ii)->tovert);
+
+		for(jj=0;jj<3;++jj){
+			snakeconn.verts.elems[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
+				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
+			+snakemesh->verts(fromVertSub)->coord[jj];
+		}
+		for(auto iEdge : snakeconn.verts(ii)->edgeind){
+			this->snakeconn.InvalidateEdgeLength(iEdge);
+		}
+	}
+	
+	this->snakeconn.SetEdgeLengths();
 }
 
 // snaxarray extension

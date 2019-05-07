@@ -67,6 +67,8 @@ using namespace std;
 namespace rsvs3d {
 	namespace constants {
 		static const int __notfound = -1;
+		static const int __failure = -1;
+		static const int __success = 0;
 	}
 }
 

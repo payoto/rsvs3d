@@ -210,6 +210,7 @@ void Test_randvelstep(snake &testSnake, vector<double> dt, vector<int> &isImpact
 	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
+	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
 	Test_stepalgo(testSnake, isImpact);
@@ -219,6 +220,7 @@ void Test_randvelstep_mc(snake &testSnake, vector<double> dt, vector<int> &isImp
 	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.25);
 	testSnake.UpdateDistance(dt);
+	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
 	Test_stepalgo_mergeclean(testSnake, isImpact);
@@ -663,8 +665,8 @@ void Test_stepalgo(snake &testSnake,  vector<int> &isImpact){
 	CalculateSnakeVelRand(testSnake);
 	testSnake.CalculateTimeStep(dt,0.9);
 	testSnake.UpdateDistance(dt,0.9);
-	testSnake.UpdateCoord();
 	testSnake.PrepareForUse(); 
+	testSnake.UpdateCoord();
 	SnakeConnectivityUpdate(testSnake,  isImpact);
 }
 
@@ -1257,8 +1259,8 @@ void repositionatquarteredge(snake &snakein){
 	}
 
 
-	snakein.UpdateCoord();
 	snakein.PrepareForUse();
+	snakein.UpdateCoord();
 }
 
 int Test_RSVSalgo_singlevol(){
@@ -1532,8 +1534,8 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	outSnake2.PrintSnake(testSnake, 1, totT);  
 	testSnake.CalculateTimeStep(dt,0.9);
 	testSnake.UpdateDistance(dt,0.9);
-	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
+	testSnake.UpdateCoord();
 
 	SnakeConnectivityUpdate(testSnake, isImpact);
 	MaintainTriangulateSnake(RSVStri);
@@ -1588,8 +1590,8 @@ void Test_mathRSVS_FD(snake &testSnake,triangulation &RSVStri , vector<double> &
 	CalculateNoNanSnakeVel(testSnake);
 	testSnake.CalculateTimeStep(dt,0.5);
 	testSnake.UpdateDistance(dt,0.34);
-	testSnake.UpdateCoord();
 	testSnake.PrepareForUse();
+	testSnake.UpdateCoord();
 
 	SnakeConnectivityUpdate(testSnake, isImpact);
 	MaintainTriangulateSnake(RSVStri);

@@ -88,10 +88,13 @@ namespace grid {
 
 namespace rsvs3d {
 	namespace constants {
+		const auto __issetlength =[](double l)->bool {return l>=-0.0;};
+		const double __unsetlength=-1.0;
 		namespace ordering {
 			const int ordered=0;
 			const int truncated=1;
 			const int open=-1;
+			const int error=2;
 		}
 	}
 }
@@ -324,6 +327,8 @@ public:
  * @brief      Class for an edge object in a mesh.
  */
 class edge: public meshpart , public modiftrackpart {
+protected:
+	double length=rsvs3d::constants::__unsetlength;
 public:
 	friend class mesh;
 	friend edgearray;
@@ -352,6 +357,17 @@ public:
 	void GeometricProperties(const mesh *meshin, coordvec &centre,
 		double &length) const;
 	double Length(const mesh &meshin) const;
+	double SetLength(const mesh &meshin){
+		this->length = this->Length(meshin);
+		return this->length;};
+	double GetLength(bool warn=true) const {
+		if(!rsvs3d::constants::__issetlength(this->length) && warn){
+			RSVS3D_ERROR_NOTHROW("Length is accessed but not set. "
+				"Run SetEdgeLengths before call.");
+		}
+		return this->length;
+	}
+	void InvalidateLength() {this->length=rsvs3d::constants::__unsetlength;}
 	double LengthSquared(const mesh &meshin) const;
 	bool IsLength0(const mesh &meshin, double eps=__DBL_EPSILON__) const;
 	bool vertconneq(const edge &other) const;
@@ -405,7 +421,7 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void TightenConnectivity() {sort(edgeind);unique(edgeind);};
-
+	int OrderEdges(mesh *meshin);
 
 	vert(){ // Constructor
 		index=0;
@@ -499,6 +515,7 @@ private:
 	bool borderIsSet=false;
 	bool meshDepIsSet=false;
 	bool facesAreOriented=false;
+	bool edgesLengthsAreSet=false;
 	int meshDim=0;
 	void SetLastIndex();
 	
@@ -563,6 +580,8 @@ public:
 	void size(int &nVe,int &nE, int &nS, int &nVo) const;
 	void reserve(int nVe,int nE, int nS, int nVo);
 	void PrepareForUse(bool needOrder=true);
+	void SetEdgeLengths();
+	void InvalidateEdgeLength(int iEdge);
 	void disp() const;
 	void displight() const;
 	void Concatenate(const mesh &other);
@@ -596,6 +615,7 @@ public:
 	vector<int> OrderEdges();
 	void SetBorders();
 	void OrientFaces();
+	int OrderVertexEdges(int vertIndex);
 	// Mesh component comparison
 	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
 		int outerVolume=-1);
@@ -626,6 +646,9 @@ public:
 	// Mesh traversal convenience functions
 	int EdgeFromVerts(int v1, int v2) const;
 	int SurfFromEdges(int e1, int e2, int repetitionBehaviour=-1) const;
+	int VertFromVertEdge(int v, int e) const;
+	void VerticesVector(int v1, int v2, coordvec &vec) const;
+	void EdgeVector(int e, coordvec &vec) const;
 	// Destructor
 	~mesh(){
 		RemoveFromFamily();
@@ -655,7 +678,7 @@ void DiffPoints(const vector<double> &vert1,
 double Angle3Points(const vector<double> &centre, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
-	coordvec &normal, coordvec &temp1);
+	coordvec &vec1, coordvec &vec2);
 double VertexDistanceToPlane(const vector<double> &planeVert1, 
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,

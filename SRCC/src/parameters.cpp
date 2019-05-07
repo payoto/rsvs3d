@@ -456,6 +456,7 @@ void param::dev::to_json(json& j, const rsvseps& p){
 		{"rsvsmath_automatic_eps_surf", p.rsvsmath_automatic_eps_surf},
 		{"rsvsmath_automatic_eps_volu", p.rsvsmath_automatic_eps_volu},
 		{"rsvsmath_automatic_eps_centre", p.rsvsmath_automatic_eps_centre},
+		{"rsvsmath_automatic_eps_centre2", p.rsvsmath_automatic_eps_centre2},
 		{"rsvsmath_automatic_eps_centre2", p.rsvsmath_automatic_eps_centre2}
 	};
 }
@@ -465,6 +466,7 @@ void param::dev::from_json(const json& j, rsvseps& p){
 	j.at("rsvsmath_automatic_eps_volu").get_to(p.rsvsmath_automatic_eps_volu);
 	j.at("rsvsmath_automatic_eps_centre").get_to(p.rsvsmath_automatic_eps_centre);
 	j.at("rsvsmath_automatic_eps_centre2").get_to(p.rsvsmath_automatic_eps_centre2);
+	j.at("rsvsmath_automatic_eps_centre2").get_to(p.rsvsmath_automatic_eps_centre2);
 }
 
 param::dev::devparam::devparam(){
@@ -473,6 +475,7 @@ param::dev::devparam::devparam(){
 	this->surfcentrejacobian = true;
 	this->surfcentrehessian = false;
 	this->snaxDistanceLimit_conserveShape = false;
+	this->devsmoothstepmethod = "none";
 }
 
 void param::dev::to_json(json& j, const devparam& p){
@@ -482,6 +485,7 @@ void param::dev::to_json(json& j, const devparam& p){
 		{"surfcentrejacobian", p.surfcentrejacobian},
 		{"surfcentrehessian", p.surfcentrehessian},
 		{"snaxDistanceLimit_conserveShape", p.snaxDistanceLimit_conserveShape},
+		{"devsmoothstepmethod", p.devsmoothstepmethod},
 		{"rsvsepsilons", p.rsvsepsilons}
 	};
 }
@@ -491,6 +495,7 @@ void param::dev::from_json(const json& j, devparam& p){
 	j.at("surfcentrejacobian").get_to(p.surfcentrejacobian);
 	j.at("surfcentrehessian").get_to(p.surfcentrehessian);
 	j.at("snaxDistanceLimit_conserveShape").get_to(p.snaxDistanceLimit_conserveShape);
+	j.at("devsmoothstepmethod").get_to(p.devsmoothstepmethod);
 	j.at("rsvsepsilons").get_to(p.rsvsepsilons);
 
 }

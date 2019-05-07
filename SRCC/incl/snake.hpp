@@ -136,6 +136,7 @@ public:
 	void SnaxImpactDetection(vector<int> &isImpact);
 	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
+	void UpdateCoord(const vector<int> &snaxInds);
 	void Flip(); // reverses snake directions
 	grid::limits Scale(const grid::limits &newSize);
 	// Snake connectivity operations

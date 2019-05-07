@@ -96,6 +96,7 @@ void SpawnSnakeAndMove(snake &snakein, std::vector<int> vertSpawn){
 	}
 	snakein.CalculateTimeStep(dt,0.51);
 	snakein.UpdateDistance(dt);
+	snakein.PrepareForUse();
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
 	snakein.SnaxImpactDetection(isImpact);
@@ -139,6 +140,7 @@ void SpawnRSVS(snake &snakein, int outerBorder){
 	}
 	snakein.CalculateTimeStep(dt,0.6);
 	snakein.UpdateDistance(dt);
+	snakein.PrepareForUse();
 	snakein.UpdateCoord();
 	snakein.PrepareForUse();
 	// snakein.displight();
