@@ -280,6 +280,7 @@ namespace param {
 			bool surfcentrejacobian;
 			bool surfcentrehessian;
 			bool snaxDistanceLimit_conserveShape;
+			std::string smoothstepmethod;
 			rsvseps rsvsepsilons;
 			devparam();
 		};

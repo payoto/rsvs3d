@@ -147,7 +147,8 @@ public:
 	void AssignInternalVerts();
 	void CheckConnectivity() const; 
 	void TakeSpawnStep(int minIndex, double stepLength);
-	void TakeSmoothSpawnStep(int minIndex, double stepLength);
+	void TakeSmoothSpawnStep(int minIndex, double stepLength,
+		std::string smoothStep="none");
 	void VertIsIn(int vertInd, bool isIn=true);
 	void VertIsIn(vector<int> vertInd, bool isIn=true);
 	bool ReturnFlip()const{return(isFlipped);}

@@ -721,8 +721,10 @@ void snake::OrderEdges(){
 		newSurf.index = newSurfPairs[i*2+1];
 		snaxsurfs.push_back(newSurf);
 	}
-
-
+	// int nVerts = this->snakeconn.verts.size();
+	// for (int i =0; i<nVerts ; ++i){
+	// 	this->snakeconn.verts.elems[i].OrderEdges(&(this->snakeconn));
+	// }
 }
 
 // Snake Movement
@@ -771,7 +773,8 @@ void snake::UpdateDistance(const vector<double> &dt,  double maxDstep){
 void snake::UpdateCoord(){
 	int fromVertSub,toVertSub;
 	int ii,jj;
-	for (ii = 0; ii < int(snaxs.size()); ++ii)
+	int nSnax = int(snaxs.size());
+	for (ii = 0; ii < nSnax; ++ii)
 	{
 		fromVertSub=snakemesh->verts.find(snaxs(ii)->fromvert);
 		toVertSub=snakemesh->verts.find(snaxs(ii)->tovert);
@@ -779,7 +782,7 @@ void snake::UpdateCoord(){
 		for(jj=0;jj<3;++jj){
 			snakeconn.verts.elems[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
 				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
-			+snakemesh->verts(fromVertSub)->coord[jj];
+				+snakemesh->verts(fromVertSub)->coord[jj];
 		}
 		for(auto iEdge : snakeconn.verts(ii)->edgeind){
 			this->snakeconn.InvalidateEdgeLength(iEdge);
@@ -803,7 +806,7 @@ void snake::UpdateCoord(const vector<int> &snaxInds){
 		for(jj=0;jj<3;++jj){
 			snakeconn.verts.elems[ii].coord[jj]=(snakemesh->verts(toVertSub)->coord[jj]
 				-snakemesh->verts(fromVertSub)->coord[jj])*snaxs(ii)->d
-			+snakemesh->verts(fromVertSub)->coord[jj];
+				+snakemesh->verts(fromVertSub)->coord[jj];
 		}
 		for(auto iEdge : snakeconn.verts(ii)->edgeind){
 			this->snakeconn.InvalidateEdgeLength(iEdge);
@@ -1021,7 +1024,7 @@ void DisplayVectorArray(const std::vector< std::array<int,2>> &in){
 	std::cout << " | ";
 }
 
-int SmoothStep3(int spawnVert, snake &snakein, double spawnDist){
+int SmoothStep_bordersetting(int spawnVert, snake &snakein, double spawnDist){
 
 	// identify snaxels
 
@@ -1278,7 +1281,7 @@ std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre,
 		// If the plane has zero area skip the rest of the loop
 		if(IsAproxEqual(planeCurr.GetNorm(),0.0) 
 			|| !isfinite(planeCurr.GetNorm())
-			|| !isfinite(planeCurr.dot({1,1,1}))){
+			|| !isfinite(currAngle)){
 			planeCurr.assign(1,1,1);
 			planeCurr.CalcNorm();
 			continue;
@@ -1290,11 +1293,35 @@ std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre,
 		planeCurr.Normalize();
 		totalTangentAngle += planeCurr.angle(planePrev);
 		planePrev.swap(planeCurr);
+		if(!isfinite(totalTangentAngle) || !isfinite(totalNormalAngle)){
+			std::cerr << std::endl;
+			DisplayVector(planePrev.usedata());
+			DisplayVector(planeCurr.usedata());
+			std::cerr << totalTangentAngle	<< "  "<< totalNormalAngle << std::endl;
+			DisplayVector(centre);
+			DisplayVector(*vecPts[i]);
+			DisplayVector(*vecPts[(i+1)%count]);
+			RSVS3D_ERROR_NOTHROW("Angles have gone infinite.");
+		}
 	}
 	normal.div(totalNormalAngle);
 	return std::make_tuple(normal,totalTangentAngle);
 }
 
+double CotanLaplacianWeight(const vector<double> &centre,
+	const vector<double> &p_im1, const vector<double> &p_i, 
+	const vector<double> &p_ip1, coordvec &temp1, coordvec &temp2){
+
+	double w_centrei = 0.0;
+
+	double angle_im1 = Angle3Points(p_im1, centre, p_i, temp1, temp2);
+	double angle_ip1 = Angle3Points(p_ip1, centre, p_i, temp1, temp2);
+	auto cot = [&] (double x) -> double {return tan(M_PI_2 - x);};
+
+	w_centrei = 0.5 * (cot(angle_im1) + cot(angle_ip1));
+
+	return w_centrei;
+}
 
 /**
  * @brief      Calculates the parametric position along a line at which it
@@ -1342,11 +1369,96 @@ std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
 	return IntersectLineSphere(lineVec, offset,sphereRadius);
 }
 
+namespace rsvs3d {
+namespace smoothsnaking {
+
+	/**
+	 * @brief      Finds the snaxel indices which are close enough to a spawnvert
+	 * to be edited.
+	 *
+	 * @param      snaxInds   The snax inds
+	 * @param[in]  spawnVert  The spawn vertical
+	 * @param[in]  snakein    The snakein
+	 * @param[in]  spawnDist  The spawn distance
+	 */
+	void FindSnaxInds(HashedVector<int, int> &snaxInds, int spawnVert,
+		const snake &snakein, double spawnDist){
+
+			double spawnDistTol = spawnDist * 1.1;
+			snaxInds.reserve(20); 
+			for (auto parentEdge : snakein.snakemesh->verts.isearch(spawnVert)->edgeind)
+			{
+				std::vector<int> snaxIndsTemp;
+				snaxIndsTemp.reserve(20); 
+				snakein.snaxs.findsiblings(parentEdge,snaxIndsTemp);
+
+				for (auto snaxCandidate : snaxIndsTemp){
+					auto currSnax = snakein.snaxs(snaxCandidate);
+					if(currSnax->CloseToVertex()==spawnVert 
+						&& snaxInds.find(currSnax->index)==rsvs3d::constants::__notfound
+						&& (currSnax->d<spawnDistTol || (1.0-spawnDistTol)<currSnax->d)){
+						snaxInds.push_back(currSnax->index);
+				}
+			}
+		}
+	}
+
+	int LaplacianSmoothingDirection(const snake &snakein, const vert* vertsmooth,
+		coordvec &smoothDir){
+		static coordvec tempPos;
+		static coordvec temp1, temp2;
+		double totalCotan=0.0;
+
+		smoothDir.assign(0.0,0.0,0.0);
+		// Cotangent multiplier cannot be defined (could fall back on uniform)
+		int nVerts = vertsmooth->edgeind.size();
+		if(nVerts<3){
+			return rsvs3d::constants::__failure;
+		}
+
+		// Iterates around each 
+		for (int i=0; i< nVerts; ++i){
+
+			int connVert = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
+				vertsmooth->edgeind[i]);
+			int connVert_m1 = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
+				vertsmooth->edgeind[(i-1+nVerts)%nVerts]);
+			int connVert_p1 = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
+				vertsmooth->edgeind[(i+1)%nVerts]);
+			tempPos = snakein.snakeconn.verts.isearch(connVert)->coord;
+
+			double currCotan = CotanLaplacianWeight(vertsmooth->coord, 
+				snakein.snakeconn.verts.isearch(connVert_m1)->coord,
+				snakein.snakeconn.verts.isearch(connVert)->coord, 
+				snakein.snakeconn.verts.isearch(connVert_p1)->coord,
+				temp1,temp2);
+
+			if(!isfinite(currCotan)){
+				return rsvs3d::constants::__failure;
+			}
+			tempPos.mult(currCotan);
+			totalCotan += currCotan;
+			smoothDir.add(tempPos.usedata());
+
+		}
+
+		smoothDir.div(totalCotan);
+
+		return rsvs3d::constants::__success;
+	}
+}
+}
+
 /**
  * @brief      Smooths the step away from a spawn vertex
  * 
  * THis function smooths the spawn step by placing the vertices on a sphere
  * corresponding to a small progression of the inset sphere at this point.
+ * 
+ * Failures lead to no smoothing being applied a list of the know holes in the
+ * algorithm are:
+ *  - Not getting a closed loop of snaxels
+ *  - does not work
  *
  * @param[in]  spawnVert  The spawn vertex in the snaking mesh
  * @param      snakein    The snake which needs smoothing
@@ -1354,33 +1466,13 @@ std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
  *
  * @return     The number of succesfully smoothed vertex steps.
  */
-int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
+int SmoothStep_sphere(int spawnVert, snake &snakein, double spawnDist){
 
 	// identify snaxels
 
-	if(IsAproxEqual(spawnDist,0.0)){
-		return  0;
-	}
 
 	HashedVector<int, int> snaxInds;
-	double spawnDistTol = spawnDist * 1.1;
-	snaxInds.reserve(20); 
-	for (auto parentEdge : snakein.snakemesh->verts.isearch(spawnVert)->edgeind)
-	{
-		std::vector<int> snaxIndsTemp;
-		snaxIndsTemp.reserve(20); 
-		snakein.snaxs.findsiblings(parentEdge,snaxIndsTemp);
-
-		for (auto snaxCandidate : snaxIndsTemp){
-			auto currSnax = snakein.snaxs(snaxCandidate);
-			if(currSnax->index >= minIndex 
-				&& currSnax->CloseToVertex()==spawnVert 
-				&& snaxInds.find(currSnax->index)==rsvs3d::constants::__notfound
-				&& (currSnax->d<spawnDistTol || (1-spawnDistTol)<currSnax->d)){
-				snaxInds.push_back(currSnax->index);
-			}
-		}
-	}
+	rsvs3d::smoothsnaking::FindSnaxInds(snaxInds, spawnVert, snakein, spawnDist);
 	if (snaxInds.size()<2){
 		return 0;
 	}
@@ -1412,8 +1504,9 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 	}
 	int retValue = OrderList(externalEdgesOrder, externalSurfsPairs, false, true);
 	int nVerts = externalEdgesOrder.size();
-	if(retValue != rsvs3d::constants::ordering::ordered){
-		RSVS3D_ERROR_LOGIC("Failed to order the list of edges.");
+	if (retValue != rsvs3d::constants::ordering::ordered){
+		RSVS3D_ERROR_NOTHROW("Failed to order the list of edges.");
+		return 0;
 	}
 	if(nVerts<2){
 		RSVS3D_ERROR_LOGIC("Only one point was left, cannot define direction.");
@@ -1429,7 +1522,15 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 			);
 	}
 	auto& centre = snakein.snakemesh->verts.isearch(spawnVert)->coord;
-	auto centreData = VertexNormal(centre, vecPts);
+	std::tuple<coordvec, double> centreData;
+	try {
+		centreData = VertexNormal(centre, vecPts);
+	} catch (exception const& ex) {
+		// This case can happen and just needs to be handled it is the result of
+		// all the points being the same. An alternative could be to compute the
+		// normal using the directrion of the snaxels.
+		return 0;
+	}
 	coordvec& vertNormal = get<0>(centreData);
 	if (IsAproxEqual(vertNormal.GetNorm(),0.0)){
 		// RSVS3D_ERROR("Vertex normal could not be computed: returned 0 norm.");
@@ -1471,7 +1572,7 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 	}
 
 	int surfInd = snakein.snakeconn.SurfFromEdges(edgeInd,edgeAfterV2);
-	#ifdef RSVS_DIAGNOSTIC_RESOLVED
+	#ifdef RSVS_DIAGNOSTIC
 	std::cerr <<std::endl;
 	std::cerr << "snaxInds ";DisplayVector(snaxInds.vec);std::cerr<< std::endl;
 	std::cerr << "internalPtsOrdered ";DisplayVector(internalPtsOrdered);std::cerr<< std::endl;
@@ -1515,7 +1616,7 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 	}
 	vertNormal.Normalize(); // Should be the outfacing vertex normal
 
-	#ifdef RSVS_DIAGNOSTIC_RESOLVED
+	#ifdef RSVS_DIAGNOSTIC
 	std::cerr << " isSameOrder " << isSameOrder  << " flipMultiplier " 
 		<< flipMultiplier << std::endl;
 
@@ -1538,8 +1639,10 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 		(where the normal is facing outwards)
 	*/
 	int radiusStep = 1;
+
 	if (!snakein.isMeshVertIn[snakein.snakemesh->verts.find(spawnVert)]){
-		radiusStep = -1;
+		// radiusStep = -1;
+		vertNormal.flipsign();
 	}
 	double maxOffset = 0.0;
 	for (auto iEdge : externalEdges){
@@ -1555,8 +1658,11 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 		minEdgeLength = max(minTemp, minEdgeLength);
 	}
 
-	double offsetMultiplier = 1.0 - (get<1>(centreData)/ (2.0 * M_PI));
-	offsetMultiplier = max(offsetMultiplier, 0.0);
+	double offsetMultiplier = 1.0 - (2.0 * get<1>(centreData)/ (2.0 * M_PI));
+	if (offsetMultiplier<0.0){
+		return 0;
+	}
+	offsetMultiplier = min(max(offsetMultiplier, 0.0), 1.0);
 	double offset = offsetMultiplier*maxOffset; 
 	vertNormal.mult(offset);
 	// vertNormal.add(centre); // This is now the sphere centre
@@ -1591,38 +1697,22 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 		} else if ((rsvs3d::sign(ds[0])==rsvs3d::sign(ds[1])) || !isfinite(ds[0])){
 			std::cerr << "ds : " << ds[0] << "  " << ds[1] << std::endl;
 			if (!isfinite(ds[0])){
-				RSVS3D_ERROR_NOTHROW("The intersection returned infinite number"
-					" (no intersection).");
+				std::cerr << std::endl;
+				int count = vecPts.size();
+				DisplayVector(centre);
+				for (int i = 0; i < count; ++i)
+				{
+					std::cerr << std::endl;
+					DisplayVector(*vecPts[i]);
+				}
+				RSVS3D_ERROR("The intersection returned Nans.");
 			} else if (rsvs3d::sign(ds[0])==1){
 				RSVS3D_ERROR_NOTHROW("The intersection returned only positive numbers.");
 			} else if (rsvs3d::sign(ds[0])==-1){
 				RSVS3D_ERROR_NOTHROW("The intersection returned only negative numbers.");
 				allNegErr = true;
 			}
-			
 			newD.push_back(errValFunc(lineVec));
-
-			#ifdef RSVS_DIAGNOSTIC_RESOLVED
-			std::cerr << endl;
-			
-			std::cerr << "aprox angle " << get<1>(centreData) << endl;
-
-			std::cerr << "offset " << offset << " sphereRadius " 
-					<< sphereRadius << " isSameOrder " << isSameOrder <<  std::endl;
-			std::cerr << "radiusStep " << radiusStep << " offsetMultiplier " 
-				<< offsetMultiplier << " flipMultiplier " << flipMultiplier << std::endl;
-			std::cerr << "centre ";DisplayVector(centre);std::cerr<< std::endl;
-			std::cerr << "far ";DisplayVector(snakein.snakemesh->verts.isearch(farVert)->coord);
-			std::cerr<< std::endl;
-			std::cerr << "Dg ";DisplayVector(lineVec.usedata());std::cerr<< std::endl;
-			std::cerr << "offsetVec ";DisplayVector(vertNormal.usedata());std::cerr<< std::endl;
-			std::cerr << "offsetVec(unit) ";DisplayVector(vertNormal.Unit().usedata());std::cerr<< std::endl;
-			coordvec centreTemp;
-			centreTemp = vertNormal;
-			centreTemp.add(centre);
-			std::cerr << "sphere centre ";DisplayVector(centreTemp.usedata());std::cerr<< std::endl;
-			std::cerr << "ds : " << ds[0] << "  " << ds[1] << std::endl;
-			#endif
 		} else {
 			int dUse = (rsvs3d::sign(ds[1])+1)/2;
 			if(fabs(ds[dUse])<=fabs(ds[1-dUse])){
@@ -1634,29 +1724,48 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 				newD.push_back(errValFunc(lineVec));
 			}
 		}
-		#ifdef RSVS_DIAGNOSTIC_RESOLVED
+		#ifdef RSVS_DIAGNOSTIC
 		std::cerr << "ds : " << ds[0] << "  " << ds[1] << std::endl;
 		#endif
 
 		maxNew = max(maxNew,newD.back());
 	}
-	if(allNegErr){
-		return 0;
-	}
-	#ifdef RSVS_DIAGNOSTIC_RESOLVED
-	std::cerr << radiusStep << std::endl;
+	#ifdef RSVS_DIAGNOSTIC
+	std::cerr << radiusStep << std::endl << "newD : ";
 	DisplayVector(newD);
 	std::cerr  << std::endl;
 	#endif
-	double scaleNewD = 1.0;
-	double scaleInfinite = 20.0;
+	if(allNegErr){
+		return 0;
+	}
+
+	double scaleInfinite = 10.0;
+	double scaleVals = spawnDist/(maxNew);
+	double minD = spawnDist/(scaleInfinite);
+	double maxD = scaleInfinite*spawnDist;
 	int noissue=0;
 	int count = snaxInds.vec.size();
+
+	auto edgeScale = [&](coordvec &lineVec) -> double {
+		return minEdgeLength/lineVec.GetNorm();
+	};
 	for (int i = 0; i < count; ++i)
 	{
-		noissue++;
-		newD[i] = (isfinite(newD[i])? newD[i] : maxNew*scaleInfinite) * scaleNewD; 
+		lineVec = centre;
+		int farVert = snakein.snaxs.isearch(snaxInds[i])->CloseToVertex(true);
+		lineVec.substractfrom(snakein.snakemesh->verts.isearch(farVert)->coord);
+		double edgeScaleCurr = edgeScale(lineVec);
+
+		newD[i]=scaleVals*newD[i];
+		newD[i] = (isfinite(newD[i]) ? newD[i] : maxD*edgeScaleCurr); 
+		// newD[i] = (isfinite(newD[i]) && newD[i]<=maxD ? newD[i] : maxD*edgeScaleCurr);
+		newD[i] = max(minD*edgeScaleCurr,newD[i]);
+	}
+	// DisplayVector(newD);
+	for (int i = 0; i < count; ++i)
+	{
 		int j = snakein.snaxs.find(snaxInds[i], true);
+		noissue++;
 		snakein.snaxs[j].d = snakein.snaxs(j)->fromvert==spawnVert ?
 			newD[i] : 1.0-newD[i];
 		snakein.snaxs[j].ValidateDistance(snakein);
@@ -1665,7 +1774,7 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist, int minIndex){
 	return(noissue);
 }
 
-void SmoothStep2(int spawnVert, snake &snakein, double spawnDist){
+int SmoothStep_planematching(int spawnVert, snake &snakein, double spawnDist){
 
 	// identify snaxels
 
@@ -1688,7 +1797,7 @@ void SmoothStep2(int spawnVert, snake &snakein, double spawnDist){
 		}
 	}
 	if (snaxInds.size()<2){
-		return;
+		return 0;
 	}
 	// Consistancy of this list can be checked making sure all the snaxels come
 	// from the same vertex or go to the same vertex.
@@ -1739,6 +1848,7 @@ void SmoothStep2(int spawnVert, snake &snakein, double spawnDist){
 
 
 	// Set the values
+	int noissue = 0;
 	int count = externalPts.size();
 	for (int i = 0; i < count; ++i)
 	{
@@ -1750,7 +1860,118 @@ void SmoothStep2(int spawnVert, snake &snakein, double spawnDist){
 			RSVS3D_ERROR_NOTHROW("Negative d was calculated");
 		}
 		snakein.snaxs[snakein.snaxs.find(externalPts[i], true)].d = newD[i]/2.0;
+		noissue++;
 	}
+	return noissue;
+}
+
+
+int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
+	// Steps:
+	// + Define the distance bounds that might be performed
+	// + Gather the snaxels that will be smoothed
+	// + Implement cotangent laplacian smoothing
+	int nIter = 10;
+
+	double stepDamping = 1.0/double(nIter+1);
+
+	HashedVector<int, int> snaxInds;
+	snaxInds.clear();
+	rsvs3d::smoothsnaking::FindSnaxInds(snaxInds, spawnVert, snakein, spawnDist);
+	if (snaxInds.size()<2){
+		return 0;
+	}
+
+	// Order the edges around each snaxel that needs to be analysed.
+	bool succesOrdering = true; 
+	for (auto iVert : snaxInds.vec){
+		int vertOrdered = snakein.snakeconn.OrderVertexEdges(iVert);
+		if(vertOrdered!=rsvs3d::constants::ordering::ordered){
+			succesOrdering = false;
+		}
+	}
+	if(!succesOrdering){ // if ordering failed stop the smoothing process.
+		RSVS3D_ERROR_NOTHROW("Failed to order vertex");
+		return 0;
+	}
+	// 
+	coordvec smoothDir, snaxDir;
+	std::vector<double> dSteps;
+	int nSnax = snaxInds.vec.size();
+	dSteps.reserve(nSnax);
+
+	for (int stepNum = 0; stepNum < nIter; ++stepNum)
+	{
+		dSteps.clear();
+		double maxD = -INFINITY;
+		double minD = INFINITY;
+		double sumD = 0.0;
+		double minEdgeLength= INFINITY;
+		double maxEdgeLength= -INFINITY;
+		double sumEdgeL=0.0;
+		for (auto iVert : snaxInds.vec){
+			rsvs3d::smoothsnaking::LaplacianSmoothingDirection(snakein, 
+				snakein.snakeconn.verts.isearch(iVert),smoothDir);
+			snakein.snakemesh->VerticesVector(spawnVert, 
+				snakein.snaxs.isearch(iVert)->CloseToVertex(true), snaxDir);
+			double dStep = snaxDir.dot(smoothDir.usedata());
+			dStep = isfinite(dStep) ? dStep : 0.0;
+			dSteps.push_back(dStep);
+			maxD = max(dStep, maxD);
+			minD = min(dStep, minD);
+			minEdgeLength = min(minEdgeLength, snaxDir.GetNorm());
+			maxEdgeLength = max(maxEdgeLength, snaxDir.GetNorm());
+			sumEdgeL += snaxDir.GetNorm(); 
+			sumD += dStep;
+		}
+		double meanD = sumD/double(nSnax);
+		double meanEdgeL = sumEdgeL/double(nSnax);
+		double maxAbs = max(fabs(maxD),fabs(minD));
+		double edgeRatio = minEdgeLength/maxEdgeLength;
+		double stepMultiplier = 0.1* (spawnDist*stepDamping)/maxAbs*edgeRatio;
+		meanD = meanD*stepMultiplier;
+		for (int i = 0; i < nSnax; ++i)
+		{
+			int j = snakein.snaxs.find(snaxInds[i], true);
+			double l = snakein.snakemesh->edges.isearch(snakein.snaxs(j)->edgeind)
+				->Length(*snakein.snakemesh);
+			snakein.snaxs[j].d += (snakein.snaxs(j)->fromvert==spawnVert ?
+				dSteps[i] : -dSteps[i]) * stepMultiplier ; //- meanD*meanEdgeL/l*edgeRatio
+			snakein.snaxs[j].ValidateDistance(snakein);
+		}
+		snakein.snaxs.PrepareForUse();
+		snakein.UpdateCoord(snaxInds.vec);
+		// std::cout << meanD << "," << stepMultiplier << "," 
+		// 	<< maxAbs << " | ";
+	}
+	return 0;
+}
+
+int SmoothStep(int spawnVert, snake &snakein, double spawnDist,
+	std::string str){
+	static bool errHit = false;
+
+	if(IsAproxEqual(spawnDist,0.0)){
+		return  0;
+	}
+	if(str.compare("none")==0 || str.compare("")==0){
+		return 0;
+	} else if(str.compare("laplacian")==0){
+		return SmoothStep_itersmooth(spawnVert, snakein, spawnDist);
+	} else if(str.compare("planar")==0){
+		return SmoothStep_planematching(spawnVert, snakein, spawnDist);
+	} else if(str.compare("sphere")==0){
+		return SmoothStep_sphere(spawnVert, snakein, spawnDist);
+	} else {
+		if(!errHit){
+			errHit=true;
+			stringstream errstr;
+			errstr << "unrecognised smooth snaking step type: '" << str 
+				<< "' defaulting to 'none'.";
+			RSVS3D_ERROR_NOTHROW(errstr.str().c_str());
+		}
+	}
+	return 0;
 }
 
 void snake::TakeSpawnStep(int minIndex, double stepLength){
@@ -1766,7 +1987,8 @@ void snake::TakeSpawnStep(int minIndex, double stepLength){
 	}
 }
 
-void snake::TakeSmoothSpawnStep(int minIndex, double stepLength){
+void snake::TakeSmoothSpawnStep(int minIndex, double stepLength,
+	std::string smoothStep){
 
 	int nSnax = this->snaxs.size();
 	std::vector<int> spawnVerts;
@@ -1781,11 +2003,13 @@ void snake::TakeSmoothSpawnStep(int minIndex, double stepLength){
 	unique(spawnVerts);
 	int numSuccess= 0;
 	for (auto spawnVert : spawnVerts){
-		numSuccess += SmoothStep(spawnVert, *this, stepLength, minIndex);
+		numSuccess += SmoothStep(spawnVert, *this, stepLength, smoothStep);
 		this->snaxs.ForceArrayReady();
 	}
+	#ifdef RSVS_DEBUG
 	std::cout << std::endl << "Number of successful smoothed steps : " 
-		<< numSuccess << std::endl;  
+		<< numSuccess << std::endl;
+	#endif  
 }
 
 void snax::TakeSpawnStep(snake &snakein, double stepLength){
@@ -1854,7 +2078,7 @@ void snax::ValidateDistance(snake &snakein){
 	}
 	if(nEdge==1){
 		return;
-	} else if (nEdge>1){
+	} else if (nEdge>1){ 
 		int nChanges=0;
 		static std::vector<int> snaxSubs;
 		snaxSubs.clear();

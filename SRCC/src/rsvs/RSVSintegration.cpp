@@ -208,16 +208,17 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
 
-void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength){
+void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength, 
+	std::string smmoothMethod){
 	// double stepLength = 1e-5;
 
 	snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
-	snakein.UpdateCoord();
 	snakein.PrepareForUse();
+	snakein.UpdateCoord();
 	snakein.OrientFaces();
-	snakein.TakeSmoothSpawnStep(maxIndPreSpawn, stepLength);
-	snakein.UpdateCoord();
+	snakein.TakeSmoothSpawnStep(maxIndPreSpawn, stepLength, smmoothMethod);
 	snakein.PrepareForUse();
+	snakein.UpdateCoord();
 }
 
 void SnakeConnectivityUpdate_2D(snake &snakein,  vector<int> &isImpact){
@@ -639,9 +640,12 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 		int maxIndPreSpawn = RSVSobj.rsvsSnake.snaxs.GetMaxIndex();
 		SnakeConnectivityUpdate(RSVSobj.rsvsSnake, isImpact,
 			RSVSobj.paramconf.snak.multiarrivaltolerance);
-		SnakeSpawnStep(RSVSobj.rsvsSnake, maxIndPreSpawn,
-			RSVSobj.paramconf.snak.spawnposition);
 		start_s=clock();
+		SnakeSpawnStep(RSVSobj.rsvsSnake, maxIndPreSpawn,
+			RSVSobj.paramconf.snak.spawnposition, 
+			RSVSobj.paramconf.dev.smoothstepmethod);
+		std::cout << RSVSobj.paramconf.dev.smoothstepmethod << " ; "; 
+		start_s=rsvs3d::TimeStamp(" spawn step:", start_s);
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
 		start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	}
