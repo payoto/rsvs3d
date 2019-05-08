@@ -588,6 +588,153 @@ coordvec volu::PseudoCentroid(const mesh &meshin) const {
 	return coordVolu;
 }
 
+
+/**
+ * @brief      Calculates the vertex normal weighted by surface angle partitions
+ *
+ * @param[in]  centre  The coordinate at which the normal needs to be evaluated.
+ * @param[in]  vecPts  The points used to compute the normal.
+ * @param      normal  The normal vector calculated during the process.
+ *
+ * @return     The total angle between the surfaces. This angle is a measure of
+ *             the local curvature.
+ */
+double VertexNormal(const std::vector<double>& centre, 
+	const grid::coordlist &vecPts, coordvec &normal){
+
+	// Calculates a normal for each face
+	// and an angle
+	// Need to make sure it is inward pointing
+	// 
+
+	if(vecPts.size()==0){
+		RSVS3D_ERROR_ARGUMENT("Attempted to define a smooth step for an empty"
+			"vector of points.");
+	}
+
+	coordvec planeCurr, planePrev, temp;
+	/// 
+	double totalNormalAngle=0.0;
+	/// 
+	double totalTangentAngle=0.0;
+	double currAngle;
+	int count = vecPts.size();
+	int iStart = 0;
+	bool flagInit = true;
+	if(count == 0){
+		normal.assign(0.0, 0.0, 0.0);
+		return totalTangentAngle;
+	}
+	// Compute initialisation points
+	while (flagInit && iStart<count){
+		currAngle = PlaneNormalAndAngle(centre, *vecPts.back(), *vecPts[iStart],
+			planePrev, temp);
+		if(IsAproxEqual(planePrev.GetNorm(),0.0) 
+			|| !isfinite(planePrev.GetNorm())
+			|| !isfinite(currAngle)){
+			iStart++;
+		} else {
+			flagInit = false;
+		}
+	}
+	if (iStart==count ){
+		std::cerr << std::endl;
+		DisplayVector(centre);
+		for (int i = 0; i < count; ++i)
+		{
+			std::cerr << std::endl;
+			DisplayVector(*vecPts[i]);
+		}
+		RSVS3D_ERROR_LOGIC("Could not compute vertex normal the set of points"
+			" surrounding the centre vertex was degenerate (all the same).");
+	}
+	planePrev.Normalize();
+	for (int i = iStart ; i < count; ++i)
+	{
+		currAngle = PlaneNormalAndAngle(centre, *vecPts[i], *vecPts[(i+1)%count],
+			planeCurr, temp);
+		// If the plane has zero area skip the rest of the loop
+		if(IsAproxEqual(planeCurr.GetNorm(),0.0) 
+			|| !isfinite(planeCurr.GetNorm())
+			|| !isfinite(currAngle)){
+			planeCurr.assign(1,1,1);
+			planeCurr.CalcNorm();
+			continue;
+		}
+		planeCurr.Normalize();
+		totalNormalAngle += currAngle;
+		planeCurr.mult(currAngle);
+		normal.add(planeCurr.usedata());
+		planeCurr.Normalize();
+		totalTangentAngle += planeCurr.angle(planePrev);
+		planePrev.swap(planeCurr);
+		if(!isfinite(totalTangentAngle) || !isfinite(totalNormalAngle)){
+			std::cerr << std::endl;
+			DisplayVector(planePrev.usedata());
+			DisplayVector(planeCurr.usedata());
+			std::cerr << totalTangentAngle	<< "  "<< totalNormalAngle << std::endl;
+			DisplayVector(centre);
+			DisplayVector(*vecPts[i]);
+			DisplayVector(*vecPts[(i+1)%count]);
+			RSVS3D_ERROR_NOTHROW("Angles have gone infinite.");
+		}
+	}
+	normal.div(totalNormalAngle);
+	return totalTangentAngle;
+}
+
+
+/**
+ * @brief      Calculates the vertex normal weighted by surface angle partitions
+ *
+ * @param[in]  centre  The coordinate at which the normal needs to be evaluated.
+ * @param[in]  vecPts  The points used to compute the normal.
+ *
+ * @return     A tuple with the normal vector and the total angle between the
+ *             surfaces. This angle is a measure of the local curvature.
+ */
+std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
+	const grid::coordlist &vecPts){
+
+	std::tuple<coordvec,double> returnTup;
+	get<1>(returnTup) = VertexNormal(centre, vecPts, get<0>(returnTup));
+	return returnTup;
+}
+
+int vert::Normal(const mesh *meshin, grid::coordlist &neighCoord,
+	coordvec &normalVec, bool isOrdered) const {
+
+	auto retVal = this->SurroundingCoords(meshin, neighCoord, isOrdered);
+
+	if(retVal!=rsvs3d::constants::__success){
+		normalVec.assign(0.0, 0.0, 0.0);
+		return rsvs3d::constants::__failure;
+	}
+
+	try{
+		double tangentAngle = VertexNormal(this->coord, neighCoord,normalVec);
+	} catch (...) {
+		normalVec.assign(0.0, 0.0, 0.0);
+		return rsvs3d::constants::__failure;
+	}
+
+	return rsvs3d::constants::__success;
+}
+
+coordvec vert::Normal(const mesh *meshin) const{
+
+	grid::coordlist neighCoord;
+	coordvec normalVec;
+
+	auto retVal = this->Normal(meshin, neighCoord, normalVec);
+
+	if(retVal!=rsvs3d::constants::__success){
+		normalVec.assign(0.0, 0.0, 0.0);
+	}
+	return normalVec;
+}
+
+
 //// ----------------------------------------
 // Implementation of mesh dependence
 //// ----------------------------------------
@@ -1130,7 +1277,7 @@ int mesh::ParentElementIndex(int childElmInd, int parentInd) const{
 
 }
 
-/// MAth operations in mesh
+/// Math operations in mesh
 void edge::GeometricProperties(const mesh *meshin, coordvec &centre,
 	double &length) const {
 
@@ -2819,9 +2966,9 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
 
 /**
  * Orders a list of elements defined by pairs of indices
- * 
- * Each element is defined by 1 index in edgeind and 2 indices in edge2Vert.
- * The two indices are then matched to the next element chaining equal indices
+ *
+ * Each element is defined by 1 index in edgeind and 2 indices in edge2Vert. The
+ * two indices are then matched to the next element chaining equal indices
  * together.
  *
  * @param      edgeind         The edgeind
@@ -2830,7 +2977,9 @@ int OrderEdgeList(vector<int> &edgeind, const mesh &meshin,	bool warn,
  * @param[in]  errout          The errout
  * @param[in]  edgeIndOrigPtr  The edge ind original pointer
  *
- * @return     { description_of_the_return_value }
+ * @return     the return value is one of the globals defined in namespace:
+ *             rsvs3d::constants::ordering::(currently:<ordered,truncated, open,
+ *             error>)
  */
 int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn,
 	bool errout, const vector<int>* edgeIndOrigPtr){
@@ -2929,16 +3078,19 @@ int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn,
 	return rsvsorder::ordered;
 }
 
-int vert::OrderEdges(mesh *meshin){
+int vert::OrderEdges(const mesh *meshin, std::vector<int> &edgeIndOut) const {
 	int retVal = 0;
 	vector<int> edge2Vert;
 
-	sort(this->edgeind);
-	unique(this->edgeind);
-	vector<int> edgeIndOrig = this->edgeind;
+	if(&edgeIndOut != &(this->edgeind)){
+		edgeIndOut = this->edgeind;
+	}
+	sort(edgeIndOut);
+	unique(edgeIndOut);
+	vector<int> edgeIndOrig = edgeIndOut;
 
-	edge2Vert.reserve(this->edgeind.size()*2);
-	for (auto iEdge : this->edgeind){
+	edge2Vert.reserve(edgeIndOut.size()*2);
+	for (auto iEdge : edgeIndOut){
 		auto edgeC = meshin->edges.isearch(iEdge);
 		if (edgeC->surfind.size()!=2){
 			return rsvs3d::constants::ordering::error;
@@ -2947,14 +3099,57 @@ int vert::OrderEdges(mesh *meshin){
 		edge2Vert.push_back(edgeC->surfind[1]);
 	}
 
-	retVal = OrderList(this->edgeind, edge2Vert, false, false, &edgeIndOrig);
+	retVal = OrderList(edgeIndOut, edge2Vert, false, false, &edgeIndOrig);
 
 	if(retVal != rsvs3d::constants::ordering::ordered){
-		this->edgeind = edgeIndOrig;
+		edgeIndOut = edgeIndOrig;
 	}
 
 	return retVal;
 }
+
+std::pair<std::vector<int>,int> vert::OrderEdges(const mesh *meshin) const {
+	std::pair<std::vector<int>,int> output;
+	vector<int> &edgeIndOut = output.first;
+	
+	auto retVal = this->OrderEdges(meshin, edgeIndOut);
+
+	return {edgeIndOut,retVal};
+}
+
+int vert::OrderEdges(const mesh *meshin){
+	return this->OrderEdges(meshin, this->edgeind);
+}
+
+int vert::SurroundingCoords(const mesh *meshin, grid::coordlist &coordout,
+	bool isOrdered) const {
+
+	// Faf about to avoid unnecessary allocation into edgeIndOut if not needed
+	std::vector<int> edgeIndModif;
+	const std::vector<int>* edgeIndOutPtr = &(this->edgeind);
+	coordout.clear();
+	if(!isOrdered){
+		auto retOrder = this->OrderEdges(meshin, edgeIndModif);
+		if (!rsvs3d::constants::ordering::__isordered(retOrder)){
+			return rsvs3d::constants::__failure;
+		}
+		edgeIndOutPtr = &edgeIndModif;
+	}
+
+	// Is a reference to either this->edgeind if isOrdered=true or edgeIndModif
+	// otherwise.
+	auto& edgeIndOut = *edgeIndOutPtr; 
+
+	int nEdges = edgeIndOut.size();
+	for (int i = 0; i < nEdges; ++i)
+	{
+		int iVert = meshin->VertFromVertEdge(this->index, edgeIndOut[i]);
+		coordout.push_back(&(meshin->verts.isearch(iVert)->coord));
+	}
+
+	return rsvs3d::constants::__success;
+}
+
 
 int surf::OrderEdges(mesh *meshin)
 {

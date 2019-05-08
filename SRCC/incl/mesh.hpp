@@ -52,6 +52,7 @@
 #include <unordered_map>
 #include <functional>
 #include <cmath>
+#include <cfloat>
 
 #include "warning.hpp"
 #include "arraystructures.hpp"
@@ -90,13 +91,14 @@ namespace grid {
 
 namespace rsvs3d {
 	namespace constants {
-		const auto __issetlength =[](double l)->bool {return l>=-0.0;};
-		const double __unsetlength=-1.0;
+		static const auto __issetlength =[](double l)->bool {return l>=-0.0;};
+		static const double __unsetlength=-1.0;
 		namespace ordering {
-			const int ordered=0;
-			const int truncated=1;
-			const int open=-1;
-			const int error=2;
+			static const int ordered=0;
+			static const int truncated=1;
+			static const int open=-1;
+			static const int error=2;
+			static const auto __isordered =[](int l)->bool {return l==ordered;};
 		}
 	}
 }
@@ -423,7 +425,16 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	void TightenConnectivity() {sort(edgeind);unique(edgeind);};
-	int OrderEdges(mesh *meshin);
+	int OrderEdges(const mesh *meshin);
+	std::pair<std::vector<int>,int> OrderEdges(const mesh *meshin) const;
+	int OrderEdges(const mesh *meshin, std::vector<int> &edgeIndOut) const;
+	int SurroundingCoords(const mesh *meshin, grid::coordlist &coordout,
+		bool isOrdered=false) const;
+
+	int Normal(const mesh *meshin, grid::coordlist &neighCoord,
+		coordvec &normalVec, bool isOrdered=false) const;
+	coordvec Normal(const mesh *meshin) const;
+
 
 	vert(){ // Constructor
 		index=0;
@@ -720,6 +731,10 @@ double PlaneNormalAndAngle(const vector<double> &planeVert1,
 	const vector<double> &planeVert2,
 	const vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1);
+std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
+	const grid::coordlist &vecPts);
+inline bool IsAproxEqual(double d1,double d2, double tol=DBL_EPSILON)
+	{return(fabs(d1-d2)<tol);}
 namespace meshhelp {
 	template<class T, class V, class W>
 	double ProjectRay(int count, const W &&boundBox,

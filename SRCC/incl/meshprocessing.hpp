@@ -85,6 +85,17 @@ std::vector<double> VolumeCentroids(const mesh &meshin);
 std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers);
 std::vector<double> SurfaceCentroids(const mesh &meshin);
 std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers);
+double CotanLaplacianWeight(const std::vector<double> &centre,
+	const std::vector<double> &p_im1, const std::vector<double> &p_i, 
+	const std::vector<double> &p_ip1, coordvec &temp1, coordvec &temp2);
+int VertexLaplacianVector(const mesh& meshin, const vert* vertsmooth,
+	coordvec &lapVec, bool isOrdered=false);
+coordvec VertexLaplacianVector(const mesh& meshin, int vertIndex);
+std::array<double, 2> IntersectLineSphere(const coordvec &lineVec, 
+	const coordvec &offset, double sphereRadius);
+std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
+	const std::vector<double> &linePoint, const coordvec &sphereCentre,
+	double sphereRadius);
 // Forward declared templated functions
 
 // Base class

@@ -7,6 +7,8 @@
 
 #include "snake.hpp"
 #include "warning.hpp"
+#include "mesh.hpp"
+#include "meshprocessing.hpp"
 
 using namespace std;
 
@@ -1322,160 +1324,6 @@ int SmoothStep_bordersetting(int spawnVert, snake &snakein, double spawnDist){
 	return(noissue);
 }
 
-
-/**
- * @brief      Calculates the vertex normal weighted by surface angle partitions
- *
- * @param[in]  centre  The coordinate at which the normal needs to be evaluated.
- * @param[in]  vecPts  The points used to compute the normal.
- *
- * @return     A tuple with the normal vector and the total angle between the 
- * surfaces. This angle is a measure of the local curvature.
- */
-std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
-	const std::vector<const std::vector<double>*> &vecPts){
-
-	// Calculates a normal for each face
-	// and an angle
-	// Need to make sure it is inward pointing
-	// 
-
-	if(vecPts.size()==0){
-		RSVS3D_ERROR_ARGUMENT("Attempted to define a smooth step for an empty"
-			"vector of points.");
-	}
-
-	coordvec planeCurr, planePrev, normal, temp;
-	/// 
-	double totalNormalAngle=0.0;
-	/// 
-	double totalTangentAngle=0.0;
-	double currAngle;
-	int count = vecPts.size();
-	int iStart = 0;
-	bool flagInit = true;
-	if(count == 0){
-		return std::make_tuple(normal,totalTangentAngle);
-	}
-	// Compute initialisation points
-	while (flagInit && iStart<count){
-		currAngle = PlaneNormalAndAngle(centre, *vecPts.back(), *vecPts[iStart],
-			planePrev, temp);
-		if(IsAproxEqual(planePrev.GetNorm(),0.0) 
-			|| !isfinite(planePrev.GetNorm())
-			|| !isfinite(currAngle)){
-			iStart++;
-		} else {
-			flagInit = false;
-		}
-	}
-	if (iStart==count ){
-		std::cerr << std::endl;
-		DisplayVector(centre);
-		for (int i = 0; i < count; ++i)
-		{
-		std::cerr << std::endl;
-		DisplayVector(*vecPts[i]);
-		}
-		RSVS3D_ERROR_LOGIC("Could not compute vertex normal the set of points"
-			" surrounding the centre vertex was degenerate (all the same).");
-	}
-	planePrev.Normalize();
-	for (int i = iStart ; i < count; ++i)
-	{
-		currAngle = PlaneNormalAndAngle(centre, *vecPts[i], *vecPts[(i+1)%count],
-			planeCurr, temp);
-		// If the plane has zero area skip the rest of the loop
-		if(IsAproxEqual(planeCurr.GetNorm(),0.0) 
-			|| !isfinite(planeCurr.GetNorm())
-			|| !isfinite(currAngle)){
-			planeCurr.assign(1,1,1);
-			planeCurr.CalcNorm();
-			continue;
-		}
-		planeCurr.Normalize();
-		totalNormalAngle += currAngle;
-		planeCurr.mult(currAngle);
-		normal.add(planeCurr.usedata());
-		planeCurr.Normalize();
-		totalTangentAngle += planeCurr.angle(planePrev);
-		planePrev.swap(planeCurr);
-		if(!isfinite(totalTangentAngle) || !isfinite(totalNormalAngle)){
-			std::cerr << std::endl;
-			DisplayVector(planePrev.usedata());
-			DisplayVector(planeCurr.usedata());
-			std::cerr << totalTangentAngle	<< "  "<< totalNormalAngle << std::endl;
-			DisplayVector(centre);
-			DisplayVector(*vecPts[i]);
-			DisplayVector(*vecPts[(i+1)%count]);
-			RSVS3D_ERROR_NOTHROW("Angles have gone infinite.");
-		}
-	}
-	normal.div(totalNormalAngle);
-	return std::make_tuple(normal,totalTangentAngle);
-}
-
-double CotanLaplacianWeight(const vector<double> &centre,
-	const vector<double> &p_im1, const vector<double> &p_i, 
-	const vector<double> &p_ip1, coordvec &temp1, coordvec &temp2){
-
-	double w_centrei = 0.0;
-
-	double angle_im1 = Angle3Points(p_im1, centre, p_i, temp1, temp2);
-	double angle_ip1 = Angle3Points(p_ip1, centre, p_i, temp1, temp2);
-	auto cot = [&] (double x) -> double {return tan(M_PI_2 - x);};
-
-	w_centrei = 0.5 * (cot(angle_im1) + cot(angle_ip1));
-
-	return w_centrei;
-}
-
-/**
- * @brief      Calculates the parametric position along a line at which it
- *             intersects a sphere
- *
- * The return value of this function when multiplied by the line direction and
- * added to the reference point gives the coordinate of the intersection points.
- *
- * @param[in]  lineVec       The vector direction followed by the line
- * @param[in]  offset        The vector going from the sphere centre to a point
- *                           on the line.
- * @param[in]  sphereRadius  The radius of the sphere.
- *
- * @return     pair of quadratic roots. Returns infinity if there is not intersection.
- */
-std::array<double, 2> IntersectLineSphere(const coordvec &lineVec, 
-	const coordvec &offset, double sphereRadius){
-
-	double a, b, c;
-	a = lineVec.dot(lineVec.usedata());
-	b = 2 * lineVec.dot(offset.usedata());
-	c = offset.dot(offset.usedata()) - (sphereRadius*sphereRadius);
-
-	double det = b*b - (4 * a*c);
-	double inva= 1.0/(2.0*a);
-	if (det<0.0){
-		return {-INFINITY, INFINITY};
-	}
-	if(IsAproxEqual(det, 0.0)){
-		double sol = -b*inva;
-		return {sol, sol};
-	}
-	det = sqrt(det);
-	return {(-b-det)*inva, (-b+det)*inva};
-}
-
-
-std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
-	const vector<double> &linePoint, const coordvec &sphereCentre,
-	double sphereRadius){
-
-	static coordvec offset;
-	offset = linePoint;
-	offset.substract(sphereCentre.usedata());
-	return IntersectLineSphere(lineVec, offset,sphereRadius);
-}
-
 namespace rsvs3d {
 namespace smoothsnaking {
 
@@ -1510,48 +1358,10 @@ namespace smoothsnaking {
 		}
 	}
 
+	
 	int LaplacianSmoothingDirection(const snake &snakein, const vert* vertsmooth,
 		coordvec &smoothDir){
-		static coordvec tempPos;
-		static coordvec temp1, temp2;
-		double totalCotan=0.0;
-
-		smoothDir.assign(0.0,0.0,0.0);
-		// Cotangent multiplier cannot be defined (could fall back on uniform)
-		int nVerts = vertsmooth->edgeind.size();
-		if(nVerts<3){
-			return rsvs3d::constants::__failure;
-		}
-
-		// Iterates around each 
-		for (int i=0; i< nVerts; ++i){
-
-			int connVert = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
-				vertsmooth->edgeind[i]);
-			int connVert_m1 = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
-				vertsmooth->edgeind[(i-1+nVerts)%nVerts]);
-			int connVert_p1 = snakein.snakeconn.VertFromVertEdge(vertsmooth->index, 
-				vertsmooth->edgeind[(i+1)%nVerts]);
-			tempPos = snakein.snakeconn.verts.isearch(connVert)->coord;
-
-			double currCotan = CotanLaplacianWeight(vertsmooth->coord, 
-				snakein.snakeconn.verts.isearch(connVert_m1)->coord,
-				snakein.snakeconn.verts.isearch(connVert)->coord, 
-				snakein.snakeconn.verts.isearch(connVert_p1)->coord,
-				temp1,temp2);
-
-			if(!isfinite(currCotan)){
-				return rsvs3d::constants::__failure;
-			}
-			tempPos.mult(currCotan);
-			totalCotan += currCotan;
-			smoothDir.add(tempPos.usedata());
-
-		}
-
-		smoothDir.div(totalCotan);
-
-		return rsvs3d::constants::__success;
+		return VertexLaplacianVector(snakein.snakeconn, vertsmooth,smoothDir);
 	}
 }
 }
@@ -1993,9 +1803,7 @@ int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
 	bool succesOrdering = true; 
 	for (auto iVert : snaxInds.vec){
 		int vertOrdered = snakein.snakeconn.OrderVertexEdges(iVert);
-		if(vertOrdered!=rsvs3d::constants::ordering::ordered){
-			succesOrdering = false;
-		}
+		succesOrdering =(vertOrdered==rsvs3d::constants::ordering::ordered);
 	}
 	if(!succesOrdering){ // if ordering failed stop the smoothing process.
 		RSVS3D_ERROR_NOTHROW("Failed to order vertex");

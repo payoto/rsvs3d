@@ -1,4 +1,7 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
+#include <cmath>
 
 #include "triangulate.hpp"
 #include "meshprocessing.hpp"
@@ -924,4 +927,132 @@ std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers){
 		}
 	}
 	return(vecPts);
+}
+
+
+double CotanLaplacianWeight(const vector<double> &centre,
+	const vector<double> &p_im1, const vector<double> &p_i, 
+	const vector<double> &p_ip1, coordvec &temp1, coordvec &temp2){
+
+	double w_centrei = 0.0;
+
+	double angle_im1 = Angle3Points(p_im1, centre, p_i, temp1, temp2);
+	double angle_ip1 = Angle3Points(p_ip1, centre, p_i, temp1, temp2);
+	auto cot = [&] (double x) -> double {return tan(M_PI_2 - x);};
+
+	w_centrei = 0.5 * (cot(angle_im1) + cot(angle_ip1));
+
+	return w_centrei;
+}
+
+int VertexLaplacianVector(const mesh& meshin, const vert* vertsmooth,
+	coordvec &lapVec, bool isOrdered){
+	
+	static coordvec tempPos;
+	static coordvec temp1, temp2;
+	double totalCotan=0.0;
+
+	// Make sure that we don't allocate or copy data if the laplacian is already
+	// ordered.
+	std::vector<int> edgeIndModif;
+	const std::vector<int>* edgeIndOutPtr = &(vertsmooth->edgeind);
+	if(!isOrdered){
+		auto retOrder = vertsmooth->OrderEdges(&meshin, edgeIndModif);
+		if (!rsvs3d::constants::ordering::__isordered(retOrder)){
+			return rsvs3d::constants::__failure;
+		}
+		edgeIndOutPtr = &edgeIndModif;
+	}
+	// Is a reference to either this->edgeind if isOrdered=true or edgeIndModif
+	// otherwise.
+	auto& edgindOrdered = *edgeIndOutPtr;
+
+
+	lapVec.assign(0.0,0.0,0.0);
+	// Cotangent multiplier cannot be defined (could fall back on uniform)
+	int nVerts = edgindOrdered.size();
+	if(nVerts<3){
+		return rsvs3d::constants::__failure;
+	}
+
+	// Iterates around each 
+	for (int i=0; i< nVerts; ++i){
+
+		int connVert = meshin.VertFromVertEdge(vertsmooth->index, 
+			edgindOrdered[i]);
+		int connVert_m1 = meshin.VertFromVertEdge(vertsmooth->index, 
+			edgindOrdered[(i-1+nVerts)%nVerts]);
+		int connVert_p1 = meshin.VertFromVertEdge(vertsmooth->index, 
+			edgindOrdered[(i+1)%nVerts]);
+		tempPos = meshin.verts.isearch(connVert)->coord;
+
+		double currCotan = CotanLaplacianWeight(vertsmooth->coord, 
+			meshin.verts.isearch(connVert_m1)->coord,
+			meshin.verts.isearch(connVert)->coord, 
+			meshin.verts.isearch(connVert_p1)->coord,
+			temp1,temp2);
+
+		if(!isfinite(currCotan)){
+			return rsvs3d::constants::__failure;
+		}
+		tempPos.mult(currCotan);
+		totalCotan += currCotan;
+		lapVec.add(tempPos.usedata());
+
+	}
+
+	lapVec.div(totalCotan);
+
+	return rsvs3d::constants::__success;
+}
+
+coordvec VertexLaplacianVector(const mesh& meshin, int vertIndex){
+	coordvec lapVec;
+	VertexLaplacianVector(meshin, meshin.verts.isearch(vertIndex), lapVec);
+	return lapVec;
+}
+
+/**
+ * @brief      Calculates the parametric position along a line at which it
+ *             intersects a sphere
+ *
+ * The return value of this function when multiplied by the line direction and
+ * added to the reference point gives the coordinate of the intersection points.
+ *
+ * @param[in]  lineVec       The vector direction followed by the line
+ * @param[in]  offset        The vector going from the sphere centre to a point
+ *                           on the line.
+ * @param[in]  sphereRadius  The radius of the sphere.
+ *
+ * @return     pair of quadratic roots. Returns infinity if there is not intersection.
+ */
+std::array<double, 2> IntersectLineSphere(const coordvec &lineVec, 
+	const coordvec &offset, double sphereRadius){
+
+	double a, b, c;
+	a = lineVec.dot(lineVec.usedata());
+	b = 2 * lineVec.dot(offset.usedata());
+	c = offset.dot(offset.usedata()) - (sphereRadius*sphereRadius);
+
+	double det = b*b - (4 * a*c);
+	double inva= 1.0/(2.0*a);
+	if (det<0.0){
+		return {-INFINITY, INFINITY};
+	}
+	if(IsAproxEqual(det, 0.0)){
+		double sol = -b*inva;
+		return {sol, sol};
+	}
+	det = sqrt(det);
+	return {(-b-det)*inva, (-b+det)*inva};
+}
+
+std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
+	const vector<double> &linePoint, const coordvec &sphereCentre,
+	double sphereRadius){
+
+	static coordvec offset;
+	offset = linePoint;
+	offset.substract(sphereCentre.usedata());
+	return IntersectLineSphere(lineVec, offset,sphereRadius);
 }
