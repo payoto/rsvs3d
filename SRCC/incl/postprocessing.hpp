@@ -54,6 +54,12 @@ namespace rsvs3d {
 			static const int polygon=2;
 			static const int line=3;
 			static const int point=4;
+			namespace snakedata {
+				static const std::string snaxel="snaxel";
+				static const std::string normal="normal";
+				static const std::string laplacian="laplacian";
+				static const std::string __default=snaxel;
+			}
 		}
 	}
 }
@@ -125,8 +131,13 @@ public:
 		int forceOutType=rsvs3d::constants::tecplot::autoselect);
 
 	// Snake specific functions
-	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat);
+	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat, 
+		std::string=rsvs3d::constants::tecplot::snakedata::__default);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const vector<int> &vertList={});
+	int PrintSnake(std::string snakeData,const snake& snakeout,
+		int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const vector<int> &vertList={});
 	// Zone Headers
@@ -209,14 +220,24 @@ public:
 		}
 		return(lengthLine);
 	}
-
 	void ResetLine(){lengthLine=0;}
+	void NewLine() {fprintf(this->fid, "\n"); this->ResetLine();};
 
 };
 
 // Derived Classes
 
 // functions
+
+namespace dataoutput {
+	void Coord(tecplotfile &tecout, const mesh& meshout, 
+		int nVert, int nVertDat);
+	void Snaxel(tecplotfile &tecout, const snake& snakeout, int nVert);
+	void VertexNormal(tecplotfile &tecout, const mesh& meshin, int nVert);
+	void VertexLaplacian(tecplotfile &tecout, const mesh& meshin, int nVert);
+}
+
+
 
 int Test_tecplotfile();
 int TestCompareReadWrite(const char* fileToOpen, mesh &blockGrid, tecplotfile &outmesh1);

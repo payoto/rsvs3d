@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "mesh.hpp"
+#include "meshprocessing.hpp"
 #include "postprocessing.hpp" 
 #include "triangulate.hpp"
 #include "warning.hpp"
 #include "RSVScalc.hpp"
 
-using namespace rsvs3d::constants;
+namespace tecplotconst=rsvs3d::constants::tecplot;
 
 // Functions
 void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge,
@@ -24,6 +25,115 @@ void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge,
 	}
 }
 
+namespace dataoutput {
+	void Coord(tecplotfile &tecout, const mesh& meshout, 
+		int nVert, int nVertDat){
+
+		int ii,jj,nCoord;
+		// Print vertex Data
+		nCoord=int(meshout.verts(0)->coord.size());
+		nCoord= nCoord > nVertDat ? nVertDat : nCoord;
+		for (jj=0;jj<nCoord;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				tecout.Print("%.16lf ",meshout.verts(ii)->coord[jj]);
+			}
+			tecout.NewLine();
+		}
+		for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
+			for ( ii = 0; ii<nVert; ++ii){
+				tecout.Print("%lf ",0);
+			}
+			tecout.NewLine();
+		}
+	}
+
+	void Snaxel(tecplotfile &tecout, const snake& snakeout, int nVert){
+		int ii ;
+		for ( ii = 0; ii<nVert; ++ii){
+			tecout.Print("%.16lf ",snakeout.snaxs(ii)->d);
+		}
+		tecout.NewLine();
+		for ( ii = 0; ii<nVert; ++ii){
+			tecout.Print("%.16lf ",snakeout.snaxs(ii)->v);
+		}
+		tecout.NewLine();
+		for ( ii = 0; ii<nVert; ++ii){
+			auto temp = snakeout.snakeconn.verts(ii)->elmind(snakeout.snakeconn,2);
+			int maxSize = 0;
+			for (auto surfSub : temp){
+				int tempSize = snakeout.snakeconn.surfs.isearch(surfSub)->edgeind.size();
+				maxSize = maxSize < tempSize ? tempSize : maxSize;
+			}
+			// tecout.Print("%i ",snakeout.snaxs(ii)->isfreeze);
+			tecout.Print("%i ", maxSize);
+		}
+		tecout.NewLine();
+	}
+
+	/**
+	 * @brief      Writes the Snaxel normals to tecplot file
+	 *
+	 * @param      tecout    The tecout
+	 * @param[in]  snakeout  The snakeout
+	 * @param[in]  nVert     The vertical
+	 */
+	void VertexNormal(tecplotfile &tecout, const mesh& meshin, int nVert){
+
+		std::vector<double> coords;
+		coords.reserve(nVert*3);
+		coordvec normal;
+
+		grid::coordlist neighCoord;
+
+		for (int i = 0; i < nVert; ++i)
+		{
+			meshin.verts(i)->Normal(&meshin, neighCoord, normal);
+			for (int j = 0; j < 3; ++j)
+			{
+				coords.push_back(normal(j));
+			}
+		}
+		for (int j = 0; j < 3; ++j)
+		{
+			for (int i = 0; i < nVert; ++i)
+			{
+				tecout.Print("%.16lf ", coords[i*3+j]);	
+			}
+			tecout.NewLine();
+		}
+
+	}
+	void VertexLaplacian(tecplotfile &tecout, const mesh& meshin, int nVert){
+
+		std::vector<double> coords;
+		coords.reserve(nVert*3);
+		coordvec lapVec;
+
+		grid::coordlist neighCoord;
+
+		for (int i = 0; i < nVert; ++i)
+		{
+			VertexLaplacianVector(meshin, meshin.verts(i), lapVec);
+
+			for (int j = 0; j < 3; ++j)
+			{
+				coords.push_back(lapVec(j));
+			}
+		}
+		for (int j = 0; j < 3; ++j)
+		{
+			for (int i = 0; i < nVert; ++i)
+			{
+				tecout.Print("%.16lf ", coords[i*3+j]);	
+			}
+			tecout.NewLine();
+		}
+
+	}
+
+}
+
+
 int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
 		int nVertDat, const std::vector<int> &voluList,
 		const std::vector<int> &vertList){
@@ -34,25 +144,15 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
 	nCoord=int(meshout.verts(0)->coord.size());
 	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
 	if(vertList.size()==0){
-		for (jj=0;jj<nCoord;++jj){
-			for ( ii = 0; ii<nVert; ++ii){
-				this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
-			}
-			fprintf(fid,"\n");this->ResetLine();
-		}
-		for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
-			for ( ii = 0; ii<nVert; ++ii){
-				this->Print("%lf ",0);
-			}
-			fprintf(fid,"\n");this->ResetLine();
-		}
+		dataoutput::Coord(*this, meshout, nVert, nVertDat);
+
 	} else {
 		for (jj=0;jj<nCoord;++jj){
 			for(auto ii : vertList){
 
 				this->Print("%.16lf ",meshout.verts.isearch(ii)->coord[jj]);
 			}
-			fprintf(fid,"\n");this->ResetLine();
+			this->NewLine();
 		}
 		nVert = vertList.size();
 		for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
@@ -60,7 +160,7 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
 			for(ii = 0; ii<nVert; ++ii){
 				this->Print("%lf ",0);
 			}
-			fprintf(fid,"\n");this->ResetLine();
+			this->NewLine();
 		}
 	}
  	// Print Cell Data
@@ -68,72 +168,52 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
 		for ( ii = 0; ii<nVolu; ++ii){
 			this->Print("%.16lf ",meshout.volus(ii)->fill);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		for ( ii = 0; ii<nVolu; ++ii){
 			this->Print("%.16lf ",meshout.volus(ii)->target);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		for ( ii = 0; ii<nVolu; ++ii){
 			this->Print("%.16lf ",meshout.volus(ii)->error);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	} else {
 		for(auto ii : voluList){
 			this->Print("%.16lf ",meshout.volus.isearch(ii)->fill);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		
 		for(auto ii : voluList){
 			this->Print("%.16lf ",meshout.volus.isearch(ii)->target);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		for(auto ii : voluList){
 			this->Print("%.16lf ",meshout.volus.isearch(ii)->error);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
 
-int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat){
+
+int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat, 
+	std::string snakeData){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj,nCoord;
-	// Print vertex Data
-	nCoord=int(snakeout.snakeconn.verts(0)->coord.size());
-	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
-	for (jj=0;jj<nCoord;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",snakeout.snakeconn.verts(ii)->coord[jj]);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
-	for (jj=int(snakeout.snakeconn.verts(0)->coord.size());jj<nVertDat;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%lf ",0);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
+	dataoutput::Coord(*this, snakeout.snakeconn, nVert, nVertDat);
 	// Print Cell Data
-	for ( ii = 0; ii<nVert; ++ii){
-		this->Print("%.16lf ",snakeout.snaxs(ii)->d);
+	if(snakeData.compare(tecplotconst::snakedata::snaxel)==0){
+		dataoutput::Snaxel(*this, snakeout, nVert);
+	} else if(snakeData.compare(tecplotconst::snakedata::normal)==0){
+		dataoutput::VertexNormal(*this, snakeout.snakeconn, nVert);
+	} else if(snakeData.compare(tecplotconst::snakedata::laplacian)==0){
+		dataoutput::VertexLaplacian(*this, snakeout.snakeconn, nVert);
+	} else {
+		stringstream errstr;
+		errstr << "Unknown snake data output '" << snakeData << "'";
+		RSVS3D_ERROR_ARGUMENT(errstr.str().c_str());
 	}
-	fprintf(fid,"\n");this->ResetLine();
-	for ( ii = 0; ii<nVert; ++ii){
-		this->Print("%.16lf ",snakeout.snaxs(ii)->v);
-	}
-	fprintf(fid,"\n");this->ResetLine();
-	for ( ii = 0; ii<nVert; ++ii){
-		auto temp = snakeout.snakeconn.verts(ii)->elmind(snakeout.snakeconn,2);
-		int maxSize = 0;
-		for (auto surfSub : temp){
-			int tempSize = snakeout.snakeconn.surfs.isearch(surfSub)->edgeind.size();
-			maxSize = maxSize < tempSize ? tempSize : maxSize;
-		}
-		// this->Print("%i ",snakeout.snaxs(ii)->isfreeze);
-		this->Print("%i ", maxSize);
-	}
-	fprintf(fid,"\n");this->ResetLine();
+	
 	return(0);
 }
 
@@ -141,35 +221,22 @@ int tecplotfile::SurfDataBlock(const mesh &meshout,int nVert,int nSurf,
 	int nVertDat){
 	// Prints the Coord and Fill Data blocks to the tecplot file
 
-	int ii,jj, nCoord;
+	int ii;
 	// Print vertex Data
-	nCoord=int(meshout.verts(0)->coord.size());
-	nCoord= nCoord > nVertDat ? nVertDat : nCoord;
-	for (jj=0;jj<nCoord;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%lf ",0);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
+	dataoutput::Coord(*this, meshout, nVert, nVertDat);
 	// Print Cell Data
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",meshout.surfs(ii)->fill);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",meshout.surfs(ii)->target);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",meshout.surfs(ii)->error);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -179,24 +246,13 @@ int tecplotfile::LineDataBlock(const mesh &meshout,int nVert,int nEdge,
 
 	int ii,jj;
 	// Print vertex Data
-	for (jj=0;jj<int(meshout.verts(0)->coord.size());++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
-	for (jj=int(meshout.verts(0)->coord.size());jj<nVertDat;++jj){
-		for ( ii = 0; ii<nVert; ++ii){
-			this->Print("%lf ",0);
-		}
-		fprintf(fid,"\n");this->ResetLine();
-	}
+	dataoutput::Coord(*this, meshout, nVert, nVertDat);
 	// Print Cell Data
 	for(jj=0;jj<nCellDat;++jj){
 		for ( ii = 0; ii<nEdge; ++ii){
 			this->Print("%i ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
@@ -213,7 +269,7 @@ int tecplotfile::VertDataBlock(const mesh &meshout,int nVert, int nVertDat,
 			for ( ii = 0; ii<nVert; ++ii){
 				this->Print("%.16lf ",meshout.verts.isearch(vertList[ii])->coord[jj]);
 			}
-			fprintf(fid,"\n");this->ResetLine();
+			this->NewLine();
 		}
 	} else if(int(vertList.size())==meshout.verts.size()) { // vertList is a boolean
 		for (jj=0;jj<nCoord;++jj){
@@ -222,28 +278,28 @@ int tecplotfile::VertDataBlock(const mesh &meshout,int nVert, int nVertDat,
 					this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
 				}
 			}
-			fprintf(fid,"\n");this->ResetLine();
+			this->NewLine();
 		}
 	} else {
 		for (jj=0;jj<nCoord;++jj){
 			for ( ii = 0; ii<nVert; ++ii){
 				this->Print("%.16lf ",meshout.verts(ii)->coord[jj]);
 			}
-			fprintf(fid,"\n");this->ResetLine();
+			this->NewLine();
 		}
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	// Print Cell Data
 	for(jj=0;jj<nCellDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%i ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
@@ -267,7 +323,7 @@ int tecplotfile::SurfFaceMap(const mesh &meshout,int nEdge){
 			actVert=meshout.edges(ii)->surfind[jj];
 			this->Print("%i ",meshout.surfs.find(actVert)+1);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	return(0);
@@ -293,7 +349,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
 		this->Print("%i ",meshout.surfs(ii)->edgeind.size());
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 
 	for (ii=0;ii<nSurf;++ii){// print ordered  list of vertices in face
 		jj=int(meshout.surfs(ii)->edgeind.size())-1;
@@ -335,7 +391,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			vertsPast[1]=verts[1];
 
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		
 
 	}
@@ -345,7 +401,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,int nSurf){
 			actVert=meshout.surfs(ii)->voluind[jj];
 			this->Print("%i ",meshout.volus.find(actVert)+1);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	return(0);
@@ -358,7 +414,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,
 	for (auto ii : meshout.surfs.find_list(surfList)){ // Print Number of vertices per face
 		this->Print("%i ",meshout.surfs(ii)->edgeind.size());
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	HashedVector<int, int> verthash;
 	verthash.vec=vertList;
 	verthash.GenerateHash();
@@ -403,7 +459,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,
 			vertsPast[1]=verts[1];
 
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 		
 
 	}
@@ -420,7 +476,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout,
 			if (notFoundCell){k=0;}
 			this->Print("%i ",k);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	return(0);
@@ -449,34 +505,34 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 	nVertDat=3;
 	nCellDat=3;
 
-	if (forceOutType==tecplot::autoselect){
+	if (forceOutType==tecplotconst::autoselect){
 		if(nVolu>0){
-			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=tecplot::line; // output as line data (FELINESEG)
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=tecplot::point;
+			forceOutType=tecplotconst::point;
 		}
 	}
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
 		this->VolDataBlock(meshout,nVert,nVolu, nVertDat);
 		this->VolFaceMap(meshout,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->SurfDataBlock(meshout,nVert,nSurf, nVertDat);
 		this->SurfFaceMap(meshout,nEdge);
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 		this->LineDataBlock(meshout,nVert,nEdge, nVertDat,nCellDat);
 		this->LineFaceMap(meshout,nEdge);
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -528,6 +584,13 @@ int tecplotfile::PrintMesh(const mesh& meshout,int strandID, double timeStep,
 int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep, 
 	int forceOutType, const vector<int> &vertList){
 
+	return this->PrintSnake(tecplotconst::snakedata::__default, snakeout, strandID, 
+		timeStep, forceOutType, vertList);
+}
+int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
+	int strandID, double timeStep, int forceOutType, 
+	const vector<int> &vertList){
+
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
 
 	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
@@ -545,37 +608,37 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 		this->StrandTime(strandID, timeStep);
 	}
 	// Fixed by the dimensionality of the mesh
-	nVertDat=3;
-	nCellDat=3;
+	nVertDat = 3;
+	nCellDat = 3;
 
-	if (forceOutType==tecplot::autoselect){
+	if (forceOutType==tecplotconst::autoselect){
 		if(nVolu>0){
-			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=tecplot::line; // output as line data (FELINESEG)
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=tecplot::point;
+			forceOutType=tecplotconst::point;
 		}
 	}
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -610,35 +673,35 @@ int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone,
 	// Fixed by the dimensionality of the mesh
 	nVertDat=3;
 	nCellDat=3;
-	// forceOutType=tecplot::autoselect;
-	// if (forceOutType==tecplot::autoselect){
+	// forceOutType=tecplotconst::autoselect;
+	// if (forceOutType==tecplotconst::autoselect){
 	if(nVolu>0){
-		forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+		forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 	} else if (nSurf>0){
-		forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+		forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 	} else if (nEdge>0){
-		forceOutType=tecplot::line; // output as line data (FELINESEG)
+		forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 	} else {
-		forceOutType=tecplot::point;
+		forceOutType=tecplotconst::point;
 	}
 	// }
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 		this->DefShareZoneVolume(shareZone, nVertDat);
 		this->VolDataBlock(meshout,nVert,nVolu, 0);
 		//this->VolFaceMap(meshout,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 		this->DefShareZoneVolume(shareZone, nVertDat);
 		this->SurfDataBlock(meshout,nVert,nSurf, 0);
 		//this->SurfFaceMap(meshout,nEdge);
 
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		RSVS3D_ERROR_ARGUMENT("Cannot output volume of line");
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		RSVS3D_ERROR_ARGUMENT("Cannot output volume of point");
 	}
 	return(0);
@@ -719,28 +782,28 @@ int tecplotfile::VolDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	// Print Cell Data
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -767,28 +830,28 @@ int tecplotfile::SurfDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	// Print Cell Data 
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -817,20 +880,20 @@ int tecplotfile::LineDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	// Print Cell Data
 	for(jj=0;jj<nCellDat;++jj){
 		for ( ii = 0; ii<nEdge; ++ii){
 			this->Print("%i ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
@@ -862,20 +925,20 @@ int tecplotfile::LineDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	// Print Cell Data
 	for(jj=0;jj<nCellDat;++jj){
 		for ( ii = 0; ii<nEdge; ++ii){
 			this->Print("%i ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
@@ -906,11 +969,11 @@ int tecplotfile::SurfFaceMap(const triangulation &triout,
 			this->Print("%i ",ii+1);
 		}
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for (ii=0;ii<3*nTri;++ii){ // Print 0
 			this->Print("%i ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -966,19 +1029,19 @@ int tecplotfile::VolFaceMap(const triangulation &triout,
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
 		this->Print("%i ",n);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	kk=1;
 	for (ii=0;ii<nSurf;++ii){// print ordered  list of vertices in face
 		for(jj=0;jj<3;++jj){
 			this->Print("%i ",kk);
 			kk++;
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (ii=0;ii<nSurf;++ii){
 		this->Print("%i ",1);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for (ii=0;ii<nSurf;++ii){
 		this->Print("%i ",0);
 	}
@@ -1011,27 +1074,27 @@ int tecplotfile::PrintTriangulation(const triangulation &triout,
 		nVertDat=3;
 		nCellDat=3;
 
-		if (forceOutType==tecplot::autoselect){
+		if (forceOutType==tecplotconst::autoselect){
 			if(nVolu>0 && triout.snakeDep->Check3D()){
-				forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+				forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
-				forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+				forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 			} else {
-				forceOutType=tecplot::line; // output as line data (FELINESEG)
+				forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 			}
 		}
 
 
-		if (forceOutType==tecplot::polyhedron){
+		if (forceOutType==tecplotconst::polyhedron){
 			this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 			this->VolDataBlock(triout,mp,nVert,nVolu, nVertDat);
 			this->VolFaceMap(triout,mp,nSurf);
 		}
-		else if (forceOutType==tecplot::polygon){
+		else if (forceOutType==tecplotconst::polygon){
 			this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 			this->SurfDataBlock(triout,mp,nVert,nSurf, nVertDat);
 			this->SurfFaceMap(triout,mp);
-		} else if (forceOutType==tecplot::line){
+		} else if (forceOutType==tecplotconst::line){
 			this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 			if(triList.size()==0){
 				this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
@@ -1089,28 +1152,28 @@ int tecplotfile::VolDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	// Print Cell Data
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nVolu; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
  
@@ -1137,28 +1200,28 @@ int tecplotfile::SurfDataBlock(const triangulation &triout,
 				}
 			}
 		} 
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 
 	// Print Cell Data 
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for ( ii = 0; ii<nSurf; ++ii){
 		this->Print("%.16lf ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -1188,20 +1251,20 @@ int tecplotfile::LineDataBlock(const triangulation &triout,
 				}
 			}
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (jj=nCoord;jj<nVertDat;++jj){
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%lf ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	// Print Cell Data
 	for(jj=0;jj<nCellDat;++jj){
 		for ( ii = 0; ii<nEdge; ++ii){
 			this->Print("%i ",0);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return(0);
 }
@@ -1231,11 +1294,11 @@ int tecplotfile::SurfFaceMap(const triangulation &triout,
 			this->Print("%i ",ii+1);
 		}
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for (ii=0;ii<3*nTri;++ii){ // Print 0
 			this->Print("%i ",0);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	return(0);
 }
 
@@ -1269,19 +1332,19 @@ int tecplotfile::VolFaceMap(const triangulation &triout,
 	for (ii=0;ii<nSurf;++ii){ // Print Number of vertices per face
 		this->Print("%i ",int((triout.*mp)(ii)->typevert.size()));
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	kk=1;
 	for (ii=0;ii<nSurf;++ii){// print ordered  list of vertices in face
 		for(jj=0;jj<int((triout.*mp)(ii)->typevert.size());++jj){
 			this->Print("%i ",kk);
 			kk++;
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	for (ii=0;ii<nSurf;++ii){
 		this->Print("%i ",1);
 	}
-	fprintf(fid,"\n");this->ResetLine();
+	this->NewLine();
 	for (ii=0;ii<nSurf;++ii){
 		this->Print("%i ",0);
 	}
@@ -1311,27 +1374,27 @@ int tecplotfile::PrintTriangulation(const triangulation &triout,
 		nVertDat=3;
 		nCellDat=3;
 
-		if (forceOutType==tecplot::autoselect){
+		if (forceOutType==tecplotconst::autoselect){
 			if(nVolu>0 && triout.snakeDep->Check3D()){
-				forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+				forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 			} else if (nSurf>0){
-				forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+				forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 			} else {
-				forceOutType=tecplot::line; // output as line data (FELINESEG)
+				forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 			}
 		}
 
 
-		if (forceOutType==tecplot::polyhedron){
+		if (forceOutType==tecplotconst::polyhedron){
 			this->ZoneHeaderPolyhedron(nVert,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat);
 			this->VolDataBlock(triout,mp,nVert,nVolu, nVertDat);
 			this->VolFaceMap(triout,mp,nSurf);
 		}
-		else if (forceOutType==tecplot::polygon){
+		else if (forceOutType==tecplotconst::polygon){
 			this->ZoneHeaderPolygon(nVert, nEdge,nSurf,nVertDat,nCellDat);
 			this->SurfDataBlock(triout,mp,nVert,nSurf, nVertDat);
 			this->SurfFaceMap(triout,mp);
-		} else if (forceOutType==tecplot::line){
+		} else if (forceOutType==tecplotconst::line){
 			this->ZoneHeaderFelineseg(nVert, nEdge,nVertDat,nCellDat);
 			this->LineDataBlock(triout,mp,nVert,nEdge, nVertDat,nCellDat);
 			this->LineFaceMap(triout,mp);
@@ -1467,39 +1530,39 @@ int tecplotfile::PrintSnakeSensitivity(const triangulation& triRSVS,
 	nCellDat=3;
 	nSensDat = calcObj.numConstr();
 
-	if (forceOutType==tecplot::autoselect){
+	if (forceOutType==tecplotconst::autoselect){
 		if(nVolu>0){
-			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=tecplot::line; // output as line data (FELINESEG)
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=tecplot::point;
+			forceOutType=tecplotconst::point;
 		}
 	}
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -1552,39 +1615,39 @@ int tecplotfile::PrintSnakeGradients(const triangulation& triRSVS,
 	nCellDat=3;
 	nSensDat = calcObj.numConstr()+nPreConstr;
 
-	if (forceOutType==tecplot::autoselect){
+	if (forceOutType==tecplotconst::autoselect){
 		if(nVolu>0){
-			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=tecplot::line; // output as line data (FELINESEG)
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=tecplot::point;
+			forceOutType=tecplotconst::point;
 		}
 	}
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat-nPreConstr,-nPreConstr,2);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat-nPreConstr,-nPreConstr,2);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat-nPreConstr,-nPreConstr,2);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -1624,7 +1687,7 @@ int tecplotfile::RSVScalcDataBlock(const triangulation& triRSVS,
 		for ( ii = 0; ii<nVert; ++ii){
 			this->Print("%.16lf ",sensTemp[ii]);
 		}
-		fprintf(fid,"\n");this->ResetLine();
+		this->NewLine();
 	}
 	return 0;
 }
@@ -1664,39 +1727,39 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 	}
 	// Fixed by the dimensionality of the mesh
 
-	if (forceOutType==tecplot::autoselect){
+	if (forceOutType==tecplotconst::autoselect){
 		if(nVolu>0){
-			forceOutType=tecplot::polyhedron; // output as volume data (FEPOLYHEDRON)
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
 		} else if (nSurf>0){
-			forceOutType=tecplot::polygon;// output as Surface data (FEPOLYGON)
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
 		} else if (nEdge>0){
-			forceOutType=tecplot::line; // output as line data (FELINESEG)
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
 		} else {
-			forceOutType=tecplot::point;
+			forceOutType=tecplotconst::point;
 		}
 	}
 
 
-	if (forceOutType==tecplot::polyhedron){
+	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
-	else if (forceOutType==tecplot::polygon){
+	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::line){
+	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
 		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
-	} else if (forceOutType==tecplot::point){
+	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
 			for (int ii=0; ii< int(vertList.size());++ii){
@@ -1716,16 +1779,16 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 	{
 		this->NewZone();
 		this->StrandTime(strandID, timeStep+tStepMultiplier*i);
-		if (forceOutType==tecplot::polyhedron){
+		if (forceOutType==tecplotconst::polyhedron){
 			this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 				nVertDat,nCellDat,nSensDat);
-		} else if (forceOutType==tecplot::polygon){
+		} else if (forceOutType==tecplotconst::polygon){
 			this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 				nSensDat);
-		} else if (forceOutType==tecplot::line){
+		} else if (forceOutType==tecplotconst::line){
 			this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 				nSensDat);
-		} else if (forceOutType==tecplot::point){
+		} else if (forceOutType==tecplotconst::point){
 			this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
 		}
 		this->DefShareZoneVolume(shareZone, nVertDat+nCellDat);
@@ -1755,7 +1818,6 @@ void tecplotfile::CloseFile (){
 }
 
 // Test Code
-
 int Test_tecplotfile(){
 
 	const char *fileToOpen;
@@ -1768,9 +1830,6 @@ int Test_tecplotfile(){
 	if (errFlag!=0){
 		return(errFlag);
 	}
-
-
-
 	return(0);
 }
 
