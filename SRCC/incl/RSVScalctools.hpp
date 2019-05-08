@@ -46,7 +46,7 @@ class RSVScalc;
  * @return     A vector of constant coordinate vectors, these allow the data to
  *             be read but not edited.
  */
-vector<vector<double> const *> TrianglePointerCoordinates(const triangle &triIn,
+grid::coordlist TrianglePointerCoordinates(const triangle &triIn,
 	const triangulation& triRSVS);
 
 /**

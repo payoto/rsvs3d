@@ -370,7 +370,7 @@ SurfCentroid SurfaceCentroid_SnakeSurf(const surf &surfin,
 	const mesh& meshin){
 	int ii,n;
 	vector<int> vertind;
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	SurfCentroid tempCalc;
 
 	n=int(surfin.edgeind.size());
@@ -415,7 +415,7 @@ SurfCentroid SurfaceCentroid_TriangleSurf(const trianglesurf &surfin,
 	const mesh& meshin,	const mesh& snakeconn){ 
 	int ii,n;
 
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	SurfCentroid tempCalc;
 	ArrayVec<double> tempCoord,jac,hes;
 

@@ -13,10 +13,10 @@
 using namespace Eigen;
 using namespace rsvs3d::constants;
 
-vector<vector<double> const *> TrianglePointerCoordinates(const triangle &triIn,
+grid::coordlist TrianglePointerCoordinates(const triangle &triIn,
 	const triangulation& triRSVS){
 
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	veccoord.reserve(3);
 
 	int ni=3;

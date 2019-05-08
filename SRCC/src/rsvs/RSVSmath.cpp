@@ -162,7 +162,7 @@ bool CoordFunc::MakeValid(){
 	return(isReady);
 }
 
-void CoordFunc::assign(vector<vector<double> const*> &pRep){
+void CoordFunc::assign(grid::coordlist &pRep){
 	if (int(pRep.size())==nCoord){
 		coords=pRep;
 	} else {

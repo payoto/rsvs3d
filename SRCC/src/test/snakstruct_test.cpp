@@ -813,7 +813,7 @@ int Test_MeshRefinement(){
 int Test_surfcentre(){ 
 	// int ii,n;
 	// vector<int> vertind;
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	SurfCentroid tempCalc;
 	vector<double> v1 = {0.0 , 0.0, 0.0 };
 	vector<double> v2 = {1.0 , 1.0, 0.0 };

@@ -84,6 +84,8 @@ namespace grid {
 	/// Defines a linear transformation to the mesh where for each dimension:
 	/// {new minimum, old minimum , scaling}
 	typedef std::array<std::array<double, 3>,3> transformation;
+	/// Defines a list of coordinates
+	typedef std::vector<const std::vector<double> *> coordlist;
 }
 
 namespace rsvs3d {

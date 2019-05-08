@@ -73,7 +73,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 	Area AreaCalc;
 	vector<int> subTempVec;
 	HashedVector<int,int> dvListMap;
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;
@@ -226,7 +226,7 @@ void RSVScalc::CalcTriangleFD(const triangle& triIn,
 	Area AreaCalc;
 	vector<int> dvList,subTempVec;
 	HashedVector<int,int> dvListMap;
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;
@@ -365,7 +365,7 @@ void RSVScalc::CalcTriangleDirectVolume(const triangle& triIn,
 	Area AreaCalc;
 	vector<int> dvList,subTempVec, dvOrder;
 	HashedVector<int,int> dvListMap;
-	vector<vector<double> const *> veccoord, veccoordvol;
+	grid::coordlist veccoord, veccoordvol;
 	vector<double> dvec;
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal;
@@ -561,7 +561,7 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle& triIn,
 	Area AreaCalc;
 	vector<int> dvList,subTempVec;
 	HashedVector<int,int> dvListMap;
-	vector<vector<double> const *> veccoord;
+	grid::coordlist veccoord;
 	MatrixXd HPos, dPos;
 	MatrixXd HVal, dVal, HVal2, dVal2;
 	MatrixXd dConstrPart,HConstrPart, HObjPart;

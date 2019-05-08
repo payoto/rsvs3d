@@ -22,7 +22,9 @@ namespace param {
 #include <vector> 
 #include <cmath> 
 #include "vectorarray.hpp" 
-
+/// \TODO refactor mesh.hpp into mesh and coord headers to allow smaller includes
+// needed for grid::coordlist (Things in mesh need a refactor)
+#include "mesh.hpp" 
 
 using namespace std; 
 
@@ -85,7 +87,7 @@ public:
 
 class CoordFunc {
 protected:
-	vector<vector<double> const *> coords;
+	grid::coordlist coords;
 
 	double fun;
 	ArrayVec<double> funA;
@@ -107,7 +109,7 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(vector<vector<double> const*> &coords);
+	void assign(grid::coordlist &coords);
 	void assign(int pRepI, const vector<double> &pRep);
 	void ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c);
