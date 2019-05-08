@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <ctime>
 #include <cmath>
@@ -20,7 +21,7 @@ int rsvs3d::TimeStamp(const char* str,int start_s){
 	int stop_s=clock();
 	#ifdef TIME_EXEC
 	if(str!=NULL){
-		cout << str << " " << Clock2ms(stop_s-start_s) << "ms; ";
+		cout << str << " " << std::setw(5) << Clock2ms(stop_s-start_s) << "ms; ";
 	}
 	#endif
 	return(stop_s);

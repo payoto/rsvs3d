@@ -860,49 +860,6 @@ void snake::SetEdgeStepLimits(){
 	}
 }
 
-void WrongApproach(snake* those){
-	int nEdges = those->snakemesh()->edges.size();
-	int numParents = those->snakemesh()->meshtree.NumberOfParents();
-	std::vector<int> voluinds;
-	std::vector<HashedVector<int,int>> edge2ParentsVolus;
-	edge2ParentsVolus.reserve(numParents);
-	for (int i = 0; i < numParents; ++i)
-	{
-		edge2ParentsVolus[i].assign(2*nEdges, rsvs3d::constants::__notfound);
-	}
-	for (int i = 0; i < nEdges; ++i)
-	{
-		voluinds.clear();
-		for(auto surfInd : those->snakemesh()->edges(i)->surfind){
-			voluinds.push_back(those->snakemesh()->surfs.isearch(surfInd)->voluind[0]);
-			voluinds.push_back(those->snakemesh()->surfs.isearch(surfInd)->voluind[1]);
-		}
-		sort(voluinds);
-		unique(voluinds);
-		int count = voluinds.size();
-		for (int nP = 0; nP < numParents; ++nP)
-		{
-			int posEdgeParent = 0; // 0 or 1 as each edge has two positions per parent
-			for (int j = 0; j < count; ++j)
-			{
-				int tempParentInd = those->snakemesh()->ParentElementIndex(voluinds[j], nP);
-				if(posEdgeParent==0){
-					edge2ParentsVolus[nP][i*2+posEdgeParent] = tempParentInd;
-					posEdgeParent++;
-				} else if(edge2ParentsVolus[nP][i*2+posEdgeParent-1]!=tempParentInd) {
-					edge2ParentsVolus[nP][i*2+posEdgeParent]=tempParentInd;
-					posEdgeParent++;
-				}
-			}
-		}
-	}
-	for (int i = 0; i < numParents; ++i)
-	{
-		edge2ParentsVolus[i].GenerateHash();
-	}
-
-	// those->isSetStepLimit=true;
-}
 
 double snake::SnaxStepLimit(int snaxSub) const {
 	int iEdge = this->snakemesh()->edges.find(this->snaxs(snaxSub)->edgeind);

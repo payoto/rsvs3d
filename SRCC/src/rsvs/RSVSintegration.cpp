@@ -1,10 +1,10 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cmath>
 #include <vector>
 #include <string>
-#include<tuple>
-
+#include <tuple>
 
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
@@ -572,6 +572,8 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 
 	auto coutbuff=std::cout.rdbuf();
 	auto cerrbuff=std::cerr.rdbuf();
+
+	auto startTime = rsvs3d::TimeStamp(NULL,0);
 	std::cout << "Start RSVS preparation" << std::endl;
 	integrate::Prepare(RSVSobj);
 
@@ -586,10 +588,12 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj){
 	integrate::execute::Exporting(RSVSobj);
 
 	std::cout << "Exporting finished - close." << std::endl;
+	auto endTime = rsvs3d::TimeStamp(NULL,0);
+	std::cout << "3D-RSVS completed in " 
+		<< ceil(rsvs3d::Clock2ms(endTime-startTime)/1000.0) << " seconds.";
+
 	std::cout.rdbuf(coutbuff);
 	std::cerr.rdbuf(cerrbuff);
-	// std::cout << std::endl <<  " cout Buffer restored" << std::endl;
-	// std::cerr << " cerr Buffer restored" << std::endl;
 }
 
 integrate::iteratereturns integrate::execute::RSVSiterate(
@@ -612,7 +616,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 	for(stepNum=0; stepNum<maxStep; ++stepNum){
 		start_s=clock(); 
 		// RSVSobj.calcObj.limLag=10000.0;
-		std::cout << std::endl << "Step " << stepNum << " ";
+		std::cout << std::endl << "Step " << std::setw(4) << stepNum << " ";
 		RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
 		start_s=rsvs3d::TimeStamp(" deriv:", start_s);
 		RSVSobj.calcObj.CheckAndCompute(
@@ -708,6 +712,7 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 		integrate::execute::postprocess::Log(
 			RSVSobj.logFile, RSVSobj.calcObj,logLvl
 			);
+		std::cout << std::endl;
 	}
 	if (logLvl==2 || logLvl==5){
 		integrate::execute::logging::Snake(

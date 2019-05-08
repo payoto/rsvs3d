@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <iomanip>  
 
 #include "snake.hpp"
 #include "triangulate.hpp"
@@ -491,8 +492,12 @@ void RSVScalc::ConvergenceLog(ofstream &out, int loglvl) const {
 		out << "> objective derivative :, ";
 		normObjDeriv = StreamStatistics(this->dObj.array(), out, string(", "));
 		out << "> objective value:," << this->obj << std::endl;
-		std::cout << " conv: (vol) " << normConstr << " (vel) " << normVel
-			<< " (Dobj) " << normObjDeriv <<  "; ";
+		auto prec = std::cout.precision();
+		std::cout << " conv:" << std::setprecision(3) << std::left
+			<< " (vol) " << std::setw(8) << normConstr 
+			<< " (vel) " << std::setw(8) << normVel
+			<< " (Dobj) " << std::setw(8) << normObjDeriv <<  "; " 
+			<< std::setprecision(prec) << std::right;
 	}
 	// Same as res but with all the constraint values
 	if (loglvl>1){
