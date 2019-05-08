@@ -54,6 +54,9 @@ namespace rsvs3d {
 			static const int polygon=2;
 			static const int line=3;
 			static const int point=4;
+
+			static const int nosharedzone=-1;
+			static const auto __issharedzone= [](int z)->bool{return z>0;};
 			namespace snakedata {
 				static const std::string snaxel="snaxel";
 				static const std::string normal="normal";
@@ -132,13 +135,15 @@ public:
 
 	// Snake specific functions
 	int SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat, 
-		std::string=rsvs3d::constants::tecplot::snakedata::__default);
+		std::string=rsvs3d::constants::tecplot::snakedata::__default,
+		bool printCoord=true);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const vector<int> &vertList={});
 	int PrintSnake(std::string snakeData,const snake& snakeout,
 		int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		int coordConnShareZone=rsvs3d::constants::tecplot::nosharedzone,
 		const vector<int> &vertList={});
 	// Zone Headers
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,

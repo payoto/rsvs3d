@@ -197,10 +197,11 @@ int tecplotfile::VolDataBlock(const mesh& meshout,int nVert,int nVolu,
 
 
 int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat, 
-	std::string snakeData){
+	std::string snakeData, bool printCoord){
 	// Prints the Coord and Fill Data blocks to the tecplot file
-
-	dataoutput::Coord(*this, snakeout.snakeconn, nVert, nVertDat);
+	if(printCoord){
+		dataoutput::Coord(*this, snakeout.snakeconn, nVert, nVertDat);
+	}
 	// Print Cell Data
 	if(snakeData.compare(tecplotconst::snakedata::snaxel)==0){
 		dataoutput::Snaxel(*this, snakeout, nVert);
@@ -585,10 +586,10 @@ int tecplotfile::PrintSnake(const snake& snakeout,int strandID, double timeStep,
 	int forceOutType, const vector<int> &vertList){
 
 	return this->PrintSnake(tecplotconst::snakedata::__default, snakeout, strandID, 
-		timeStep, forceOutType, vertList);
+		timeStep, forceOutType, tecplotconst::nosharedzone,vertList);
 }
 int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
-	int strandID, double timeStep, int forceOutType, 
+	int strandID, double timeStep, int forceOutType, int coordConnShareZone,
 	const vector<int> &vertList){
 
 	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat;
@@ -623,20 +624,33 @@ int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
 		}
 	}
 
-
+	bool zoneSharing = tecplotconst::__issharedzone(coordConnShareZone);
+	bool printCoord = !zoneSharing;
 	if (forceOutType==tecplotconst::polyhedron){
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		if(zoneSharing){
+			this->DefShareZoneVolume(coordConnShareZone, nVertDat);
+		}
+		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
+			printCoord);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
 	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		if(zoneSharing){
+			this->DefShareZoneVolume(coordConnShareZone, nVertDat);
+		}
+		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
+			printCoord);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
+			printCoord);
+		if(zoneSharing){
+			this->DefShareZoneVolume(coordConnShareZone, nVertDat);
+		}
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
@@ -648,7 +662,11 @@ int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
 			nVert=int(vertList.size());
 		}
 		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		if(zoneSharing){
+			this->DefShareZoneVolume(coordConnShareZone, nVertDat);
+		}
+		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
+			printCoord);
 		// No map just points
 	}
 	return(0);
@@ -1402,8 +1420,6 @@ int tecplotfile::PrintTriangulation(const triangulation &triout,
 	}
 	return(0);
 }
-
-
 
 void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf,
 	int totNumFaceNode,
