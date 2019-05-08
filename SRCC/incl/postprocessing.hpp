@@ -61,6 +61,7 @@ namespace rsvs3d {
 				static const std::string snaxel="snaxel";
 				static const std::string normal="normal";
 				static const std::string laplacian="laplacian";
+				static const std::string direction="direction";
 				static const std::string __default=snaxel;
 			}
 		}

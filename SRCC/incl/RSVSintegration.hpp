@@ -55,8 +55,24 @@ double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
 	double snaxtimestep, double snaxdiststep);
 namespace integrate {
 	namespace constants {
+		namespace outputs {
+			static const int numberdefined = 6;
+				auto printBaseSnake = [&](int lvl) -> bool  {
+					return lvl==2 || lvl==5;
+				};
+				auto printFullSnake = [&](int lvl) -> bool  {
+					return lvl==3 || lvl==4 || numberdefined<lvl;
+				};
+				auto printGradientsSnake = [&](int lvl) -> bool  {
+					return lvl==4 || lvl==5 || numberdefined<lvl;
+				};
+				auto printVectorSnake = [&](int lvl) -> bool  {
+					return lvl==6 || numberdefined<lvl;
+				};
+		}
 		static const std::string tecplotsnake = "rsvs3D_";
 		static const std::string tecplotgradient = "rsvsgradients3D_";
+		static const std::string tecplotvectors = "rsvsvectors3D_";
 	}
 	class iteratereturns {
 	public:
@@ -99,6 +115,7 @@ namespace integrate {
 			const param::parameters &origcong,
 			tecplotfile &outSnake,
 			tecplotfile &outgradientsnake,
+			tecplotfile &outvectorsnake,
 			std::ofstream &logFile,
 			std::ofstream &coutFile,
 			std::ofstream &cerrFile
@@ -152,6 +169,8 @@ namespace integrate {
 			void Gradients(const RSVScalc &calcObj, 
 				const triangulation &rsvsTri,
 				tecplotfile &outgradientsnake, 
+				double totT);
+			void SnakeVectors(tecplotfile &outSnake, snake &rsvsSnake,
 				double totT);
 		}
 

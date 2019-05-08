@@ -712,7 +712,7 @@ int vert::Normal(const mesh *meshin, grid::coordlist &neighCoord,
 	}
 
 	try{
-		double tangentAngle = VertexNormal(this->coord, neighCoord,normalVec);
+		VertexNormal(this->coord, neighCoord,normalVec);
 	} catch (...) {
 		normalVec.assign(0.0, 0.0, 0.0);
 		return rsvs3d::constants::__failure;

@@ -207,6 +207,7 @@ public:
 	int CloseToVertex(bool far=false) const {
 		return ((d<0.5) ^ far)? fromvert : tovert;}
 	void ValidateDistance(snake &snakein);
+	void Direction(const snake &snakein, coordvec& dir) const;
 };
 
 

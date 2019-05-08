@@ -2040,6 +2040,10 @@ void snax::ValidateDistance(snake &snakein){
 	}
 }
 
+void snax::Direction(const snake &snakein, coordvec& dir) const{
+	snakein.snakemesh()->EdgeVector(this->edgeind, dir);
+}
+
 // Snake operations
 
 void snake::ForceCloseContainers(){

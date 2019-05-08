@@ -130,6 +130,32 @@ namespace dataoutput {
 		}
 
 	}
+	void SnaxelDirection(tecplotfile &tecout, const snake& snakein, int nVert){
+
+		std::vector<double> coords;
+		coords.reserve(nVert*3);
+		coordvec lapVec;
+
+		grid::coordlist neighCoord;
+
+		for (int i = 0; i < nVert; ++i)
+		{
+			snakein.snaxs(i)->Direction(snakein, lapVec);
+			for (int j = 0; j < 3; ++j)
+			{
+				coords.push_back(lapVec(j));
+			}
+		}
+		for (int j = 0; j < 3; ++j)
+		{
+			for (int i = 0; i < nVert; ++i)
+			{
+				tecout.Print("%.16lf ", coords[i*3+j]);	
+			}
+			tecout.NewLine();
+		}
+
+	}
 
 }
 
@@ -209,6 +235,8 @@ int tecplotfile::SnakeDataBlock(const snake& snakeout,int nVert, int nVertDat,
 		dataoutput::VertexNormal(*this, snakeout.snakeconn, nVert);
 	} else if(snakeData.compare(tecplotconst::snakedata::laplacian)==0){
 		dataoutput::VertexLaplacian(*this, snakeout.snakeconn, nVert);
+	} else if(snakeData.compare(tecplotconst::snakedata::direction)==0){
+		dataoutput::SnaxelDirection(*this, snakeout, nVert);
 	} else {
 		stringstream errstr;
 		errstr << "Unknown snake data output '" << snakeData << "'";

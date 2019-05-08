@@ -311,7 +311,7 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 		RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
 	integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
 	integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake,
-		RSVSobj.outgradientsnake, RSVSobj.logFile, RSVSobj.coutFile,
+		RSVSobj.outgradientsnake, RSVSobj.outvectorsnake, RSVSobj.logFile, RSVSobj.coutFile,
 		RSVSobj.cerrFile);
 }
 
@@ -519,6 +519,7 @@ void integrate::prepare::Output(
 	const param::parameters &origconf,
 	tecplotfile &outSnake,
 	tecplotfile &outgradientsnake,
+	tecplotfile &outvectorsnake,
 	std::ofstream &logFile,
 	std::ofstream &coutFile,
 	std::ofstream &cerrFile
@@ -532,9 +533,13 @@ void integrate::prepare::Output(
 	outSnakeName = utils::OutputFileName(paramconf, constants::tecplotsnake,".plt");
 	outSnake.OpenFile(outSnakeName.c_str());
 
-	if(paramconf.files.ioout.logginglvl>3){
+	if(integrate::constants::outputs::printGradientsSnake(paramconf.files.ioout.logginglvl)){
 		outSnakeName = utils::OutputFileName(paramconf, constants::tecplotgradient,".plt");
 		outgradientsnake.OpenFile(outSnakeName.c_str());
+	}
+	if(integrate::constants::outputs::printVectorSnake(paramconf.files.ioout.logginglvl)){
+		outSnakeName = utils::OutputFileName(paramconf, constants::tecplotvectors,".plt");
+		outvectorsnake.OpenFile(outSnakeName.c_str());
 	}
 
 	outSnakeName = utils::OutputFileName(paramconf, "config_call_",".json");
@@ -662,6 +667,9 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 	double totT, int nVoluZone, int stepNum){
 	// Simple function which directs to the correct output
 	int logLvl = RSVSobj.paramconf.files.ioout.logginglvl;
+
+	// The maximum number for which there is a specific
+
 	if (0 < logLvl){
 		// calcObj logging outputs different amounts of data
 		// depending.
@@ -672,20 +680,24 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 			RSVSobj.paramconf.files.ioout.logginglvl
 			);
 	}
-
-	if (logLvl==2 || logLvl==5){
+	if (integrate::constants::outputs::printBaseSnake(logLvl)){
 		integrate::execute::logging::Snake(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.voluMesh, totT, nVoluZone);
-	} else if (2 < logLvl && logLvl!=5){
+	}
+	if (integrate::constants::outputs::printFullSnake(logLvl)){
 		integrate::execute::logging::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
 			totT, nVoluZone, stepNum);
 	}
-	if(3 < logLvl){
+	if(integrate::constants::outputs::printGradientsSnake(logLvl)){
 		integrate::execute::logging::Gradients(RSVSobj.calcObj,
 			RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT);
+	}
+	if(integrate::constants::outputs::printVectorSnake(logLvl)){
+		integrate::execute::logging::SnakeVectors(RSVSobj.outSnake,
+			RSVSobj.rsvsSnake, totT);
 	}
 }
 
@@ -866,6 +878,20 @@ void integrate::execute::logging::Gradients(const RSVScalc &calcObj,
 	outgradientsnake.PrintSnakeGradients(rsvsTri, calcObj, 1, totT);
 }
 
+void integrate::execute::logging::SnakeVectors(
+	tecplotfile &outSnake, snake &rsvsSnake,
+	double totT){
+
+	outSnake.PrintSnake( rsvs3d::constants::tecplot::snakedata::snaxel, 
+		rsvsSnake, 1, totT, rsvs3d::constants::tecplot::polygon);
+	int zoneShare = outSnake.ZoneNum();
+	outSnake.PrintSnake( rsvs3d::constants::tecplot::snakedata::normal, 
+		rsvsSnake, 2, totT, rsvs3d::constants::tecplot::polygon, zoneShare);
+	outSnake.PrintSnake( rsvs3d::constants::tecplot::snakedata::laplacian, 
+		rsvsSnake, 3, totT, rsvs3d::constants::tecplot::polygon, zoneShare);
+	outSnake.PrintSnake( rsvs3d::constants::tecplot::snakedata::direction, 
+		rsvsSnake, 4, totT, rsvs3d::constants::tecplot::polygon, zoneShare); 
+}
 // ====================
 // integrate
 // 		execute
@@ -904,7 +930,6 @@ void integrate::execute::postprocess::Snake(
 	paramconf.files.ioin.casename = "restart_" + paramconf.files.ioout.pattern;
 	fileToOpen= utils::OutputFileName(paramconf, "config_restart_",".json");
 	param::io::writeflat(fileToOpen, paramconf);
-	
 }
 
 void integrate::execute::postprocess::FullTecplot(
@@ -993,18 +1018,22 @@ void integrate::utils::SpecialiseTemplateFiles(const param::parameters &paramcon
 	auto& tecconfig = paramconf.files.ioout.tecplot;
 	int loglvl = paramconf.files.ioout.logginglvl;
 
-	if (loglvl<=3){
+	if (integrate::constants::outputs::printBaseSnake(loglvl)){
 		SpecialiseTemplateFile(tecconfig, loglvl, paramconf.files.ioout, 
 			constants::tecplotsnake);
-	} else if (loglvl!=5){
+	} else if (integrate::constants::outputs::printFullSnake(loglvl)){
 		SpecialiseTemplateFile(tecconfig, 3, paramconf.files.ioout, 
 			constants::tecplotsnake);
 	}
-	if(loglvl>=4){
+	if(integrate::constants::outputs::printFullSnake(loglvl)){
 		SpecialiseTemplateFile(tecconfig, 5, paramconf.files.ioout, 
 			constants::tecplotgradient);
 	}
-	if (loglvl>5){
+	if(integrate::constants::outputs::printVectorSnake(loglvl)){
+		SpecialiseTemplateFile(tecconfig, 6, paramconf.files.ioout, 
+			constants::tecplotvectors);
+	}
+	if (loglvl>integrate::constants::outputs::numberdefined){
 		SpecialiseTemplateFile(tecconfig, loglvl, paramconf.files.ioout, 
 			constants::tecplotsnake);
 	}
@@ -1059,6 +1088,7 @@ int integrate::test::Prepare(){
 	triangulation rsvsTri;
 	tecplotfile outSnake;
 	tecplotfile outgradientSnake;
+	tecplotfile outvectorSnake;
 	std::ofstream logFile;
 	std::ofstream coutFile;
 	std::ofstream cerrFile;
@@ -1097,7 +1127,7 @@ int integrate::test::Prepare(){
 
 	try {
 		integrate::prepare::Output(paramconf, origconf, outSnake,
-			outgradientSnake,logFile,
+			outgradientSnake, outvectorSnake, logFile,
 			coutFile, cerrFile);
 	} catch (exception const& ex) { 
 		cerr << "integrate::prepare::Output" << endl;

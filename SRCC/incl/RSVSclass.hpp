@@ -34,11 +34,18 @@
 // of the various compoments into a cohesive framework
 //
 namespace integrate {
+	class RSVStecplot{
+	public:
+		tecplotfile outSnake;
+		tecplotfile outgradientsnake;
+		tecplotfile outvectorsnake;
+	};
 	class RSVSclass {
 	public:
 		param::parameters paramconf;
 		tecplotfile outSnake;
 		tecplotfile outgradientsnake;
+		tecplotfile outvectorsnake;
 		snake rsvsSnake;
 		mesh snakeMesh;
 		mesh voluMesh;
