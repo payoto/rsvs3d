@@ -6,6 +6,9 @@
 #include "mesh.hpp"
 #include "postprocessing.hpp"
 // Test code
+
+using namespace std;
+
 int Test_ArrayStructures() { 
    // Test the functionality provided by arraystructures
 

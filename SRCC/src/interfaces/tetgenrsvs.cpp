@@ -18,6 +18,8 @@
 #include "tetgenrsvs.hpp"
 #include "rsvsjson.hpp"
 
+
+using namespace std;
 using json = rsvsjson::json;
 
 void tetgen::internal::MeshData2Tetgenio(const mesh &meshgeom, 

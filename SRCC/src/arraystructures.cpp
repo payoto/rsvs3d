@@ -5,6 +5,7 @@
 
 #include "arraystructures.hpp"
 
+using namespace std;
 // Implementation of features
 
 bool CompareFuncOut(function<void()> func1, function<void()> func2){

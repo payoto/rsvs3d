@@ -22,6 +22,7 @@
 #include "tetgenrsvs.hpp"
 
 using namespace rsvstest;
+using namespace std;
 
 int rsvstest::maintest(){ 
 	customtest gridTest("3-D RSVS tests - passing");

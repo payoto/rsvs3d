@@ -7,6 +7,8 @@
 #include "snakeengine.hpp"
 #include "warning.hpp"
 
+using namespace std;
+
 std::vector<int> FindSpawnVerts(const mesh &meshin, vector<int> &vertList,
 	vector<int> &voluOutList, int outerBorder){
 	// Function which identifies spawn points

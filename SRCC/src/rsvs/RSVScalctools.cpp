@@ -10,6 +10,7 @@
 #include "RSVSmath.hpp"
 
 
+using namespace std;
 using namespace Eigen;
 using namespace rsvs3d::constants;
 

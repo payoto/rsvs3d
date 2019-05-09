@@ -32,6 +32,7 @@
 
 
 using namespace integrate::test;
+using namespace std;
 
 typedef std::tuple<double, Eigen::MatrixXd, double, double> processed_derivative;
 

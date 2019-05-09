@@ -23,6 +23,8 @@
 
 #include "filesystem.hpp"
 
+using namespace std;
+
 int SAFE_ALGO_TestConn(snake &snakein){
 	int ret=0;
 
@@ -833,7 +835,7 @@ void integrate::execute::logging::FullTecplot(
 	tecplotfile &outSnake, snake &rsvsSnake,
 	triangulation &rsvsTri, mesh &voluMesh,
 	double totT, int nVoluZone, int stepNum){
-	vector<int> vertList;
+	std::vector<int> vertList;
 	int jj;
 	if(rsvsSnake.snaxs.size()>0){
 
@@ -1106,7 +1108,7 @@ int integrate::test::Prepare(){
 		integrate::prepare::Mesh(paramconf.grid, paramconf.files.ioin,
 			snakeMesh, voluMesh);
 		voluMesh.volus.disp();
-	} catch (exception const& ex) { 
+	} catch (std::exception const& ex) { 
 		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, "
 			"voluMesh);" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -1117,7 +1119,7 @@ int integrate::test::Prepare(){
 		integrate::prepare::Snake(paramconf.snak, paramconf.rsvs, 
 			paramconf.files.ioin,
 			snakeMesh,voluMesh,  rsvsSnake);
-	} catch (exception const& ex) { 
+	} catch (std::exception const& ex) { 
 		cerr << "integrate::prepare::Snake(paramconf.snak, snakeMesh,"
 			" rsvsSnake);" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
@@ -1126,7 +1128,7 @@ int integrate::test::Prepare(){
 
 	try {
 		integrate::prepare::Triangulation(snakeMesh, rsvsSnake, rsvsTri);
-	} catch (exception const& ex) { 
+	} catch (std::exception const& ex) { 
 		cerr << "integrate::prepare::Triangulation" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
@@ -1136,7 +1138,7 @@ int integrate::test::Prepare(){
 		integrate::prepare::Output(paramconf, origconf, outSnake,
 			outgradientSnake, outvectorSnake, logFile,
 			coutFile, cerrFile);
-	} catch (exception const& ex) { 
+	} catch (std::exception const& ex) { 
 		cerr << "integrate::prepare::Output" << endl;
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;

@@ -9,6 +9,8 @@
 
 namespace tecplotconst=rsvs3d::constants::tecplot;
 
+using namespace std;
+
 // Functions
 void ExtractMeshData(const mesh &grid,int *nVert, int *nEdge,
 	int *nVolu, int *nSurf, int *totNumFaceNode){

@@ -8,7 +8,7 @@
 #include "warning.hpp"
 #include "voxel.hpp"
 
-
+using namespace std;
 
 void FlattenBoundaryFaces(mesh &meshin){
 	/*
