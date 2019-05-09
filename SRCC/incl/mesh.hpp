@@ -274,6 +274,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
 	bool isready(bool isInMesh) const {return(isInMesh? isordered : true);}
+	bool IsOrdered() const {return(isordered);}
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	int OrderEdges(mesh *meshin);
@@ -429,7 +430,7 @@ public:
 	std::pair<std::vector<int>,int> OrderEdges(const mesh *meshin) const;
 	int OrderEdges(const mesh *meshin, std::vector<int> &edgeIndOut) const;
 	int SurroundingCoords(const mesh *meshin, grid::coordlist &coordout,
-		bool isOrdered=false) const;
+		bool isOrdered=false, std::vector<int>* edgeIndOutPtr=NULL) const;
 
 	int Normal(const mesh *meshin, grid::coordlist &neighCoord,
 		coordvec &normalVec, bool isOrdered=false) const;
@@ -772,6 +773,8 @@ namespace meshhelp {
 		bool needFlip=false);
 	int Get3PointsInSurface(const mesh &meshin, int surfCurr, 
 		std::array<int, 3> &surfacePoints);
+	int NormalShouldFlip(const std::vector<int> orderedList, int elm1, int elm2,
+		const std::vector<int> & voluind, bool innerComparison);
 }
 //test functions
 int Test_ArrayStructures();

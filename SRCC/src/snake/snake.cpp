@@ -1501,33 +1501,8 @@ int SmoothStep_sphere(int spawnVert, snake &snakein, double spawnDist){
 	#endif
 
 	snakein.snakeconn.surfs.isearch(surfInd)->OrderedVerts(&snakein.snakeconn, internalPts);
-	// int isSameOrder = OrderMatchLists(internalPtsOrdered, internalPts, v1, v2);
-	auto pairOrder = OrderMatchLists(internalPts, v1, v2);
-	int isSameOrder = -pairOrder.first;
-	// compares the list vec1 and vec2 returning 
-	// 1 if indices p1 and p2 appear in the same order 
-	// -1 if indices p1 and p2 appear in opposite orders
-	int flipMultiplier = 0;
-	if ((snakein.snakeconn.surfs.isearch(surfInd)->voluind[1]==0)
-		&& (isSameOrder==-1)){ // case 1 right way if pointing through
-		flipMultiplier = 1;
-	} else if ((snakein.snakeconn.surfs.isearch(surfInd)->voluind[0]==0)
-		&& (isSameOrder==1)) { // case 2 right way
-		flipMultiplier = 1;
-	} else if ((snakein.snakeconn.surfs.isearch(surfInd)->voluind[1]==0)
-		&& (isSameOrder==1)) { // case 3 wrong way
-		flipMultiplier = -1;
-	} else if ((snakein.snakeconn.surfs.isearch(surfInd)->voluind[0]==0)
-		&& (isSameOrder==-1)) { // case 4 wrong way
-		flipMultiplier = -1;
-	}
-	if (flipMultiplier==0){
-		std::cerr << std::endl;
-		snakein.snakeconn.surfs.isearch(surfInd)->disp();
-		std::cerr << " isSameOrder " << isSameOrder << std::endl;
-		RSVS3D_ERROR_LOGIC("Flip multiplier was not set in the cases.");
-	}
-
+	int flipMultiplier = meshhelp::NormalShouldFlip(internalPts, v1, v2,
+		snakein.snakeconn.surfs.isearch(surfInd)->voluind, false);
 	if (flipMultiplier==-1){
 		vertNormal.flipsign();
 	}
@@ -2041,7 +2016,7 @@ void snax::ValidateDistance(snake &snakein){
 }
 
 void snax::Direction(const snake &snakein, coordvec& dir) const{
-	snakein.snakemesh()->EdgeVector(this->edgeind, dir);
+	snakein.snakemesh()->VerticesVector(this->fromvert,this->tovert, dir);
 }
 
 // Snake operations

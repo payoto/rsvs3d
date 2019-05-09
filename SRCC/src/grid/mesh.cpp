@@ -15,7 +15,7 @@
 // Mesh Linking methods
 using namespace std;
 namespace rsvsorder = rsvs3d::constants::ordering;
-
+namespace rsvslogic = rsvs3d::logicals;
 // --------------------------------------------------------------------------
 // Implementatation of coordvec 
 // --------------------------------------------------------------------------
@@ -146,6 +146,8 @@ void coordvec::max(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]>=vecin[ii] ? elems[ii] : vecin[ii];
 	}
+	this->isuptodate=0;
+
 }
 void coordvec::min(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
@@ -153,6 +155,7 @@ void coordvec::min(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]<=vecin[ii] ? elems[ii] : vecin[ii];
 	}
+	this->isuptodate=0;
 }
 
 void coordvec::add(const vector<double> &vecin){
@@ -161,6 +164,7 @@ void coordvec::add(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]+vecin[ii];
 	}
+	this->isuptodate=0;
 }
 void coordvec::substract(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
@@ -168,6 +172,7 @@ void coordvec::substract(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]-vecin[ii];
 	}
+	this->isuptodate=0;
 }
 void coordvec::substractfrom(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
@@ -175,6 +180,7 @@ void coordvec::substractfrom(const vector<double> &vecin){
 	{
 		elems[ii]=vecin[ii]-elems[ii];
 	}
+	this->isuptodate=0;
 }
 void coordvec::div(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
@@ -182,6 +188,7 @@ void coordvec::div(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]/vecin[ii];
 	}
+	this->isuptodate=0;
 }
 void coordvec::mult(const vector<double> &vecin){
 	int n=int(elems.size()<=vecin.size()?elems.size():vecin.size());
@@ -189,6 +196,7 @@ void coordvec::mult(const vector<double> &vecin){
 	{
 		elems[ii]=elems[ii]*vecin[ii];
 	}
+	this->isuptodate=0;
 } 
 
 void coordvec::div(double scalin){
@@ -621,8 +629,8 @@ double VertexNormal(const std::vector<double>& centre,
 	int count = vecPts.size();
 	int iStart = 0;
 	bool flagInit = true;
+	normal.assign(0.0, 0.0, 0.0);
 	if(count == 0){
-		normal.assign(0.0, 0.0, 0.0);
 		return totalTangentAngle;
 	}
 	// Compute initialisation points
@@ -684,6 +692,7 @@ double VertexNormal(const std::vector<double>& centre,
 }
 
 
+
 /**
  * @brief      Calculates the vertex normal weighted by surface angle partitions
  *
@@ -701,10 +710,69 @@ std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre,
 	return returnTup;
 }
 
+/**
+ * Answers if a normal should be flipped to point towards the outside of a
+ * volume.
+ *
+ * @param[in]  orderedList      An ordered list of elements indicating the
+ *                              orientation of an object.
+ * @param[in]  elm1             The first element of a second ordered list.
+ * @param[in]  elm2             The second element of this second ordered list,
+ *                              these two elements are sufficient to represent
+ *                              that list and are enough to represent it.
+ * @param[in]  voluind          Normally the volume indices of a surface object.
+ *                              Could be any list with one 0 and one Non zero
+ *                              elements.
+ * @param[in]  innerComparison  Is this comparing two lists with an object
+ *                              inside the other or two outer neighbouring
+ *                              lists. If one is inside the other they are
+ *                              expected to go in the same direction otherwise
+ *                              they need to be contra-rotating (for no flip
+ *                              required).
+ *
+ * @return     -1 if the normal vector needs to be flipped to point outwards. 1
+ *             otherwise.
+ */
+int meshhelp::NormalShouldFlip(const std::vector<int> orderedList, int elm1, int elm2,
+	const std::vector<int> & voluind, bool innerComparison){
+
+	RSVS3D_ARGCHECK(voluind.size()==2, "4th argument voluind must be size 2");
+	RSVS3D_ARGCHECK(voluind[0]^voluind[1], "4th argument must have one 0 and "
+		"one non zero element.");
+
+	auto pairOrder = OrderMatchLists(orderedList, elm1, elm2);
+	int isSameOrder = -pairOrder.first;
+	// compares the list vec1 and vec2 returning 
+	// 1 if indices p1 and p2 appear in the same order 
+	// -1 if indices p1 and p2 appear in opposite orders
+	int flipMultiplier = 0;
+	if ((voluind[1]==0)	&& (isSameOrder==-1)){ // case 1 right way if pointing through
+		flipMultiplier = 1;
+	} else if ((voluind[0]==0) && (isSameOrder==1)) { // case 2 right way
+		flipMultiplier = 1;
+	} else if ((voluind[1]==0) && (isSameOrder==1)) { // case 3 wrong way
+		flipMultiplier = -1;
+	} else if ((voluind[0]==0) && (isSameOrder==-1)) { // case 4 wrong way
+		flipMultiplier = -1;
+	}
+	if (flipMultiplier==0){
+		stringstream strerr;
+		strerr << "Flip multiplier was not set in the cases." << std::endl 
+			<< " isSameOrder " << isSameOrder << "pairOrder (2)" 
+			<< pairOrder.second << std::endl;
+		RSVS3D_ERROR_LOGIC(strerr.str().c_str());
+	}
+	if(innerComparison){
+		flipMultiplier = -flipMultiplier;
+	}
+	return flipMultiplier;
+}
+
 int vert::Normal(const mesh *meshin, grid::coordlist &neighCoord,
 	coordvec &normalVec, bool isOrdered) const {
 
-	auto retVal = this->SurroundingCoords(meshin, neighCoord, isOrdered);
+	std::vector<int> edgeIndOut;
+	auto retVal = this->SurroundingCoords(meshin, neighCoord, isOrdered, &edgeIndOut);
 
 	if(retVal!=rsvs3d::constants::__success){
 		normalVec.assign(0.0, 0.0, 0.0);
@@ -716,6 +784,24 @@ int vert::Normal(const mesh *meshin, grid::coordlist &neighCoord,
 	} catch (...) {
 		normalVec.assign(0.0, 0.0, 0.0);
 		return rsvs3d::constants::__failure;
+	}
+	normalVec.Normalize();
+	if (edgeIndOut.size()>2){
+		int surfInd = meshin->SurfFromEdges(edgeIndOut[0],edgeIndOut[1]);
+		if(rsvslogic::__isfound(surfInd)
+			&& meshin->surfs.isearch(surfInd)->IsOrdered()){
+
+			auto needFlip = meshhelp::NormalShouldFlip(
+				meshin->surfs.isearch(surfInd)->edgeind,
+				edgeIndOut[0],edgeIndOut[1], 
+				meshin->surfs.isearch(surfInd)->voluind, true);
+
+			if(needFlip==-1){
+				normalVec.flipsign();
+			}
+		} else {
+			RSVS3D_ERROR_NOTHROW("Surface not ordered. Cannot orient normal.");
+		}
 	}
 
 	return rsvs3d::constants::__success;
@@ -3087,6 +3173,9 @@ int vert::OrderEdges(const mesh *meshin, std::vector<int> &edgeIndOut) const {
 	}
 	sort(edgeIndOut);
 	unique(edgeIndOut);
+	if(edgeIndOut.size()<2){
+		return rsvs3d::constants::ordering::error;
+	}
 	vector<int> edgeIndOrig = edgeIndOut;
 
 	edge2Vert.reserve(edgeIndOut.size()*2);
@@ -3122,23 +3211,25 @@ int vert::OrderEdges(const mesh *meshin){
 }
 
 int vert::SurroundingCoords(const mesh *meshin, grid::coordlist &coordout,
-	bool isOrdered) const {
+	bool isOrdered, std::vector<int>* edgeIndOutPtr) const {
 
 	// Faf about to avoid unnecessary allocation into edgeIndOut if not needed
 	std::vector<int> edgeIndModif;
-	const std::vector<int>* edgeIndOutPtr = &(this->edgeind);
+
+	const std::vector<int>* edgeIndInPtr = &(this->edgeind);
+
 	coordout.clear();
 	if(!isOrdered){
 		auto retOrder = this->OrderEdges(meshin, edgeIndModif);
 		if (!rsvs3d::constants::ordering::__isordered(retOrder)){
 			return rsvs3d::constants::__failure;
 		}
-		edgeIndOutPtr = &edgeIndModif;
+		edgeIndInPtr = &edgeIndModif;
 	}
 
 	// Is a reference to either this->edgeind if isOrdered=true or edgeIndModif
 	// otherwise.
-	auto& edgeIndOut = *edgeIndOutPtr; 
+	auto& edgeIndOut = *edgeIndInPtr; 
 
 	int nEdges = edgeIndOut.size();
 	for (int i = 0; i < nEdges; ++i)
@@ -3146,7 +3237,14 @@ int vert::SurroundingCoords(const mesh *meshin, grid::coordlist &coordout,
 		int iVert = meshin->VertFromVertEdge(this->index, edgeIndOut[i]);
 		coordout.push_back(&(meshin->verts.isearch(iVert)->coord));
 	}
-
+	// Return the ordered list if a location is provided for it.
+	if(edgeIndOutPtr!=NULL){
+		if(!isOrdered){
+			edgeIndModif.swap(*edgeIndOutPtr);
+		} else {
+			*edgeIndOutPtr = this->edgeind;
+		}
+	}
 	return rsvs3d::constants::__success;
 }
 
