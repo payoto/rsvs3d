@@ -1736,7 +1736,6 @@ int tecplotfile::RSVScalcDataBlock(const triangulation& triRSVS,
 	return 0;
 }
 
-
 // Print snake with sensitivity
 int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS, 
 	const RSVScalc &calcObj, int strandID, double timeStep, int forceOutType, 

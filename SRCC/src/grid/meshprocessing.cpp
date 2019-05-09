@@ -948,8 +948,8 @@ double CotanLaplacianWeight(const vector<double> &centre,
 int VertexLaplacianVector(const mesh& meshin, const vert* vertsmooth,
 	coordvec &lapVec, bool isOrdered){
 	
-	static coordvec tempPos;
-	static coordvec temp1, temp2;
+	coordvec tempPos;
+	coordvec temp1, temp2;
 	double totalCotan=0.0;
 
 	// Make sure that we don't allocate or copy data if the laplacian is already
@@ -1002,7 +1002,10 @@ int VertexLaplacianVector(const mesh& meshin, const vert* vertsmooth,
 	}
 
 	lapVec.div(totalCotan);
-
+	lapVec.substract(vertsmooth->coord);
+	if(IsAproxEqual(lapVec.GetNorm(), 0.0)){
+		lapVec.assign(0.0, 0.0, 0.0);
+	}
 	return rsvs3d::constants::__success;
 }
 
