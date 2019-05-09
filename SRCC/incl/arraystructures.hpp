@@ -70,6 +70,9 @@ namespace rsvs3d {
 		static const int __failure = -1;
 		static const int __success = 0;
 	}
+	namespace logicals {
+		inline bool __isfound(int f){return f!=constants::__notfound;}
+	}
 }
 
 template <class T> class ArrayStruct;
