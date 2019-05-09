@@ -40,7 +40,7 @@ template<class T> void DisplayVector(vector<T> vec)
 	}
 	cout << " | " ;
 }
-template<class T> void PrintVector(vector<T> vec, std::ofstream &streamout)
+template<class T> void PrintVector(vector<T> vec, std::ostream &streamout)
 {
 	streamout << int(vec.size()) << " - "; 
 	for (int i = 0; i < int(vec.size()); ++i)
