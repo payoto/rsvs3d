@@ -696,7 +696,7 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj,
 			RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT);
 	}
 	if(integrate::constants::outputs::printVectorSnake(logLvl)){
-		integrate::execute::logging::SnakeVectors(RSVSobj.outSnake,
+		integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake,
 			RSVSobj.rsvsSnake, totT);
 	}
 }
@@ -721,24 +721,31 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj,
 	if (0 < logLvl){
 		RSVSobj.logFile << "> final step" << stepNum << " :," ;
 			RSVSobj.logFile << totT << endl;
+		RSVSobj.logFile << totT << endl;
 		integrate::execute::postprocess::Log(
-			RSVSobj.logFile, RSVSobj.calcObj,logLvl
+			RSVSobj.logFile, RSVSobj.calcObj,
+			RSVSobj.paramconf.files.ioout.logginglvl
 			);
 		std::cout << std::endl;
 	}
-	if (logLvl==2 || logLvl==5){
+	if (integrate::constants::outputs::printBaseSnake(logLvl)){
 		integrate::execute::logging::Snake(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.voluMesh, totT, nVoluZone);
-	} else if (2 < logLvl && logLvl!=5){
+	}
+	if (integrate::constants::outputs::printFullSnake(logLvl)){
 		integrate::execute::postprocess::FullTecplot(
 			RSVSobj.outSnake, RSVSobj.rsvsSnake,
 			RSVSobj.rsvsTri, RSVSobj.voluMesh,
 			totT, nVoluZone, stepNum);
 	}
-	if(3 < logLvl){
+	if(integrate::constants::outputs::printGradientsSnake(logLvl)){
 		integrate::execute::postprocess::Gradients(RSVSobj.calcObj,
 			RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT);
+	}
+	if(integrate::constants::outputs::printVectorSnake(logLvl)){
+		integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake,
+			RSVSobj.rsvsSnake, totT);
 	}
 }
 

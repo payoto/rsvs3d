@@ -662,7 +662,7 @@ int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
 		}
 		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
 			printCoord);
-		this->VolFaceMap(snakeout.snakeconn,nSurf);
+		if(printCoord){this->VolFaceMap(snakeout.snakeconn,nSurf);}
 	}
 	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat);
@@ -671,15 +671,15 @@ int tecplotfile::PrintSnake(std::string snakeData, const snake& snakeout,
 		}
 		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
 			printCoord);
-		this->SurfFaceMap(snakeout.snakeconn,nEdge);
+		if(printCoord){this->SurfFaceMap(snakeout.snakeconn,nEdge);}
 	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat);
-		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
-			printCoord);
 		if(zoneSharing){
 			this->DefShareZoneVolume(coordConnShareZone, nVertDat);
 		}
-		this->LineFaceMap(snakeout.snakeconn,nEdge);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat, snakeData,
+			printCoord);
+		if(printCoord){this->LineFaceMap(snakeout.snakeconn,nEdge);}
 	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
 			nVert=0;
@@ -1543,7 +1543,7 @@ void tecplotfile::ZoneHeaderOrdered(int nVert,  int nVertDat, int nCellDat,
 }
 
 
-// Print snake with sensitivity
+// Print snake with sensitivity 
 int tecplotfile::PrintSnakeSensitivity(const triangulation& triRSVS,
 	const RSVScalc &calcObj, int strandID, double timeStep, int forceOutType, 
 	const vector<int> &vertList){
@@ -1858,7 +1858,6 @@ int tecplotfile::OpenFile (const char *str, const char *mode){
 void tecplotfile::CloseFile (){
 
 	fclose(fid);
-	
 }
 
 // Test Code
