@@ -146,6 +146,13 @@ namespace rsvs3d {
  */
 #define RSVS3D_ERROR_ARGUMENT(M) (rsvs3d::error<std::invalid_argument>(M, __PRETTY_FUNCTION__, __FILE__, __LINE__, true))
 
+#ifndef RSVS_NO_ARGCHECK
+#define RSVS3D_ARGCHECK(E,M) if(!(E)){RSVS3D_ERROR_ARGUMENT(M);}
+#define RSVS3D_ARGCHECK_WARN(E,M) if(!(E)){RSVS3D_ERROR_NOTHROW(M);}
+#else
+#define RSVS3D_ARGCHECK(E,M)
+#define RSVS3D_ARGCHECK_WARN(E,M)
+#endif
 /**
  * @brief      Throw a range_error.
  *
