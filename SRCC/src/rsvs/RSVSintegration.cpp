@@ -1028,13 +1028,13 @@ void integrate::utils::SpecialiseTemplateFiles(const param::parameters &paramcon
 	int loglvl = paramconf.files.ioout.logginglvl;
 
 	if (integrate::constants::outputs::printBaseSnake(loglvl)){
-		SpecialiseTemplateFile(tecconfig, loglvl, paramconf.files.ioout, 
+		SpecialiseTemplateFile(tecconfig, 2, paramconf.files.ioout, 
 			constants::tecplotsnake);
 	} else if (integrate::constants::outputs::printFullSnake(loglvl)){
 		SpecialiseTemplateFile(tecconfig, 3, paramconf.files.ioout, 
 			constants::tecplotsnake);
 	}
-	if(integrate::constants::outputs::printFullSnake(loglvl)){
+	if(integrate::constants::outputs::printGradientsSnake(loglvl)){
 		SpecialiseTemplateFile(tecconfig, 5, paramconf.files.ioout, 
 			constants::tecplotgradient);
 	}

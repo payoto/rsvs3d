@@ -1361,7 +1361,7 @@ namespace smoothsnaking {
 	
 	int LaplacianSmoothingDirection(const snake &snakein, const vert* vertsmooth,
 		coordvec &smoothDir){
-		return VertexLaplacianVector(snakein.snakeconn, vertsmooth,smoothDir);
+		return VertexLaplacianVector(snakein.snakeconn, vertsmooth,smoothDir,true);
 	}
 }
 }
@@ -1763,9 +1763,9 @@ int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
 	// + Define the distance bounds that might be performed
 	// + Gather the snaxels that will be smoothed
 	// + Implement cotangent laplacian smoothing
-	int nIter = 10;
+	int nIter = 5;
 
-	double stepDamping = 1.0/double(2*nIter+1);
+	double stepDamping = 2.0/double(nIter+1);
 
 	HashedVector<int, int> snaxInds;
 	snaxInds.clear();
@@ -1807,8 +1807,8 @@ int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
 			minEdgeLength = min(minEdgeLength, snaxDir.GetNorm());
 			maxEdgeLength = max(maxEdgeLength, snaxDir.GetNorm());
 			sumEdgeL += snaxDir.GetNorm(); 
-			snaxDir.Normalize();
-			double dStep = snaxDir.dot(smoothDir.usedata());
+			double edgeL = snaxDir.Normalize();
+			double dStep = snaxDir.dot(smoothDir.usedata())/edgeL;
 			dStep = isfinite(dStep) ? dStep : 0.0;
 			dSteps.push_back(dStep);
 
@@ -1816,7 +1816,7 @@ int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
 			maxD = max(dStep, maxD);
 			minD = min(dStep, minD);
 		}
-		double maxAbs = max(fabs(maxD),fabs(minD));
+		double maxAbs = max(max(fabs(maxD),fabs(minD)),spawnDist);
 		// double edgeRatio = minEdgeLength/maxEdgeLength;
 		double stepMultiplier = (spawnDist*stepDamping)/maxAbs;
 
@@ -1829,26 +1829,37 @@ int SmoothStep_itersmooth(int spawnVert, snake &snakein, double spawnDist){
 				dSteps[i] : -dSteps[i]) * stepMultiplier * l;
 			double prevD = snakein.snaxs[j].d;
 			snakein.snaxs[j].d += tempStep;
+			stringstream errstr;
+				errstr << "Attempted to take a step of length " << tempStep
+					<< " snaxel->d: " << prevD;
+				errstr << " Step " << stepNum << " of " << nIter;
+				errstr << " maxD " << maxD << " minD " << minD  << " l " << l
+					<< "dSteps : ";PrintVector(dSteps, errstr);
+				errstr << std::endl;
 			try{
 				snakein.snaxs[j].ValidateDistance(snakein);
 			} catch (const exception& exc) {
-				stringstream errstr;
-				errstr << "Attempted to take a step of lenght " << tempStep
-					<< " snaxel->d: " << prevD << std::endl;
-				errstr << "Step " << stepNum << " of " << nIter << std::endl;
-				errstr << "maxD " << maxD << " minD " << minD 
-					<< std::endl << "dSteps : ";
-				PrintVector(dSteps, errstr);
-				errstr << std::endl;
+				
 				RSVS3D_ERROR_NOTHROW(errstr.str().c_str());
-				throw exc;
-			}
+				snakein.snaxs[j].d = snakein.snaxs[j].d< 0.5 ?
+					spawnDist/double(nIter) : 1.0-spawnDist/double(nIter);
+ 			}
+			#ifdef RSVS_DIAGNOSTIC_RESOLVED
+			std::cout << errstr.str();
+			#endif
 		}
 		snakein.snaxs.PrepareForUse();
 		snakein.UpdateCoord(snaxInds.vec);
 		// std::cout << meanD << "," << stepMultiplier << "," 
 		// 	<< maxAbs << " | ";
 	}
+	double totD = 0.0;
+	for (auto iSnax : snaxInds.vec)
+	{
+		totD += snakein.snaxs.isearch(iSnax)->d<0.5?
+			snakein.snaxs.isearch(iSnax)->d : 1.0 - snakein.snaxs.isearch(iSnax)->d;
+	}
+	std::cout << " totD " << totD/snaxInds.size();
 	return snaxInds.size();
 }
 

@@ -55,18 +55,18 @@ double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
 namespace integrate {
 	namespace constants {
 		namespace outputs {
-			static const int numberdefined = 6;
+			static const int numberdefined = 7;
 				auto printBaseSnake = [&](int lvl) -> bool  {
-					return lvl==2 || lvl==5;
+					return lvl==2 || lvl==5 || lvl==7;
 				};
 				auto printFullSnake = [&](int lvl) -> bool  {
 					return lvl==3 || lvl==4 || numberdefined<lvl;
 				};
 				auto printGradientsSnake = [&](int lvl) -> bool  {
-					return lvl==4 || lvl==5 || numberdefined<lvl;
+					return lvl==4 || lvl==5 || lvl==7 || numberdefined<lvl;
 				};
 				auto printVectorSnake = [&](int lvl) -> bool  {
-					return lvl==6 || numberdefined<lvl;
+					return lvl==6 || lvl==7 || numberdefined<lvl;
 				};
 		}
 		static const std::string tecplotsnake = "rsvs3D_";
