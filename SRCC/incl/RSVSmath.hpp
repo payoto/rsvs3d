@@ -26,7 +26,6 @@ namespace param {
 // needed for grid::coordlist (Things in mesh need a refactor)
 #include "mesh.hpp" 
 
-using namespace std; 
 
 
 //==================================
@@ -37,9 +36,9 @@ using namespace std;
 
 class TriFunc {
 protected:
-	vector<double> const * p0=NULL;
-	vector<double> const * p1=NULL;
-	vector<double> const * p2=NULL;
+	std::vector<double> const * p0=NULL;
+	std::vector<double> const * p1=NULL;
+	std::vector<double> const * p2=NULL;
 
 	double fun;
 	ArrayVec<double> jac;
@@ -49,7 +48,7 @@ protected:
 	bool isCalc;
 	int nTarg; // target length of vectors
 
-	bool MakeValidField(vector<double>* TriFunc::*mp);
+	bool MakeValidField(std::vector<double>* TriFunc::*mp);
 
 public:
 	// Check validity
@@ -57,11 +56,11 @@ public:
 	bool MakeValid();
 	void PreCalc();
 	// Build a valid object
-	void assign(const vector<double> &in0,const vector<double> &in1,
-		const vector<double> &in2);
-	void assign(const vector<double> *in0,const vector<double> *in1,
-		const vector<double> *in2);
-	void assign(int pRepI,const vector<double> &pRep);
+	void assign(const std::vector<double> &in0,const std::vector<double> &in1,
+		const std::vector<double> &in2);
+	void assign(const std::vector<double> *in0,const std::vector<double> *in1,
+		const std::vector<double> *in2);
+	void assign(int pRepI,const std::vector<double> &pRep);
 	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c) ;
 	virtual void Calc() = 0; // Virtual function that calculates 
 
@@ -101,7 +100,7 @@ protected:
 	int nCoord; // target length of vectors
 	int nFun;
 
-	bool MakeValidField(vector<double> const* mp);
+	bool MakeValidField(std::vector<double> const* mp);
 	void InitialiseArrays();
 public:
 	// Check validity
@@ -110,7 +109,7 @@ public:
 	void PreCalc();
 	// Build a valid object
 	void assign(grid::coordlist &coords);
-	void assign(int pRepI, const vector<double> &pRep);
+	void assign(int pRepI, const std::vector<double> &pRep);
 	void ReturnDat(double &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDat(ArrayVec<double> &a, ArrayVec<double> &b,ArrayVec<double> &c);
 	void ReturnDatPoint(double **a, ArrayVec<double> **b,ArrayVec<double> **c);
@@ -219,14 +218,14 @@ protected:
 
 
 
-	vector<double> centroid;
+	std::vector<double> centroid;
 	double edgeLength=0.0;
 	bool calcDeriv = true;
 public:
 	void Disp();
 	void Calc() override;
 	void CalcFD();
-	void assigncentroid(const vector<double> &vecin);
+	void assigncentroid(const std::vector<double> &vecin);
 
 	const ArrayVec<double>& jac_ptr() const {return((this->jac));};
 	const ArrayVec<double>& hes_ptr() const {return((this->hes));};

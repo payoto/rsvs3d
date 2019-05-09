@@ -1,5 +1,5 @@
 /**
- * Provide vector container with hashed index mapping.
+ * Provide std::vector container with hashed index mapping.
  * 
  * This file provides classes and methods for the handling of groups of mesh
  * subcomponents...
@@ -62,7 +62,6 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
 
 namespace rsvs3d {
 	namespace constants {
@@ -84,19 +83,26 @@ typedef unsigned int unsigned_int;
 
 // Forward declared templated functions
 template <class T> int TestTemplate_ArrayStruct();
-bool CompareFuncOut(function<void()> func1, function<void()> func2);
-template <typename T> inline void sort(vector<T> &vec);
-template <typename T> inline void unique(vector<T> &vec);
-// template <typename T> inline void set_intersection(vector<T> &targVec,vector<T> &vec1,vector<T> &vec2,bool isSort=true);
-template <typename T> inline void set_intersection(vector<T> &targVec,const vector<T> &vec1,const vector<T> &vec2,bool isSort);
-template<class T> vector<int> FindSubList(const vector<T> &keyFind, const vector<T> &keyList, unordered_multimap<T,int> &hashTable) ;
-template<class T> vector<int> FindSubList(const vector<T> &keyFind,const vector<T> &keyList, const unordered_multimap<T,int> &hashTable);
-template<class T, class Q> void HashVector(const vector<T> &elems,unordered_multimap<T,Q> &hashTable,
-	 const vector<Q> &targElems={});
-template<class T> int FindSub(const T &key, const unordered_multimap<T,int> &hashTable);
-template<class T> void ConcatenateVector(vector<T> &vecRoot, const vector<T> &vecConcat);
-template<class T, class R> vector<R> ReturnDataEqualRange(T key, const unordered_multimap<T,R> &hashTable);
-template<class T, class R> void ReturnDataEqualRange(T key,const unordered_multimap<T,R> &hashTable, vector<R> &subList);
+bool CompareFuncOut(std::function<void()> func1, std::function<void()> func2);
+template <typename T> inline void sort(std::vector<T> &vec);
+template <typename T> inline void unique(std::vector<T> &vec);
+// template <typename T> inline void set_intersection(std::vector<T> 
+// &targVec,std::vector<T> &vec1,std::vector<T> &vec2,bool isSort=true);
+template <typename T> inline void set_intersection(std::vector<T> &targVec,
+	const std::vector<T> &vec1,const std::vector<T> &vec2,bool isSort);
+template<class T> std::vector<int> FindSubList(const std::vector<T> &keyFind, 
+	const std::vector<T> &keyList, std::unordered_multimap<T,int> &hashTable) ;
+template<class T> std::vector<int> FindSubList(const std::vector<T> &keyFind,
+	const std::vector<T> &keyList, const std::unordered_multimap<T,int> &hashTable);
+template<class T, class Q> void HashVector(const std::vector<T> &elems,
+	std::unordered_multimap<T,Q> &hashTable, const std::vector<Q> &targElems={});
+template<class T> int FindSub(const T &key, const std::unordered_multimap<T,int> &hashTable);
+template<class T> void ConcatenateVector(std::vector<T> &vecRoot,
+	const std::vector<T> &vecConcat);
+template<class T, class R> std::vector<R> ReturnDataEqualRange(T key, 
+	const std::unordered_multimap<T,R> &hashTable);
+template<class T, class R> void ReturnDataEqualRange(T key, 
+	const std::unordered_multimap<T,R> &hashTable, std::vector<R> &subList);
 
 
 
@@ -110,8 +116,8 @@ protected:
 	bool readyforuse=false;
 	bool isInMesh=false; // used to change behaviour if not in a mesh.
 
-	vector<T> elems;    // vector of elements (structures) 
-	unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
+	std::vector<T> elems;    // std::vector of elements (structures) 
+	std::unordered_multimap<int,int> hashTable; // Hash Table of indexed elements
 	void ForceArrayReady();
 	void SetLastIndex() {isSetMI=1;maxIndex=elems.back().index;};
 
@@ -122,10 +128,10 @@ public:
 	friend int TestTemplate_ArrayStruct<T>();
 
 	void disp() const;
-	void disp(const vector<int> &subs) const;
+	void disp(const std::vector<int> &subs) const;
 	void disp(int iStart, int iEnd) const;
 	int find(int key, bool noWarn=false) const ;
-	vector<int> find_list(const vector<int> &key, bool noWarn=false) const ;
+	std::vector<int> find_list(const std::vector<int> &key, bool noWarn=false) const ;
 	inline int GetMaxIndex() const;
 	inline void Init(int n);
 	bool isready() const {return(readyforuse);};
@@ -138,9 +144,9 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void write(FILE *fid) const;
 	void read(FILE *fid);
-	void remove(vector<int> delInd);
+	void remove(std::vector<int> delInd);
 	void TightenConnectivity();
-	// methods needed from vector
+	// methods needed from std::vector
 	inline int size() const;
 	inline int capacity() const;
 	inline void assign(int n, T& newelem);
@@ -151,12 +157,12 @@ public:
 	void issafeaccess(const int a){
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) || (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			#ifdef USE_STACKTRACE 
-			cerr << stacktrace::stacktrace() << endl;
+			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
-			cerr << "Attempt to access position " << a << 
-				" in array of size " << elems.size() << endl;
+			std::cerr << "Attempt to access position " << a << 
+				" in std::array of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -168,12 +174,12 @@ public:
 	// Cannot be used on the left hand side and can't be used to edit data in elems
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) || (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			#ifdef USE_STACKTRACE 
-			cerr << stacktrace::stacktrace() << endl;
+			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
-			cerr << "Attempt to access position " << a << 
-				" in array of size " << elems.size() << endl;
+			std::cerr << "Attempt to access position " << a << 
+				" in std::array of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -186,13 +192,13 @@ public:
 		int a=this->find(b);
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) || (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			#ifdef USE_STACKTRACE 
-			cerr << stacktrace::stacktrace() << endl;
+			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
-			cerr << "Attempt to access index " << b 
+			std::cerr << "Attempt to access index " << b 
 				<< " at position " << a <<
-				" in array of size " << elems.size() << endl;
+				" in std::array of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -204,12 +210,12 @@ public:
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=elems.size()) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			#ifdef USE_STACKTRACE 
-			cerr << stacktrace::stacktrace() << endl;
+			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
-			cerr << "Attempt to access position " << a << 
-				" in array of size " << elems.size() << endl;
+			std::cerr << "Attempt to access position " << a << 
+				" in std::array of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE("Index is out of range");
 		}
@@ -231,7 +237,7 @@ protected:
 	using ArrayStruct<T>::elems;
     using ArrayStruct<T>::readyforuse;
 
-	unordered_multimap<int,int> hashParent;
+	std::unordered_multimap<int,int> hashParent;
 	int isHashParent=0;
 
 public: 
@@ -239,7 +245,7 @@ public:
 
 	//inline int KeyParent(int a) const ;
 	int findparent(int key) const; 
-	void findsiblings(int key, vector<int> &siblings) const; 
+	void findsiblings(int key, std::vector<int> &siblings) const; 
 	int countparent(int key) const {return(hashParent.count(key));};
 	void HashParent();
 	void DeHashParent(const int pos);
@@ -252,7 +258,7 @@ public:
 	void ForceArrayReady();
 	void PrepareForUse();
 	void Concatenate(const SnakStruct<T> &other);
-	void remove(const vector<int> &sub);
+	void remove(const std::vector<int> &sub);
 	T& operator[](const int a){ 
 		isHashParent=0;
 		return(ArrayStruct<T>::operator[](a));
@@ -269,8 +275,8 @@ protected:
 
 public:
 	void SetNoModif();
-	void ReturnModifInd(vector<int> &vecind);
-	void ReturnModifLog(vector<bool> &modiflog);
+	void ReturnModifInd(std::vector<int> &vecind);
+	void ReturnModifLog(std::vector<bool> &modiflog);
 	T& operator[](const int a){ 
 		#ifdef SAFE_ACCESS 
 		ArrayStruct<T>::issafeaccess(a);
@@ -283,16 +289,16 @@ public:
 template <class T,class Q, class R>  
 class HashedVector { // container for 
 public:
-	vector<T> vec;
-	unordered_multimap<T,R> hashTable;
+	std::vector<T> vec;
+	std::unordered_multimap<T,R> hashTable;
 	bool isHash=true;
 
 	inline void GenerateHash();
 	inline int find(const T key) const;
-	inline vector<int> findall(const T key) const;
+	inline std::vector<int> findall(const T key) const;
 	inline int count(const T key) const;
-	vector<int> count(const vector<T> &key) const;
-	inline vector<int> find_list(const vector<T> &key) const;
+	std::vector<int> count(const std::vector<T> &key) const;
+	inline std::vector<int> find_list(const std::vector<T> &key) const;
 	bool operator()(const Q &key) const;
 	inline bool IsInVec(const Q &key) const;
 	T& operator[](const int a){return this->vec[a];}
@@ -321,7 +327,7 @@ public:
 	using HashedVector<T,Q,R>::vec;
 	using HashedVector<T,Q,R>::isHash;
 
-	vector<R> targ;
+	std::vector<R> targ;
 	inline void GenerateHash();
 
 };
@@ -333,7 +339,7 @@ public:
 	using HashedVector<T,Q,R>::hashTable;
 	using HashedVector<T,Q,R>::vec;
 	using HashedVector<T,Q,R>::isHash;
-	vector<S> targ;
+	std::vector<S> targ;
 
 	S& operator()(const T& elm){
 		int pos = this->HashedVector<T,Q,R>::find(elm);
@@ -384,7 +390,7 @@ public:
 	using HashedVector<T,Q,R>::operator();
 	using HashedVector<T,Q,R>::IsInVec;
 
-	void operator=(const vector<T> &a){
+	void operator=(const std::vector<T> &a){
 		vec=a;
 		isHash=false;
 	}
@@ -397,7 +403,7 @@ public:
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -408,7 +414,7 @@ public:
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -420,7 +426,7 @@ public:
 		int a=this->find(b);
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if ((unsigned_int(a)>=vec.size()) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
@@ -463,22 +469,22 @@ public:
 // functions
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
 template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
-template<class T> void DisplayVector(vector<T> vec);
-template<class T> void DisplayVectorStatistics(vector<T> vec);
-template<class T> void PrintVector(vector<T> vec, std::ostream &streamout);
+template<class T> void DisplayVector(std::vector<T> vec);
+template<class T> void DisplayVectorStatistics(std::vector<T> vec);
+template<class T> void PrintVector(std::vector<T> vec, std::ostream &streamout);
 
 template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn,
-R T::*mp, const vector<int> &subList);
-template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn,
-R T::*mp, const vector<int> &subList);
+R T::*mp, const std::vector<int> &subList);
+template<class T, class R> std::vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn,
+R T::*mp, const std::vector<int> &subList);
 template<class T, class R> R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp, 
 int rStart,int rEnd);
 
-template<class T, class R> vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, 
+template<class T, class R> std::vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, 
 R T::*mp, int rStart,int rEnd);
 
 template<class T, class R, class U, class  V> 
-void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const vector<int> &subList,
+void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,const std::vector<int> &subList,
 	R T::*mp , U &out , V oper);
 template<template<class Q, class R> class T,class Q, class R>
 	void EraseKeyPair(T<Q,R> hashTable, Q key, R pos);
@@ -492,3 +498,7 @@ template<template<class Q, class R> class T,class Q, class R>
 #include "snakstruct_incl.cpp"
 
 #endif // ARRAYSTRUCTS_H_INCLUDED
+
+// Regexp to add std everywhere
+// ([^:])((exception|cerr|endl|cout|vector|unordered_multimap|string|stringstream)[^a-zA-Z0-9_])
+// \1std::\2

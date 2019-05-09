@@ -44,8 +44,7 @@
  */
 namespace rsvstest {
 
-	using namespace std;
-	/**
+		/**
 	 * @brief      Class for customtest.
 	 */
 	class customtest {
@@ -67,20 +66,20 @@ namespace rsvstest {
 				runTotal=0;
 				lastRunTime=0;
 				testName=testNameIn;
-				cout << "-------------------------------------------------------------"
-					"---------------------------" << endl;
-				cout << "-------------------------------------------------------------"
-					"---------------------------" << endl;
-				cout << "      Start testing " << testName << endl;
-				cout << "-------------------------------------------------------------"
-					"---------------------------" << endl;
+				std::cout << "-------------------------------------------------------------"
+					"---------------------------" << std::endl;
+				std::cout << "-------------------------------------------------------------"
+					"---------------------------" << std::endl;
+				std::cout << "      Start testing " << testName << std::endl;
+				std::cout << "-------------------------------------------------------------"
+					"---------------------------" << std::endl;
 			}
 			~customtest(){
 				this->PrintSummary();
 			}
 
-			int Run(function<int()> test, const char * funcName);
-			int RunSilent(function<int()> test, const char * funcName);
+			int Run(std::function<int()> test, const char * funcName);
+			int RunSilent(std::function<int()> test, const char * funcName);
 			void PrintSummary();
 	};
 

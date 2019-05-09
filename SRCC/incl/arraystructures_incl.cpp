@@ -10,8 +10,8 @@ compiled on its own.
 #include "arraystructures.hpp"
 #include "warning.hpp"
 
-template<class T> void ConcatenateVector(vector<T> &vecRoot,
-	const vector<T> &vecConcat)
+template<class T> void ConcatenateVector(std::vector<T> &vecRoot,
+	const std::vector<T> &vecConcat)
 {
 	vecRoot.insert(vecRoot.end(),vecConcat.begin(),vecConcat.end());
 }
@@ -19,11 +19,11 @@ template<class T> void ConcatenateVector(vector<T> &vecRoot,
 template <class T> bool CompareDisp(T &mesh1,T &mesh2)
 {
 	bool compFlag;
-	stringstream ss1,ss2;
-	auto old_buf = cout.rdbuf(ss1.rdbuf()); 
+	std::stringstream ss1,ss2;
+	auto old_buf = std::cout.rdbuf(ss1.rdbuf()); 
 
 	mesh1.disp();
-	cout.rdbuf(ss2.rdbuf()); 
+	std::cout.rdbuf(ss2.rdbuf()); 
 	mesh2.disp();
 	std::cout.rdbuf(old_buf);
 
@@ -31,16 +31,11 @@ template <class T> bool CompareDisp(T &mesh1,T &mesh2)
 	return(compFlag);
 }
 
-template<class T> void DisplayVector(vector<T> vec)
+template<class T> void DisplayVector(std::vector<T> vec)
 {
-	cout << int(vec.size()) << " - "; 
-	for (int i = 0; i < int(vec.size()); ++i)
-	{
-		cout << vec[i] << " ";
-	}
-	cout << " | " ;
+	PrintVector(vec, std::cout);
 }
-template<class T> void PrintVector(vector<T> vec, std::ostream &streamout)
+template<class T> void PrintVector(std::vector<T> vec, std::ostream &streamout)
 {
 	streamout << int(vec.size()) << " - "; 
 	for (int i = 0; i < int(vec.size()); ++i)
@@ -50,22 +45,22 @@ template<class T> void PrintVector(vector<T> vec, std::ostream &streamout)
 	streamout << " | " ;
 }
 
-template<class T> void DisplayVectorStatistics(vector<T> vec)
+template<class T> void DisplayVectorStatistics(std::vector<T> vec)
 {
-	cout << int(vec.size()) << " - "; 
-	cout << *min_element(vec.begin(), vec.end()) 
+	std::cout << int(vec.size()) << " - "; 
+	std::cout << *min_element(vec.begin(), vec.end()) 
 		<< " " << *max_element(vec.begin(), vec.end()) << " " ;
 	T s = 0;
 	for (auto& n : vec){
     	s += n;
 	}
-	cout << s << " " << double(s)/double(vec.size());
-	cout << " | " ;
+	std::cout << s << " " << double(s)/double(vec.size());
+	std::cout << " | " ;
 }
 
 template<class T, class R> 
 R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp,
-	const vector<int> &subList)
+	const std::vector<int> &subList)
 {
 	R surfInds;
 	int ii;
@@ -75,21 +70,21 @@ R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp,
 		surfInds.insert(itVecInt, (arrayIn(subList[ii])->*mp).begin(),
 			(arrayIn(subList[ii])->*mp).end());
 		itVecInt=surfInds.end();
-		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+		//vDisplayVector(arrayIn(subList[ii])->*mp);std::cout << std::endl;
 	}
 	return(surfInds);
 }
 
 template<class T, class R> 
-vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp,
-	const vector<int> &subList)
+std::vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp,
+	const std::vector<int> &subList)
 {
-	vector<R> surfInds;
+	std::vector<R> surfInds;
 	int ii;
 	surfInds.reserve(subList.size());
 	for(ii=0; ii<int(subList.size());++ii){
 		surfInds.push_back((arrayIn(subList[ii])->*mp));
-		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+		//vDisplayVector(arrayIn(subList[ii])->*mp);std::cout << std::endl;
 	}
 	return(surfInds);
 }
@@ -106,28 +101,28 @@ R ConcatenateVectorField(const ArrayStruct<T> &arrayIn, R T::*mp,
 		surfInds.insert(itVecInt, (arrayIn(ii)->*mp).begin(),
 			(arrayIn(ii)->*mp).end());
 		itVecInt=surfInds.end();
-		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+		//vDisplayVector(arrayIn(subList[ii])->*mp);std::cout << std::endl;
 	}
 	return(surfInds);
 }
 
 template<class T, class R> 
-vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp,
+std::vector<R> ConcatenateScalarField(const ArrayStruct<T> &arrayIn, R T::*mp,
 	int rStart,int rEnd)
 {
-	vector<R> surfInds;
+	std::vector<R> surfInds;
 	int ii;
 	surfInds.reserve((rStart-rEnd)>0?(rStart-rEnd):0);
 	for(ii=rStart; ii<rEnd;++ii){
 		surfInds.push_back((arrayIn(ii)->*mp));
-		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+		//vDisplayVector(arrayIn(subList[ii])->*mp);std::cout << std::endl;
 	}
 	return(surfInds);
 }
 
 template<class T, class R, class U, class  V> 
 void OperArrayStructMethod(const ArrayStruct<T> &arrayIn, 
-	const vector<int> &subList,  R T::*mp , U &out , V oper)
+	const std::vector<int> &subList,  R T::*mp , U &out , V oper)
 {
 	
 	int ii;
@@ -135,14 +130,14 @@ void OperArrayStructMethod(const ArrayStruct<T> &arrayIn,
 	for(ii=0; ii<int(subList.size());++ii){
 		out=oper(out,(arrayIn(subList[ii])->*mp)());
 		
-		//vDisplayVector(arrayIn(subList[ii])->*mp);cout << endl;
+		//vDisplayVector(arrayIn(subList[ii])->*mp);std::cout << std::endl;
 	}
 
 }
-template<class T, class R> vector<R> ReturnDataEqualRange(T key,
-	const unordered_multimap<T,R> &hashTable)
+template<class T, class R> std::vector<R> ReturnDataEqualRange(T key,
+	const std::unordered_multimap<T,R> &hashTable)
 {
-	vector<R> subList;
+	std::vector<R> subList;
 	
 	subList.reserve(5);
 	auto range=hashTable.equal_range(key);
@@ -154,7 +149,7 @@ template<class T, class R> vector<R> ReturnDataEqualRange(T key,
 	return(subList);
 }
 template<class T, class R> void ReturnDataEqualRange(T key, 
-	const unordered_multimap<T,R> &hashTable, vector<R> &subList)
+	const std::unordered_multimap<T,R> &hashTable, std::vector<R> &subList)
 {
 	
 	subList.clear();
@@ -167,16 +162,16 @@ template<class T, class R> void ReturnDataEqualRange(T key,
 
 	
 }
-template <typename T> inline void sort(vector<T> &vec)
+template <typename T> inline void sort(std::vector<T> &vec)
 {
 	sort(vec.begin(),vec.end());
 }
-template <typename T> inline void unique(vector<T> &vec)
+template <typename T> inline void unique(std::vector<T> &vec)
 {
 	auto itVecInt = std::unique (vec.begin(), vec.end());       
 	vec.resize( std::distance(vec.begin(),itVecInt));
 }
-// template <typename T> inline void set_intersection(vector<T> &targVec,vector<T> &vec1,vector<T> &vec2,bool isSort)
+// template <typename T> inline void set_intersection(std::vector<T> &targVec,std::vector<T> &vec1,std::vector<T> &vec2,bool isSort)
 // {
 // 	T tempType;
 // 	typename std::vector<T>::iterator it;
@@ -190,8 +185,8 @@ template <typename T> inline void unique(vector<T> &vec)
 // 	targVec.resize(it-targVec.begin());
 // }
 
-template <typename T> inline void set_intersection(vector<T> &targVec,
-	const vector<T> &vec1,const vector<T> &vec2,bool isSort)
+template <typename T> inline void set_intersection(std::vector<T> &targVec,
+	const std::vector<T> &vec1,const std::vector<T> &vec2,bool isSort)
 {
 	T tempType;
 	typename std::vector<T>::iterator it;
@@ -216,8 +211,8 @@ template <class T> int TestTemplate_ArrayStruct()
 {
 	ArrayStruct<T> stackT,stackT2,stackT3;
 	T singleT;
-	vector<int> testSub = {2,5,10,7};
-	vector<int> delInd={1,2};
+	std::vector<int> testSub = {2,5,10,7};
+	std::vector<int> delInd={1,2};
 	FILE *fidw,*fidr;
 	int i=0,j=0;
 	int errFlag=0;
@@ -233,7 +228,7 @@ template <class T> int TestTemplate_ArrayStruct()
 
 		errTest=CompareDisp(stackT,stackT2);
 		if (!errTest){
-			cerr << "Error Displays were not the same (Stage 1)" << endl;
+			std::cerr << "Error Displays were not the same (Stage 1)" << std::endl;
 			errFlag++;
 		} 
 		// Test ASsignement
@@ -241,8 +236,8 @@ template <class T> int TestTemplate_ArrayStruct()
 		stackT[2]=singleT;
 		errTest=CompareDisp(stackT,stackT2);
 		if (errTest){
-			cerr << "Error Displays were not the same - assignement not "
-				"working (Stage 2)" << endl;
+			std::cerr << "Error Displays were not the same - assignement not "
+				"working (Stage 2)" << std::endl;
 			errFlag++;
 		} 
 		errFlag+=TestReadyness(stackT," after assignement",false);
@@ -281,11 +276,11 @@ template <class T> int TestTemplate_ArrayStruct()
 				<< std::endl;
 			errFlag++;
 			#endif //SAFE_ACCESS
-		}  catch (exception const& ex) { 
-			cout << "Previous Call should have thrown the following "
-				"warning:" << endl;
-			cout << "Warning: reading from potentially obsolete unordered_map"
-				<< endl;
+		}  catch (std::exception const& ex) { 
+			std::cout << "Previous Call should have thrown the following "
+				"warning:" << std::endl;
+			std::cout << "Warning: reading from potentially obsolete unordered_map"
+				<< std::endl;
 			i=-1;
 		}
 		// Test Concatenation of arrays
@@ -318,18 +313,18 @@ template <class T> int TestTemplate_ArrayStruct()
 				stackT3.PrepareForUse();
 				errTest=CompareDisp(stackT,stackT3);
 				if (!errTest){
-					cerr << "Error Displays were not the same after write read"
-						<< endl;
+					std::cerr << "Error Displays were not the same after write read"
+						<< std::endl;
 					errFlag++;
 				}
 			}else{
-				cout << "Error: Could not open file to read test arraystructures."
-					<< endl;
+				std::cout << "Error: Could not open file to read test arraystructures."
+					<< std::endl;
 				errFlag++;  
 			}
 		}else{
-			cout << "Error: Could not open file to write test arraystructures." 
-				<< endl;
+			std::cout << "Error: Could not open file to write test arraystructures." 
+				<< std::endl;
 			errFlag++;  
 		}
 
@@ -337,8 +332,8 @@ template <class T> int TestTemplate_ArrayStruct()
 		stackT2=stackT;
 		errTest=CompareDisp(stackT,stackT2);
 		if (!errTest){
-			cerr << "Error Displays were not the same after full assignement"
-				<< endl;
+			std::cerr << "Error Displays were not the same after full assignement"
+				<< std::endl;
 			errFlag++;
 		}
 		stackT.disp();
@@ -353,12 +348,12 @@ template <class T> int TestTemplate_ArrayStruct()
 		if (!errTest){
 			stackT.disp();
 			stackT2.disp();
-			cerr << "Error Displays were not the same erase" << endl;
+			std::cerr << "Error Displays were not the same erase" << std::endl;
 			errFlag++;
 		}
 
-	} catch (exception const& ex) { 
-		cerr << "Exception: " << ex.what() <<endl; 
+	} catch (std::exception const& ex) { 
+		std::cerr << "Exception: " << ex.what() <<std::endl; 
 		return -1;
 	} 
 	return(errFlag);
@@ -374,14 +369,14 @@ template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg)
 	int errFlag=0;
 	errTest=stackT.isready();
 	if (!(errTest==errTarg)){
-		cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) 
-			<< " ready (isready()) " << txt << endl;
+		std::cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) 
+			<< " ready (isready()) " << txt << std::endl;
 		errFlag++;
 	} 
 	errTest=stackT.checkready();
 	if (!(errTest==errTarg)){
-		cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) 
-			<< " ready (checkready())"  << txt  << endl;
+		std::cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) 
+			<< " ready (checkready())"  << txt  << std::endl;
 		errFlag++;
 	} 
 	return(errFlag);
@@ -394,9 +389,9 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 	#ifdef SAFE_ACCESS
 	if (!isSetMI)
 	{
-		cerr << "warning: Potentially unsafe reading of max index"
-			" - execute PrepareForUse() before access" << endl;
-		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
+		std::cerr << "warning: Potentially unsafe reading of max index"
+			" - execute PrepareForUse() before access" << std::endl;
+		std::cerr << "          in " << __PRETTY_FUNCTION__ << std::endl; 
 	}
 	#endif //SAFE_ACCESS
 	return(maxIndex);
@@ -405,10 +400,10 @@ template<class T> inline int ArrayStruct <T>::GetMaxIndex() const
 template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const 
 {
 	if (isHash==0 && !noWarn){
-		cerr << "Warning: reading from potentially obsolete unordered_map ";
-		cerr << endl << "          in " << __PRETTY_FUNCTION__ << endl; 
-		cerr << "          To avoid this message perform read operations on"
-			" ArrayStruct<T> using the () operator" << endl; 
+		std::cerr << "Warning: reading from potentially obsolete unordered_map ";
+		std::cerr << std::endl << "          in " << __PRETTY_FUNCTION__ << std::endl; 
+		std::cerr << "          To avoid this message perform read operations on"
+			" ArrayStruct<T> using the () operator" << std::endl; 
 	}
 	auto search=hashTable.find(key);
 	
@@ -420,17 +415,17 @@ template<class T>  int ArrayStruct <T>::find(int key, bool noWarn) const
 	int key2;
 	key2=elems[search->second].index;
 	if (key2!=key){
-		cerr << "          Error in " << __PRETTY_FUNCTION__ << endl; 
+		std::cerr << "          Error in " << __PRETTY_FUNCTION__ << std::endl; 
 		RSVS3D_ERROR_ARGUMENT("FIND returned an invalid output ");
 	}
 	#endif //SAFE_ACCESS
 	return(search->second);
 }
 
-template<class T> vector<int> ArrayStruct <T>::find_list(const vector<int> &key,
+template<class T> std::vector<int> ArrayStruct <T>::find_list(const std::vector<int> &key,
 	bool noWarn) const 
 {
-	vector<int> returnSub=key;
+	std::vector<int> returnSub=key;
 	int ii;
 	for (ii=0;ii<int(key.size());++ii){
 		returnSub[ii]=this->find(key[ii], noWarn);
@@ -482,31 +477,31 @@ template<class T>  void ArrayStruct <T>::ForceArrayReady()
 
 template<class T> void ArrayStruct <T>::disp() const 
 {
-	cout << "Array of size " << this->size() << endl;
+	std::cout << "Array of size " << this->size() << std::endl;
 	for (int ii=0 ; unsigned_int(ii)<elems.size();ii++){
-		cout << "Array " << ii << " " ;
+		std::cout << "Array " << ii << " " ;
 		elems[ii].disp();
 	}
-	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI 
-		<< "; isInMesh "  << isInMesh << endl;
+	std::cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI 
+		<< "; isInMesh "  << isInMesh << std::endl;
 }
 template<class T> void ArrayStruct <T>::disp(int iStart, int iEnd) const 
 {
-	cout << "Array of size " << this->size() << endl;
+	std::cout << "Array of size " << this->size() << std::endl;
 	for (int ii=iStart ; iEnd<elems.size();ii++){
-		cout << "Array " << ii << " " ;
+		std::cout << "Array " << ii << " " ;
 		elems[ii].disp();
 	}
-	cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI 
-		<< "; isInMesh "  << isInMesh << endl;
+	std::cout << "Array Dat: isHash " << isHash << "; isSetMI " << isSetMI 
+		<< "; isInMesh "  << isInMesh << std::endl;
 }
-template<class T> void ArrayStruct <T>::disp(const vector<int> &subs) const
+template<class T> void ArrayStruct <T>::disp(const std::vector<int> &subs) const
 {
 	int ii;
-	cout << "Array of size " << this->size() << " displaying subset of size " 
-		<< subs.size() << endl;
+	std::cout << "Array of size " << this->size() << " displaying subset of size " 
+		<< subs.size() << std::endl;
 	for (ii=0 ; unsigned_int(ii)<subs.size();ii++){
-		cout << "Array " << subs[ii] << " " ;
+		std::cout << "Array " << subs[ii] << " " ;
 		elems[subs[ii]].disp();
 	}
 }
@@ -535,7 +530,7 @@ template<class T> void ArrayStruct <T>::HashArray()
 	isHash=1;
 	
 	
-   //cout << "Array Struct Succesfully Hashed" << endl;
+   //std::cout << "Array Struct Succesfully Hashed" << std::endl;
 }
 
 template<class T> void ArrayStruct <T>::TightenConnectivity()
@@ -548,7 +543,7 @@ template<class T> void ArrayStruct <T>::TightenConnectivity()
 	}
 	
 	
-   //cout << "Array Struct Succesfully Hashed" << endl;
+   //std::cout << "Array Struct Succesfully Hashed" << std::endl;
 }
 
 template<class T> void ArrayStruct <T>::SetMaxIndex()
@@ -633,7 +628,7 @@ template<class T> void ArrayStruct <T>::PrepareForUse()
 	
 }
 
-template<class T> void ArrayStruct<T>::remove(vector<int> delInd)
+template<class T> void ArrayStruct<T>::remove(std::vector<int> delInd)
 {
 
 	HashedVector<int,T> delHash;
@@ -655,7 +650,7 @@ template<class T> void ArrayStruct<T>::remove(vector<int> delInd)
 
 }
 
-// Implementation of vector member functions into the base class
+// Implementation of std::vector member functions into the base class
 
 template<class T> inline int ArrayStruct <T>::size() const 
 {
@@ -707,7 +702,7 @@ inline int HashedVector<T,Q,R>::find(const T key) const
 	return(FindSub(key, hashTable) );
 }
 template <class T,class Q,class R> 
-inline vector<int> HashedVector<T,Q,R>::findall(const T key) const
+inline std::vector<int> HashedVector<T,Q,R>::findall(const T key) const
 {
 	return(ReturnDataEqualRange(key,hashTable));
 }
@@ -719,9 +714,9 @@ inline int HashedVector<T,Q,R>::count(const T key) const
 }
 
 template <class T,class Q,class R> 
-vector<int> HashedVector<T,Q,R>::count(const vector<T> &key) const
+std::vector<int> HashedVector<T,Q,R>::count(const std::vector<T> &key) const
 {
-	vector<int> subOut;
+	std::vector<int> subOut;
 	subOut.reserve(key.size());
 	for (int i = 0; i < int(key.size()); ++i)
 	{
@@ -732,7 +727,7 @@ vector<int> HashedVector<T,Q,R>::count(const vector<T> &key) const
 }
 
 template <class T,class Q,class R> 
-inline vector<int> HashedVector<T,Q,R>::find_list(const vector<T> &key) const
+inline std::vector<int> HashedVector<T,Q,R>::find_list(const std::vector<T> &key) const
 {
 	return(FindSubList(key, vec, hashTable) );
 }
@@ -757,7 +752,7 @@ template <class T,class Q,class R> inline void HashedMap<T,Q,R>::GenerateHash()
 }
 
 template<class T>  int FindSub(const T &key,
-	const unordered_multimap<T,int> &hashTable)  
+	const std::unordered_multimap<T,int> &hashTable)  
 {
 	auto search=hashTable.find(key);
 
@@ -768,10 +763,10 @@ template<class T>  int FindSub(const T &key,
 	return(search->second);
 }
 
-template<class T> vector<int> FindSubList(const vector<T> &keyFind, 
-	const vector<T> &keyList, unordered_multimap<T,int> &hashTable) 
+template<class T> std::vector<int> FindSubList(const std::vector<T> &keyFind, 
+	const std::vector<T> &keyList, std::unordered_multimap<T,int> &hashTable) 
 {
-	vector<int> returnSub;
+	std::vector<int> returnSub;
 	int ii;
 
 	returnSub.reserve(int(keyFind.size()));
@@ -794,10 +789,10 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,
 }
 
 
-template<class T> vector<int> FindSubList(const vector<T> &keyFind, 
-	const vector<T> &keyList, const unordered_multimap<T,int> &hashTable) 
+template<class T> std::vector<int> FindSubList(const std::vector<T> &keyFind, 
+	const std::vector<T> &keyList, const std::unordered_multimap<T,int> &hashTable) 
 {
-	vector<int> returnSub;
+	std::vector<int> returnSub;
 	int ii;
 
 	returnSub.reserve(int(keyFind.size()));
@@ -820,8 +815,8 @@ template<class T> vector<int> FindSubList(const vector<T> &keyFind,
 }
 
 
-template<class T, class Q> void HashVector(const vector<T> &elems, 
-	unordered_multimap<T,Q> &hashTable, const vector<Q> &targElems)
+template<class T, class Q> void HashVector(const std::vector<T> &elems, 
+	std::unordered_multimap<T,Q> &hashTable, const std::vector<Q> &targElems)
 {
    // Generates a valid unordered_map for the current ArrayStruct
    // Function should not be called repeatedly 
@@ -856,10 +851,10 @@ template<template<class Q, class R> class T,class Q, class R>
 	if (it->second==pos && it->first==key){
 		hashTable.erase (it);
 	} else {
-		cerr << "Error: Key value pair not found and could not be removed "<< endl;
-		cerr << " key " << key << " pos " << pos << endl;
-		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-		RSVS3D_ERROR_ARGUMENT("Key value pair not found and could not be removed");
+		std::cerr << "Error: Key value std::pair not found and could not be removed "<< std::endl;
+		std::cerr << " key " << key << " pos " << pos << std::endl;
+		std::cerr << "	in function:" <<  __PRETTY_FUNCTION__ << std::endl;
+		RSVS3D_ERROR_ARGUMENT("Key value std::pair not found and could not be removed");
 	}
 }
 

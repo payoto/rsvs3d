@@ -60,7 +60,6 @@
 //------------------------------------------------------------------------------
 // Code NOTE: function in a class definition are IMPLICITELY INLINED ie replaced
 // by their code at compile time
-using namespace std;
 
 
 class meshpart;
@@ -112,7 +111,7 @@ namespace rsvs3d {
 */
 class coordvec {
 protected:
-	vector<double> elems;
+	std::vector<double> elems;
 	double norm;
 	int isuptodate;
 	
@@ -130,23 +129,23 @@ public:
 	double operator()(int a) const;
 	void disp() const;
 	bool isready() const {return(bool(isuptodate));};
-	const vector<double>& usedata() const {return(elems);}
-	const vector<double>* retPtr() const {return(&elems);}
+	const std::vector<double>& usedata() const {return(elems);}
+	const std::vector<double>* retPtr() const {return(&elems);}
 	// Math and logical operations (element wise)
 	void flipsign();
-	void max(const vector<double> &vecin);
-	void min(const vector<double> &vecin);
-	void add(const vector<double> &vecin);
-	void substract(const vector<double> &vecin);
-	void substractfrom(const vector<double> &vecin);
-	void div(const vector<double> &vecin);
+	void max(const std::vector<double> &vecin);
+	void min(const std::vector<double> &vecin);
+	void add(const std::vector<double> &vecin);
+	void substract(const std::vector<double> &vecin);
+	void substractfrom(const std::vector<double> &vecin);
+	void div(const std::vector<double> &vecin);
 	void div(double scalin);
-	void mult(const vector<double> &vecin);
+	void mult(const std::vector<double> &vecin);
 	void mult(double scalin);
-	void swap(vector<double> &vecin);
+	void swap(std::vector<double> &vecin);
 	void swap(coordvec &coordin);
-	vector<double> cross(const vector<double> &vecin) const ;
-	double dot(const vector<double> &vecin) const ;
+	std::vector<double> cross(const std::vector<double> &vecin) const ;
+	double dot(const std::vector<double> &vecin) const ;
 	double angle(const coordvec &coordin) const ;
 
 	coordvec(){
@@ -155,13 +154,13 @@ public:
 		norm=0;
 		isuptodate=0;
 		#ifdef TEST_SNAKSTRUCT
-		cout << "constructor called for coordvec" << endl;
+		std::cout << "constructor called for coordvec" << std::endl;
 		#endif
 	}
-	void operator=(const vector<double> &a){
+	void operator=(const std::vector<double> &a){
 		if(int(a.size())!=3){
-			RSVS3D_ERROR_NOTHROW("Warning : Coordinate vector is being a "
-				"vector other than 3 long");
+			RSVS3D_ERROR_NOTHROW("Warning : Coordinate std::vector is being a "
+				"std::vector other than 3 long");
 		}
 		elems=a;
 		isuptodate=0;
@@ -186,7 +185,7 @@ class volu: public meshpart {
 public:
 	
 	double fill,target,error, volume;
-	vector<int> surfind;
+	std::vector<int> surfind;
 
 	std::vector<int> vertind(const mesh &meshin) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -209,7 +208,7 @@ public:
 		this->error=1;
 
 		#ifdef TEST_ARRAYSTRUCT
-		cout << "volu #" << index << " Was created " << surfind.size() << endl;
+		std::cout << "volu #" << index << " Was created " << surfind.size() << std::endl;
 		#endif
 	}
 	volu(const volu& oldVolu){ // Copy-Constructor
@@ -220,15 +219,15 @@ public:
 		this->surfind=oldVolu.surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
-		cout << "copyvolu #" << index << " Was created " 
-			<< surfind.size() << endl;
+		std::cout << "copyvolu #" << index << " Was created " 
+			<< surfind.size() << std::endl;
 		#endif
 	}
 	~volu(){ // Destructor
 		surfind.clear();
 
 		#ifdef TEST_ARRAYSTRUCT
-		cout << "volu #" << index << " Was deleted " << surfind.size() << endl;
+		std::cout << "volu #" << index << " Was deleted " << surfind.size() << std::endl;
 		#endif
 
 	}
@@ -240,7 +239,7 @@ public:
 		surfind=other->surfind;
 
 		#ifdef TEST_ARRAYSTRUCT
-		cout << "OTHER: " ; other->disp();
+		std::cout << "OTHER: " ; other->disp();
 		#endif
 	}
 
@@ -264,8 +263,8 @@ public:
 	// oldInd);
 
 	double fill,target,error,area;
-	vector<int> edgeind;
-	vector<int> voluind;
+	std::vector<int> edgeind;
+	std::vector<int> voluind;
 	 // reserves 2 as this is the size of the array
 	
 	std::vector<int> vertind(const mesh &meshin) const;
@@ -278,9 +277,9 @@ public:
 	void read(FILE * fid);
 	void write(FILE * fid) const;
 	int OrderEdges(mesh *meshin);
-	int SplitSurface(mesh &meshin, const vector<int> &fullEdgeInd);
-	void OrderedVerts(const mesh *meshin, vector<int> &vertList) const;
-	vector<int> OrderedVerts(const mesh *meshin) const ;
+	int SplitSurface(mesh &meshin, const std::vector<int> &fullEdgeInd);
+	void OrderedVerts(const mesh *meshin, std::vector<int> &vertList) const;
+	std::vector<int> OrderedVerts(const mesh *meshin) const ;
 	void TightenConnectivity() {sort(voluind);unique(voluind);
 		sort(edgeind);unique(edgeind);isordered=false;};
 	void FlipVolus();
@@ -339,8 +338,8 @@ public:
 	friend edgearray;
 	
 
-	vector<int> vertind;
-	vector<int> surfind;
+	std::vector<int> vertind;
+	std::vector<int> surfind;
 	 // reserves 2 as this is the size of the array
 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -410,8 +409,8 @@ class vert: public meshpart {
 public:
 	
 
-	vector<int> edgeind;
-	vector<double> coord;
+	std::vector<int> edgeind;
+	std::vector<double> coord;
 	 // reserves 2 as this is the size of the array
 	std::vector<int> elmind(const mesh &meshin, int dimOveride=-1) const;
 
@@ -473,8 +472,8 @@ class ConnecRemv {
 public:
 	int keepind;
 	int typeobj;
-	vector<int> rmvind;
-	vector<int> scopeind;
+	std::vector<int> rmvind;
+	std::vector<int> scopeind;
 	void disp();
 	
 };
@@ -492,28 +491,28 @@ protected:
 	/// Number of parent meshes
 	int nParents = 0;
 	/// Indices of the active elements of the owning mesh
-	vector<int> elemind;
+	std::vector<int> elemind;
 	/// Vector of pointers to the mesh which are coarser (parents).
-	vector<mesh*> parentmesh;
+	std::vector<mesh*> parentmesh;
 	/// Vector of pointers to the mesh which are finer (children).
-	vector<mesh*> childmesh;
+	std::vector<mesh*> childmesh;
 	/// parent/to self connectivity, 1 vector element per parent. This is an 
 	/// vector with the index of each parent element stored at the location of 
 	/// each self element.
-	vector<HashedVectorSafe<int,int>> parentconn;
+	std::vector<HashedVectorSafe<int,int>> parentconn;
 	// These methods are protected to avoid broken/uni-directional
 	// connectivities being generated
 	
 	int AddParent(mesh* meshin);
 	int AddChild(mesh* meshin);
-	void AddParent(mesh* meshin, vector<int> &parentind);
+	void AddParent(mesh* meshin, std::vector<int> &parentind);
 	void RemoveChild(mesh* meshin);
 	void RemoveParent(mesh* meshin);
 
 public:
 	int NumberOfParents() const {return this->nParents;}
 	const mesh* ParentPointer(int a) const {return this->parentmesh.at(a);}
-	vector<int> ChildIndices(int parent, int parentVoluIndex) const {
+	std::vector<int> ChildIndices(int parent, int parentVoluIndex) const {
 		return this->parentconn.at(parent).findall(parentVoluIndex);}
 };
 
@@ -538,10 +537,10 @@ private:
 	
 	void OrientSurfaceVolume();
 	void OrientEdgeSurface();
-	int OrientRelativeSurfaceVolume(vector<int> &surfOrient);
+	int OrientRelativeSurfaceVolume(std::vector<int> &surfOrient);
 	void ArraysAreHashed();
 	void _LinearTransformGeneration(const grid::transformation &transform,
-		vector<mesh*> meshdependence::*mp);
+		std::vector<mesh*> meshdependence::*mp);
 	friend class snake;
 public:
 	vertarray verts;
@@ -554,37 +553,37 @@ public:
 	void RemoveFromFamily();
 	void AddChild(mesh* meshin);
 	void AddParent(mesh* meshin);
-	void AddParent(mesh* meshin, vector<int> &parentind);
-	void AddChild(mesh* meshin, vector<int> &parentind);
+	void AddParent(mesh* meshin, std::vector<int> &parentind);
+	void AddChild(mesh* meshin, std::vector<int> &parentind);
 	void SetMeshDepElm();
 	// Method needed to robustly maintain lineage through the family.
 	void MaintainLineage();
 	int CountParents() const;
 	int SurfInParent(int surfind) const;
-	void SurfInParent(vector<int> &listInParent) const;
-	void ElmOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	void SurfInParent(std::vector<int> &listInParent) const;
+	void ElmOnParentBound(std::vector<int> &listInParent, std::vector<int> &voluInd,
 		bool isBorderBound=true,
 		bool outerVolume=true) const;
-	void SurfOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	void SurfOnParentBound(std::vector<int> &listInParent, std::vector<int> &voluInd,
 		bool isBorderBound,
 		bool outerVolume) const;
-	void EdgeOnParentBound(vector<int> &listInParent, vector<int> &voluInd,
+	void EdgeOnParentBound(std::vector<int> &listInParent, std::vector<int> &voluInd,
 		bool isBorderBound,
 		bool outerVolume) const;
 	int CountVoluParent() const ;
-	void ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
-		vector<pair<int,int>> &parentcases, vector<double> &voluVals) const;
-	void MapVolu2Parent(const vector<double> &fillIn,
-		const vector<pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
-	void MapVolu2Self(const vector<double> &fillIn, 
-		const vector<int> &elms, double volu::*mp=&volu::fill);
-	void VoluValuesofParents(int elmInd, vector<double> &vals,
+	void ReturnParentMap(std::vector<int> &currind, std::vector<int> &parentpos,
+		std::vector<std::pair<int,int>> &parentcases, std::vector<double> &voluVals) const;
+	void MapVolu2Parent(const std::vector<double> &fillIn,
+		const std::vector<std::pair<int,int>> &parentcases, double volu::*mp=&volu::fill);
+	void MapVolu2Self(const std::vector<double> &fillIn, 
+		const std::vector<int> &elms, double volu::*mp=&volu::fill);
+	void VoluValuesofParents(int elmInd, std::vector<double> &vals,
 		int volType=0) const;
-	void VoluValuesofParents(int elmInd, vector<double> &vals,
+	void VoluValuesofParents(int elmInd, std::vector<double> &vals,
 		double volu::*mp) const;
-	void SurfValuesofParents(int elmInd, vector<double> &vals,
+	void SurfValuesofParents(int elmInd, std::vector<double> &vals,
 		int volType=0) const;
-	void SurfValuesofParents(int elmInd, vector<double> &vals,
+	void SurfValuesofParents(int elmInd, std::vector<double> &vals,
 		double surf::*mp) const;
 	int ParentElementIndex(int childElmInd, int parentInd=0) const;
 	// Mesh property
@@ -618,34 +617,34 @@ public:
 	mesh MakeCompatible(mesh other) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void SwitchIndex(int typeInd, int oldInd, int newInd,
-		const vector<int> &scopeInd={0});
+		const std::vector<int> &scopeInd={0});
 	void RemoveIndex(int typeInd, int oldInd);
-	int ConnectedVertex(vector<int> &vertBlock) const;
-	int ConnectedVolumes(vector<int> &volBlock, 
-		const vector<bool> &boundaryFaces={}) const;
+	int ConnectedVertex(std::vector<int> &vertBlock) const;
+	int ConnectedVolumes(std::vector<int> &volBlock, 
+		const std::vector<bool> &boundaryFaces={}) const;
 	void ForceCloseContainers();
 	void RemoveSingularConnectors(const std::vector<int> &rmvVertInds={},
 		bool voidError=true);
 	std::vector<int> MergeGroupedVertices(HashedVector<int, int> &closeVert,
 		bool delVerts=true);
 	// Mesh Quality
-	vector<int> OrderEdges();
+	std::vector<int> OrderEdges();
 	void SetBorders();
 	void OrientFaces();
 	int OrderVertexEdges(int vertIndex);
 	// Mesh component comparison
-	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
+	void GetOffBorderVert(std::vector<int> &vertList, std::vector<int> &voluInd,
 		int outerVolume=-1);
-	void GetOffBorderVert(vector<int> &vertList, vector<int> &voluInd,
+	void GetOffBorderVert(std::vector<int> &vertList, std::vector<int> &voluInd,
 		int outerVolume=-1) const;
-	void GetOffBorderVert3D(vector<int> &vertList, vector<int> &voluInd,
+	void GetOffBorderVert3D(std::vector<int> &vertList, std::vector<int> &voluInd,
 		int outerVolume=-1) const;
-	void GetOffBorderVert2D(vector<int> &vertInd, vector<int> &surfind,
+	void GetOffBorderVert2D(std::vector<int> &vertInd, std::vector<int> &surfind,
 		int outerVolume=-1) const;
 	// Mesh calculations
 	coordvec CalcCentreVolu(int ind) const;
 	coordvec CalcPseudoNormalSurf(int ind) const;
- 	vector<int> VertexInVolume(const vector<double> testVertices,
+ 	std::vector<int> VertexInVolume(const std::vector<double> testVertices,
  		int sizeVert=3) const; 
 	// Mesh size and position
 	grid::transformation Scale();
@@ -657,9 +656,9 @@ public:
 	void ReturnBoundingBox(std::array<double,3> &lowerB, 
 		std::array<double,3> &upperB) const ;
 	// Mesh Splitting and cropping
-	void Crop(vector<int> indList, int indType=1);
-	vector<int> AddBoundary(const vector<double> &lb, const vector<double> &ub);
-	void CropAtBoundary(const vector<double> &lb, const vector<double> &ub);
+	void Crop(std::vector<int> indList, int indType=1);
+	std::vector<int> AddBoundary(const std::vector<double> &lb, const std::vector<double> &ub);
+	void CropAtBoundary(const std::vector<double> &lb, const std::vector<double> &ub);
 	// Mesh traversal convenience functions
 	int EdgeFromVerts(int v1, int v2) const;
 	int SurfFromEdges(int e1, int e2, int repetitionBehaviour=-1) const;
@@ -674,63 +673,63 @@ public:
 
 // Function declarations
 
-void ConnVertFromConnEdge(const mesh &meshin, const vector<int> &edgeind,
-	vector<int> &vertind);
-std::pair<int, int> OrderMatchLists(const vector<int> &vec1, int p1, int p2);
-int OrderMatchLists(const vector<int> &vec1, const vector<int> &vec2,
+void ConnVertFromConnEdge(const mesh &meshin, const std::vector<int> &edgeind,
+	std::vector<int> &vertind);
+std::pair<int, int> OrderMatchLists(const std::vector<int> &vec1, int p1, int p2);
+int OrderMatchLists(const std::vector<int> &vec1, const std::vector<int> &vec2,
 	int p1, int p2);
 void CropMeshGreedy(mesh &meshin, const std::vector<double> &lb,
 		const std::vector<double> &ub);
-int OrderEdgeList(vector<int> &edgeind, const mesh &meshin, bool warn=true,
-	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL,
+int OrderEdgeList(std::vector<int> &edgeind, const mesh &meshin, bool warn=true,
+	bool errout=true, const std::vector<int>* edgeIndOrigPtr=NULL,
 	const surf* surfin=NULL);
-int OrderList(vector<int> &edgeind, const vector<int> &edge2Vert, bool warn=true,
-	bool errout=true, const vector<int>* edgeIndOrigPtr=NULL);
-void DiffPointsFromCentre(const vector<double> &centre, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
+int OrderList(std::vector<int> &edgeind, const std::vector<int> &edge2Vert, bool warn=true,
+	bool errout=true, const std::vector<int>* edgeIndOrigPtr=NULL);
+void DiffPointsFromCentre(const std::vector<double> &centre, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1);
-void DiffPoints(const vector<double> &vert1,
-	const vector<double> &vert2, coordvec &diffVerts);
-double Angle3Points(const vector<double> &centre, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
+void DiffPoints(const std::vector<double> &vert1,
+	const std::vector<double> &vert2, coordvec &diffVerts);
+double Angle3Points(const std::vector<double> &centre, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
 	coordvec &vec1, coordvec &vec2);
-double VertexDistanceToPlane(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
-	const vector<double> &testVertex,
+double VertexDistanceToPlane(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
+	const std::vector<double> &testVertex,
 	coordvec &temp1, 
 	coordvec &temp2);
-vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
-	const vector<double> &testVertices,
+std::vector<double> VerticesDistanceToPlane(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
+	const std::vector<double> &testVertices,
 	coordvec &temp1, 
 	coordvec &temp2);
-double VertexDistanceToPlane(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
-	const vector<double> &testVertex);
-vector<double> VerticesDistanceToPlane(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
-	const vector<double> &testVertices);
+double VertexDistanceToPlane(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
+	const std::vector<double> &testVertex);
+std::vector<double> VerticesDistanceToPlane(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
+	const std::vector<double> &testVertices);
 mesh Points2Mesh(const std::vector<double> &vecPts, int nProp=3);
-double PlanesDotProduct(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
-	const vector<double> &planeVert4, 
-	const vector<double> &planeVert5,
-	const vector<double> &planeVert6, 
+double PlanesDotProduct(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
+	const std::vector<double> &planeVert4, 
+	const std::vector<double> &planeVert5,
+	const std::vector<double> &planeVert6, 
 	bool normalize=true);
-void PlaneNormal(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
+void PlaneNormal(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1);
-double PlaneNormalAndAngle(const vector<double> &planeVert1, 
-	const vector<double> &planeVert2,
-	const vector<double> &planeVert3,
+double PlaneNormalAndAngle(const std::vector<double> &planeVert1, 
+	const std::vector<double> &planeVert2,
+	const std::vector<double> &planeVert3,
 	coordvec &normal, coordvec &temp1);
 std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
 	const grid::coordlist &vecPts);
@@ -753,8 +752,8 @@ namespace meshhelp {
 		const std::vector<bool> &edgeOut, 
 		std::vector<int> &vecconnIn, std::vector<int> &vecconnOut);
 	void HandleMultiSurfaceSplit(mesh &meshin, 
-		vector<int> &edgeindOld, vector<int> &edgeindNew,
-		vector<int> &vertindNew);
+		std::vector<int> &edgeindOld, std::vector<int> &edgeindNew,
+		std::vector<int> &vertindNew);
 	std::vector<int> FindVertInFromEdgeOut(const mesh &meshin, 
 		const std::vector<bool> &vertOut,
 		const std::vector<int> &edgeList, 
@@ -763,13 +762,13 @@ namespace meshhelp {
 		const std::vector<bool> &edgeOut,
 		std::vector<int> surfList);
 	double VerticesDistanceSquared(const mesh &meshin,
-		const vector<int> &vertind);
+		const std::vector<int> &vertind);
 	double VerticesDistance(const mesh &meshin,
-		const vector<int> &vertind);
+		const std::vector<int> &vertind);
 	bool IsVerticesDistance0(const mesh &meshin,
-		const vector<int> &vertind, double eps=__DBL_EPSILON__);
+		const std::vector<int> &vertind, double eps=__DBL_EPSILON__);
 	int VertexInVolume(const mesh &meshin, 
-		const vector<double> testCoord,
+		const std::vector<double> testCoord,
 		bool needFlip=false);
 	int Get3PointsInSurface(const mesh &meshin, int surfCurr, 
 		std::array<int, 3> &surfacePoints);

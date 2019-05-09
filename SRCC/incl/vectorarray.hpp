@@ -38,7 +38,6 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
  
 // Template Class
 
@@ -51,8 +50,8 @@ using namespace std;
  */
 template<class T> class ArrayVec{
 protected:
-	vector< vector<T> > elems;
-	vector<int> dim;
+	std::vector< std::vector<T> > elems;
+	std::vector<int> dim;
 public:
 	void assign(int nR,int nC, T newelem);
 	void size(int &nR, int &nC) const {nR=elems.size();if(nR>0){nC=elems[0].size();}};
@@ -63,23 +62,23 @@ public:
 		}
 		elems.clear();
 	}
-	void write(ofstream &streamout, const char* sep=", ") const;
-	vector<T>& operator[](const int a){ 
+	void write(std::ostream &streamout, const char* sep=", ") const;
+	std::vector<T>& operator[](const int a){ 
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if (((a)>=int(elems.size())) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS
 		return(elems[a]);
 	}
 
-	const vector<T>& operator[](const int a) const { 
+	const std::vector<T>& operator[](const int a) const { 
 	// [] Operator returns a reference to the corresponding elems.
 		#ifdef SAFE_ACCESS // adds a check in debug mode
 		if (((a)>=int(elems.size())) | (0>a)){
-			cerr << "Error in " << __PRETTY_FUNCTION__ << endl;
+			std::cerr << "Error in " << __PRETTY_FUNCTION__ << std::endl;
 			RSVS3D_ERROR_RANGE(" : Index is out of range");
 		}
 		#endif //SAFE_ACCESS

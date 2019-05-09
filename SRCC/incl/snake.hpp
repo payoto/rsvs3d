@@ -43,7 +43,6 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
 
 class snax;
 class snaxedge;
@@ -63,13 +62,13 @@ public:
 	friend class snake;
 	friend class snax;
 	friend void SpawnArrivedSnaxelsDir(snake &fullsnake, snake &partSnake,
-		const vector<int> &isImpact, int dir);
+		const std::vector<int> &isImpact, int dir);
 
 	void ReorderOnEdge();
 	void OrderOnEdge();
-	void CalculateTimeStepOnEdge(vector<double> &dt, vector<bool> &isSnaxDone,
+	void CalculateTimeStepOnEdge(std::vector<double> &dt, std::vector<bool> &isSnaxDone,
 		int edgeInd);
-	void DetectImpactOnEdge(vector<int> &isImpact, vector<bool> &isSnaxDone,
+	void DetectImpactOnEdge(std::vector<int> &isImpact, std::vector<bool> &isSnaxDone,
 		int edgeInd);
 	// Functions that need modification
 	bool checkready();
@@ -109,8 +108,8 @@ public:
 	// pointer to snaking mesh
 	mesh* snakemesh() const {return this->privatesnakemesh;};
 
-	vector<bool> isMeshVertIn;
-	vector<double> edgeStepLimit;
+	std::vector<bool> isMeshVertIn;
+	std::vector<double> edgeStepLimit;
 	// basic operations grouped from each field
 	void disp() const;
 	void displight() const;
@@ -135,30 +134,30 @@ public:
 	void ForceCloseContainers();
 	// Snake Movement
 	void UpdateDistance(double dt,  double maxDstep=1.0, bool scaledStep=false);
-	void UpdateDistance(const vector<double> &dt,  double maxDstep=1.0, 
+	void UpdateDistance(const std::vector<double> &dt,  double maxDstep=1.0, 
 		bool scaledStep=false);
-	void CalculateTimeStep(vector<double> &dt, double dtDefault, 
+	void CalculateTimeStep(std::vector<double> &dt, double dtDefault, 
 		double distDefault=1.0);
 	double SnaxStepLimit(int snaxSub) const;
 	void SetEdgeStepLimits();
-	void SnaxImpactDetection(vector<int> &isImpact);
-	void SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim);
+	void SnaxImpactDetection(std::vector<int> &isImpact);
+	void SnaxAlmostImpactDetection(std::vector<int> &isImpact, double dDlim);
 	void UpdateCoord();
-	void UpdateCoord(const vector<int> &snaxInds);
+	void UpdateCoord(const std::vector<int> &snaxInds);
 	void Flip(); // reverses snake directions
 	grid::limits Scale(const grid::limits &newSize);
 	// Snake connectivity operations
 	void OrderEdges();
 	void SetSnaxSurfs(){}
 	void OrientFaces();
-	int FindBlockSnakeMeshVerts(vector<int> &vertBlock) const;
+	int FindBlockSnakeMeshVerts(std::vector<int> &vertBlock) const;
 	void AssignInternalVerts();
 	void CheckConnectivity() const; 
 	void TakeSpawnStep(int minIndex, double stepLength);
 	void TakeSmoothSpawnStep(int minIndex, double stepLength,
 		std::string smoothStep="none");
 	void VertIsIn(int vertInd, bool isIn=true);
-	void VertIsIn(vector<int> vertInd, bool isIn=true);
+	void VertIsIn(std::vector<int> vertInd, bool isIn=true);
 	bool ReturnFlip()const{return(isFlipped);}
 	// io of snake
 	void read(FILE *fid);
@@ -262,8 +261,8 @@ public:
 
 // Function prototypes
 double SnaxImpactDt(const snax &snax1,const snax &snax2);
-int CompareSnakeInternalStatus(const vector<bool> & thisVec,bool thisFlipped,
-	 const vector<bool> & otherVec, bool otherFlipped);
+int CompareSnakeInternalStatus(const std::vector<bool> & thisVec,bool thisFlipped,
+	 const std::vector<bool> & otherVec, bool otherFlipped);
 // Test Function prototypes
 int Test_SnakeStructures();
 int Test_coordvec();
@@ -274,8 +273,8 @@ int Test_snakeinit();
 int Test_snakeinit_MC();
 int Test_snakeOrderEdges();
 int Test_snakeinitflat();
-void Test_stepalgo(snake &testSnake,  vector<int> &isImpact);
-void Test_stepalgo_mergeclean(snake &testSnake,  vector<int> &isImpact);
+void Test_stepalgo(snake &testSnake,  std::vector<int> &isImpact);
+void Test_stepalgo_mergeclean(snake &testSnake,  std::vector<int> &isImpact);
 // Functions needed at Compile time
 
 // set constructors (used to avoid a variable being unknowingly forgotten)

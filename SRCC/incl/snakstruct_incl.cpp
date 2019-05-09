@@ -38,29 +38,29 @@ template<class T> void SnakStruct<T>::HashParent()
 	isHashParent=1;
 	
 	
-   //cout << "Array Struct Succesfully Hashed" << endl;
+   //std::cout << "Array Struct Succesfully Hashed" << std::endl;
 }
 
 template<class T> void SnakStruct<T>::DeHashParent(const int pos){
 	
 	int key=elems[pos].KeyParent();
-	unordered_multimap<int,int>::iterator it = hashParent.find(key);
+	auto it = hashParent.find(key);
 	while(it->second!=pos && it->first==key){++it;}
 
 	if (it->second==pos && it->first==key){
 		hashParent.erase (it);
 	} else {
 
-		cerr << "Error: Key value pair not found and could not be removed "<< endl;
-		cerr << " key " << key << " pos " << pos << endl;
-		cerr << "	in function:" <<  __PRETTY_FUNCTION__ << endl;
-		RSVS3D_ERROR_ARGUMENT("Key value pair not found and could not be removed");
+		std::cerr << "Error: Key value std::pair not found and could not be removed "<< std::endl;
+		std::cerr << " key " << key << " pos " << pos << std::endl;
+		std::cerr << "	in function:" <<  __PRETTY_FUNCTION__ << std::endl;
+		RSVS3D_ERROR_ARGUMENT("Key value std::pair not found and could not be removed");
 	}
 }
 template<class T> bool SnakStruct<T>::memberIsHashParent(const int pos) const{
 	
 	int key=elems[pos].KeyParent();
-	unordered_multimap<int,int>::const_iterator it = hashParent.find(key);
+	auto it = hashParent.find(key);
 	if(it != hashParent.end()){
 		while(it != hashParent.end() 
 			&& it->second!=pos && it->first==key){++it;}
@@ -96,7 +96,7 @@ template<class T> void SnakStruct<T>::Concatenate(const SnakStruct<T> &other)
 	isHashParent=0;
 }
 
-template<class T> void SnakStruct<T>::remove(const vector<int> &sub)
+template<class T> void SnakStruct<T>::remove(const std::vector<int> &sub)
 {
 	ArrayStruct<T>::remove(sub);
 	isHashParent=0;
@@ -125,8 +125,8 @@ template<class T>
 int SnakStruct<T>::findparent(int key) const 
 {
 	if (isHashParent==0){
-		cerr << "Warning: reading from potentially obsolete unordered_map " << endl;
-		cerr << "          in snaxarray::findedge(int key)" << endl; 
+		std::cerr << "Warning: reading from potentially obsolete unordered_map " << std::endl;
+		std::cerr << "          in snaxarray::findedge(int key)" << std::endl; 
 	}
 	auto search=hashParent.find(key);
 	
@@ -145,12 +145,12 @@ int SnakStruct<T>::findparent(int key) const
 }
 
 template<class T>
-void SnakStruct<T>::findsiblings(int key, vector<int> &siblings) const 
+void SnakStruct<T>::findsiblings(int key, std::vector<int> &siblings) const 
 {
 	if (isHashParent==0){
-		cerr << "Warning: reading from potentially obsolete unordered_multimap " << endl;
-		cerr << "          in " << __PRETTY_FUNCTION__ << endl; 
-		cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << endl; 
+		std::cerr << "Warning: reading from potentially obsolete std::unordered_multimap " << std::endl;
+		std::cerr << "          in " << __PRETTY_FUNCTION__ << std::endl; 
+		std::cerr << "          To avoid this message perform read operations on ArrayStruct<T> using the () operator" << std::endl; 
 	}
 	ReturnDataEqualRange(key, hashParent, siblings);
 }
@@ -173,7 +173,7 @@ void ModiftrackArray<T>::SetNoModif(){
 }
 
 template<class T>
-void ModiftrackArray<T>::ReturnModifInd(vector<int> &vecind){
+void ModiftrackArray<T>::ReturnModifInd(std::vector<int> &vecind){
 	int ii,n;
 	n=ArrayStruct<T>::size();
 	vecind.clear();
@@ -185,7 +185,7 @@ void ModiftrackArray<T>::ReturnModifInd(vector<int> &vecind){
 }
 
 template<class T>
-void ModiftrackArray<T>::ReturnModifLog(vector<bool> &modiflog){
+void ModiftrackArray<T>::ReturnModifLog(std::vector<bool> &modiflog){
 	int ii,n;
 	n=ArrayStruct<T>::size();
 	modiflog.assign(n,false);

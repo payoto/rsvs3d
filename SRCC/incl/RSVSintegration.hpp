@@ -43,14 +43,13 @@ namespace param {
 // ================================
 // declarations
 
-using namespace std; 
 
 
-void SnakeConnectivityUpdate(snake &testSnake,  vector<int> &isImpact,
+void SnakeConnectivityUpdate(snake &testSnake,  std::vector<int> &isImpact,
 	double impactAlmostRange=0.2);
-void SnakeConnectivityUpdate_2D(snake &testSnake,  vector<int> &isImpact);
-void SnakeConnectivityUpdate_legacy(snake &snakein,  vector<int> &isImpact);
-void SnakeConnectivityUpdate_robust(snake &snakein,  vector<int> &isImpact);
+void SnakeConnectivityUpdate_2D(snake &testSnake,  std::vector<int> &isImpact);
+void SnakeConnectivityUpdate_legacy(snake &snakein,  std::vector<int> &isImpact);
+void SnakeConnectivityUpdate_robust(snake &snakein,  std::vector<int> &isImpact);
 double SnakePositionUpdate(snake &rsvsSnake, std::vector<double> &dt,
 	double snaxtimestep, double snaxdiststep);
 namespace integrate {

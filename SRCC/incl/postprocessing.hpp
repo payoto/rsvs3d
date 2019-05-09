@@ -44,7 +44,6 @@ class triarray;
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
 
 namespace rsvs3d {
 	namespace constants{
@@ -83,7 +82,7 @@ public:
 	// Mesh out
 	int PrintMesh(const mesh& meshout,int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	int PrintSnakeInternalPts(const snake &snakein,int strandID=0, double timeStep=0);
 	int VolDataBlock(const mesh& meshout,int nVert,int nVolu, int nVertDat,
 		const std::vector<int> &voluList={},
@@ -91,7 +90,7 @@ public:
 	int SurfDataBlock(const mesh& meshout,int nVert,int nSurf, int nVertDat);
 	int LineDataBlock(const mesh &meshout,int nVert,int nEdge, int nVertDat,int nCellDat);
 	int VertDataBlock(const mesh &meshout,int nVert, int nVertDat,int nCellDat,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	int VolFaceMap(const mesh& meshout,int nSurf);
 	int VolFaceMap(const mesh& meshout, const std::vector<int> &surfList,
 		const std::vector<int> &voluList,
@@ -110,15 +109,15 @@ public:
 	int LineDataBlock(const triangulation &triout, triarray triangulation::*mp,
 		int nVert,int nEdge, int nVertDat,int nCellDat);
 	int LineDataBlock(const triangulation &triout, triarray triangulation::*mp,
-		int nVert,int nEdge, int nVertDat,int nCellDat, const vector<int> &triList);
+		int nVert,int nEdge, int nVertDat,int nCellDat, const std::vector<int> &triList);
 	int SurfFaceMap(const triangulation &triout, triarray triangulation::*mp);
 	int LineFaceMap(const triangulation &triout, triarray triangulation::*mp);
-	int LineFaceMap( const vector<int> &triList);
+	int LineFaceMap( const std::vector<int> &triList);
 	int VolFaceMap(const triangulation &triout, triarray triangulation::*mp,int nSurf);
 	int PrintTriangulation(const triangulation &triout, triarray triangulation::*mp,
 		int strandID=0, double timeStep=0,
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
-		const vector<int> &triList={});
+		const std::vector<int> &triList={});
 
 	// Triangulation surface array out
 	int VolDataBlock(const triangulation &triout, trisurfarray triangulation::*mp,
@@ -140,12 +139,12 @@ public:
 		bool printCoord=true);
 	int PrintSnake(const snake& snakeout,int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	int PrintSnake(std::string snakeData,const snake& snakeout,
 		int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		int coordConnShareZone=rsvs3d::constants::tecplot::nosharedzone,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	// Zone Headers
 	void ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode,
 		int nVertDat, int nCellDat);
@@ -165,18 +164,18 @@ public:
 	int PrintSnakeSensitivity(const triangulation& triRSVS, const RSVScalc &calcObj,
 		int strandID=0, double timeStep=0,
 		int forceOutType=rsvs3d::constants::tecplot::autoselect, 
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	int RSVScalcDataBlock(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0,
 		int methodProcess=1);
 	int PrintSnakeSensitivityTime(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 	int PrintSnakeGradients(const triangulation& triRSVS,
 		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
-		const vector<int> &vertList={});
+		const std::vector<int> &vertList={});
 
 	tecplotfile(){
 		this->fid=NULL;
@@ -188,18 +187,18 @@ public:
 		lengthLine=0;
 		this->isloud = isloudIn;
 		if (this->isloud){
-			cout << "tecplot file object created" << endl;
+			std::cout << "tecplot file object created" << std::endl;
 		}
 	}
 	~tecplotfile(){
 		if (fid!=NULL){
 			this->CloseFile();
 			if (this->isloud){
-				cout << "Object deleted - File Closed" << endl;
+				std::cout << "Object deleted - File Closed" << std::endl;
 			}
 		} else {
 			if (this->isloud){
-				cout << "Object deleted - No File Closed" << endl;
+				std::cout << "Object deleted - No File Closed" << std::endl;
 			}
 		}
 	}

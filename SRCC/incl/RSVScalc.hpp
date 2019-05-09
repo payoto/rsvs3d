@@ -27,7 +27,6 @@
 #include "snake.hpp"
 #include "triangulate.hpp"
 
-using namespace std; 
 typedef Eigen::SparseMatrix<double, Eigen::ColMajor> MatrixXd_sparse;
 typedef HashedVectorPair<int,int,int, double> TripletMap;
 
@@ -169,7 +168,7 @@ public:
 	/// maps snakemesh() volu onto constr
 	HashedMap<int,int,int> constrMap;
 	/// keeps pairs with parentindex and voluindex
-	std::vector<pair<int,int>> constrList;
+	std::vector<std::pair<int,int>> constrList;
 
 	/**
 	 * @brief      Decides wether full or sparse math should be used.
@@ -477,7 +476,7 @@ public:
 	 *                     statistics, ==2 ...and constraint vectors, >2 ...and 
 	 *                     snaxel velocity vector.
 	 */
-	void ConvergenceLog(ofstream &out, int loglvl=3) const;
+	void ConvergenceLog(std::ofstream &out, int loglvl=3) const;
 	
 	void SetUseSurfCentreDeriv(int in){this->useSurfCentreDeriv = in;}
 	bool GetUseSurfCentreDeriv() const{return(this->useSurfCentreDeriv);}
@@ -500,7 +499,7 @@ public:
  This uses the RSVScalc object to guide the resizing operation if it is needed.
 
  @param[in]     calcobj     The calculation object.
- @param[in,out] lagMultAct  The vector of active lagrangian multipliers.
+ @param[in,out] lagMultAct  The std::vector of active lagrangian multipliers.
  @param[out]    isLarge     Returns if lagMultAct is too large.
  @param[out]    isNan       Returns if lagMultAct has Nan values.
 */

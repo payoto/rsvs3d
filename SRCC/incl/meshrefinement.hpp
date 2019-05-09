@@ -40,7 +40,6 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
 
 
 
@@ -49,10 +48,10 @@ using namespace std;
 
 // Base class
 
-void CoarsenMesh(const mesh &meshchild, mesh &newparent, const vector<int> &elmMapping);
-void CartesianMapping(const mesh& meshin, vector<int> &elmMapping, vector<int> &dims);
-void CartesianMapping2D(const mesh& meshin, vector<int> &elmMapping, vector<int> &dims);
-void CartesianMapping3D(const mesh& meshin, vector<int> &elmMapping, vector<int> &dims);
+void CoarsenMesh(const mesh &meshchild, mesh &newparent, const std::vector<int> &elmMapping);
+void CartesianMapping(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
+void CartesianMapping2D(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
+void CartesianMapping3D(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
 //test functions
 
 int Test_MeshRefinement();

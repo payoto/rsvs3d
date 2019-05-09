@@ -39,7 +39,6 @@ class SurfCentroid;
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
 
 template <class T> class TriStruct;
 
@@ -75,7 +74,7 @@ class trisurfarray : public TriStruct<trianglesurf>{};
 class triangulation  
 {
 public:
-	vector<int> acttri; // 
+	std::vector<int> acttri; // 
 	triarray stattri;
 	triarray dynatri;
 	triarray intertri;
@@ -113,8 +112,8 @@ public:
 
 class tri2mesh {
 public:
-	vector<int> celltarg; // cell need to be indexed in a support array which maps to constraints etc
-	vector<double> constrinfluence; // +1 -1 to indicate 
+	std::vector<int> celltarg; // cell need to be indexed in a support array which maps to constraints etc
+	std::vector<double> constrinfluence; // +1 -1 to indicate 
 };
 
 
@@ -123,8 +122,8 @@ private:
 	bool isTriangleReady=false;
 public:
 
-	vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
-	vector<int> pointind;
+	std::vector<int> pointtype; // 1=mesh vertex 2=snaxel 3=trianglepoint
+	std::vector<int> pointind;
 	int parentsurf=0; // Surface in the snakemesh() needs to be converted to constr
 	int parenttype=0;
 
@@ -189,9 +188,9 @@ public:
 class trianglesurf : public meshpart , public snakpart {
 
 public:
-	vector<int> indvert;
-	vector<int> typevert;
-	vector<int> voluind;
+	std::vector<int> indvert;
+	std::vector<int> typevert;
+	std::vector<int> voluind;
 	int parentsurfmesh=0;
 	
 	// interface functions
@@ -222,7 +221,7 @@ void TriangulateSurface(const surf &surfin,const mesh& meshin,
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
 void TriangulateTriSurface(const trianglesurf &surfin,
 	triarray &triangul, tripointarray& trivert, const int typeMesh, int trivertMaxInd);
-void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const vector<int> &subList={});
+void TriangulateContainer(const mesh& meshin, triangulation &triangleRSVS , const int typeMesh, const std::vector<int> &subList={});
 void TriangulateSnake(snake& snakein, triangulation &triangleRSVS);
 void TriangulateMesh(mesh& meshin, triangulation &triangleRSVS);
 void MeshTriangulation(mesh &meshout,const mesh& meshin,triarray &triangul, tripointarray& trivert);
@@ -230,12 +229,12 @@ void MaintainTriangulateSnake(triangulation &triangleRSVS);
 void SnakeSurfaceCentroid_fun(coordvec &coord,const surf &surfin, const mesh& meshin);
 void HybridSurfaceCentroid_fun(coordvec &coord,const trianglesurf &surfin, const mesh& meshin, const mesh& snakeconn);
 
-void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> &dt,
-	vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT);
+void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , std::vector<double> &dt,
+	std::vector<int> &isImpact, RSVScalc &calcObj, tecplotfile &outSnake2, double totT);
 void BuildTriSurfGridSnakeIntersect(triangulation &triangleRSVS);
 int FollowVertexConnection(int actVert, int prevEdge, const HashedVector<int,int> &edgeSurfInd,	const HashedVector<int,int> &vertSurfInd, const snake &snakeRSVS, const mesh &meshRSVS, int &returnIndex,int &returnType, int &nextEdge);
 int FollowSnaxelDirection(int actSnax,const snake &snakeRSVS, int &returnIndex, int &returnType, int &actEdge);
-bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, vector<bool> &isSnaxEdgeDone, int & returnIndex);
+bool FollowSnaxEdgeConnection(int actSnax, int actSurf,int followSnaxEdge,  const snake &snakeRSVS, std::vector<bool> &isSnaxEdgeDone, int & returnIndex);
 mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin);
 void FlattenBoundaryFaces(mesh &meshin);
 SurfCentroid SurfaceCentroid_TriangleSurf(const trianglesurf &surfin, 

@@ -48,8 +48,6 @@
 // Code
 // NOTE: function in a class definition are IMPLICITELY INLINED 
 //       ie replaced by their code at compile time
-using namespace std;
-using namespace Eigen;
 // Templates
 
 /**
@@ -116,20 +114,20 @@ template <class T> T cumprod(const T &matIn, int d) {
 
 // functions
 int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid);
-int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid);
-int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert, 
-	Matrix3i edgeProp, RowVector3i nEdgeDim);
+int BuildBlockGrid(Eigen::RowVector3i dimGrid, mesh& blockGrid);
+int BuildBlockVert(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nVert, 
+	Eigen::Matrix3i edgeProp, Eigen::RowVector3i nEdgeDim);
 
-int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
-	RowVector3i nEdgeDim,  RowVector3i nSurfDim, Matrix3i edgeProp,
-	Matrix3i surfProp );
+int BuildBlockEdge(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
+	Eigen::RowVector3i nEdgeDim,  Eigen::RowVector3i nSurfDim, Eigen::Matrix3i edgeProp,
+	Eigen::Matrix3i surfProp );
 
-int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
-	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim,
-	 RowVector3i nEdgeDim);
+int BuildBlockSurf(Eigen::RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
+	Eigen::Matrix3i surfProp, Eigen::Matrix3i edgeProp, Eigen::RowVector3i nSurfDim,
+	 Eigen::RowVector3i nEdgeDim);
 
-int BuildBlockVolu(RowVector3i dimGrid, int nVolu , mesh& blockGrid,
-	RowVector3i nSurfDim, Matrix3i surfProp);
+int BuildBlockVolu(Eigen::RowVector3i dimGrid, int nVolu , mesh& blockGrid,
+	Eigen::RowVector3i nSurfDim, Eigen::Matrix3i surfProp);
 //test functions
 int Test_BuildBlockGrid_noout();
 int Test_MeshOut();

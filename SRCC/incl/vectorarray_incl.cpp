@@ -15,7 +15,7 @@ compiled on its own.
 
 template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)  
 {
-	vector<T> tempElems;
+	std::vector<T> tempElems;
 	tempElems.assign(nC,newelem);
 	elems.assign(nR,tempElems);
 
@@ -24,7 +24,7 @@ template<class T> void ArrayVec<T>::assign(int nR,int nC, T newelem)
 	dim.push_back(nC);
 }
 template<class T> 
-void ArrayVec<T>::write(ofstream &streamout, const char* sep) const{
+void ArrayVec<T>::write(std::ostream &streamout, const char* sep) const{
 	int nR=0, nC=0;
 	this->size(nR, nC);
 	for (int i = 0; i < nR; ++i)
