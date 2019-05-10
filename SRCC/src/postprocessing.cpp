@@ -81,20 +81,8 @@ namespace dataoutput {
 	 */
 	void VertexNormal(tecplotfile &tecout, const mesh& meshin, int nVert){
 
-		std::vector<double> coords;
-		coords.reserve(nVert*3);
-		coordvec normal;
-
-		grid::coordlist neighCoord;
-
-		for (int i = 0; i < nVert; ++i)
-		{
-			meshin.verts(i)->Normal(&meshin, neighCoord, normal);
-			for (int j = 0; j < 3; ++j)
-			{
-				coords.push_back(normal(j));
-			}
-		}
+		std::vector<double> coords = MeshUnitNormals(meshin);
+		
 		for (int j = 0; j < 3; ++j)
 		{
 			for (int i = 0; i < nVert; ++i)
@@ -107,21 +95,7 @@ namespace dataoutput {
 	}
 	void VertexLaplacian(tecplotfile &tecout, const mesh& meshin, int nVert){
 
-		std::vector<double> coords;
-		coords.reserve(nVert*3);
-		coordvec lapVec;
-
-		grid::coordlist neighCoord;
-
-		for (int i = 0; i < nVert; ++i)
-		{
-			VertexLaplacianVector(meshin, meshin.verts(i), lapVec);
-
-			for (int j = 0; j < 3; ++j)
-			{
-				coords.push_back(lapVec(j));
-			}
-		}
+		auto coords = MeshLaplacians(meshin);
 		for (int j = 0; j < 3; ++j)
 		{
 			for (int i = 0; i < nVert; ++i)
@@ -130,24 +104,11 @@ namespace dataoutput {
 			}
 			tecout.NewLine();
 		}
-
 	}
+
 	void SnaxelDirection(tecplotfile &tecout, const snake& snakein, int nVert){
 
-		std::vector<double> coords;
-		coords.reserve(nVert*3);
-		coordvec lapVec;
-
-		grid::coordlist neighCoord;
-
-		for (int i = 0; i < nVert; ++i)
-		{
-			snakein.snaxs(i)->Direction(snakein, lapVec);
-			for (int j = 0; j < 3; ++j)
-			{
-				coords.push_back(lapVec(j));
-			}
-		}
+		auto coords = snakein.MoveDirections();
 		for (int j = 0; j < 3; ++j)
 		{
 			for (int i = 0; i < nVert; ++i)
@@ -1738,6 +1699,49 @@ int tecplotfile::RSVScalcDataBlock(const triangulation& triRSVS,
 	return 0;
 }
 
+int tecplotfile::RSVScalcVectorDataBlock(const triangulation& triRSVS, 
+	const RSVScalc &calcObj, int nVert, int numConstrPlot,
+	int methodProcess){
+	// Prints the Coord and Fill Data blocks to the tecplot file
+
+	int ii;
+	// Print vertex Data
+	std::vector<double> sensTemp;
+
+	void (RSVScalc::*mp) (const triangulation&, std::vector<double>&, int) const;
+	if (methodProcess==1){
+		mp = &RSVScalc::ReturnSensitivities;
+	} else if(methodProcess==2){
+		mp = &RSVScalc::ReturnGradient;
+	} else {
+		RSVS3D_ERROR_ARGUMENT("Unknown methodProcess value accepted are 1 "
+			"(sensitivities) and 2 (derivatives).");
+	}
+    auto normals = MeshUnitNormals(triRSVS.snakeDep->snakeconn);
+    auto directions = triRSVS.snakeDep->MoveDirections();
+
+	(calcObj.*mp)(triRSVS, sensTemp, numConstrPlot);
+	for ( ii = 0; ii<nVert; ++ii){
+		double dotProd = 0.0;
+		for (int j = 0; j < 3; ++j)
+		{
+			dotProd += normals[ii*3+j]*directions[ii*3+j];
+		}
+		this->Print("%.16lf ",sensTemp[ii]);
+		sensTemp[ii] *= dotProd;
+	}
+	this->NewLine();
+	for (int j = 0; j < 3; ++j)
+	{
+		for ( ii = 0; ii<nVert; ++ii){
+			this->Print("%.16lf ",sensTemp[ii]*normals[ii*3+j]);
+		}
+		this->NewLine();
+	}
+
+	return 0;
+}
+
 // Print snake with sensitivity
 int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS, 
 	const RSVScalc &calcObj, int strandID, double timeStep, int forceOutType, 
@@ -1765,7 +1769,7 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 
 	this->NewZone();
 	if(strandID<=0){
-		strandID = rand();
+		while (this->isStrand(++strandID) && strandID<=100){}
 	}
 	if(strandID>0){
 		this->StrandTime(strandID, timeStep);
@@ -1789,20 +1793,20 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
 			nVertDat,nCellDat,nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
-		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat);
 		this->VolFaceMap(snakeout.snakeconn,nSurf);
 	}
 	else if (forceOutType==tecplotconst::polygon){
 		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
-		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->RSVScalcDataBlock(triRSVS,calcObj, nVert, nSensDat);
 		this->SurfFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==tecplotconst::line){
 		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
 			nSensDat);
 		this->SnakeDataBlock(snakeout,nVert, nVertDat);
-		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, nSensDat);
+		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, nSensDat);
 		this->LineFaceMap(snakeout.snakeconn,nEdge);
 	} else if (forceOutType==tecplotconst::point){
 		if(int(vertList.size())==nVert){
@@ -1837,7 +1841,112 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation& triRSVS,
 			this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
 		}
 		this->DefShareZoneVolume(shareZone, nVertDat+nCellDat);
-		this->RSVScalcDataBlock(triRSVS,	calcObj, nVert, i+1, i);
+		this->RSVScalcDataBlock(triRSVS, calcObj, nVert, i+1, i);
+	}
+
+	return(0);
+}
+
+
+// Print snake with sensitivity
+int tecplotfile::PrintSnakeSensitivityVector(const triangulation& triRSVS, 
+	const RSVScalc &calcObj, int strandID, double timeStep, int forceOutType, 
+	const vector<int> &vertList){
+
+	int nVert,nEdge,nVolu,nSurf,totNumFaceNode,nVertDat,nCellDat, nSensDat, nSensStep;
+	const snake& snakeout = *triRSVS.snakeDep;
+	ExtractMeshData(snakeout.snakeconn,&nVert,&nEdge,&nVolu, &nSurf, &totNumFaceNode);
+	if(nVert==0){ // Don't print mesh
+		return(1);
+	}
+	nVertDat=3;
+	nCellDat=3;
+	nSensDat = 4;
+	nSensStep = calcObj.numConstr();
+	
+	if(nZones==0){
+		fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"" );
+		for (int i = 0; i < nSensDat; ++i)
+		{
+			fprintf(fid, ", \"sens_%i\"",i);
+		}
+		fprintf(fid, "\n");
+	}
+
+	this->NewZone();
+	if(strandID<=0){
+		while (this->isStrand(++strandID) && strandID<=100){}
+	}
+	if(strandID>0){
+		this->StrandTime(strandID, timeStep);
+	}
+	// Fixed by the dimensionality of the mesh
+
+	if (forceOutType==tecplotconst::autoselect){
+		if(nVolu>0){
+			forceOutType=tecplotconst::polyhedron; // output as volume data (FEPOLYHEDRON)
+		} else if (nSurf>0){
+			forceOutType=tecplotconst::polygon;// output as Surface data (FEPOLYGON)
+		} else if (nEdge>0){
+			forceOutType=tecplotconst::line; // output as line data (FELINESEG)
+		} else {
+			forceOutType=tecplotconst::point;
+		}
+	}
+
+	if (forceOutType==tecplotconst::polyhedron){
+		this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+			nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->RSVScalcVectorDataBlock(triRSVS, calcObj, nVert);
+		this->VolFaceMap(snakeout.snakeconn,nSurf);
+	}
+	else if (forceOutType==tecplotconst::polygon){
+		this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->RSVScalcVectorDataBlock(triRSVS, calcObj, nVert);
+		this->SurfFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==tecplotconst::line){
+		this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
+			nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->RSVScalcVectorDataBlock(triRSVS,	calcObj, nVert);
+		this->LineFaceMap(snakeout.snakeconn,nEdge);
+	} else if (forceOutType==tecplotconst::point){
+		if(int(vertList.size())==nVert){
+			nVert=0;
+			for (int ii=0; ii< int(vertList.size());++ii){
+				nVert += int(vertList[ii]); 
+			}
+		} else if (vertList.size()>0){
+			nVert=int(vertList.size());
+		}
+		this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
+		this->SnakeDataBlock(snakeout,nVert, nVertDat);
+		this->RSVScalcVectorDataBlock(triRSVS,	calcObj, nVert);
+		// No map just points
+	}
+	int shareZone = this->ZoneNum();
+	double tStepMultiplier = pow(10,- ceil(log10(double(nSensStep))));
+	for (int i = 1; i < nSensStep; ++i)
+	{
+		this->NewZone();
+		this->StrandTime(strandID, timeStep+tStepMultiplier*i);
+		if (forceOutType==tecplotconst::polyhedron){
+			this->ZoneHeaderPolyhedronSnake(nVert,nVolu,nSurf,totNumFaceNode,
+				nVertDat,nCellDat,nSensDat);
+		} else if (forceOutType==tecplotconst::polygon){
+			this->ZoneHeaderPolygonSnake(nVert, nEdge,nSurf,nVertDat,nCellDat,
+				nSensDat);
+		} else if (forceOutType==tecplotconst::line){
+			this->ZoneHeaderFelinesegSnake(nVert, nEdge,nVertDat,nCellDat,
+				nSensDat);
+		} else if (forceOutType==tecplotconst::point){
+			this->ZoneHeaderOrdered(nVert,nVertDat,nCellDat,nSensDat);
+		}
+		this->DefShareZoneVolume(shareZone, nVertDat+nCellDat);
+		this->RSVScalcVectorDataBlock(triRSVS, calcObj, nVert, i);
 	}
 
 	return(0);

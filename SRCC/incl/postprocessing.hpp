@@ -71,11 +71,14 @@ namespace rsvs3d {
 
 class tecplotfile {
 private:
+	HashedVector<int,int> strands;
 	FILE *fid;
 	int lengthLine;
 	int nZones=0;
 	bool isloud;
 public:
+	bool isStrand(int strandID){
+		return rsvs3d::logicals::__isfound(this->strands.find(strandID));}
 	int OpenFile(const char *str, const char *mode="w");
 	void CloseFile();
 	int ZoneNum() const {return(nZones);}
@@ -168,7 +171,14 @@ public:
 	int RSVScalcDataBlock(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int nVert, int nSensDat, int sensStart=0,
 		int methodProcess=1);
+	int RSVScalcVectorDataBlock(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int nVert, int numConstrPlot=0,
+		int methodProcess=1);
 	int PrintSnakeSensitivityTime(const triangulation& triRSVS, 
+		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
+		int forceOutType=rsvs3d::constants::tecplot::autoselect,
+		const std::vector<int> &vertList={});
+	int PrintSnakeSensitivityVector(const triangulation& triRSVS, 
 		const RSVScalc &calcObj, int strandID=0, double timeStep=0, 
 		int forceOutType=rsvs3d::constants::tecplot::autoselect,
 		const std::vector<int> &vertList={});
@@ -209,6 +219,9 @@ public:
 	}
 	void StrandTime(int strandID, double timeStep){
 		fprintf(fid, "STRANDID = %i \nSOLUTIONTIME = %.10lf \n",strandID,timeStep);
+		if(!rsvs3d::logicals::__isfound(this->strands.find(strandID))){
+			this->strands.push_back(strandID);
+		}
 	}
 	
 	int Print(const char *format, ...){ // Mimics the printf function hides fid

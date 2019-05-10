@@ -780,7 +780,10 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 			RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.domain);
 			auto fileToOpen= utils::OutputFileName(paramconf, "SnakeConnExport_",".msh");
 			auto tecFileToOpen = utils::OutputFileName(paramconf, "SnakeSensitivity_",".plt");
-
+			auto tecconfig = RSVSobj.paramconf.files.ioout.tecplot;
+			tecconfig.loglvlspecialisation.push_back({-1,"RSVS_sensitivity"});
+			integrate::utils::SpecialiseTemplateFile(tecconfig, -1, 
+				paramconf.files.ioout,"SnakeSensitivity_");
 			RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
 			tecplotfile tecsens;
 			tecsens.OpenFile(tecFileToOpen.c_str());
@@ -788,7 +791,7 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj){
 			RSVSobj.calcObj.CheckAndCompute(
 				RSVSobj.paramconf.rsvs.solveralgorithm, true);
 			RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
-			tecsens.PrintSnakeSensitivityTime(RSVSobj.rsvsTri, RSVSobj.calcObj);
+			tecsens.PrintSnakeSensitivityVector(RSVSobj.rsvsTri, RSVSobj.calcObj);
 			
 		} else {
 			RSVS3D_ERROR_NOTHROW((
@@ -1049,8 +1052,8 @@ void integrate::utils::SpecialiseTemplateFiles(const param::parameters &paramcon
 
 }
 
-void integrate::utils::SpecialiseTemplateFile(const param::tecplottemplate &tecconfig, 
-	int logLvl,
+void integrate::utils::SpecialiseTemplateFile(
+	const param::tecplottemplate &tecconfig, int logLvl,
 	const param::ioout &ioout, std::string fileName){
 
 	// Build the name of the correct file from logging lvl and 

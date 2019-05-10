@@ -164,6 +164,8 @@ public:
 	void write(FILE *fid) const;
 	int read(const char *str);
 	int write(const char *str) const;
+	std::vector<double> MoveDirections() const ;
+
 	void SetSnaxDistanceLimit_conserveShape(bool in){
 		this->snaxDistanceLimit_conserveShape = in;
 	}

@@ -1059,3 +1059,43 @@ std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
 	offset.substract(sphereCentre.usedata());
 	return IntersectLineSphere(lineVec, offset,sphereRadius);
 }
+
+std::vector<double> MeshUnitNormals(const mesh& meshin){
+	std::vector<double> coords;
+	int nVert = meshin.verts.size();
+	coords.reserve(nVert*3);
+	coordvec normal;
+
+	grid::coordlist neighCoord;
+
+	for (int i = 0; i < nVert; ++i)
+	{
+		meshin.verts(i)->Normal(&meshin, neighCoord, normal);
+		normal.Normalize();
+		for (int j = 0; j < 3; ++j)
+		{
+			coords.push_back(normal(j));
+		}
+	}
+	return coords;
+}
+
+std::vector<double> MeshLaplacians(const mesh& meshin){
+	std::vector<double> coords;
+	int nVert = meshin.verts.size();
+	coords.reserve(nVert*3);
+	coordvec lapVec;
+
+	grid::coordlist neighCoord;
+
+	for (int i = 0; i < nVert; ++i)
+	{
+		VertexLaplacianVector(meshin, meshin.verts(i), lapVec);
+
+		for (int j = 0; j < 3; ++j)
+		{
+			coords.push_back(lapVec(j));
+		}
+	}
+	return coords;
+}

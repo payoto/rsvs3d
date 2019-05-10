@@ -96,6 +96,8 @@ std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
 std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
 	const std::vector<double> &linePoint, const coordvec &sphereCentre,
 	double sphereRadius);
+std::vector<double> MeshUnitNormals(const mesh& meshin);
+std::vector<double> MeshLaplacians(const mesh& meshin);
 // Forward declared templated functions
 
 // Base class

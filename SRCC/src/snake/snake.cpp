@@ -2476,6 +2476,25 @@ grid::limits snake::Scale(const grid::limits &newSize){
 	return boundBox;
 }
 
+std::vector<double> snake::MoveDirections() const {
+	std::vector<double> coords;
+	int nVert = this->snaxs.size();
+	coords.reserve(nVert*3);
+	coordvec lapVec;
+
+	grid::coordlist neighCoord;
+
+	for (int i = 0; i < nVert; ++i)
+	{
+		this->snaxs(i)->Direction(*this, lapVec);
+		for (int j = 0; j < 3; ++j)
+		{
+			coords.push_back(lapVec(j));
+		}
+	}
+	return coords;
+}
+
 
 
 
