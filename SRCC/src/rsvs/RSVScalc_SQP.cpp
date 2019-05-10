@@ -9,6 +9,7 @@
 #include "vectorarray.hpp"
 #include "RSVScalc.hpp"
 #include "matrixtools.hpp"
+#include "SQPstep.hpp"
 
 using namespace std; 
 using namespace Eigen; 
