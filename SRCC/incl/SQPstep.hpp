@@ -168,16 +168,17 @@ bool SQPstep(const RSVScalc &calcobj,
 }
 
 
-template<class T>
+template<class T> 
 bool SQPstep(const RSVScalc &calcobj,
 	const Eigen::MatrixXd &dConstrAct, const Eigen::RowVectorXd &dObjAct,
 	const Eigen::VectorXd &constrAct, Eigen::VectorXd &lagMultAct,
 	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
 	bool attemptConstrOnly){
 
-	Eigen::LDLT<Eigen::MatrixXd> condsys(calcobj.HLag_sparse);
+	Eigen::LDLT<Eigen::MatrixXd> condsys(calcobj.HLag);
 	Eigen::MatrixXd temp1, temp2;
 	T HLagSystem(calcobj.HLag);
+
 	std::cout << " (rcond) " << condsys.rcond();
 
 	temp1 = HLagSystem.solve(dConstrAct.transpose());
@@ -215,10 +216,10 @@ bool SQPstep_sparse(const RSVScalc &calcobj,
 	Eigen::VectorXd &deltaDVAct, bool &isNan, bool &isLarge, 
 	bool attemptConstrOnly){
 
-	Eigen::LDLT<MatrixXd_sparse> condsys(calcobj.HLag_sparse);
+	// Eigen::LDLT<MatrixXd_sparse> condsys(calcobj.HLag_sparse);
 	T HLagSystem;
 	HLagSystem.compute(calcobj.HLag_sparse);
-	std::cout << " (rcond) " << condsys.rcond();
+	// std::cout << " (rcond) " << condsys.rcond();
 	if(HLagSystem.info()!=Eigen::Success) {
 		// decomposition failed
 		RSVS3D_ERROR_NOTHROW("Failed to decompose Hessian of lagrangian.");

@@ -113,6 +113,11 @@
             "-DTETLIBRARY",
             "-DEIGEN_NO_DEBUG","-DEIGEN_NO_STATIC_ASSERT",
 		],
+		"rulers":
+		[
+			80
+		],
+		"wrap_width": 95
 
 	}
  }
