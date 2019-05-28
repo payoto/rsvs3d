@@ -210,9 +210,21 @@ void SnakeConnectivityUpdate(snake &snakein,  vector<int> &isImpact,
 	rsvs3d::TimeStamp(" - Connec Update: ", start_f);
 }
 
+void UpdateStabilityMesh(snake &snakein, int maxIndPreSpawn, double stepLength,
+	mesh& stabilityMesh){
+
+	// Check which previous need to be removed
+	// Find which volumes need to be added
+	// Optional: group volumes
+	// Update the element mapping
+
+}
+
 void SnakeSpawnStep(snake &snakein, int maxIndPreSpawn, double stepLength, 
 	std::string smmoothMethod){
 	// double stepLength = 1e-5;
+
+	// Update stability mesh? -> type of smooth spawn step really
 
 	snakein.TakeSpawnStep(maxIndPreSpawn, stepLength);
 	snakein.PrepareForUse();
@@ -661,6 +673,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(
 			RSVSobj.paramconf.dev.smoothstepmethod);
 		std::cout << RSVSobj.paramconf.dev.smoothstepmethod << " ; "; 
 		start_s=rsvs3d::TimeStamp(" spawn step:", start_s);
+		// Need to update the stability mesh
 		MaintainTriangulateSnake(RSVSobj.rsvsTri);
 		start_s=rsvs3d::TimeStamp(" triangulate:", start_s);
 	}
@@ -1071,7 +1084,6 @@ void integrate::utils::SpecialiseTemplateFile(
 			fileName, ".plt")+"\"'";
 	integrate::utils::WriteModifiedTemplate(templateLayout, outputLayout,
 		tecconfig.filenameregex, lineOut);
-	
 
 }
 
