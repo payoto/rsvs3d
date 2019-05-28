@@ -25,7 +25,7 @@
 using namespace std; 
 
 //silent functions
-  
+ 
 
 /*
 Implementation of the interfaces for RSVScalc

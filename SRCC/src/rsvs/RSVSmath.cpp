@@ -244,27 +244,27 @@ void CoordFunc::InitialiseArrays(){
 // Derived classes
 
 void Volume::Calc(){
-		/* This function calculates Volume Jacobian and Hessian using
-matlab automatically generated code
+	/* This function calculates Volume Jacobian and Hessian using
+	matlab automatically generated code
 
-the jacobian is arranged :
-	  x0 y0 z0  x1 y1 z1  x2 y2 z2
- V [                               ] 
+	the jacobian is arranged :
+		  x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 V [                               ] 
 
- The Hessian is arranged:
- 					V 	
-	   x0 y0 z0  x1 y1 z1  x2 y2 z2
- x0 [                               ]  
- y0 [                               ] 
- z0 [                               ] 
- x1 [                               ] 
- y1 [                               ] 
- z1 [                               ] 
- x2 [                               ] 
- y2 [                               ] 
- z2 [                               ] 
+	 The Hessian is arranged:
+	 					V 	
+		   x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 x0 [                               ]  
+	 y0 [                               ] 
+	 z0 [                               ] 
+	 x1 [                               ] 
+	 y1 [                               ] 
+	 z1 [                               ] 
+	 x2 [                               ] 
+	 y2 [                               ] 
+	 z2 [                               ] 
 
-*/
+	*/
 	#ifdef SAFE_ALGO
 	PreCalc(); 
 	#endif
@@ -277,27 +277,27 @@ the jacobian is arranged :
 }
 
 void Volume::CalcFD(){
-		/* This function calculates Volume Jacobian and Hessian using
-matlab automatically generated code
+	/* This function calculates Volume Jacobian and Hessian using
+	matlab automatically generated code
 
-the jacobian is arranged :
-	  x0 y0 z0  x1 y1 z1  x2 y2 z2
- V [                               ] 
+	the jacobian is arranged :
+		  x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 V [                               ] 
 
- The Hessian is arranged:
- 					V 	
-	   x0 y0 z0  x1 y1 z1  x2 y2 z2
- x0 [                               ]  
- y0 [                               ] 
- z0 [                               ] 
- x1 [                               ] 
- y1 [                               ] 
- z1 [                               ] 
- x2 [                               ] 
- y2 [                               ] 
- z2 [                               ] 
+	 The Hessian is arranged:
+	 					V 	
+		   x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 x0 [                               ]  
+	 y0 [                               ] 
+	 z0 [                               ] 
+	 x1 [                               ] 
+	 y1 [                               ] 
+	 z1 [                               ] 
+	 x2 [                               ] 
+	 y2 [                               ] 
+	 z2 [                               ] 
 
-*/  
+	*/  
 	#ifdef SAFE_ALGO
 	PreCalc(); 
 	#endif
@@ -331,27 +331,27 @@ the jacobian is arranged :
 }
  
 void Area::Calc(){
-		/* This function calculates Area Jacobian and Hessian using
-matlab automatically generated code
+	/* This function calculates Area Jacobian and Hessian using
+	matlab automatically generated code
 
-the jacobian is arranged :
-	  x0 y0 z0  x1 y1 z1  x2 y2 z2
- A [                               ] 
+	the jacobian is arranged :
+		  x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 A [                               ] 
 
- The Hessian is arranged:
- 					A 	
-	   x0 y0 z0  x1 y1 z1  x2 y2 z2
- x0 [                               ]  
- y0 [                               ] 
- z0 [                               ] 
- x1 [                               ] 
- y1 [                               ] 
- z1 [                               ] 
- x2 [                               ] 
- y2 [                               ] 
- z2 [                               ] 
+	 The Hessian is arranged:
+	 					A 	
+		   x0 y0 z0  x1 y1 z1  x2 y2 z2
+	 x0 [                               ]  
+	 y0 [                               ] 
+	 z0 [                               ] 
+	 x1 [                               ] 
+	 y1 [                               ] 
+	 z1 [                               ] 
+	 x2 [                               ] 
+	 y2 [                               ] 
+	 z2 [                               ] 
 
-*/
+	*/
 	#ifdef SAFE_ALGO
 	PreCalc();
 	#endif
@@ -412,29 +412,29 @@ void SurfCentroid::CalcFD(){
 }
 
 void SurfCentroid::Calc(){
-/* This function calculates centroid Jacobian and Hessian using
-matlab automatically generated code
+	/* This function calculates centroid Jacobian and Hessian using
+	matlab automatically generated code
 
-the jacobian is arranged :
-	  x0 x1  xn y0 y1  yn  z0 z1  zn
- xc [                               ] 
- yc [                               ]
- zc [                               ]
+	the jacobian is arranged :
+		  x0 x1  xn y0 y1  yn  z0 z1  zn
+	 xc [                               ] 
+	 yc [                               ]
+	 zc [                               ]
 
- The Hessian is arranged:
- 					xc 				 					yc 				 				zc 				
-	  x0 x1  xn y0 y1  yn  z0 z1  zn	x0 x1  xn y0 y1  yn  z0 z1  zn	    x0 x1  xn y0 y1  yn  z0 z1  zn
- x0 [                               ]  [                               ]  [                               ] 
- x1 [                               ]  [                               ]  [                               ] 
- xn [                               ]  [                               ]  [                               ] 
- y0 [                               ]  [                               ]  [                               ] 
- y1 [                               ]  [                               ]  [                               ] 
- yn [                               ]  [                               ]  [                               ] 
- z0 [                               ]  [                               ]  [                               ] 
- z1 [                               ]  [                               ]  [                               ] 
- zn [                               ]  [                               ]  [                               ] 
+	 The Hessian is arranged:
+	 					xc 				 					yc 				 				zc 				
+		  x0 x1  xn y0 y1  yn  z0 z1  zn	x0 x1  xn y0 y1  yn  z0 z1  zn	    x0 x1  xn y0 y1  yn  z0 z1  zn
+	 x0 [                               ]  [                               ]  [                               ] 
+	 x1 [                               ]  [                               ]  [                               ] 
+	 xn [                               ]  [                               ]  [                               ] 
+	 y0 [                               ]  [                               ]  [                               ] 
+	 y1 [                               ]  [                               ]  [                               ] 
+	 yn [                               ]  [                               ]  [                               ] 
+	 z0 [                               ]  [                               ]  [                               ] 
+	 z1 [                               ]  [                               ]  [                               ] 
+	 zn [                               ]  [                               ]  [                               ] 
 
-*/
+	*/
 
 	vector<double> x,y,z,centroidTLength;
 	ArrayVec<double> temp;
