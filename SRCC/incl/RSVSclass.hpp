@@ -48,6 +48,7 @@ namespace integrate {
 		tecplotfile outvectorsnake;
 		snake rsvsSnake;
 		mesh snakeMesh;
+		mesh stabilityMesh;
 		mesh voluMesh;
 		triangulation rsvsTri;
 		RSVScalc calcObj;

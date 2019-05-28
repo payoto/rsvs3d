@@ -94,7 +94,8 @@ namespace integrate {
 			const param::grid &gridconf,
 			const param::ioin &ioinconf,
 			mesh &snakeMesh,
-			mesh &voluMesh
+			mesh &voluMesh,
+			mesh &stabilityMesh
 		);
 		void Snake(
 			const param::snaking &snakconf, 

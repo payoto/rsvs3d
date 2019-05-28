@@ -952,7 +952,7 @@ void mesh::SetMeshDepElm(){
 	meshDepIsSet=true;
 
 }
-
+// TODO: This is not suitable for surfaces?
 void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 	vector<pair<int,int>> &parentcases, vector<double> &voluVals) const {
 
@@ -984,9 +984,11 @@ void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos,
 				* meshtree.parentmesh[ii]->volus(jj)->target);
 		}
 		for (jj = 0; jj < nElm; ++jj){
-			currind.push_back(meshtree.elemind[jj]);
-			parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
-				meshtree.parentconn[ii][jj])+nParCases);
+			if(meshtree.parentconn[ii][jj] != 0){
+				currind.push_back(meshtree.elemind[jj]);
+				parentpos.push_back(meshtree.parentmesh[ii]->volus.find(
+					meshtree.parentconn[ii][jj])+nParCases);
+			}
 			
 		}
 		nParCases+=nj;
@@ -1161,8 +1163,15 @@ void mesh::VoluValuesofParents(int elmInd, vector<double> &vals,
 
 	sub = volus.find(elmInd);
 	for (ii=0; ii < meshtree.nParents; ++ii){
-		vals.push_back(meshtree.parentmesh[ii]->volus.isearch
-			(meshtree.parentconn[ii][sub])->*mp);
+		if(meshtree.parentconn[ii][sub]==0){
+			// Throw infinity on empty as a place holder that won't trigger any
+			// test conditions
+			vals.push_back(INFINITY);
+		} else {
+			vals.push_back(meshtree.parentmesh[ii]->volus.isearch
+				(meshtree.parentconn[ii][sub])->*mp);
+
+		}
 
 	}
 

@@ -307,7 +307,9 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj){
 	RSVSobj.paramconf.PrepareForUse();
 
 	integrate::prepare::Mesh(RSVSobj.paramconf.grid, 
-		RSVSobj.paramconf.files.ioin, RSVSobj.snakeMesh, RSVSobj.voluMesh);
+		RSVSobj.paramconf.files.ioin, RSVSobj.snakeMesh, RSVSobj.voluMesh,
+		RSVSobj.stabilityMesh);
+
 	integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.paramconf.rsvs,
 		RSVSobj.paramconf.files.ioin,
 		RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
@@ -333,7 +335,8 @@ void integrate::prepare::Mesh(
 	const param::grid &gridconf,
 	const param::ioin &ioinconf,
 	mesh &snakeMesh,
-	mesh &voluMesh
+	mesh &voluMesh,
+	mesh &stabilityMesh
 	){
 	/*prepares the snake and volume meshes gor the RSVS process*/
 	// Local declaration
@@ -363,6 +366,12 @@ void integrate::prepare::Mesh(
 	calcVolus.CalculateMesh(voluMesh);
 	calcVolus.ReturnConstrToMesh(voluMesh,&volu::volume);
 
+	// Add stability mesh
+	stabilityMesh.PrepareForUse();
+	std::vector<int> elmMapping;
+	elmMapping.assign(snakeMesh.volus.size(),0);
+	snakeMesh.AddParent(&stabilityMesh,elmMapping);
+
 	std::cout << "Meshes prepared..." << std::endl;
 }
 
@@ -372,7 +381,6 @@ void integrate::prepare::grid::Voxel(
 	mesh &voluMesh
 	){
 
-	int ii;
 	auto gridSize = gridconf.voxel.gridsizebackground;
 	vector<int> elmMapping, backgroundGrid;
 
@@ -391,13 +399,9 @@ void integrate::prepare::grid::Voxel(
 
 	// map elements to coarse grid
 	if(snakeMesh.WhatDim()==3){
-		for (ii=0;ii<snakeMesh.volus.size();++ii){
-			elmMapping.push_back(1);
-		}
+		elmMapping.assign(snakeMesh.volus.size(), 1);
 	} else if (snakeMesh.WhatDim()==2){
-		for (ii=0;ii<snakeMesh.surfs.size();++ii){
-			elmMapping.push_back(1);
-		}
+		elmMapping.assign(snakeMesh.surfs.size(), 1);
 	} else { 
 		RSVS3D_ERROR_ARGUMENT("Incorrect dimension");
 	}
@@ -1096,6 +1100,7 @@ int integrate::test::Prepare(){
 	param::parameters paramconf, origconf;
 	mesh snakeMesh;
 	mesh voluMesh;
+	mesh stabilityMesh;
 	snake rsvsSnake;
 	triangulation rsvsTri;
 	tecplotfile outSnake;
@@ -1109,7 +1114,7 @@ int integrate::test::Prepare(){
 	paramconf.PrepareForUse();
 	try {
 		integrate::prepare::Mesh(paramconf.grid, paramconf.files.ioin,
-			snakeMesh, voluMesh);
+			snakeMesh, voluMesh, stabilityMesh);
 		voluMesh.volus.disp();
 	} catch (std::exception const& ex) { 
 		cerr << "integrate::prepare::Mesh(paramconf.grid, snakeMesh, "
