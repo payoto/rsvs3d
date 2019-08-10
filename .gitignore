@@ -18,6 +18,7 @@ temp/*
 *.o
 *.f
 *.asv
+*.tar.[a-z]*
 SRCC/obj/*.o
 SRCC/.d/*
 SRCC/dbg*

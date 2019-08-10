@@ -539,7 +539,7 @@ double PseudoSurfaceAngle(const mesh &meshin,
 	const std::array<int, 2> &surfInds){
 
 	double surfaceAngle=0.0;
-	auto getcoord = [&](int indexVert) auto 
+	auto getcoord = [&](int indexVert) -> const std::vector<double> 
 		{return meshin.verts.isearch(indexVert)->coord;};
 	// if one of the surfaces is not at the boundary of the domain (volu==0) 
 	// then return 0 angle;

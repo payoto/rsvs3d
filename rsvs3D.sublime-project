@@ -98,20 +98,22 @@
 		// NOTE: You MUST provide --interpreter=mi for the plugin to work
 		"sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
 
-		"SublimeLinter.linters.gcc.include_dirs": [
+		"SublimeLinter.linters.g++.I": [
 			"C:\\ap1949include\\Eigen_all\\Eigen\\",
 			"C:\\ap1949include\\json\\single_include\\nlohmann",
 			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
 			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\modules\\tetgen",
+			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\incl",
+			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\modules\\tetgen",
 			"C:\\ap1949include\\boost_1_67_0",
 			"C:\\ap1949include\\cxxopts-2.1.1\\include",
 		],
 
-		"SublimeLinter.linters.gcc.c++_extra_flags": [
+		"SublimeLinter.linters.g++.args": [
 	          "-fsyntax-only",
 	          "-std=c++11",
-            "-DTETLIBRARY",
-            "-DEIGEN_NO_DEBUG","-DEIGEN_NO_STATIC_ASSERT",
+	            "-DTETLIBRARY",
+	            "-DEIGEN_NO_DEBUG","-DEIGEN_NO_STATIC_ASSERT",
 		],
 		"rulers":
 		[

@@ -47,14 +47,14 @@ DIRTETGEN= modules/tetgen
 # except under std=c++17 which added a standard filesystem header
 # (Broken on GCC v8.1 + MinGW, must still use boost)
 USE_BOOST = true
-DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_67_0
+DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_68_0
 # BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
 # boost compiled library file location (for linker)
 LDDIRBOOST = $(DIRBOOST)/stage/lib
 # boost libraries to load: boost_<library>
 LDFILEBOOST = boost_filesystem boost_system
 # boost version appropriate to the system 
-BOOSTVERSION = -mgw63-mt-sd-x64-1_67
+BOOSTVERSION = -mgw63-mt-sd-x64-1_68
 
 # intel MKL libraries for faster Eigen maths 
 # Not compatible with GCC on windows
@@ -91,11 +91,13 @@ endif
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # Tetgen flag to use as library: -DTETLIBRARY
 # cxxopts #
-CCFLAGDBG= -g -ggdb
+CCFLAGDBG= 
+#-g -ggdb
 # -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
 CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
+# 
 CCFLAGBOOST= 
-CCFLAGEIG= 
+CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
 CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 

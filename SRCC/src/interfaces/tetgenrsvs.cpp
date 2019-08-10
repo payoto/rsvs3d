@@ -158,7 +158,7 @@ void tetgen::internal::PointCurvature2Metric(std::vector<double> &vertCurvature,
 	double maxCurv = *max_element(vertCurvature.begin(), vertCurvature.end());
 	double minCurv = 0.0;
 	double deltaCurv = maxCurv-minCurv;
-	auto lininterp = [&](double curv) double {
+	auto lininterp = [&](double curv) -> double {
 		return (inparam.surfedgelengths[1]-inparam.surfedgelengths[0])
 			/(deltaCurv)*(curv-minCurv)+inparam.surfedgelengths[0];
 		};

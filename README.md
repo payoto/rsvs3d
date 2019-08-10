@@ -1,7 +1,16 @@
-# README #
-Last updated 12/03/2019
+# 3D-RSVS #
+[![JSON for Modern C++](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
 
+The 3D-RSVS is a geometry generation tool using volume specification to build
+smooth surfaces. Papers describing the method are available on 
+[researchgate](https://www.researchgate.net/publication/330197375_Parametric_Surfaces_with_Volume_of_Solid_Control_for_Optimisation_of_Three_Dimensional_Aerodynamic_Topologies) 
+and [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0045793018304730).
+
+
+Last updated 12/03/2019
 [Full documentation](https://payoto.github.io/rsvs3d_docs/)
+available.
+
 # What is this repository for? #
 
 This repository is the C++ implementation of the 3D R-Snake Volume of Solid (RSVS) parameterisation.
