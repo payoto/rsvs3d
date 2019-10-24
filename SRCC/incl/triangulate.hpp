@@ -215,6 +215,7 @@ public:
 void CalculateSnakeVel(snake &snakein);
 void CalculateSnakeVelRand(snake &snakein);
 void CalculateSnakeVelUnit(snake &snakein);
+void CalculateSnakeVelUnitReflect(snake &snakein);
 void CalculateSnakeVelFast(snake &snakein);
 void CalculateNoNanSnakeVel(snake &snakein, double deltaStep=0.01);
 void TriangulateSurface(const surf &surfin,const mesh& meshin, 

@@ -174,8 +174,8 @@ function [currVertSub, currVertInd, currEdgeSub, currEdgeInd]=...
     [cellOrderedVertex,cellOrderedEdges]=OrderBlockEdges(blockEdges);
     
     if numel(cellOrderedVertex)>1
-        errstruct.message = "A face was closed into multiple loops.";
-        errstruct.identifier = "rsvs3D:grid:multiloopface";
+        errstruct.message = 'A face was closed into multiple loops.';
+        errstruct.identifier = 'rsvs3D:grid:multiloopface';
         error(errstruct)
     end
     

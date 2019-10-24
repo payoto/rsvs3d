@@ -227,6 +227,21 @@ void Test_randvelstep_mc(snake &testSnake, vector<double> dt, vector<int> &isImp
 }
 
 
+void Test_unitvelstep(snake &testSnake, vector<double> dt, vector<int> &isImpact,
+	bool reflectVel=true){
+	if (reflectVel){
+		CalculateSnakeVelUnitReflect(testSnake);
+	} else {
+		CalculateSnakeVelUnit(testSnake);
+	}
+	testSnake.CalculateTimeStep(dt,0.25);
+	testSnake.UpdateDistance(dt);
+	testSnake.PrepareForUse();
+	testSnake.UpdateCoord();
+	testSnake.PrepareForUse();
+	Test_stepalgo(testSnake, isImpact);
+}
+
 // -------------------------------------------------------------------------------------------
 // TEST CODE
 // -------------------------------------------------------------------------------------------
@@ -423,7 +438,8 @@ int Test_snake(){
 	return(errTest);
 }
 
-int Test_snakeinit(){ 
+
+int Test_snakeinit_velselect(int velCase=0){ 
 	snake testSnake;
 	mesh snakeMesh, triMesh;
 	triangulation testTriangle;
@@ -439,7 +455,20 @@ int Test_snakeinit(){
 
 	try {
 		fileToOpen="../TESTOUT/TestSnake.plt";
-
+		switch (velCase) {
+			case 0: // random
+				fileToOpen="../TESTOUT/TestSnake_rand.plt";
+				break;
+			case 1: // unit with reflection
+				fileToOpen="../TESTOUT/TestSnake_unitref.plt";
+				break;
+			case 2: // unit step with no reflection
+				fileToOpen="../TESTOUT/TestSnake_unitnoref.plt";
+				break;
+			default:
+				RSVS3D_ERROR_ARGUMENT("velCase option not known");
+				break;
+		}
 		outSnake.OpenFile(fileToOpen);
 		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
@@ -462,7 +491,7 @@ int Test_snakeinit(){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<50;++ii){
+		for(ii=0;ii<300;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -478,7 +507,20 @@ int Test_snakeinit(){
 				MeshTriangulation(triMesh,testSnake.snakeconn,testTriangle.stattri, testTriangle.trivert);
 				outSnake.PrintMesh(triMesh,2,totT);
 			}
-			Test_randvelstep(testSnake, dt, isImpact);
+			switch (velCase) {
+				case 0: // random
+					Test_randvelstep(testSnake, dt, isImpact);
+					break;
+				case 1: // unit with reflection
+					Test_unitvelstep(testSnake, dt, isImpact,true);
+					break;
+				case 2: // unit step with no reflection
+					Test_unitvelstep(testSnake, dt, isImpact,false);
+					break;
+				default:
+					RSVS3D_ERROR_ARGUMENT("velCase option not known");
+					break;
+			}
 			cout << endl;
 			
 			totT=totT+1;
@@ -510,6 +552,18 @@ int Test_snakeinit(){
 	return(errTest);
 }
 
+int Test_snakeinit_random(){ 
+	// rand
+	return(Test_snakeinit_velselect(0));
+}
+int Test_snakeinit_unit(){ 
+	// unit reflect
+	return(Test_snakeinit_velselect(1));
+}
+int Test_snakeinit_unitnoreflect(){ 
+	// unit no reflect
+	return(Test_snakeinit_velselect(2));
+}
 
 int Test_snakeinit_MC(){ 
 	snake testSnake;
