@@ -47,7 +47,12 @@ void CalculateSnakeVelUnit(snake &snakein){
 	int ii=0;
 
 	for (ii=0;ii<int(snakein.snaxs.size());++ii){
-		snakein.snaxs[ii].v=1;
+		if (snakein.snaxs(ii)->isfreeze==1){
+			snakein.snaxs[ii].v=0;
+			snakein.snaxs[ii].isfreeze=0;
+		} else {
+			snakein.snaxs[ii].v=1;
+		}
 	}
 }
 
@@ -57,7 +62,7 @@ void CalculateSnakeVelUnitReflect(snake &snakein){
 
 	for (ii=0;ii<int(snakein.snaxs.size());++ii){
 		if (snakein.snaxs(ii)->isfreeze==1){
-			snakein.snaxs[ii].v=-1*snakein.snaxs[ii].v;
+			snakein.snaxs[ii].v=-0.2*snakein.snaxs[ii].v;
 			snakein.snaxs[ii].isfreeze=0;
 		} else {
 			snakein.snaxs[ii].v=1*snakein.snaxs[ii].v;

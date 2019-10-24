@@ -115,8 +115,8 @@ int rsvstest::newtest(){
 
 
 	gridTest.Run(Test_snakeinit_unit,"Snake unit velocity (reflected)"); 
-	gridTest.Run(Test_snakeinit_unitnoreflect,"Snake unit velocity "
-		"(no reflection)"); 
+	// gridTest.Run(Test_snakeinit_unitnoreflect,"Snake unit velocity "
+	// 	"(no reflection)"); 
 	// gridTest.Run(Test_snakeinit_random,"Snake rand velocity"); 
 
 	return(0);
