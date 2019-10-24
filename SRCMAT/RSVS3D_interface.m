@@ -46,8 +46,43 @@ function [paramOut]=RSVS3D_ReadParam(fileIn)
     end
     fclose(fid);
     paramOut = jsondecode(string);
+    fieldNames = fieldnames(paramOut);
+    if all(cellfun(@(x)~isempty(regexp(x,'^x_','once')),fieldNames))
+        paramOut=InflateJson(paramOut);
+    end
     [paramOut.structdat]=GetStructureData(paramOut);
     
+end
+
+function newParamOut=InflateJson(paramOut)
+    disp('inflate me please')
+    fieldNames = fieldnames(paramOut);
+    fieldSplits = regexp(fieldNames, '_','split');
+    for ii = 1:numel(fieldSplits)
+        for jj = 1:numel(fieldSplits{ii})
+            if ~isempty(regexp(fieldSplits{ii}{jj}, '^[0-9]+$'))
+                fieldSplits{ii}{jj} = str2double(fieldSplits{ii}{jj})+1;
+            end
+        end
+    end
+    
+    newParamOut=struct('structdat',[]);
+    
+    for ii = 1:numel(fieldSplits)
+        if isnumeric(paramOut.(fieldNames{ii}))
+            arrayType = 'num';
+            arrayInit = @(x) zeros(x);
+            arrayAccess = @(arr,i) arr(i);
+        else
+            arrayType = 'cell';
+            arrayInit = @(x) cell(x);
+            arrayAccess = @(arr,i) arr{i};
+        end
+        for jj = 1:numel(fieldSplits{ii})
+            [newParamOut] = SetNestedStructureField(newParamOut,...
+                fieldSplits{ii}(2:end),paramOut.(fieldNames{ii}));
+        end
+    end
 end
 
 % Write new parameter files

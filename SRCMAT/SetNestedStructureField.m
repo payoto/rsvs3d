@@ -26,28 +26,51 @@ function [obj] = SetNestedStructureField(obj,varargin)
                 try
                     eval(strEval);
                 catch ME
-                    ME.message = [strEval, '\n', ME.message];
+                    warning(['Cause of error : ', strEval])
                     rethrow(ME);
                 end
             end
         else
             strEval = 'obj';
+            
+            if isnumeric(varargin{ii+1})
+                openArray = '(';
+                closeArray = ')';
+            else
+                openArray = '{';
+                closeArray = '}';
+            end
+            
             nArg = numel(varargin{ii});
+            prevIsNum = false;
+            
             for kk = 1:nArg
                 if ischar(varargin{ii}{kk})
+                    if prevIsNum
+                        strEval = [strEval,closeArray];
+                    end
                     strEval = [strEval,'.', varargin{ii}{kk}];
                 elseif isnumeric(varargin{ii}{kk}) && varargin{ii}{kk}>0 ...
                         && isfinite(varargin{ii}{kk})
-                    strEval = [strEval,'(', int2str(varargin{ii}{kk}),')'];
+                    if ~prevIsNum 
+                        strEval = [strEval,openArray];
+                    else
+                        strEval = [strEval,','];
+                    end
+                    strEval = [strEval, int2str(varargin{ii}{kk})];
+                    prevIsNum = true;
                 else
                     error('Unhandled type.')
                 end
+            end
+            if prevIsNum
+                strEval = [strEval,closeArray];
             end
             strEval = [strEval, '= varargin{ii+1};'];
             try
                 eval(strEval);
             catch ME
-                ME.message = [strEval, '\n', ME.message];
+                warning(['Cause of error : ', strEval])
                 rethrow(ME);
             end
                 

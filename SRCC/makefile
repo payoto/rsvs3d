@@ -47,7 +47,7 @@ DIRTETGEN= modules/tetgen
 # except under std=c++17 which added a standard filesystem header
 # (Broken on GCC v8.1 + MinGW, must still use boost)
 USE_BOOST = true
-BOOST_VERSION_NUMBER = 1_67
+BOOST_VERSION_NUMBER = 1_68
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)_0
 # BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
 # boost compiled library file location (for linker)
