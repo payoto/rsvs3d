@@ -57,7 +57,10 @@ int rsvstest::maintest(){
 	// Snakstruct 3D tests
 	gridTest.RunSilent(Test_RSVSalgo_init,"RSVS spawn");
 	gridTest.RunSilent(Test_RSVSvoro_init,"Snake spawning voronoi"); 
-	gridTest.RunSilent(Test_snakeinit,"Snake rand velocity"); 
+	gridTest.RunSilent(Test_snakeinit_random,"Snake rand velocity"); 
+	gridTest.RunSilent(Test_snakeinit_unit,"Snake unit velocity (reflected)"); 
+	gridTest.RunSilent(Test_snakeinit_unitnoreflect,"Snake unit velocity "
+		"(no reflection)"); 
 	gridTest.RunSilent(Test_RSVSalgo,"Snake RSVS from spawn");
 	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS");
 	gridTest.RunSilent(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
@@ -93,22 +96,29 @@ int rsvstest::maintest(){
 int rsvstest::newtest(){
 	customtest gridTest("3-D RSVS tests: New and breaking ");
 
-	#ifdef TEST_KNOWN_FAILURES
-	gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
-	gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
-	gridTest.Run(integrate::test::CompareDerivativesSpike,"Test spike issues"); 
-	gridTest.Run(integrate::test::CompareDerivativesSpikeNoDPos,"Test spike issues no dPos"); 
-	gridTest.Run(integrate::test::StudyDerivatives,"Generate Derivative study"); 
-	#endif
-	// Parameter and JSON tests
-	gridTest.RunSilent(param::test::base,"parameter implementation");
-	gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
-	gridTest.RunSilent(param::test::io,"parameter read write");
-	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
-	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
-		" write flat format");
-	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
-		"determination of flat json");
+	// #ifdef TEST_KNOWN_FAILURES
+	// gridTest.RunSilent(Test_snakeinitflat,"Snake spawning 2D");
+	// gridTest.Run(Test_RSVSalgoflat,"RSVS 2D"); // Non working test - Maths not finished	
+	// gridTest.Run(integrate::test::CompareDerivativesSpike,"Test spike issues"); 
+	// gridTest.Run(integrate::test::CompareDerivativesSpikeNoDPos,"Test spike issues no dPos"); 
+	// gridTest.Run(integrate::test::StudyDerivatives,"Generate Derivative study"); 
+	// #endif
+	// // Parameter and JSON tests
+	// gridTest.RunSilent(param::test::base,"parameter implementation");
+	// gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
+	// gridTest.RunSilent(param::test::io,"parameter read write");
+	// gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
+	// gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
+	// 	" write flat format");
+	// gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
+	// 	"determination of flat json");
+
+
+	gridTest.Run(Test_snakeinit_unit,"Snake unit velocity (reflected)"); 
+	gridTest.Run(Test_snakeinit_unitnoreflect,"Snake unit velocity "
+		"(no reflection)"); 
+	// gridTest.Run(Test_snakeinit_random,"Snake rand velocity"); 
+
 	return(0);
 }
 
