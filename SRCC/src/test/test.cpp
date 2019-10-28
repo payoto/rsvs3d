@@ -112,12 +112,8 @@ int rsvstest::newtest(){
 	// 	" write flat format");
 	// gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
 	// 	"determination of flat json");
-
-
-	gridTest.Run(Test_snakeinit_unit,"Snake unit velocity (reflected)"); 
-	// gridTest.Run(Test_snakeinit_unitnoreflect,"Snake unit velocity "
-	// 	"(no reflection)"); 
-	// gridTest.Run(Test_snakeinit_random,"Snake rand velocity"); 
+	
+	gridTest.Run(Test_RSVSalgo_singlevol,"Snake RSVS algorithm single vol");
 
 	return(0);
 }
