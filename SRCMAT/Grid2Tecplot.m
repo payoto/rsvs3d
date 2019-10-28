@@ -149,16 +149,25 @@ function [cellFaceMap]=BuildPolyhedronFaceMap(grid)
 end
 function [cellFaceMap]=BuildPolygonFaceMap(grid)
     
-    
+    gridVertInd = [grid.vert.index];
     cellFaceMap{1}=int2str(vertcat(grid.edge.vertind));
-    
-    
+    for ii = 1:numel(grid.edge)
+        cellFaceMap{ii} = int2str(...
+            reshape(FindObjNum([],grid.edge(ii).vertind, gridVertInd),...
+            [1 numel(grid.edge(ii).vertind)]));
+    end
+        
     [voluOnRight]=FindRightSurface2D(grid);
+    gridEdgeInd = [grid.surf.index];
     voluOnLeft=abs(voluOnRight-3);
     surfEdgeInd=vertcat(grid.edge.surfind)';
-    cellFaceMap{end+1}=int2str(surfEdgeInd(sub2ind(size(surfEdgeInd),...
-        voluOnLeft,1:size(surfEdgeInd,2))));
-    cellFaceMap{end+1}=int2str(surfEdgeInd(sub2ind(size(surfEdgeInd),...
-        voluOnRight,1:size(surfEdgeInd,2))));
+    
+    surfEdgeSub(1,1:size(surfEdgeInd,2))=FindObjNum([],surfEdgeInd(1,:), gridEdgeInd)';
+    surfEdgeSub(2,1:size(surfEdgeInd,2))=FindObjNum([],surfEdgeInd(2,:), gridEdgeInd)';
+    
+    cellFaceMap{end+1}=int2str(surfEdgeSub(sub2ind(size(surfEdgeSub),...
+        voluOnLeft,1:size(surfEdgeSub,2))));
+    cellFaceMap{end+1}=int2str(surfEdgeSub(sub2ind(size(surfEdgeSub),...
+        voluOnRight,1:size(surfEdgeSub,2))));
     
 end

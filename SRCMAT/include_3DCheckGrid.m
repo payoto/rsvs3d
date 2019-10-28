@@ -100,7 +100,6 @@ function [vert]=ParseVert(vert,nums)
     vert.coord=nums(s+(1:nums(s)));
 end
 
-
 function [vert]=ParseEdge(vert,nums)
     vert.index=nums(1);
     s=3;
@@ -108,7 +107,6 @@ function [vert]=ParseEdge(vert,nums)
     s=3+nums(s)+1;
     vert.surfind=nums(s+(1:nums(s)));
 end
-
 
 function [vert]=ParseSurf(vert,nums)
     vert.index=nums(1);
@@ -119,7 +117,6 @@ function [vert]=ParseSurf(vert,nums)
     vert.edgeind=nums(s+(1:nums(s)));
 end
 
-
 function [vert]=ParseVolu(vert,nums)
     vert.index=nums(1);
     
@@ -127,6 +124,7 @@ function [vert]=ParseVolu(vert,nums)
     s=6;
     vert.surfind=nums(s+(1:nums(s)));
 end
+
 %% Grid Connectivity methods
 
 function [vertInSurf]=FindVertInSurf(grid)
