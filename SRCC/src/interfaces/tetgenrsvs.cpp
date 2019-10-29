@@ -289,7 +289,7 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain,
 	tetgen::io_safe &tetin, const tetgen::apiparam &tetgenParam){
 	mesh meshboundary;
 	meshboundary.Init(0,0,0,0);
-	meshboundary.PrepareForUse();
+	meshboundary.HashArray();
 
 	tetgen::input::RSVSGRIDS(meshdomain, meshboundary, 
 		tetin, tetgenParam);

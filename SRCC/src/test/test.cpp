@@ -105,15 +105,12 @@ int rsvstest::newtest(){
 	gridTest.Run(integrate::test::StudyDerivatives,"Generate Derivative study"); 
 	#endif
 	// Parameter and JSON tests
-	gridTest.RunSilent(param::test::base,"parameter implementation");
-	gridTest.RunSilent(param::test::symmetry,"Test json internal symmetry");
-	gridTest.RunSilent(param::test::io,"parameter read write");
-	gridTest.RunSilent(param::test::ioflat,"parameter read write flat format");
 	gridTest.RunSilent(param::test::ipartialread,"parameter partial read"
 		" write flat format");
-	gridTest.RunSilent(param::test::autoflat,"Algorithm for automatic "
-		"determination of flat json");
-	
+	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
+	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
+	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
+	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
 
 	return(0);
 }

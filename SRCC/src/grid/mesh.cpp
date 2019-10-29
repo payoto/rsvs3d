@@ -2691,13 +2691,20 @@ void mesh::ArraysAreHashed(){
 }
 void mesh::SetEdgeLengths(){
 	int nEdges = int(this->edges.size());
+	bool setEdgeLengths = true;
 	for (int ii = 0; ii < nEdges; ++ii){
 		if(!rsvs3d::constants::__issetlength(this->edges(ii)->GetLength(false)))
 		{
-			this->edges.elems[ii].SetLength(*this);
+			// if (this->edges(ii)->vertind[0] == 0 
+			// 	&& this->edges(ii)->vertind[1] == 0) {
+			// 	setEdgeLengths = false;
+			// 	break;
+			// } else {
+				this->edges.elems[ii].SetLength(*this);
+			// }
 		}
 	}
-	this->edgesLengthsAreSet = true;
+	this->edgesLengthsAreSet = setEdgeLengths;
 }
 void mesh::PrepareForUse(bool needOrder){
 
@@ -2739,7 +2746,13 @@ void mesh::PrepareForUse(bool needOrder){
 	surfs.ForceArrayReady();
 	volus.ForceArrayReady();
 	if(!this->edgesLengthsAreSet){
-		this->SetEdgeLengths();
+		try {
+			this->SetEdgeLengths();
+		} catch (exception const& ex) {
+			RSVS3D_ERROR_NOTHROW(" Error setting Edge lengths.\n Note this can "
+				"be due to a call to mesh::PrepareForUse before edges[].vertind"
+				" has been set, use mesh::HashArray instead if");
+		}
 	}
 
 }
