@@ -246,7 +246,9 @@ SurfCentroid SurfaceCentroid_SnakeSurf(const surf &surfin,
 int Test_snakeRSVS();
 int Test_surfcentre();
 int Test_snakeRSVS_singlevol();
-int Test_RSVSalgo_singlevol();
 int Test_MeshOrient();
+int Test_RSVSalgo_singlevol(int sparseCuttoff);
+int Test_RSVSalgo_singlevol_fullmath();
+int Test_RSVSalgo_singlevol_sparse();
 #endif // TRIANGULATE_H_INCLUDED
 

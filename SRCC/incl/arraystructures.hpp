@@ -162,7 +162,7 @@ public:
 			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
 			std::cerr << "Attempt to access position " << a << 
-				" in std::array of size " << elems.size() << std::endl;
+				" in std::vector of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -179,7 +179,7 @@ public:
 			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
 			std::cerr << "Attempt to access position " << a << 
-				" in std::array of size " << elems.size() << std::endl;
+				" in std::vector of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -198,7 +198,7 @@ public:
 			#endif
 			std::cerr << "Attempt to access index " << b 
 				<< " at position " << a <<
-				" in std::array of size " << elems.size() << std::endl;
+				" in std::vector of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE(" Index is out of range");
 		}
@@ -215,7 +215,7 @@ public:
 			std::cerr << stacktrace::stacktrace() << std::endl;
 			#endif
 			std::cerr << "Attempt to access position " << a << 
-				" in std::array of size " << elems.size() << std::endl;
+				" in std::vector of size " << elems.size() << std::endl;
 			// dbg::fail(__PRETTY_FUNCTION__,"index out of range");
 			RSVS3D_ERROR_RANGE("Index is out of range");
 		}

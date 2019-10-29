@@ -483,12 +483,7 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 	meshout.Init(nVe, nE, nSurf, nVolu);
 	meshout.PopulateIndices();
 	meshout.volus.HashArray();
-	meshout.PrepareForUse();
-	// cout << endl ; 
-	// for(ii=0; ii<nVolu; ++ii){
-	// 	cout << meshout.volus(ii)->index << " " ; 
-	// }
-	// cout << endl ; 
+	meshout.HashArray();
 	
 	for(ii=0; ii<nSurf; ++ii){
 		// cout << endl;
@@ -505,7 +500,7 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 		if(meshout.surfs[ii].voluind.size()==1){
 			meshout.surfs[ii].voluind.push_back(0);
 		}
-		if(triin(ii)->connec.constrinfluence[0]==1.0){
+		if(IsAproxEqual(triin(ii)->connec.constrinfluence[0],1.0)){
 			kk=meshout.surfs[ii].voluind[0];
 			meshout.surfs[ii].voluind[0] = meshout.surfs[ii].voluind[1];
 			meshout.surfs[ii].voluind[1]=kk;
@@ -515,14 +510,16 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 			kk=meshout.volus.find(meshout.surfs[ii].voluind[jj], true);
 			if(kk>=0){
 				meshout.volus[kk].surfind.push_back(ii+1);
-			} else { cerr << " w " << kk << " " << meshout.surfs[ii].voluind[jj]
-				<< " " << triin(ii)->connec.celltarg[jj];
+			} 
+			else if (meshout.surfs[ii].voluind[jj]!=0) {
+				std::cerr << " w " << kk << " " << meshout.surfs[ii].voluind[jj]
+					<< " " << triin(ii)->connec.celltarg[jj];
 				// meshout.volus[meshout.surfs[ii].voluind[jj]-1].surfind.push_back(ii+1);
 			}
 		}
 		
 		for(jj =0; jj<3; jj++){
-			meshout.edges[ii*3+jj].surfind = {ii};
+			meshout.edges[ii*3+jj].surfind = {meshout.surfs(ii)->index};
 			meshout.edges[ii*3+jj].vertind = {ii*3+1+jj, ii*3+1+((jj+1)%3)};
 			if (triin(ii)->pointtype[jj]==meshtypes::mesh){
 				meshout.verts[ii*3+jj].coord=triangul.meshDep->

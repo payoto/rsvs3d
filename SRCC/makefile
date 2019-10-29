@@ -92,8 +92,7 @@ endif
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # Tetgen flag to use as library: -DTETLIBRARY
 # cxxopts #
-CCFLAGDBG= 
-#-g -ggdb
+CCFLAGDBG= -g -ggdb
 # -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
 CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
 # 

@@ -1317,7 +1317,8 @@ void repositionatquarteredge(snake &snakein){
 	snakein.UpdateCoord();
 }
 
-int Test_RSVSalgo_singlevol(){
+
+int Test_RSVSalgo_singlevol(int sparseCutOff){
 	// int nVoluZone, ii;
 
 	snake testSnake;
@@ -1383,8 +1384,8 @@ int Test_RSVSalgo_singlevol(){
 		triRSVS.PrepareForUse();
 		triRSVS.CalcTriVertPos();
 		MaintainTriangulateSnake(triRSVS);
-
-		for(ii=0;ii<20;++ii){
+		calcObj.SetSparseDVcutoff(sparseCutOff);
+		for(ii=0;ii<2;++ii){
 			cout << ii << " ";
 			// if (ii%2==0){
 				PrintRSVSSnake(outSnake, testSnake, totT, testTriangle,
@@ -1403,37 +1404,62 @@ int Test_RSVSalgo_singlevol(){
 		stop_s=clock();
 		cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
 		testSnake.displight();
+		testSnake.PrepareForUse();
 		// outSnake.PrintMesh(testSnake.snakeconn);
 		// outSnake.PrintSnakeInternalPts(testSnake);
 		
 		repositionatquarteredge(testSnake);
 		triRSVS.CalcTriVertPos();
 		triRSVS.PrepareForUse();
-		triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
 		FILE *fid;
-		fid = fopen("../TESTOUT/triintertestbig.dat","w");
-		triMesh2.write(fid);//(triMesh,3,totT);
-		fclose(fid);
-		/*fid = fopen("../TESTOUT/snakeconnouttri.dat","w");
-		triMesh3= TriarrayToMesh(triRSVS, triRSVS.dynatri);
-		// testSnake.snakeconn.write(fid);//(triMesh,3,totT);
-		triMesh3.write(fid);//(triMesh,3,totT);
-		fclose(fid);
+		try {
+			triMesh2= TriarrayToMesh(triRSVS, triRSVS.intertri);
+			fid = fopen("../TESTOUT/triintertestbig.dat","w");
+			triMesh2.PrepareForUse();
+			triMesh2.write(fid);//(triMesh,3,totT);
+			fclose(fid);
+		} catch (exception const& extriMesh2) { 
+			RSVS3D_ERROR_NOTHROW("intertri output fails");
+			errTest++;
+		} 
 
-		fid = fopen("../TESTOUT/snakeconnout.dat","w");		
-		testSnake.snakeconn.write(fid);//(triMesh,3,totT);
-		fclose(fid);
+		try {
+			triMesh3= TriarrayToMesh(triRSVS, triRSVS.dynatri);
+			fid = fopen("../TESTOUT/snakeconnouttri.dat","w");
+			triMesh3.PrepareForUse();
+			triMesh3.write(fid);//(triMesh,3,totT);
+			fclose(fid);
+		} catch (exception const& extriMesh2) { 
+			RSVS3D_ERROR_NOTHROW("dynatri output fails");
+			errTest++;
+		} 
 
-		fid = fopen("../TESTOUT/stattri.dat","w");
-		triMesh4= TriarrayToMesh(triRSVS, triRSVS.stattri);
-		triMesh4.write(fid);//(triMesh,3,totT);
-		fclose(fid);*/
+		try {
+			triMesh4= TriarrayToMesh(triRSVS, triRSVS.stattri);
+			fid = fopen("../TESTOUT/stattri.dat","w");
+			triMesh4.PrepareForUse();
+			triMesh4.write(fid);//(triMesh,3,totT);
+			fclose(fid);
+		} catch (exception const& extriMesh2) { 
+			RSVS3D_ERROR_NOTHROW("stattri output fails");
+			errTest++;
+		} 
 
 	} catch (exception const& ex) { 
 		cerr << "Exception: " << ex.what() <<endl; 
 		return -1;
 	} 
 	return(errTest);
+}
+
+
+int Test_RSVSalgo_singlevol_fullmath(){
+	return(Test_RSVSalgo_singlevol(10000000));
+}
+
+
+int Test_RSVSalgo_singlevol_sparse(){
+	return(Test_RSVSalgo_singlevol(0));
 }
 
 int Test_snakeRSVS_singlevol(){
@@ -1586,7 +1612,7 @@ void Test_stepalgoRSVS(snake &testSnake,triangulation &RSVStri , vector<double> 
 	// calcObj.Print2Screen(2);
 	CalculateNoNanSnakeVel(testSnake);
 	outSnake2.PrintSnake(testSnake, 1, totT);  
-	testSnake.CalculateTimeStep(dt,0.9);
+	testSnake.CalculateTimeStep(dt,0.4);
 	testSnake.UpdateDistance(dt,0.9,true);
 	testSnake.PrepareForUse();
 	testSnake.UpdateCoord();

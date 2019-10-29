@@ -598,6 +598,7 @@ template<class T> void ArrayStruct <T>::PopulateIndices()
 	isSetMI=1;
 	isHash=0;
 	readyforuse=false;
+	this->HashArray();
 }
 template<class T> void ArrayStruct <T>::ChangeIndices(int nVert, int nEdge,
 	int nSurf, int nVolu)
