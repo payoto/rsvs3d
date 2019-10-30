@@ -1155,7 +1155,7 @@ tetgenmesh* tetgen::rsvstetrahedralize(const char *switches, tetgen::io_safe *in
 		<< std::endl;
 	std::cout << "____ in " ;//<< std::endl;
 	in->displaystats();
-	in->displaypoints();
+	// in->displaypoints();
 	if (addin!=NULL){
 		std::cout << "____ addin " ;//<< std::endl;
 		addin->displaystats();
