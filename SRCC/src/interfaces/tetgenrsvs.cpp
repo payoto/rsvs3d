@@ -1155,6 +1155,7 @@ tetgenmesh* tetgen::rsvstetrahedralize(const char *switches, tetgen::io_safe *in
 		<< std::endl;
 	std::cout << "____ in " ;//<< std::endl;
 	in->displaystats();
+	in->displaypoints();
 	if (addin!=NULL){
 		std::cout << "____ addin " ;//<< std::endl;
 		addin->displaystats();
@@ -1507,6 +1508,7 @@ void tetgen::io_safe::SpecifyTetFacetMetric(int startPnt, int numPnt,
 void tetgen::io_safe::displaystats(){
 	std::cout << "tetrahedralisation stats: " << std::endl;
 	std::cout << "points " << this->numberofpoints << ", ";
+	std::cout << "numberofpointmtrs " << this->numberofpointmtrs << ", ";
 	std::cout << "tetrahedra " << this->numberoftetrahedra << ", ";
 	std::cout << "facets " << this->numberoffacets << ", ";
 	std::cout << "facetconstraints " << this->numberoffacetconstraints << ", ";
@@ -1522,6 +1524,22 @@ void tetgen::io_safe::displaystats(){
 	std::cout << "vcells " << this->numberofvcells << ", ";
 	std::cout << "vfacets " << this->numberofvfacets << ", ";
 	std::cout << std::endl;
+}
+void tetgen::io_safe::displaypoints(){
+	for (int j = 0; j < this->numberofpointmtrs; ++j)
+	{
+		std::cout << "metric " << j << " :";
+		for (int i = 0; i < this->numberofpoints*this->numberofpointmtrs;
+			i=i+this->numberofpointmtrs)	{
+			std::cout << this->pointmtrlist[i+j] << " ";
+		}
+		std::cout << std::endl;
+
+	}
+	for (int i = 0; i < this->numberoffacetconstraints*2; ++i)
+	{
+		std::cout << this->facetconstraintlist[i] << " ";
+	}
 }
 
 //================================

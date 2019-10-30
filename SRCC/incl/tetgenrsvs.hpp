@@ -126,6 +126,7 @@ namespace tetgen {
 			int marker);
 
 		void displaystats();
+		void displaypoints();
 
 		io_safe(){initialize();}
 	};
