@@ -686,6 +686,34 @@ std::vector<double> CalculateVertexMinEdgeLength(const mesh &meshin){
 }
 
 /**
+ * @brief      Calculates the vertex maximum edge length.
+ *
+ * @param[in]  meshin  The meshin
+ *
+ * @return     The vertex minimum edge length.
+ */
+std::vector<double> CalculateVertexMaxEdgeLength(const mesh &meshin){
+
+	std::vector<double> vertEdgeLength;
+	int nVerts = meshin.verts.size();
+	vertEdgeLength.assign(nVerts, 0);
+	
+	auto edgeLength = CalculateEdgeLengths(meshin);
+
+	for (int i = 0; i < nVerts; ++i)
+	{
+		vertEdgeLength[i] = -INFINITY;
+		for (auto edgeInd : meshin.verts(i)->edgeind)
+		{
+			double testLength = edgeLength[meshin.edges.find(edgeInd)];
+			vertEdgeLength[i] = testLength > vertEdgeLength[i] ?
+				testLength : vertEdgeLength[i];
+		}
+	}
+	return vertEdgeLength;
+}
+
+/**
  * @brief      Calculates the vertex mean edge length.
  *
  * @param[in]  meshin  The meshin

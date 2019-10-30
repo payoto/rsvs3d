@@ -78,6 +78,7 @@ std::vector<double> CalculateEdgeCurvature(const mesh &meshin);
 std::vector<double> CalculateVertexCurvature(const mesh &meshin,
 	int smoothingSteps);
 std::vector<double> CalculateVertexMinEdgeLength(const mesh &meshin);
+std::vector<double> CalculateVertexMaxEdgeLength(const mesh &meshin);
 std::vector<double> CalculateVertexMeanEdgeLength(const mesh &meshin);
 std::vector<double> CalculateEdgeLengths(const mesh &meshin);
 std::vector<double> CoordInVolume(const mesh &meshin);

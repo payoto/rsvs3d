@@ -124,6 +124,9 @@ namespace tetgen {
 			const std::vector<double> &mtrs);
 		void SpecifyTetFacetMetric(int startPnt, int numPnt, 
 			int marker);
+
+		void displaystats();
+
 		io_safe(){initialize();}
 	};
 
@@ -175,6 +178,10 @@ namespace tetgen {
 	
 	void SnakeToSU2(const snake &snakein, const std::string &fileName,
 		tetgen::apiparam &inparam);
+
+	tetgenmesh* rsvstetrahedralize(const char *switches, tetgen::io_safe *in, 
+		tetgen::io_safe *out, tetgen::io_safe *addin = NULL,
+		tetgen::io_safe *bgmin = NULL);
 
 	namespace input {
 		void POINTGRIDS(const mesh &meshdomain, 
@@ -230,7 +237,7 @@ namespace tetgen {
 		int CFD();
 		int RSVSVORO();
 		int RSVSVORO_Contain();
-		int RSVSVOROFunc(int nPts=0, double distanceTol=0.26,
+		int RSVSVOROFunc(const std::vector<double> &vecPts={}, double distanceTol=0.26,
 			const char* tecoutStr="../TESTOUT/rsvs_voro.plt");
 		int RSVSVOROFunc_contain(int nPts=0, double distanceTol=0.26, 
 			const char* tecoutStr="../TESTOUT/rsvs_voro_contain.plt");
