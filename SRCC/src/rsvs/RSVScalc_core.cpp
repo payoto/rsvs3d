@@ -12,6 +12,7 @@
 #include "RSVScalctools.hpp"
 #include "matrixtools.hpp"
 #include "warning.hpp"
+#include "rsvsutils.hpp"
 
 using namespace std; 
 using namespace Eigen; 
@@ -142,7 +143,7 @@ void RSVScalc::CalcTriangle(const triangle& triIn,
 
 				} else {
 					for(jj=0; jj< nDvAct; ++jj){
-						if(!IsAproxEqual(HObjPart(jj,ii),0.0)){
+						if(!rsvs3d::utils::IsAproxEqual(HObjPart(jj,ii),0.0)){
 
 							this->HObj_sparse.coeffRef(dvMap.find(dvListMap.vec[jj]),
 								 this->dvMap.find(dvListMap.vec[ii])) += HObjPart(jj,ii);

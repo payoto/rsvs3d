@@ -8,6 +8,7 @@
 #include "matrixtools.hpp"
 #include "RSVScalc.hpp"
 #include "RSVSmath.hpp"
+#include "rsvsutils.hpp"
 
 
 using namespace std;
@@ -106,7 +107,7 @@ void TrianglePositionDerivatives(const triangle &triIn,
 	int nDvAct=dvListMap.vec.size();
 	bool triggerPrint=false, triggerActive=false;
 	auto ifisnan0 = [&](double in) -> double {return isnan(in)?0.0:in;};
-	// auto ifisapprox0 = [&](double in) -> double {return IsAproxEqual(in,0.0)?0.0:in;};
+	// auto ifisapprox0 = [&](double in) -> double {return rsvs3d::utils::IsAproxEqual(in,0.0)?0.0:in;};
 	auto cleanup = [&](double in) -> double {return ifisnan0((in));};
 
 	static std::ofstream streamout;
@@ -316,7 +317,7 @@ void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn
 	int ii = cellTarg;
 	
 	for(int kk=0; kk< nDvAct; ++kk){
-		if(!IsAproxEqual(dConstrPart(0,kk),0.0)){
+		if(!rsvs3d::utils::IsAproxEqual(dConstrPart(0,kk),0.0)){
 			calc.dConstr_sparse.coeffRef(constrPos,
 				calc.dvMap.find(dvListMap.vec[kk])) += 
 				triIn.connec.constrinfluence[ii]*dConstrPart(0,kk);
@@ -325,7 +326,7 @@ void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn
 		for(int ll=0; ll< nDvAct; ++ll){
 			double HconstrLag = HConstrPart(ll,kk)
 					*calc.lagMult[constrPos];
-			if(!IsAproxEqual(HconstrLag,0.0)){
+			if(!rsvs3d::utils::IsAproxEqual(HconstrLag,0.0)){
 				// TODO cross product with lagrangian
 				calc.HConstr_sparse.coeffRef(calc.dvMap.find(dvListMap.vec[ll]),
 					calc.dvMap.find(dvListMap.vec[kk])) += 

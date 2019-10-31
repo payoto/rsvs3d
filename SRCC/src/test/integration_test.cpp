@@ -29,7 +29,7 @@
 #include "parameters.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSmath_automatic.hpp"
-
+#include "rsvsutils.hpp"
 
 using namespace integrate::test;
 using namespace std;
@@ -75,7 +75,7 @@ processed_derivative test_RSVScalcvsFD(
 	int nRows = diffDConstr.size();
 	for (int i = 0; i < nRows; ++i)
 	{
-		if (IsAproxEqual(0.0, analyticalDConstr(i,dvNum))){
+		if (rsvs3d::utils::IsAproxEqual(0.0, analyticalDConstr(i,dvNum))){
 			diffDConstr[i] = 0.0;
 		}
 	}

@@ -9,7 +9,7 @@
 
 #include "mesh.hpp"
 #include "warning.hpp"
-
+#include "rsvsutils.hpp"
 
 // Class function definitions
 // Mesh Linking methods

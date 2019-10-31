@@ -9,6 +9,7 @@
 #include "warning.hpp"
 #include "mesh.hpp"
 #include "meshprocessing.hpp"
+#include "rsvsutils.hpp"
 
 using namespace std;
 
@@ -1930,7 +1931,7 @@ void snake::TakeSmoothSpawnStep(int minIndex, double stepLength,
 
 void snax::TakeSpawnStep(snake &snakein, double stepLength){
 
-	if(IsAproxEqual(stepLength,0.0)){
+	if(rsvs3d::utils::IsAproxEqual(stepLength,0.0)){
 		return;
 	}
 	if(stepLength<-__DBL_EPSILON__ || stepLength>=0.5){
@@ -2125,10 +2126,10 @@ double SnaxImpactDt(const snax &snax1,const snax &snax2){
 	dD=((1.0*!isSameDir)+(1.0+(-2.0)*!isSameDir)*snax2.d)-snax1.d;
 	dV=(1.0+(-2.0)*!isSameDir)*snax2.v-snax1.v;
 
-	if (IsAproxEqual(dD,0.0)){
+	if (rsvs3d::utils::IsAproxEqual(dD,0.0)){
 		return(0.0);
 	}
-	if (IsAproxEqual(dV,0.0)){
+	if (rsvs3d::utils::IsAproxEqual(dV,0.0)){
 		return(-1.0);
 	}
 
@@ -2153,11 +2154,13 @@ void snake::SnaxImpactDetection(vector<int> &isImpact){
 		if(!isSnaxDone[ii]){
 			nEdge=snaxs.countparent(snaxs(ii)->edgeind);
 			if (nEdge==1){
-				if(IsAproxEqual(snaxs(ii)->d,0.0) && (snaxs(ii)->v<=0.0)) {
+				if(rsvs3d::utils::IsAproxEqual(snaxs(ii)->d,0.0)
+					&& (snaxs(ii)->v<=0.0)) {
 					isImpact.push_back(snaxs(ii)->index);
 					isImpact.push_back(-1);
 
-				} else if (IsAproxEqual(snaxs(ii)->d,1.0) && (snaxs(ii)->v>=0.0)){
+				} else if (rsvs3d::utils::IsAproxEqual(snaxs(ii)->d,1.0) 
+					&& (snaxs(ii)->v>=0.0)){
 					isImpact.push_back(snaxs(ii)->index);
 					isImpact.push_back(-2);
 				}
@@ -2198,12 +2201,12 @@ void snake::SnaxAlmostImpactDetection(vector<int> &isImpact, double dDlim){
 	{
 		flag = false;
 		if((snaxs(i)->d<dDlim) && (snaxs(i)->v<=0.0) 
-			&& !IsAproxEqual(snaxs(i)->d,0.0)){
+			&& !rsvs3d::utils::IsAproxEqual(snaxs(i)->d,0.0)){
 			flag = true;
 			vertInd = snaxs(i)->fromvert;
 			d = snaxs(i)->d;
 		} else if (((1.0-snaxs(i)->d)<dDlim) && (snaxs(i)->v>=0.0) 
-			&& !IsAproxEqual(snaxs(i)->d,1.0)){
+			&& !rsvs3d::utils::IsAproxEqual(snaxs(i)->d,1.0)){
 			flag = true;
 			vertInd = snaxs(i)->tovert;
 			d = 1-snaxs(i)->d;
@@ -2252,7 +2255,7 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact,
 			
 			impactTime=SnaxImpactDt(elems[snaxSubs[ii]],elems[snaxSubs[jj]]);
 			dOrd=abs(elems[snaxSubs[ii]].orderedge-elems[snaxSubs[jj]].orderedge);
-			if(dOrd==1 && IsAproxEqual(impactTime,0.0)){
+			if(dOrd==1 && rsvs3d::utils::IsAproxEqual(impactTime,0.0)){
 
 				isImpact.push_back((elems[snaxSubs[ii]].index));
 				isImpact.push_back((elems[snaxSubs[jj]].index));
@@ -2265,14 +2268,18 @@ void snaxarray::DetectImpactOnEdge(vector<int> &isImpact,
 			
 		}
 		
-		if(IsAproxEqual(elems[snaxSubs[ii]].d,0.0) && (elems[snaxSubs[ii]].v<=0.0) 
-			&& elems[snaxSubs[ii]].orderedge==1) {
+		if(rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d,0.0) 
+			&& (elems[snaxSubs[ii]].v<=0.0) 
+			&& elems[snaxSubs[ii]].orderedge==1)
+		{
 			isImpact.push_back(elems[snaxSubs[ii]].index);
 			isImpact.push_back(-1);
 
 
-		} else if (IsAproxEqual(elems[snaxSubs[ii]].d,1.0) && (elems[snaxSubs[ii]].v>=0.0)
-			&& elems[snaxSubs[ii]].orderedge==nSnax){
+		} else if (rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d,1.0) 
+			&& (elems[snaxSubs[ii]].v>=0.0)
+			&& elems[snaxSubs[ii]].orderedge==nSnax)
+		{
 			isImpact.push_back(elems[snaxSubs[ii]].index);
 			isImpact.push_back(-2);
 
