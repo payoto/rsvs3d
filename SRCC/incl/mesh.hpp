@@ -733,8 +733,7 @@ double PlaneNormalAndAngle(const std::vector<double> &planeVert1,
 	coordvec &normal, coordvec &temp1);
 std::tuple<coordvec,double> VertexNormal(const std::vector<double>& centre, 
 	const grid::coordlist &vecPts);
-inline bool IsAproxEqual(double d1,double d2, double tol=DBL_EPSILON)
-	{return(fabs(d1-d2)<tol);}
+
 namespace meshhelp {
 	template<class T, class V, class W>
 	double ProjectRay(int count, const W &&boundBox,

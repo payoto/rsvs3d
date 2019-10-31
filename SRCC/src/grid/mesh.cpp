@@ -653,7 +653,7 @@ double VertexNormal(const std::vector<double>& centre,
 	while (flagInit && iStart<count){
 		currAngle = PlaneNormalAndAngle(centre, *vecPts.back(), *vecPts[iStart],
 			planePrev, temp);
-		if(IsAproxEqual(planePrev.GetNorm(),0.0) 
+		if(rsvs3d::utils::IsAproxEqual(planePrev.GetNorm(),0.0) 
 			|| !isfinite(planePrev.GetNorm())
 			|| !isfinite(currAngle)){
 			iStart++;
@@ -678,7 +678,7 @@ double VertexNormal(const std::vector<double>& centre,
 		currAngle = PlaneNormalAndAngle(centre, *vecPts[i], *vecPts[(i+1)%count],
 			planeCurr, temp);
 		// If the plane has zero area skip the rest of the loop
-		if(IsAproxEqual(planeCurr.GetNorm(),0.0) 
+		if(rsvs3d::utils::IsAproxEqual(planeCurr.GetNorm(),0.0) 
 			|| !isfinite(planeCurr.GetNorm())
 			|| !isfinite(currAngle)){
 			planeCurr.assign(1,1,1);

@@ -10,6 +10,7 @@
 #include "RSVSmath.hpp"
 #include "RSVScalc.hpp"
 #include "warning.hpp"
+#include "rsvsutils.hpp"
 
 using namespace std;
 using namespace rsvs3d::constants;
@@ -500,7 +501,7 @@ mesh TriarrayToMesh(const triangulation& triangul, const triarray& triin){
 		if(meshout.surfs[ii].voluind.size()==1){
 			meshout.surfs[ii].voluind.push_back(0);
 		}
-		if(IsAproxEqual(triin(ii)->connec.constrinfluence[0],1.0)){
+		if(rsvs3d::utils::IsAproxEqual(triin(ii)->connec.constrinfluence[0],1.0)){
 			kk=meshout.surfs[ii].voluind[0];
 			meshout.surfs[ii].voluind[0] = meshout.surfs[ii].voluind[1];
 			meshout.surfs[ii].voluind[1]=kk;

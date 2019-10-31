@@ -7,6 +7,7 @@
 #include "meshprocessing.hpp"
 #include "warning.hpp"
 #include "voxel.hpp"
+#include "rsvsutils.hpp"
 
 using namespace std;
 
@@ -1031,7 +1032,7 @@ int VertexLaplacianVector(const mesh& meshin, const vert* vertsmooth,
 
 	lapVec.div(totalCotan);
 	lapVec.substract(vertsmooth->coord);
-	if(IsAproxEqual(lapVec.GetNorm(), 0.0)){
+	if(rsvs3d::utils::IsAproxEqual(lapVec.GetNorm(), 0.0)){
 		lapVec.assign(0.0, 0.0, 0.0);
 	}
 	return rsvs3d::constants::__success;
@@ -1070,7 +1071,7 @@ std::array<double, 2> IntersectLineSphere(const coordvec &lineVec,
 	if (det<0.0){
 		return {-INFINITY, INFINITY};
 	}
-	if(IsAproxEqual(det, 0.0)){
+	if(rsvs3d::utils::IsAproxEqual(det, 0.0)){
 		double sol = -b*inva;
 		return {sol, sol};
 	}

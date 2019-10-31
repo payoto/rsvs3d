@@ -1450,7 +1450,7 @@ int SmoothStep_sphere(int spawnVert, snake &snakein, double spawnDist){
 		return 0;
 	}
 	coordvec& vertNormal = get<0>(centreData);
-	if (IsAproxEqual(vertNormal.GetNorm(),0.0)){
+	if (rsvs3d::utils::IsAproxEqual(vertNormal.GetNorm(),0.0)){
 		// RSVS3D_ERROR("Vertex normal could not be computed: returned 0 norm.");
 		return 0;
 	}
@@ -1868,7 +1868,7 @@ int SmoothStep(int spawnVert, snake &snakein, double spawnDist,
 	std::string str){
 	static bool errHit = false;
 
-	if(IsAproxEqual(spawnDist,0.0)){
+	if(rsvs3d::utils::IsAproxEqual(spawnDist,0.0)){
 		return  0;
 	}
 	if(str.compare("none")==0 || str.compare("")==0){
