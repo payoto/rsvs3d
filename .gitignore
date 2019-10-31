@@ -25,6 +25,7 @@ SRCC/dbg*
 SRCC/obj*
 SRCC/matrices*
 SRCC/modules/external*
+SRCC/bisect/*
 
 SRCC/gch/*
 SRCC/config/*

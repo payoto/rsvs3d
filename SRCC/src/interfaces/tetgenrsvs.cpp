@@ -262,12 +262,7 @@ void tetgen::input::RSVSGRIDS(const mesh &meshdomain, const mesh &meshboundary,
 
 	vertPerSubDomain.push_back(meshdomain.verts.size());
 	
-
 	tetgen::internal::Mesh2Tetgenio(meshboundary, meshdomain, tetin, nHoles);
-
-	meshboundary.displight();
-	meshdomain.displight();
-	DisplayVector(tetgenParam.edgelengths);
 
 	int startPnt = meshboundary.verts.size();
 	// Assign "boundary" point metrics

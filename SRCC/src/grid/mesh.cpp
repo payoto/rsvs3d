@@ -596,7 +596,6 @@ coordvec volu::PseudoCentroid(const mesh &meshin) const {
 		surfLength = meshin.surfs.isearch(surfInd)
 			->PseudoCentroid(meshin, coordSurf);
 		coordSurf.mult(surfLength);
-		std::cout << surfLength << " ";
 		coordVolu.add(coordSurf.usedata());
 		voluLength += surfLength;
 	}
@@ -609,7 +608,6 @@ coordvec volu::PseudoCentroid(const mesh &meshin) const {
 	} else {
 		coordVolu.div(voluLength);
 	}
-	std::cout << ":" << voluLength << " ";
 
 	return coordVolu;
 }
