@@ -1825,11 +1825,11 @@ int tetgen::test::RSVSVORO()
 	const char* tecoutStr =  "../TESTOUT/rsvs_voro.plt";
 	vector<int> numCells = {
 		0
-		// ,1,2,3,4,5,10,20,100,1000
+		,1,2,3,4,5,10,20,100,1000
 	};
 	vector<double> numEdge = {
 		0.05
-		// ,0.1, 0.3
+		,0.1, 0.3
 	};
 	// std :: cin >> nPts;
 	tecout.OpenFile(tecoutStr);
@@ -1938,7 +1938,7 @@ int tetgen::test::RSVSVOROFunc(const std::vector<double> &vecPts, double distanc
 
 		inparam.lowerB= {-0.0, -0.0,-0.0};
 		inparam.upperB= {1.0, 1.0, 1.0};
-		inparam.edgelengths = {10};
+		inparam.edgelengths = {0.8};
 		inparam.distanceTol = distanceTol;
 
 		tetgen::RSVSVoronoiMesh(vecPts, vosMesh, snakMesh, inparam);
