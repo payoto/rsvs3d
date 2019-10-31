@@ -556,17 +556,26 @@ coordvec surf::PseudoCentroid(const mesh &meshin) const {
 int surf::PseudoCentroid(const mesh &meshin, coordvec &coord) const {
 	int ii,n;
 	coordvec edgeCentre;
-	double edgeLength,surfLength=0;
+	double edgeLength = 0.0;
+	double surfLength = 0.0;
 	coord.assign(0,0,0);
 	n=int(this->edgeind.size());
 	for(ii=0; ii<n; ++ii){
-		meshin.edges.isearch(this->edgeind[ii])->GeometricProperties(&meshin,edgeCentre,edgeLength);
+		meshin.edges.isearch(this->edgeind[ii])->GeometricProperties(
+			&meshin,edgeCentre,edgeLength);
 		edgeCentre.mult(edgeLength);
 		coord.add(edgeCentre.usedata());
 		surfLength+=edgeLength;
 	}
+	if (rsvs3d::utils::IsAproxEqual(surfLength,0.0)){
+		if (n>0){
+			meshin.edges.isearch(this->edgeind[0])->GeometricProperties(
+				&meshin,coord,edgeLength);
+		}
+	} else {
+		coord.div(surfLength);
+	}
 
-	coord.div(surfLength);
 	return surfLength;
 }
 
@@ -587,11 +596,20 @@ coordvec volu::PseudoCentroid(const mesh &meshin) const {
 		surfLength = meshin.surfs.isearch(surfInd)
 			->PseudoCentroid(meshin, coordSurf);
 		coordSurf.mult(surfLength);
+		std::cout << surfLength << " ";
 		coordVolu.add(coordSurf.usedata());
 		voluLength += surfLength;
 	}
-
-	coordVolu.div(voluLength);
+	if (rsvs3d::utils::IsAproxEqual(voluLength,0.0)){
+		int n = this->surfind.size();
+		if (n>0){
+			surfLength = meshin.surfs.isearch(this->surfind[0])
+				->PseudoCentroid(meshin, coordVolu);
+		}
+	} else {
+		coordVolu.div(voluLength);
+	}
+	std::cout << ":" << voluLength << " ";
 
 	return coordVolu;
 }
@@ -1369,14 +1387,14 @@ void edge::GeometricProperties(const mesh *meshin, coordvec &centre,
 
 	int sub;
 	centre.assign(0,0,0);
-	length=0;
-	sub=meshin->verts.find(vertind[0]);
+	length = 0.0;
+	sub = meshin->verts.find(vertind[0]);
 	centre.substract(meshin->verts(sub)->coord);
 	centre.add(meshin->verts.isearch(vertind[1])->coord);
-	length=centre.CalcNorm(); 
+	length = centre.CalcNorm(); 
 	centre.add(meshin->verts(sub)->coord);
 	centre.add(meshin->verts(sub)->coord);
-	centre.div(2);
+	centre.div(2.0);
 }
 
 /**

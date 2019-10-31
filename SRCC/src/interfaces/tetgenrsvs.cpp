@@ -1829,12 +1829,12 @@ int tetgen::test::RSVSVORO()
 	int nErrors=0;
 	const char* tecoutStr =  "../TESTOUT/rsvs_voro.plt";
 	vector<int> numCells = {
-		0,
-		1,
-		2,3,4,5,10,20,100,1000
+		0
+		// ,1,2,3,4,5,10,20,100,1000
 	};
 	vector<double> numEdge = {
-		0.05, 0.1, 0.3
+		0.05
+		// ,0.1, 0.3
 	};
 	// std :: cin >> nPts;
 	tecout.OpenFile(tecoutStr);
