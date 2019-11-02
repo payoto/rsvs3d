@@ -114,20 +114,20 @@ template <class T> T cumprod(const T &matIn, int d) {
 
 // functions
 int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid);
-int BuildBlockGrid(Eigen::RowVector3i dimGrid, mesh& blockGrid);
-int BuildBlockVert(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nVert, 
-	Eigen::Matrix3i edgeProp, Eigen::RowVector3i nEdgeDim);
+int BuildBlockGrid(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid);
+int BuildBlockVert(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid, int nVert, 
+	const Eigen::Matrix3i  &edgeProp, const Eigen::RowVector3i  &nEdgeDim);
 
-int BuildBlockEdge(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
-	Eigen::RowVector3i nEdgeDim,  Eigen::RowVector3i nSurfDim, Eigen::Matrix3i edgeProp,
-	Eigen::Matrix3i surfProp );
+int BuildBlockEdge(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid, int nEdge ,
+	const Eigen::RowVector3i  &nEdgeDim,  const Eigen::RowVector3i  &nSurfDim, const Eigen::Matrix3i  &edgeProp,
+	const Eigen::Matrix3i  &surfProp );
 
-int BuildBlockSurf(Eigen::RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
-	Eigen::Matrix3i surfProp, Eigen::Matrix3i edgeProp, Eigen::RowVector3i nSurfDim,
-	 Eigen::RowVector3i nEdgeDim);
+int BuildBlockSurf(const Eigen::RowVector3i  &dimGrid, int nSurf ,mesh& blockGrid ,
+	const Eigen::Matrix3i  &surfProp, const Eigen::Matrix3i  &edgeProp, const Eigen::RowVector3i  &nSurfDim,
+	 const Eigen::RowVector3i  &nEdgeDim);
 
-int BuildBlockVolu(Eigen::RowVector3i dimGrid, int nVolu , mesh& blockGrid,
-	Eigen::RowVector3i nSurfDim, Eigen::Matrix3i surfProp);
+int BuildBlockVolu(const Eigen::RowVector3i  &dimGrid, int nVolu , mesh& blockGrid,
+	const Eigen::RowVector3i  &nSurfDim, const Eigen::Matrix3i  &surfProp);
 //test functions
 int Test_BuildBlockGrid_noout();
 int Test_MeshOut();

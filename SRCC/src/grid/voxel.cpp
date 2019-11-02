@@ -18,25 +18,30 @@
 
 // Namespaces
 using namespace std;
-using namespace Eigen;
 
 // Main code
 int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid){
 
 	int out; 
-	Eigen::RowVector3i dimGridEig = Eigen::Map<Eigen::RowVector3i, 
-		Eigen::Unaligned>(dimGrid.data(), dimGrid.size());
+	Eigen::RowVector3i dimGridEig;
+		//  = Eigen::Map<Eigen::RowVector3i, 
+		// Eigen::Unaligned>(dimGrid.data(), dimGrid.size());
+
+	for (int i = 0; i < 3; ++i)
+	{
+		dimGridEig[i] = dimGrid[i];
+	}
 
 	out = BuildBlockGrid(dimGridEig,blockGrid);
 	return(out);
 }
 
 // Implementation of Cartesian Block grids
-int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
+int BuildBlockGrid(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid) {
 
 	int nVolu, nVert, nSurf,nEdge;
-	RowVector3i nSurfDim,nEdgeDim;
-	Matrix3i surfProp, edgeProp;
+	Eigen::RowVector3i nSurfDim,nEdgeDim;
+	Eigen::Matrix3i surfProp, edgeProp;
    //int ii;
 
    // Calculate Number of Elements
@@ -44,8 +49,8 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	nVolu=dimGrid.prod();
 	nVert=(dimGrid.array()+1).prod();
 
-	surfProp=(MatrixXi::Identity(3,3)).rowwise().reverse();
-	edgeProp=(1-MatrixXi::Identity(3,3).array());
+	surfProp=(Eigen::MatrixXi::Identity(3,3)).rowwise().reverse();
+	edgeProp=(1-Eigen::MatrixXi::Identity(3,3).array());
 
 	nSurfDim=((dimGrid.colwise().replicate(3).array())
 		+surfProp.array()).rowwise().prod();
@@ -97,13 +102,13 @@ int BuildBlockGrid(RowVector3i dimGrid, mesh& blockGrid) {
 	return(0);
 }
 
-int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
-	RowVector3i nSurfDim, Matrix3i surfProp){
+int BuildBlockVolu(const Eigen::RowVector3i  &dimGrid, int nVolu,  mesh& blockGrid,
+	const Eigen::RowVector3i  &nSurfDim, const Eigen::Matrix3i  &surfProp){
 
-	RowVector3i incrSurf, pos;
-	Matrix3i matSurf;
-	Matrix<int,3,3> incPos;
-	Matrix<int,6,1> incrSurf2, tempSurfInd;
+	Eigen::RowVector3i incrSurf, pos;
+	Eigen::Matrix3i matSurf;
+	Eigen::Matrix<int,3,3> incPos;
+	Eigen::Matrix<int,6,1> incrSurf2, tempSurfInd;
 	int jj;
 
 	matSurf=(dimGrid.colwise().replicate(3).array())+surfProp.array();
@@ -112,7 +117,7 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 	incrSurf=cumsum(incrSurf,0);
 	incrSurf2 << incrSurf.rowwise().replicate(2).transpose();
 
-	incPos << Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
+	incPos << Eigen::Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
 	//cout << "Size of volus: " << blockGrid.volus.capacity() << endl;
@@ -151,18 +156,19 @@ int BuildBlockVolu(RowVector3i dimGrid, int nVolu,  mesh& blockGrid,
 	return(0);
 }
 
-int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
-	Matrix3i surfProp, Matrix3i edgeProp, RowVector3i nSurfDim, RowVector3i nEdgeDim){
+int BuildBlockSurf(const Eigen::RowVector3i  &dimGrid, int nSurf ,mesh& blockGrid ,
+	const Eigen::Matrix3i  &surfProp, const Eigen::Matrix3i  &edgeProp, const Eigen::RowVector3i  &nSurfDim, const Eigen::RowVector3i  &nEdgeDim){
 	/*Builds the surface information for the generation of block grids of size dimGrid*/
 
-	RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;
-	Matrix<bool, 1,3> maskVec;
-	RowVector2i currDim;
-	Matrix3i matSurf, matEdge;
-	Matrix<int,3,3> incPos;
-	Matrix<int,6,1> incrSurf2;
-	Matrix<int,4,3> mask,incPosTemp;
-	Matrix<int,4,1> tempEdgeInd,incrEdge2;
+	Eigen::RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, 
+		cumProdDimGrid, ind;
+	Eigen::Matrix<bool, 1,3> maskVec;
+	Eigen::RowVector2i currDim;
+	Eigen::Matrix3i matSurf, matEdge;
+	Eigen::Matrix<int,3,3> incPos;
+	Eigen::Matrix<int,6,1> incrSurf2;
+	Eigen::Matrix<int,4,3> mask,incPosTemp;
+	Eigen::Matrix<int,4,1> tempEdgeInd,incrEdge2;
 	int  isFill,jPlane, boundaryFlag, jj, kk;
 
 	// Calculate arrays which can be precalculated
@@ -178,7 +184,7 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	incrEdge=cumsum(incrEdge,0);
 	
 
-	incPos << Matrix<int,3,1>::Ones() ,  matEdge.leftCols<2>();
+	incPos << Eigen::Matrix<int,3,1>::Ones() ,  matEdge.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
 	cumSurfDim=cumsum(nSurfDim,0);
@@ -253,22 +259,24 @@ int BuildBlockSurf(RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
 	return(0);
 }
 
-int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i nEdgeDim,
-	RowVector3i nSurfDim, Matrix3i edgeProp,Matrix3i surfProp ){
+int BuildBlockEdge(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid, 
+	int nEdge ,const Eigen::RowVector3i  &nEdgeDim,
+	const Eigen::RowVector3i  &nSurfDim, const Eigen::Matrix3i  &edgeProp,
+	const Eigen::Matrix3i  &surfProp ){
 	/*Function to build the Edges of a simple cartesian block grid*/
 
-	RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;
-	RowVector2i currDim;
-	Matrix3i matSurf, matEdge;
-	Matrix<bool, 1,3> maskVec;
-	Matrix<bool, 6,1> surfLog;
-	Matrix<int,3,3> incPos;
-	Matrix<int,6,1> incrSurf2,surfIndTemp;
-	Matrix<int,6,3> mask, surfLogTemp;
-	Matrix<int,4,3> incPosTemp;
-	Matrix<int,4,1> tempEdgeInd,incrEdge2;
-	Matrix<int,2,1> vertIndTemp,indTemp1,indTemp2;
-	Matrix<int,2,3> posMatTemp;
+	Eigen::RowVector3i incrSurf, incrEdge, cumSurfDim,dimGridCur, pos, cumProdDimGrid, ind;
+	Eigen::RowVector2i currDim;
+	Eigen::Matrix3i matSurf, matEdge;
+	Eigen::Matrix<bool, 1,3> maskVec;
+	Eigen::Matrix<bool, 6,1> surfLog;
+	Eigen::Matrix<int,3,3> incPos;
+	Eigen::Matrix<int,6,1> incrSurf2,surfIndTemp;
+	Eigen::Matrix<int,6,3> mask, surfLogTemp;
+	Eigen::Matrix<int,4,3> incPosTemp;
+	Eigen::Matrix<int,4,1> tempEdgeInd,incrEdge2;
+	Eigen::Matrix<int,2,1> vertIndTemp,indTemp1,indTemp2;
+	Eigen::Matrix<int,2,3> posMatTemp;
 
 	int  jPlane, jj, kk, nSurfEdge;
 
@@ -285,7 +293,7 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i 
 	incrEdge=cumsum(incrEdge,0);
 	
 
-	incPos << Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
+	incPos << Eigen::Matrix<int,3,1>::Ones() ,  matSurf.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
 	cumSurfDim=cumsum(nSurfDim,0);
@@ -373,16 +381,18 @@ int BuildBlockEdge(RowVector3i dimGrid, mesh& blockGrid, int nEdge ,RowVector3i 
 	return(0);
 }
 
-int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert, 
-	Matrix3i edgeProp, RowVector3i nEdgeDim){
+int BuildBlockVert(const Eigen::RowVector3i  &dimGrid, mesh& blockGrid, int nVert, 
+	const Eigen::Matrix3i  &edgeProp, const Eigen::RowVector3i  &nEdgeDim){
 	// Builds vertices for block grid
-	RowVector3i  cumSurfDim,dimGridVert,dimGridAct, pos, cumProdDimGrid, incrEdge;
-	RowVector3d coordTemp;
-	RowVector2i currDim;
-	Matrix3i  matEdge, incPos;
-	Matrix<int, 6,1> edgeIndTemp;
-	Matrix<bool, 6,1> edgeLog;
-	Matrix<int, 6,3> edgeLogTemp;
+	Eigen::RowVector3i  cumSurfDim,dimGridVert,dimGridAct, pos, cumProdDimGrid,
+		incrEdge;
+	Eigen::RowVector3d coordTemp;
+	Eigen::RowVector2i currDim;
+	Eigen::Matrix3i  matEdge, incPos;
+	Eigen::Matrix<int, 6,1> edgeIndTemp;
+	Eigen::Matrix<bool, 6,1> edgeLog;
+	Eigen::Matrix<int, 6,3> edgeLogTemp;
+
 
 	int ii,jj,kk;
 
@@ -393,8 +403,8 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 	dimGridAct=dimGrid.cwiseMax(1);
 
 	matEdge=(dimGrid.colwise().replicate(3).array())+edgeProp.array();
-	edgeProp=1-edgeProp.array();
-	incPos << Matrix<int,3,1>::Ones() ,  matEdge.leftCols<2>();
+	Eigen::Matrix3i edgeProp2 = 1-edgeProp.array();
+	incPos << Eigen::Matrix<int,3,1>::Ones() ,  matEdge.leftCols<2>();
 	incPos=cumprod(incPos,0);
 
 
@@ -410,7 +420,7 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 			blockGrid.verts[ii].coord[jj]=coordTemp[jj];
 		}
 
-		edgeLogTemp << pos.colwise().replicate(3), (pos.colwise().replicate(3)-edgeProp);
+		edgeLogTemp << pos.colwise().replicate(3), (pos.colwise().replicate(3)-edgeProp2);
 		edgeIndTemp=(edgeLogTemp.cwiseProduct(incPos.colwise().replicate(2))
 			.rowwise().sum()+(incrEdge.rowwise().replicate(2).transpose())).array()+1;
 
@@ -439,9 +449,6 @@ int BuildBlockVert(RowVector3i dimGrid, mesh& blockGrid, int nVert,
 	return(0);
 }
 
-
-
-
 // Implementation of Refinement of block grids
 
 // Test code
@@ -449,7 +456,7 @@ int Test_BuildBlockGrid_noout() {
    // Test the functionality provided by arraystructures
 
 	int errFlag,errTest;
-	RowVector3i dimGrid(2,3,4);
+	Eigen::RowVector3i dimGrid(2,3,4);
 	mesh blockGrid;
 
 	errFlag=0;
@@ -467,7 +474,7 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-	RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
+	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
 	mesh blockGrid;
 	const char *fileToOpen;
 	
