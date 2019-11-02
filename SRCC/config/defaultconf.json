@@ -1,7 +1,7 @@
 {
   "dev": {
     "limitlagrangian": 1e+308,
-    "mindesvarsparse": 200.0,
+    "mindesvarsparse": 200,
     "rsvsepsilons": {
       "rsvsmath_automatic_eps_centre": 1e-10,
       "rsvsmath_automatic_eps_centre2": 1e-10,
@@ -9,6 +9,7 @@
       "rsvsmath_automatic_eps_surf": 1e-10,
       "rsvsmath_automatic_eps_volu": 0.0
     },
+    "smoothstepmethod": "none",
     "snaxDistanceLimit_conserveShape": false,
     "surfcentrehessian": false,
     "surfcentrejacobian": true

@@ -1,11 +1,12 @@
 {
   "/dev/limitlagrangian": 1e+308,
-  "/dev/mindesvarsparse": 200.0,
+  "/dev/mindesvarsparse": 200,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_centre": 1e-10,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_centre2": 1e-10,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_edge": 0.0,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_surf": 1e-10,
   "/dev/rsvsepsilons/rsvsmath_automatic_eps_volu": 0.0,
+  "/dev/smoothstepmethod": "none",
   "/dev/snaxDistanceLimit_conserveShape": false,
   "/dev/surfcentrehessian": false,
   "/dev/surfcentrejacobian": true,
