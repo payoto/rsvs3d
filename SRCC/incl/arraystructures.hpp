@@ -468,7 +468,8 @@ public:
 
 // functions
 template <class T> bool CompareDisp(T *mesh1,T *mesh2);
-template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg);
+template<class T> int TestReadiness(T &stackT, const char* txt, bool errTarg, 
+	bool errTargCheck);
 template<class T> void DisplayVector(std::vector<T> vec);
 template<class T> void DisplayVectorStatistics(std::vector<T> vec);
 template<class T> void PrintVector(std::vector<T> vec, std::ostream &streamout);

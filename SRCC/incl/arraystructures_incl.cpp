@@ -240,18 +240,18 @@ template <class T> int TestTemplate_ArrayStruct()
 				"working (Stage 2)" << std::endl;
 			errFlag++;
 		} 
-		errFlag+=TestReadyness(stackT," after assignement",false);
+		errFlag+=TestReadiness(stackT," after assignement",false,false);
 
 		// Test prepare
 		stackT.PrepareForUse();
 		stackT2.PrepareForUse();
-		errFlag+=TestReadyness(stackT," after PrepareForUse",true);
+		errFlag+=TestReadiness(stackT," after PrepareForUse",true,true);
 
 		// Test Find
 		i=stackT.find(10);
 		j=stackT.find(7);
 		testSub=stackT.find_list(testSub);
-		errFlag+=TestReadyness(stackT," after find",true);
+		errFlag+=TestReadiness(stackT," after find",true,true);
 
 
 		if (i!=2 || j!=rsvs3d::constants::__notfound){
@@ -267,7 +267,7 @@ template <class T> int TestTemplate_ArrayStruct()
 
 		try{
 			stackT[2].index=7;
-			errFlag+=TestReadyness(stackT," after [] assignement",false);
+			errFlag+=TestReadiness(stackT," after [] assignement",false,false);
 
 			i=stackT.find(10);
 			// If this does not throw an error with have an issue
@@ -286,25 +286,25 @@ template <class T> int TestTemplate_ArrayStruct()
 		// Test Concatenation of arrays
 
 		stackT.PrepareForUse();
-		errFlag+=TestReadyness(stackT," after PrepareForUse (2nd Time)",true);
+		errFlag+=TestReadiness(stackT," after PrepareForUse (2nd Time Time)",true,true);
 
 		stackT.Concatenate(stackT2);
-		errFlag+=TestReadyness(stackT," after Concatenate",false);
+		errFlag+=TestReadiness(stackT," after Concatenate",false,false);
 
 		stackT.PrepareForUse();
-		errFlag+=TestReadyness(stackT," after PrepareForUse (3nd Time)",true);
+		errFlag+=TestReadiness(stackT," after PrepareForUse (3nd Time Time)",true,true);
 
 		stackT.PopulateIndices();
-		errFlag+=TestReadyness(stackT," after PopulateIndices",false);
+		errFlag+=TestReadiness(stackT," after PopulateIndices",false,true);
 
 		stackT.PrepareForUse();
-		errFlag+=TestReadyness(stackT," after PrepareForUse (4th Time)",true);
+		errFlag+=TestReadiness(stackT," after PrepareForUse (4th Time Time)",true,true);
 
 		// Test Read write:
 		fidw=fopen("../TESTOUT/testarray.dat","w");
 		if(fidw!=NULL){
 			stackT.write(fidw);
-			errFlag+=TestReadyness(stackT," Write out",true);
+			errFlag+=TestReadiness(stackT," Write out",true,true);
 			fclose(fidw);
 			fidr=fopen("../TESTOUT/testarray.dat","r");
 			if(fidr!=NULL){
@@ -337,7 +337,7 @@ template <class T> int TestTemplate_ArrayStruct()
 			errFlag++;
 		}
 		stackT.disp();
-		errFlag+=TestReadyness(stackT," Disp",true);
+		errFlag+=TestReadiness(stackT," Disp",true,true);
 		
 		stackT.elems.erase(stackT.elems.begin(),++(++stackT.elems.begin()));
 		stackT.isHash=0;
@@ -359,7 +359,8 @@ template <class T> int TestTemplate_ArrayStruct()
 	return(errFlag);
 }
 
-template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg)
+template<class T> int TestReadiness(T &stackT, const char* txt, bool errTarg,
+	bool errTargCheck)
 {
 	// Test if the behaviour of the readyness test is as expected
 	// stackT is the class to be tested 
@@ -374,7 +375,7 @@ template<class T> int TestReadyness(T &stackT, const char* txt, bool errTarg)
 		errFlag++;
 	} 
 	errTest=stackT.checkready();
-	if (!(errTest==errTarg)){
+	if (!(errTest==errTargCheck)){
 		std::cerr << "stackT wrongly marked as " << (errTarg ? "not" : "" ) 
 			<< " ready (checkready())"  << txt  << std::endl;
 		errFlag++;
