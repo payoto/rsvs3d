@@ -12,6 +12,9 @@
 #ifdef RSVSTEST
 #include "test.hpp"
 #endif // RSVSTEST
+#ifndef RSVS_NOTESTS
+#include "test.hpp"
+#endif
 
 using namespace std;
 
@@ -23,12 +26,16 @@ int main(int argc, char* argv[])
 int main_rsvs3d(int argc, char* argv[])
 #endif
 {
+	// Execution paths for different compilation flags allows building test 
+	// executables
 	#ifndef RSVSTEST
-	return RSVSExecution(argc, argv);
+		return RSVSExecution(argc, argv);
 	#elif defined(TEST_ALL)
-	rsvstest::maintest();
+		return rsvstest::maintest();
+	#elif defined(TEST_SHORT)
+		return rsvstest::shorttest();
 	#else
-	rsvstest::newtest();
+		return rsvstest::newtest();
 	#endif //RSVSTEST
 }
 #pragma GCC diagnostic pop
@@ -44,6 +51,13 @@ int RSVSExecution(int argc, char* argv[]){
 
 		integrate::execute::All(RSVSobj);
 
+	} else if (parseOut.execFlow==-3) {
+		#ifndef RSVS_NOTESTS
+		ExecuteTests(parseOut);
+		#else
+		RSVS3D_ERROR("Tests not compiled; use `make all` to produce an executable"
+			"with tests;\n or `make notest` for an executable without");
+		#endif
 	} else {
 		// Output parameter file to the directory (NO OVERWRITE?)
 		NoExecution(parseOut, paramconf);
@@ -51,7 +65,28 @@ int RSVSExecution(int argc, char* argv[]){
 	return (0);
 }
 
-void NoExecution(parse::ParserOutput parseOut, param::parameters &paramconf){
+void ExecuteTests(const parse::ParserOutput &parseOut){
+
+	int testNum=0;
+
+	if (parseOut.testCase.compare("all")==0) {
+		testNum = rsvstest::maintest();
+	} else if (parseOut.testCase.compare("short")==0) {
+		testNum = rsvstest::shorttest();
+	} else if (parseOut.testCase.compare("new")==0) {
+		testNum = rsvstest::newtest();
+	} else {
+		std::stringstream errStr;
+		errStr << "The test case '" << parseOut.testCase 
+			<< "'is not known, valid options are:" << std::endl 
+			<< "'all', 'short', or 'new'.";
+		RSVS3D_ERROR_ARGUMENT(errStr.str().c_str());
+	}
+	
+	exit(testNum);
+}
+
+void NoExecution(parse::ParserOutput &parseOut, param::parameters &paramconf){
 
 
 	if (parseOut.execFlow==-2){
@@ -62,7 +97,7 @@ void NoExecution(parse::ParserOutput parseOut, param::parameters &paramconf){
 	param::io::write(parseOut.paramFileOut, paramconf);
 
 	if (parseOut.execFlow==-2){
-		cerr << "Error while parsing the arguments. Check generated '"
+		std::cerr << "Error while parsing the arguments. Check generated '"
 			<< parseOut.paramFileOut << "' file";
 			exit(-2);
 	}
@@ -86,7 +121,7 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 	parse::ParserOutput parseOut;
 	parseOut.execFlow=0;
 	std::vector<std::string> triggerExec,configParam, configFiles, configPredef,
-		noexecStr;
+		noexecStr, testString;
 	// options that will trigger execution of RSVS
 	triggerExec = {"use-config","load-config","param"};
 
@@ -125,6 +160,11 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 		cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"))
 	("e,exec", "Execute RSVS. With no command line argument the "
 		"program does nothing.")
+	#ifndef RSVS_HIDETESTS
+	("t,test",std::string("Executes specified tests. requires compilation "
+		"without flag RSVS_NOTESTS."),
+		cxxopts::value(testString)->implicit_value("short"))
+	#endif
 	;
 
 	auto result = options.parse(argc, argv);
@@ -141,8 +181,24 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 		std::cerr << " on the command line." << std::endl;
 		std::cerr << " see --help for more info" << std::endl;
 		exit(-1);
+	} else if (result.count("exec") && result.count("test")){
+		std::cerr << std::endl << " Invalid specification of -e (exec) and -t (test)";
+		std::cerr << " on the command line." << std::endl;
+		std::cerr << " see --help for more info" << std::endl;
+		exit(-1);
+	} else if (result.count("noexec") && result.count("test")){
+		std::cerr << std::endl << " Invalid specification of -n (noexec) and -t (test)";
+		std::cerr << " on the command line." << std::endl;
+		std::cerr << " see --help for more info" << std::endl;
+		exit(-1);
 	} else if (result.count("exec")){
 		parseOut.execFlow = 1;
+	} else if (result.count("test")){
+		parseOut.execFlow = -3;
+		for (auto testCase : testString){
+			parseOut.testCase = testCase;
+			break;
+		}
 	} else if (result.count("noexec")){
 		parseOut.execFlow = -1;
 		for (auto confCase : noexecStr){

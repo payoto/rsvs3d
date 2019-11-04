@@ -13,6 +13,7 @@ LINK=g++
 # Executable name
 MAINEXECUTABLE=RSVS3D
 TESTEXECUTABLE=test_RSVS3D
+TESTSHORTEXECUTABLE=testshort_RSVS3D
 TESTALLEXECUTABLE=testall_RSVS3D
 
 # source, object and dependency directories
@@ -21,13 +22,6 @@ SRCTREE = src
 DEPDIR := .d
 BINDIR = bin
 INCLPROJ= incl
-#modules/tetgen/
-
-# Sources which contain the main function for all and test
-MAINALLSRC = src/main.cpp
-MAINTESTSRC = src/test/test.cpp
-
-# NOTNEEDEDNEWTEST = src/rsvs/RSVScalc.cpp
 
 # Include directories
 SHAREINCLROOTDIR = C:/ap1949include
@@ -36,6 +30,16 @@ DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
 DIRTETGEN= modules/tetgen
+
+#------------------------------------------------------
+#           WARNING AND OPTIMISATION FLAGS
+#------------------------------------------------------
+# Standard GCC warning, optimisation and c++ standard flags
+WARNFLAGS= -Wall -Wextra -pedantic
+# -Werror
+#
+OPTIMLVL=3
+CCPSTD=11
 
 #------------------------------------------------------
 #                 USE OF OPTIONAL LIBRARIES
@@ -67,20 +71,11 @@ SRCTREE+= $(DIRTETGEN)
 INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
 INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
+
+
 #------------------------------------------------------
 #                 COMPILER FLAGS
 #------------------------------------------------------
-# Standard GCC warning, optimisation and c++ standard flags
-WARNFLAGS= -Wall -Wextra -pedantic
-# -Werror
-#
-OPTIMLVL=3
-CCPSTD=11
-
-# O3 comes with spurious warnings which is ugly to deal in the code
-ifeq ($(OPTIMLVL), 3)
-WARNFLAGS += -Wno-maybe-uninitialized
-endif
 
 # Other compiler flags
 # project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE
@@ -110,10 +105,17 @@ CCFLAGETETGEN += $(CCFLAGDBG)
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
 CFTESTFLAG= -DTEST_ALL 
+CF_NORSVSTESTFLAG= -DRSVS_NOTESTS 
+CF_DISTRIBUTIONFLAG= -DRSVS_HIDETESTS 
 
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work
 #------------------------------------------------------
+
+# O3 comes with spurious warnings which is ugly to deal in the code
+ifeq ($(OPTIMLVL), 3)
+WARNFLAGS += -Wno-maybe-uninitialized
+endif
 
 ifneq (,$(filter $(CC),gcc g++))
 ifneq ($(USE_BOOST),true)
@@ -199,17 +201,24 @@ SOURCES = $(foreach d,$(wildcard $(SRCTREE)*),$(call rwildcard,$d/,*.cpp))
 # $(info sources printed)
 # Handling target differences
 SRCS := $(SOURCES)
-# 
-ifeq ($(MAKECMDGOALS), )
+# Set default executable
 EXECUTABLE = $(MAINEXECUTABLE)
+
+ifeq ($(MAKECMDGOALS), notests)
+CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG)
 endif
-ifeq ($(MAKECMDGOALS), all)
-EXECUTABLE = $(MAINEXECUTABLE)
+ifeq ($(MAKECMDGOALS), distribution)
+CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG) 
 endif
 
 ifeq ($(MAKECMDGOALS), testnew)
 EXECUTABLE = $(TESTEXECUTABLE)
 CCFLAGCUSTOM += -DRSVSTEST 
+endif
+
+ifeq ($(MAKECMDGOALS), testshort)
+EXECUTABLE = $(TESTEXECUTABLE)
+CCFLAGCUSTOM += -DRSVSTEST -DTEST_SHORT
 endif
 
 ifeq ($(MAKECMDGOALS), testall)
@@ -239,7 +248,10 @@ endif
 all : FORCE $(SRCS) $(EXECUTABLE)  
 testnew : FORCE $(SRCS) $(EXECUTABLE) 
 testall : FORCE $(SRCS) $(EXECUTABLE) 
-  
+testshort : FORCE $(SRCS) $(EXECUTABLE) 
+notests : FORCE $(SRCS) $(EXECUTABLE) 
+distribution : FORCE $(SRCS) $(EXECUTABLE) 
+
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./

@@ -32,7 +32,8 @@ namespace parse {
 // Substructure names are all 4-5 letters
 
 int RSVSExecution(int argc, char* argv[]);
-void NoExecution(parse::ParserOutput execFlow, param::parameters &paramconf);
+void NoExecution(parse::ParserOutput &parseOut, param::parameters &paramconf);
+void ExecuteTests(const parse::ParserOutput &parseOut);
 #ifdef LIB_RSVS
 int main_rsvs3d(int argc, char* argv[]);
 #endif
@@ -42,6 +43,7 @@ namespace parse {
 	public:
 		int execFlow = 0;
 		std::string paramFileOut = "noexec_config.json";
+		std::string testCase = "";
 	};
 
 	ParserOutput CommandLineParser(int argc, char* argv[],

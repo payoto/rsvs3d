@@ -4,9 +4,7 @@
 		{
 			"file_regex": "^([^ ]*):(\\d+):(\\d+):\\s*(.*)$",
 			"name": "Custom Make",
-			"working_dir": "${folder:${project_path}}",
 			"shell_cmd": "make ",
-
 			"variants":
 			[
 				{
@@ -33,27 +31,63 @@
 					"name": "clean",
 					"shell_cmd": "make clean"
 				}
-			]
+			],
+			"working_dir": "${folder:${project_path}}"
 		}
 	],
 	"folders":
 	[
 		{
-			"path": "SRCC",
-			"file_exclude_patterns": [
-				"*.d", "*.o"
+			"file_exclude_patterns":
+			[
+				"*.d",
+				"*.o"
 			],
+			"path": "SRCC"
 		},
 		{
-			"path": ".",
-			"file_exclude_patterns": [
-				"*.cpp", "*.hpp", "*.d", "*.o"
+			"file_exclude_patterns":
+			[
+				"*.cpp",
+				"*.hpp",
+				"*.d",
+				"*.o"
 			],
+			"path": "."
 		},
 		{
 			"path": "D:\\alexa\\Documents\\MATLAB"
 		}
 	],
+	"settings":
+	{
+		"SublimeLinter.linters.g++.I":
+		[
+			"C:\\ap1949include\\Eigen_all\\Eigen\\",
+			"C:\\ap1949include\\json\\single_include\\nlohmann",
+			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
+			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\modules\\tetgen",
+			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\incl",
+			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\modules\\tetgen",
+			"C:\\ap1949include\\boost_1_67_0",
+			"C:\\ap1949include\\cxxopts-2.1.1\\include"
+		],
+		"SublimeLinter.linters.g++.args":
+		[
+			"-fsyntax-only",
+			"-std=c++11",
+			"-DTETLIBRARY",
+			"-DEIGEN_NO_DEBUG",
+			"-DEIGEN_NO_STATIC_ASSERT"
+		],
+		"rulers":
+		[
+			80
+		],
+		"sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
+		"sublimegdb_workingdir": "${folder:${project_path:test_RSVS3D.exe}}",
+		"wrap_width": 95
+	},
 	"syntax_override":
 	{
 		"\\.cpp$":
@@ -66,60 +100,5 @@
 			"User",
 			"C++RSVS3D"
 		]
-	},
-	// "settings": {
- //        "SublimeLinter.linters.cppcheck.disable": false, 
- //        "SublimeLinter.linters.cppcheck.args": [], 
- //        "SublimeLinter.linters.cppcheck.enable": "style", 
- //        "SublimeLinter.linters.cppcheck.excludes": ["variableScope"], 
- //        "SublimeLinter.linters.cppcheck.std": [
- //            "c++11"
- //        ], 
- //        "SublimeLinter.linters.gcc.c++_executable": "g++", 
- //        "SublimeLinter.linters.gcc.c++_extra_flags": [
- //            "-fsyntax-only", 
- //            "-std=c++11"
- //        ], 
- //        "SublimeLinter.linters.gcc.c_executable": "gcc", 
- //        "SublimeLinter.linters.gcc.c_extra_flags": [
- //            "-fsyntax-only", 
- //            "-std=c90"
- //        ], 
- //        "SublimeLinter.linters.gcc.disable": false, 
- //        "SublimeLinter.linters.gcc.include_dirs": [
- //            "C:\\ap1949include\\Eigen_all\\Eigen\\"
- //        ], 
- //        "SublimeLinter.linters.gcc.selector": "source.c++"
- //    },
- 
-	 "settings":
-	 {
-		"sublimegdb_workingdir": "${folder:${project_path:test_RSVS3D.exe}}",
-		// NOTE: You MUST provide --interpreter=mi for the plugin to work
-		"sublimegdb_commandline": "gdb --interpreter=mi ./test_RSVS3D.exe",
-
-		"SublimeLinter.linters.g++.I": [
-			"C:\\ap1949include\\Eigen_all\\Eigen\\",
-			"C:\\ap1949include\\json\\single_include\\nlohmann",
-			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\incl",
-			"C:\\Users\\ap1949\\Local Documents\\PhD\\Development Work\\rsvs3D\\source\\SRCC\\modules\\tetgen",
-			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\incl",
-			"D:\\alexa\\Documents\\TRAVAIL\\UNIDESK\\PhD\\rsvs3D\\source\\SRCC\\modules\\tetgen",
-			"C:\\ap1949include\\boost_1_67_0",
-			"C:\\ap1949include\\cxxopts-2.1.1\\include",
-		],
-
-		"SublimeLinter.linters.g++.args": [
-	          "-fsyntax-only",
-	          "-std=c++11",
-	            "-DTETLIBRARY",
-	            "-DEIGEN_NO_DEBUG","-DEIGEN_NO_STATIC_ASSERT",
-		],
-		"rulers":
-		[
-			80
-		],
-		"wrap_width": 95
-
 	}
- }
+}
