@@ -439,11 +439,11 @@ int Test_snake(){
 }
 
 
-int Test_snakeinit_velselect(int velCase=0){ 
+int Test_snakeinit_velselect(int velCase=0, int nStep=300){ 
 	snake testSnake;
 	mesh snakeMesh, triMesh;
 	triangulation testTriangle;
-	const char *fileToOpen;    
+	std::string fileToOpen;    
 	tecplotfile outSnake;   
 	double totT=0.0;  
 	vector<double> dt;  
@@ -454,22 +454,24 @@ int Test_snakeinit_velselect(int velCase=0){
 	
 
 	try {
-		fileToOpen="../TESTOUT/TestSnake.plt";
+		fileToOpen="../TESTOUT/TestSnake";
 		switch (velCase) {
 			case 0: // random
-				fileToOpen="../TESTOUT/TestSnake_rand.plt";
+				fileToOpen+="_rand";
 				break;
 			case 1: // unit with reflection
-				fileToOpen="../TESTOUT/TestSnake_unitref.plt";
+				fileToOpen+="_unitref";
 				break;
 			case 2: // unit step with no reflection
-				fileToOpen="../TESTOUT/TestSnake_unitnoref.plt";
+				fileToOpen+="_unitnoref";
 				break;
 			default:
 				RSVS3D_ERROR_ARGUMENT("velCase option not known");
 				break;
 		}
-		outSnake.OpenFile(fileToOpen);
+		fileToOpen+=std::string("_") + std::to_string(nStep) + ".plt";
+
+		outSnake.OpenFile(fileToOpen.c_str());
 		errTest+=snakeMesh.read("../TESTOUT/mesh203010.dat");
 		snakeMesh.PrepareForUse();
 		testSnake.SetSnakeMesh(&snakeMesh);
@@ -491,7 +493,7 @@ int Test_snakeinit_velselect(int velCase=0){
 
 		start_s=clock();
 		testSnake.PrepareForUse();
-		for(ii=0;ii<300;++ii){
+		for(ii=0;ii<nStep;++ii){
 			cout << ii << " ";
 			
 			if(testSnake.snaxs.size()>0){
@@ -563,6 +565,19 @@ int Test_snakeinit_unit(){
 int Test_snakeinit_unitnoreflect(){ 
 	// unit no reflect
 	return(Test_snakeinit_velselect(2));
+}
+
+int Test_snakeinit_random_short(){ 
+	// rand
+	return(Test_snakeinit_velselect(0, 20));
+}
+int Test_snakeinit_unit_short(){ 
+	// unit reflect
+	return(Test_snakeinit_velselect(1, 20));
+}
+int Test_snakeinit_unitnoreflect_short(){ 
+	// unit no reflect
+	return(Test_snakeinit_velselect(2, 20));
 }
 
 int Test_snakeinit_MC(){ 

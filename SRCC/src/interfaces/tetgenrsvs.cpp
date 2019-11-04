@@ -1226,7 +1226,7 @@ std::vector<bool> tetgen::voronoi::Points2VoroAndTetmesh(const std::vector<doubl
 	}
 	tetgen::voronoi::GenerateInternalPoints(voroMesh,nInternalLayers, tetinSupport);
 
-	cmd = "pqminnefO9/7"; 
+	cmd = "QpqminnefO9/7"; 
 	try{
 		rsvstetrahedralize(cmd.c_str(), &tetinT, &tetoutT, &tetinSupport);
 	} catch (exception const& ex) {

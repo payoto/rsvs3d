@@ -74,17 +74,30 @@ namespace rsvstest {
 				std::cout << "-------------------------------------------------------------"
 					"---------------------------" << std::endl;
 			}
+			int ReturnErrCount(){return errCount;}
 			~customtest(){
 				this->PrintSummary();
 			}
 
-			int Run(std::function<int()> test, const char * funcName);
-			int RunSilent(std::function<int()> test, const char * funcName);
+			int Run(std::function<int()> test, const char * funcName,
+				int expectedTime=-1);
+			int RunSilent(std::function<int()> test, const char * funcName, 
+				int expectedTime=-1);
 			void PrintSummary();
 	};
 
 	int maintest();
+	int shorttest();
 	int newtest();
+	int arraystructtemplates();
+	int meshprocesses();
+	int snakeprocesses();
+	int longevolution();
+	int RSVSprocesses();
+	int RSVS2Dprocesses();
+	int tetgenprocesses();
+	int JSONprocesses();
+	int integrationprocesses();
 }
 
 // member function definition template <class T> 
