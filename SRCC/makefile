@@ -40,6 +40,7 @@ WARNFLAGS= -Wall -Wextra -pedantic
 #
 OPTIMLVL=3
 CCPSTD=11
+DEBUG=false
 
 #------------------------------------------------------
 #                 USE OF OPTIONAL LIBRARIES
@@ -86,7 +87,6 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 # eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
 # -funroll-all-loops -ffast-math -ffinite-math-only 
 # Tetgen flag to use as library: -DTETLIBRARY
-# cxxopts #
 CCFLAGDBG= 
 # -g -ggdb
 # -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
@@ -98,10 +98,7 @@ CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT
 # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_DONT_VECTORIZE 
 CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 
-CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
-# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation 
-# beyond O3. It will break using -march and/or -ffast-math and co...
-CCFLAGETETGEN += $(CCFLAGDBG)
+
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
 CFTESTFLAG= -DTEST_ALL 
@@ -109,13 +106,39 @@ CF_NORSVSTESTFLAG= -DRSVS_NOTESTS
 CF_DISTRIBUTIONFLAG= -DRSVS_HIDETESTS 
 
 #------------------------------------------------------
-#    PARSE correct flags to get FILESYSTEM to work
+#          PARSE compiler flags
 #------------------------------------------------------
+# flags are grouped from the variable in which they are called to the ones
+# in which they are called. There can be dependencies on the target and other
+# flags
+
+ifeq ($(MAKECMDGOALS), distribution)
+	# distribution requires optimisation and No debug and test flags
+	OPTIMLVL= 3
+	CCFLAGDBG= 
+	CCFLAGPROJ= -DTIME_EXEC $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
+	CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT
+endif
+
+ifeq ($(DEBUG), true)
+	OPTIMLVL= 0
+	CCFLAGDBG= -g -ggdb
+	CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
+	CCFLAGEIG= 
+endif
 
 # O3 comes with spurious warnings which is ugly to deal in the code
 ifeq ($(OPTIMLVL), 3)
 WARNFLAGS += -Wno-maybe-uninitialized
 endif
+
+CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
+# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation 
+# beyond O3. It will break using -march and/or -ffast-math and co...
+CCFLAGETETGEN += $(CCFLAGDBG)
+#------------------------------------------------------
+#    PARSE correct flags to get FILESYSTEM to work
+#------------------------------------------------------
 
 ifneq (,$(filter $(CC),gcc g++))
 ifneq ($(USE_BOOST),true)
