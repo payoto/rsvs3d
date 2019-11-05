@@ -44,7 +44,7 @@
  */
 namespace rsvstest {
 
-		/**
+	/**
 	 * @brief      Class for customtest.
 	 */
 	class customtest {

@@ -20,6 +20,7 @@ using namespace std;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+
 #ifndef LIB_RSVS
 int main(int argc, char* argv[])
 #else
@@ -157,13 +158,14 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 	("n,noexec",std::string("Do not execute RSVS process, "
 		"will only parse the inputs and output "
 		"the resulting configuration file to 'arg'"),
-		cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"))
+		cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"), 
+		"STRING")
 	("e,exec", "Execute RSVS. With no command line argument the "
 		"program does nothing.")
 	#ifndef RSVS_HIDETESTS
-	("t,test",std::string("Executes specified tests. requires compilation "
+	("test",std::string("Executes specified tests. requires compilation "
 		"without flag RSVS_NOTESTS."),
-		cxxopts::value(testString)->implicit_value("short"))
+		cxxopts::value(testString)->implicit_value("short"), "STRING")
 	#endif
 	;
 
@@ -173,7 +175,6 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 		std::cout << options.help({"", "Execution control",
 			"Parameter configuration"}) << std::endl;
 		exit(0);
-		parseOut.execFlow = -1;
 	}
 	// "Execution control"
 	if(result.count("noexec")>0 && result.count("exec")>0){
@@ -197,7 +198,7 @@ parse::ParserOutput parse::CommandLineParser(int argc, char* argv[],
 		parseOut.execFlow = -3;
 		for (auto testCase : testString){
 			parseOut.testCase = testCase;
-			break;
+			std::cout << parseOut.testCase << " " << testCase << std::endl;
 		}
 	} else if (result.count("noexec")){
 		parseOut.execFlow = -1;

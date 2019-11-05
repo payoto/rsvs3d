@@ -117,11 +117,13 @@ int rsvstest::RSVSprocesses(){
 	customtest gridTest("Test RSVS process");
 
 
-	gridTest.RunSilent(Test_RSVSalgo,"Snake RSVS from spawn");
-	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS");
-	gridTest.RunSilent(Test_snakeRSVS_singlevol,"Snake RSVS single vol");
-	gridTest.RunSilent(Test_RSVSalgo_singlevol_fullmath,"Snake RSVS algorithm (full maths)");
-	gridTest.RunSilent(Test_RSVSalgo_singlevol_sparse,"Snake RSVS algorithm (sparse)");
+	gridTest.RunSilent(Test_RSVSalgo,"Snake RSVS from spawn", 90);
+	gridTest.RunSilent(Test_snakeRSVS,"Snake RSVS", 5);
+	gridTest.RunSilent(Test_snakeRSVS_singlevol,"Snake RSVS single vol",5);
+	gridTest.RunSilent(Test_RSVSalgo_singlevol_fullmath,
+		"Snake RSVS algorithm (full maths)", 25);
+	gridTest.RunSilent(Test_RSVSalgo_singlevol_sparse,
+		"Snake RSVS algorithm (sparse)", 12);
 	return (gridTest.ReturnErrCount());
 }
 
@@ -138,11 +140,11 @@ int rsvstest::tetgenprocesses(){
 	customtest gridTest("Tetgen interface tests");
 
 	// Tetgen interface tests
-	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing"); 
-	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing"); 
-	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
+	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing", 26); 
+	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing", 30); 
+	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS", 78); 
 	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,
-		"tegen API testing - Voro to RSVS");
+		"tegen API testing - Voro to RSVS", 42);
 	return (gridTest.ReturnErrCount());
 }
 
