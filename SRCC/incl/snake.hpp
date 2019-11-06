@@ -189,6 +189,8 @@ public:
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
 	void disptree(const snake &snakein, int n) const;
+	double value(const mesh &meshin) const 
+		{return meshin.verts.isearch(this->index)->value(meshin);}
 	int Key() const {return (index);};
 	int KeyParent() const {return (edgeind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -221,6 +223,8 @@ public:
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
 	void disptree(const snake &snakein, int n) const;
+	double value(const mesh &meshin) const
+		{return meshin.edges.isearch(this->index)->value(meshin);}
 	int Key() const {return (index);};
 	int KeyParent() const {return (surfind);}; 
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
@@ -245,6 +249,8 @@ public:
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
 	void disptree(const snake &snakein, int n) const;
+	double value(const mesh &meshin) const
+		{return meshin.surfs.isearch(this->index)->value(meshin);}
 	int Key() const {return (index);};
 	int KeyParent() const {return (voluind);};
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);

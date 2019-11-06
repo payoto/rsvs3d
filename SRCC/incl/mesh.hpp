@@ -174,7 +174,7 @@ public:
 class meshpart : public ArrayStructpart { 
 public : 
 	virtual void disptree(const mesh &meshin, int n) const =0 ;
-
+	virtual double value(const mesh &meshin) const =0;
 };
 
 
@@ -191,6 +191,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	double value(const mesh &meshin) const;
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -269,6 +270,7 @@ public:
 	
 	std::vector<int> vertind(const mesh &meshin) const;
 	void disp() const;
+	double value(const mesh &meshin) const;
 	void disptree(const mesh &meshin, int n) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};	
@@ -286,7 +288,6 @@ public:
 	bool edgeconneq(const surf &other, bool recurse=true) const;
 	coordvec PseudoCentroid(const mesh &meshin) const;
 	int PseudoCentroid(const mesh &meshin, coordvec &coord) const;
-
 
 	surf(){ // Constructor
 		index=0;
@@ -345,6 +346,7 @@ public:
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	double value(const mesh &meshin) const;
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -416,6 +418,7 @@ public:
 
 	void disp() const;
 	void disptree(const mesh &meshin, int n) const;
+	double value(const mesh &meshin) const;
 	void ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu);
 	void PrepareForUse(){};
 	#pragma GCC diagnostic push
@@ -632,6 +635,12 @@ public:
 	void SetBorders();
 	void OrientFaces();
 	int OrderVertexEdges(int vertIndex);
+	// Mesh Ordering 
+	void ReOrder();
+	bool CompareVerts(const vert &in1, const vert &in2) const;
+	bool CompareEdges(const edge &in1, const edge &in2) const;
+	bool CompareSurfs(const surf &in1, const surf &in2) const;
+	bool CompareVolus(const volu &in1, const volu &in2) const;
 	// Mesh component comparison
 	void GetOffBorderVert(std::vector<int> &vertList, std::vector<int> &voluInd,
 		int outerVolume=-1);

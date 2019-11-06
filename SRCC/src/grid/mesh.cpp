@@ -1555,6 +1555,65 @@ void vert::disptree(const mesh &meshin, int n) const{
 	}
 }
 
+double volu::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->surfind.size()>0 ? 
+		1.0/double(this->surfind.size()): 0.0; 
+	for (auto vi : this->surfind) {
+		val += meshin.surfs.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+double surf::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->edgeind.size()>0 ? 
+		1.0/double(this->edgeind.size()): 0.0; 
+	for (auto vi : this->edgeind) {
+		val += meshin.edges.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+double edge::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->vertind.size()>0 ? 
+		1.0/double(this->vertind.size()): 0.0; 
+	for (auto vi : this->vertind) {
+		val += meshin.verts.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+double vert::value(const mesh &meshin) const {
+	double val=0.0;
+	for (int j = 0; j < 3; ++j)
+	{
+		val += this->coord[j] * pow(10.0, double(j));
+	}
+	return val;
+}
+#pragma GCC diagnostic pop
+
+bool mesh::CompareVerts(const vert &in1, const vert &in2) const {
+	return in1.value(*this) < in2.value(*this);
+}
+
+bool mesh::CompareEdges(const edge &in1, const edge &in2) const {
+	return in1.value(*this) < in2.value(*this);
+}
+
+bool mesh::CompareSurfs(const surf &in1, const surf &in2) const {
+	return in1.value(*this) < in2.value(*this);
+}
+
+bool mesh::CompareVolus(const volu &in1, const volu &in2) const {
+	return in1.value(*this) < in2.value(*this);
+}
+
 // Input and output
 void volu::write(FILE *fid) const{
 
@@ -5392,6 +5451,109 @@ void mesh::EdgeVector(int edgeIndex, coordvec &vec) const{
 
 int mesh::OrderVertexEdges(int vertIndex){
 	return this->verts.elems[this->verts.find(vertIndex)].OrderEdges(this);
+}
+
+void mesh::ReOrder(){
+
+	// Bind comparison functions into lambdas
+	auto compareVerts = [&](const vert &i1, const vert & i2) -> bool 
+		{return (this->CompareVerts(i1, i2));};
+	auto compareEdges = [&](const edge &i1, const edge & i2) -> bool 
+		{return (this->CompareEdges(i1, i2));};
+	auto compareSurfs = [&](const surf &i1, const surf & i2) -> bool 
+		{return (this->CompareSurfs(i1, i2));};
+	auto compareVolus = [&](const volu &i1, const volu & i2) -> bool 
+		{return (this->CompareVolus(i1, i2));};
+
+	// Reorder the arrays according to element values
+	sort(this->verts.elems.begin(),this->verts.elems.end(), compareVerts);
+	this->verts.HashArray();
+	sort(this->edges.elems.begin(),this->edges.elems.end(), compareEdges);
+	this->edges.HashArray();
+	sort(this->surfs.elems.begin(),this->surfs.elems.end(), compareSurfs);
+	this->surfs.HashArray();
+	sort(this->volus.elems.begin(),this->volus.elems.end(), compareVolus);
+	this->volus.HashArray();
+
+	this->HashArray();
+
+	// Renumber elements according to position
+	// Update connectivity first
+	// Vertices
+	int nVerts = this->verts.size();
+	for (int i = 0; i < nVerts; ++i)
+	{
+		for (auto &ei : this->verts[i].edgeind)
+		{
+			ei = this->edges.find(ei, true)+1;
+		}
+	}
+
+	// Edges
+	int nEdges = this->edges.size();
+	for (int i = 0; i < nEdges; ++i)
+	{
+		for (auto &ei : this->edges[i].surfind)
+		{
+			ei = this->surfs.find(ei, true)+1;
+		}		
+		for (auto &ei : this->edges[i].vertind)
+		{
+			ei = this->verts.find(ei, true)+1;
+		}
+	}
+
+	// Surfs
+	int nSurfs = this->surfs.size();
+	for (int i = 0; i < nSurfs; ++i)
+	{
+		for (auto &ei : this->surfs[i].voluind)
+		{
+			ei = this->volus.find(ei, true)+1;
+		}		
+		for (auto &ei : this->surfs[i].edgeind)
+		{
+			ei = this->edges.find(ei, true)+1;
+		}
+	}
+
+	// Volumes
+	int nVolus = this->volus.size();
+	for (int i = 0; i < nVolus; ++i)
+	{
+		this->volus[i].index = i+1;	
+		for (auto &ei : this->volus[i].surfind)
+		{
+			ei = this->surfs.find(ei, true)+1;
+		}
+	}
+
+	// Update indices
+	nVerts = this->verts.size();
+	for (int i = 0; i < nVerts; ++i){
+		this->verts[i].index = i+1;
+	}
+
+	nEdges = this->edges.size();
+	for (int i = 0; i < nEdges; ++i){
+		this->edges[i].index = i+1;
+	}
+
+	nSurfs = this->surfs.size();
+	for (int i = 0; i < nSurfs; ++i){
+		this->surfs[i].index = i+1;
+	}
+
+	nVolus = this->volus.size();
+	for (int i = 0; i < nVolus; ++i){
+		this->volus[i].index = i+1;	
+	}
+
+	// Finish
+	this->PrepareForUse();
+	#ifdef SAFE_ALGO
+	this->TestConnectivityBiDir();
+	#endif // SAFE_ALGO
 }
 
 std::pair<int, int> OrderMatchLists(const vector<int> &vec1, int p1, int p2){

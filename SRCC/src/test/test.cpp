@@ -82,6 +82,7 @@ int rsvstest::meshprocesses(){
 	gridTest.RunSilent(Test_BuildBlockGrid_noout,"Voxel");
 	gridTest.RunSilent(Test_tecplotfile,"post-processing class");
 	gridTest.RunSilent(Test_MeshOut,"Mesh output"); 
+	gridTest.RunSilent(Test_MeshReOrder,"Mesh Reordering"); 
 	gridTest.RunSilent(Test_surfcentre,"test SurfCentroid"); 
 	gridTest.RunSilent(Test_MeshRefinement,"Multi-Level Meshes");
 	gridTest.RunSilent(Test_MeshOrient,"Output mesh orientation");

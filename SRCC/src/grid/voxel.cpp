@@ -522,4 +522,59 @@ int Test_MeshOut(){
 	errFlag+= TestCompareReadWrite(fileToOpen, blockGrid, outmesh3);
 
 	return(errFlag);
-}    
+}
+
+int Test_MeshReOrder(){
+	int errFlag,errTest, start_s,stop_s;
+	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
+	mesh blockGrid;
+	const char *fileToOpen;
+	
+	tecplotfile outmesh1, outmesh3, outmesh2,outmesh4;
+
+	errFlag=0;
+	errTest=BuildBlockGrid(dimGrid1,blockGrid);
+	blockGrid.ReOrder();
+	errFlag+= (errTest!=0);
+
+	fileToOpen="../TESTOUT/tecout_ordered_6612.plt";
+	errTest=outmesh1.OpenFile(fileToOpen);
+	errFlag+= (errTest!=0);
+	errTest=outmesh1.PrintMesh(blockGrid);
+	errFlag+= (errTest!=0);
+	fileToOpen="../TESTOUT/mesh_ordered_6612.dat";
+	blockGrid.write(fileToOpen);
+
+	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
+	blockGrid.ReOrder();
+	errFlag+= (errTest!=0);
+
+	fileToOpen="../TESTOUT/tecout_ordered_100100.plt";
+	errTest=outmesh2.OpenFile(fileToOpen);
+	errFlag+= (errTest!=0);
+	fileToOpen="../TESTOUT/mesh_ordered_100100.dat";
+	blockGrid.write(fileToOpen);
+
+	errTest=outmesh2.PrintMesh(blockGrid);
+	errFlag+= (errTest!=0);
+	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
+	start_s=clock();
+	errTest=BuildBlockGrid(dimGrid3,blockGrid);
+	blockGrid.ReOrder();
+	errFlag+= (errTest!=0);
+	// the code you wish to time goes here
+	stop_s=clock();
+	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
+	fileToOpen="../TESTOUT/tecout_ordered_202020.plt";
+
+	errTest=outmesh3.OpenFile(fileToOpen);
+	errFlag+= (errTest!=0); 
+
+	errTest=outmesh3.PrintMesh(blockGrid);
+	errFlag+= (errTest!=0);
+
+	fileToOpen="../TESTOUT/mesh_ordered_203010.dat";
+	blockGrid.write(fileToOpen);
+
+	return(errFlag);
+}
