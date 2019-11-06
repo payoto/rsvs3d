@@ -70,6 +70,7 @@ void ExecuteTests(const parse::ParserOutput &parseOut){
 
 	int testNum=0;
 
+	#ifndef RSVS_HIDETESTS
 	if (parseOut.testCase.compare("all")==0) {
 		testNum = rsvstest::maintest();
 	} else if (parseOut.testCase.compare("short")==0) {
@@ -83,6 +84,7 @@ void ExecuteTests(const parse::ParserOutput &parseOut){
 			<< "'all', 'short', or 'new'.";
 		RSVS3D_ERROR_ARGUMENT(errStr.str().c_str());
 	}
+	#endif // RSVS_HIDETESTS
 	
 	exit(testNum);
 }
