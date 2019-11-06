@@ -635,6 +635,12 @@ public:
 	void SetBorders();
 	void OrientFaces();
 	int OrderVertexEdges(int vertIndex);
+	// Mesh Ordering 
+	void ReOrder();
+	bool CompareVerts(const vert &in1, const vert &in2) const;
+	bool CompareEdges(const edge &in1, const edge &in2) const;
+	bool CompareSurfs(const surf &in1, const surf &in2) const;
+	bool CompareVolus(const volu &in1, const volu &in2) const;
 	// Mesh component comparison
 	void GetOffBorderVert(std::vector<int> &vertList, std::vector<int> &voluInd,
 		int outerVolume=-1);
