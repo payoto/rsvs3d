@@ -117,7 +117,7 @@ public:
 };
 
 
-class triangle : public meshpart , public snakpart {	
+class triangle : public ArrayStructpart , public snakpart {	
 private:
 	bool isTriangleReady=false;
 public:
@@ -132,7 +132,6 @@ public:
  
 	// interface functions
 	void disp() const override;
-	void disptree(const mesh &meshin, int n) const override;
 	int Key() const override {return (index);};
 	int KeyParent() const override {return (parentsurf);};
 	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
@@ -158,7 +157,7 @@ public:
 };
 
 
-class trianglepoint : public meshpart , public snakpart {	
+class trianglepoint : public ArrayStructpart , public snakpart {	
 public:
 	
 	coordvec coord;
@@ -168,7 +167,6 @@ public:
 
 	// interface functions
 	void disp() const override;
-	void disptree(const mesh &meshin, int n) const override;
 	int Key() const override {return (index);};
 	int KeyParent() const override {return (parentsurf);};
 	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;
@@ -185,7 +183,7 @@ public:
 
 };
 
-class trianglesurf : public meshpart , public snakpart {
+class trianglesurf : public ArrayStructpart , public snakpart {
 
 public:
 	std::vector<int> indvert;
@@ -195,7 +193,6 @@ public:
 	
 	// interface functions
 	void disp() const override;
-	void disptree(const mesh &meshin, int n) const override;
 	int Key() const override {return (index);};
 	int KeyParent() const override {return (parentsurfmesh);};
 	void ChangeIndices (int nVert,int nEdge,int nSurf,int nVolu) override;

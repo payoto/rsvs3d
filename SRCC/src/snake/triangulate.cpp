@@ -1197,13 +1197,11 @@ void triangulation::SetConnectivityDyna(int ii){
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void triangle::disp() const{} 
-void triangle::disptree(mesh const&, int) const {}
 void triangle::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
 void triangle::read(FILE * fid){}
 void triangle::write(FILE * fid) const {}
 
 void trianglepoint::disp() const{} 
-void trianglepoint::disptree(mesh const&, int) const {}
 void trianglepoint::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglepoint::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglepoint::read(FILE * fid){}
@@ -1216,7 +1214,6 @@ void trianglesurf::disp() const{
 	cout << "typevert: " ;DisplayVector(typevert);
 	cout << endl;
 } 
-void trianglesurf::disptree(mesh const&, int) const {}
 void trianglesurf::ChangeIndices(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglesurf::ChangeIndicesSnakeMesh(int nVert,int nEdge,int nSurf,int nVolu){}
 void trianglesurf::read(FILE * fid){}
