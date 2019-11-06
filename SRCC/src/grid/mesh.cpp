@@ -1555,6 +1555,45 @@ void vert::disptree(const mesh &meshin, int n) const{
 	}
 }
 
+double volu::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->surfind.size()>0 ? 
+		1.0/double(this->surfind.size()): 0.0; 
+	for (auto vi : this->surfind) {
+		val += meshin.surfs.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+double surf::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->edgeind.size()>0 ? 
+		1.0/double(this->edgeind.size()): 0.0; 
+	for (auto vi : this->edgeind) {
+		val += meshin.edges.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+double edge::value(const mesh &meshin) const {
+	double val=0.0;
+	double valMult = this->vertind.size()>0 ? 
+		1.0/double(this->vertind.size()): 0.0; 
+	for (auto vi : this->vertind) {
+		val += meshin.verts.isearch(vi)->value(meshin);
+	}
+	return val * valMult;
+}
+
+double vert::value(const mesh &meshin) const {
+	double val=0.0;
+	for (int j = 0; j < 3; ++j)
+	{
+		val += this->coord[j] * pow(10.0, double(j));
+	}
+	return val;
+}
+
 // Input and output
 void volu::write(FILE *fid) const{
 
