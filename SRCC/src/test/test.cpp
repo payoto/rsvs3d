@@ -42,7 +42,7 @@ int rsvstest::shorttest(){
 
 	gridTest.RunSilent(rsvstest::arraystructtemplates, 
 		"Test Arraystructures templates", 1);
-	gridTest.RunSilent(rsvstest::meshprocesses,"Test meshes", 5);
+	gridTest.RunSilent(rsvstest::meshprocesses,"Test meshes", 15);
 	gridTest.RunSilent(rsvstest::snakeprocesses,"Test snake processes",41);
 	gridTest.Run(rsvstest::RSVSprocesses,"Test RSVS process",150);
 	gridTest.Run(rsvstest::tetgenprocesses,"Tetgen interface tests",200);
@@ -82,6 +82,7 @@ int rsvstest::meshprocesses(){
 	gridTest.RunSilent(Test_BuildBlockGrid_noout,"Voxel");
 	gridTest.RunSilent(Test_tecplotfile,"post-processing class");
 	gridTest.RunSilent(Test_MeshOut,"Mesh output"); 
+	gridTest.RunSilent(Test_MeshOut2,"Functionalised Mesh output"); 
 	gridTest.RunSilent(Test_MeshReOrder,"Mesh Reordering"); 
 	gridTest.RunSilent(Test_surfcentre,"test SurfCentroid"); 
 	gridTest.RunSilent(Test_MeshRefinement,"Multi-Level Meshes");

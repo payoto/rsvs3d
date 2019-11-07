@@ -131,6 +131,8 @@ int BuildBlockVolu(const Eigen::RowVector3i  &dimGrid, int nVolu , mesh& blockGr
 //test functions
 int Test_BuildBlockGrid_noout();
 int Test_MeshOut();
+int Test_MeshOut2();
+int Test_MeshOut_Size(Eigen::RowVector3i dimGrid, bool runReOrder=false);
 int Test_MeshReOrder();
 
 #endif // VOXEL_H_INCLUDED

@@ -461,9 +461,6 @@ int Test_BuildBlockGrid_noout() {
 
 	errFlag=0;
 
-	cout << "--------------------------------------------" << endl;
-	cout << "      testing BuildBlockGrid" << endl;
-	cout << "--------------------------------------------" << endl;
 	errTest=BuildBlockGrid(dimGrid,blockGrid);
 	errFlag= errFlag | (errTest!=0);
 
@@ -474,16 +471,16 @@ int Test_BuildBlockGrid_noout() {
 
 int Test_MeshOut(){
 	int errFlag,errTest, start_s,stop_s;
-	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
+	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), 
+		dimGrid3(20,30,10), dimGrid4(2,3,4);
 	mesh blockGrid;
 	const char *fileToOpen;
 	
-	tecplotfile outmesh1, outmesh3, outmesh2,outmesh4;
+	tecplotfile outmesh1, outmesh3, outmesh2, outmesh4;
 
 	errFlag=0;
 	errTest=BuildBlockGrid(dimGrid1,blockGrid);
 	errFlag+= (errTest!=0);
-
 	fileToOpen="../TESTOUT/tecout6612.plt";
 	errTest=outmesh1.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
@@ -494,7 +491,6 @@ int Test_MeshOut(){
 
 	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
 	errFlag+= (errTest!=0);
-
 	fileToOpen="../TESTOUT/tecout100100.plt";
 	errTest=outmesh2.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0);
@@ -510,11 +506,9 @@ int Test_MeshOut(){
 	// the code you wish to time goes here
 	stop_s=clock();
 	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-	fileToOpen="../TESTOUT/tecout202020.plt";
-
+	fileToOpen="../TESTOUT/tecout203010.plt";
 	errTest=outmesh3.OpenFile(fileToOpen);
 	errFlag+= (errTest!=0); 
-
 	errTest=outmesh3.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
 
@@ -524,57 +518,76 @@ int Test_MeshOut(){
 	return(errFlag);
 }
 
-int Test_MeshReOrder(){
-	int errFlag,errTest, start_s,stop_s;
-	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), dimGrid3(20,30,10);
-	mesh blockGrid;
-	const char *fileToOpen;
-	
-	tecplotfile outmesh1, outmesh3, outmesh2,outmesh4;
+
+int Test_MeshOut2(){
+	int errFlag;
+	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), 
+		dimGrid3(20,30,10), dimGrid4(2,3,4);
+
 
 	errFlag=0;
-	errTest=BuildBlockGrid(dimGrid1,blockGrid);
-	blockGrid.ReOrder();
-	errFlag+= (errTest!=0);
+	errFlag+=Test_MeshOut_Size(dimGrid1, false);
+	errFlag+=Test_MeshOut_Size(dimGrid2, false);
+	errFlag+=Test_MeshOut_Size(dimGrid3, false);
+	errFlag+=Test_MeshOut_Size(dimGrid4, false);
 
-	fileToOpen="../TESTOUT/tecout_ordered_6612.plt";
-	errTest=outmesh1.OpenFile(fileToOpen);
-	errFlag+= (errTest!=0);
-	errTest=outmesh1.PrintMesh(blockGrid);
-	errFlag+= (errTest!=0);
-	fileToOpen="../TESTOUT/mesh_ordered_6612.dat";
-	blockGrid.write(fileToOpen);
 
-	errTest+=BuildBlockGrid(dimGrid2,blockGrid);
-	blockGrid.ReOrder();
-	errFlag+= (errTest!=0);
+	return(errFlag);
+}
 
-	fileToOpen="../TESTOUT/tecout_ordered_100100.plt";
-	errTest=outmesh2.OpenFile(fileToOpen);
-	errFlag+= (errTest!=0);
-	fileToOpen="../TESTOUT/mesh_ordered_100100.dat";
-	blockGrid.write(fileToOpen);
 
-	errTest=outmesh2.PrintMesh(blockGrid);
-	errFlag+= (errTest!=0);
-	//scanf("%i %i %i",&dimGrid3[0],&dimGrid3[1],&dimGrid3[2]);
+int Test_MeshOut_Size(Eigen::RowVector3i dimGrid, bool runReOrder){
+	mesh blockGrid;
+	std::string fileToOpen, gridSize;
+	int errFlag, errTest, start_s;
+	tecplotfile outmesh;
+
+	gridSize = std::to_string(dimGrid[0]) + std::to_string(dimGrid[1])
+		+ std::to_string(dimGrid[2]);
+
+	if (runReOrder)
+	{
+		gridSize += "_reordered";
+	}
+
+	errFlag = 0;
+	// Build grid
 	start_s=clock();
-	errTest=BuildBlockGrid(dimGrid3,blockGrid);
-	blockGrid.ReOrder();
+	errTest=BuildBlockGrid(dimGrid,blockGrid);
+	if (runReOrder)	{
+		blockGrid.ReOrder();
+	}
 	errFlag+= (errTest!=0);
-	// the code you wish to time goes here
-	stop_s=clock();
-	cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << "ms" << endl;
-	fileToOpen="../TESTOUT/tecout_ordered_202020.plt";
+	rsvs3d::TimeStamp((std::string("Grid of size ") + gridSize + " : ").c_str(),
+		start_s);
 
-	errTest=outmesh3.OpenFile(fileToOpen);
+	// Print to PLT
+	fileToOpen=std::string("../TESTOUT/tecout") + gridSize + ".plt";
+	errTest=outmesh.OpenFile(fileToOpen.c_str());
 	errFlag+= (errTest!=0); 
-
-	errTest=outmesh3.PrintMesh(blockGrid);
+	errTest=outmesh.PrintMesh(blockGrid);
 	errFlag+= (errTest!=0);
 
-	fileToOpen="../TESTOUT/mesh_ordered_203010.dat";
-	blockGrid.write(fileToOpen);
+	// print to .msh file
+	fileToOpen=std::string("../TESTOUT/mesh") + gridSize + ".dat";
+	errFlag+= TestCompareReadWrite(fileToOpen.c_str(), blockGrid, outmesh);
+
+	std::cout << std::endl;
+	return (errFlag);
+}
+
+int Test_MeshReOrder(){
+	int errFlag;
+	Eigen::RowVector3i dimGrid1(6,6,12), dimGrid2(100,100,0), 
+		dimGrid3(20,30,10), dimGrid4(2,3,4);
+
+
+	errFlag=0;
+	errFlag+=Test_MeshOut_Size(dimGrid1, true);
+	errFlag+=Test_MeshOut_Size(dimGrid2, true);
+	errFlag+=Test_MeshOut_Size(dimGrid3, true);
+	errFlag+=Test_MeshOut_Size(dimGrid4, true);
+
 
 	return(errFlag);
 }
