@@ -1,5 +1,5 @@
 # 3D-RSVS #
-[![JSON for Modern C++](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
+[![3D Restricted Snakes Volume of Solid Parameterisation](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
 
 The 3D-RSVS is a geometry generation tool using volume specification to build
 smooth surfaces. Papers describing the method are available on 

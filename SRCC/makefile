@@ -24,11 +24,10 @@ BINDIR = bin
 INCLPROJ= incl
 
 # Include directories
-SHAREINCLROOTDIR = C:/ap1949include
-DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
-DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
+SHAREINCLROOTDIR = ./externals
+DIREIGEN= $(SHAREINCLROOTDIR)/Eigen/include
+DIRJSON= $(SHAREINCLROOTDIR)/json/include
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
-DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
 DIRTETGEN= modules/tetgen
 
 #------------------------------------------------------
@@ -53,10 +52,10 @@ DEBUG=false
 # (Broken on GCC v8.1 + MinGW, must still use boost)
 USE_BOOST = true
 BOOST_VERSION_NUMBER = 1_68
-DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)_0
+DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/include
 # BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
 # boost compiled library file location (for linker)
-LDDIRBOOST = $(DIRBOOST)/stage/lib
+LDDIRBOOST = $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/lib
 # boost libraries to load: boost_<library>
 LDFILEBOOST = boost_filesystem boost_system
 # boost version appropriate to the system 
