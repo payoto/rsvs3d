@@ -24,7 +24,7 @@ BINDIR = bin
 INCLPROJ= incl
 
 # Include directories
-SHAREINCLROOTDIR = ./externals
+SHAREINCLROOTDIR = ./modules/rsvs3d-externals
 DIREIGEN= $(SHAREINCLROOTDIR)/Eigen/include
 DIRJSON= $(SHAREINCLROOTDIR)/json/include
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
@@ -52,6 +52,7 @@ DEBUG=false
 # (Broken on GCC v8.1 + MinGW, must still use boost)
 USE_BOOST = true
 BOOST_VERSION_NUMBER = 1_68
+BOOST_BUILD_TOOLCHAIN = mgw63-mt-sd-x64
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/include
 # BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
 # boost compiled library file location (for linker)
@@ -59,11 +60,11 @@ LDDIRBOOST = $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/lib
 # boost libraries to load: boost_<library>
 LDFILEBOOST = boost_filesystem boost_system
 # boost version appropriate to the system 
-BOOSTVERSION = -mgw63-mt-sd-x64-$(BOOST_VERSION_NUMBER)
+BOOSTVERSION = -$(BOOST_BUILD_TOOLCHAIN)-$(BOOST_VERSION_NUMBER)
 
 # intel MKL libraries for faster Eigen maths 
 # Not compatible with GCC on windows
-DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
+DIRMKL = 
 # -isystem$(DIRMKL)
 INCL= 
 
@@ -77,24 +78,30 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 #                 COMPILER FLAGS
 #------------------------------------------------------
 
-# Other compiler flags
-# project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE
-# -DRSVS_DIAGNOSTIC_RESOLVED -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
-# -DRSVS_NO_ARGCHECK
-# gdb (debug) flags: # -g -ggdb 
-# boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE -DUSE_STACKTRACE
-# eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
-# -funroll-all-loops -ffast-math -ffinite-math-only 
-# Tetgen flag to use as library: -DTETLIBRARY
+# Compilation flags
+# gdb (debug) flags:
+#  -g -ggdb 
 CCFLAGDBG= 
-# -g -ggdb
-# -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
-CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
-# 
+
+# Flags defined by the RSVS project: 
+# -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC 
+# -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE -DRSVS_DIAGNOSTIC_RESOLVED 
+# -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS -DTIME_EXEC
+# -DRSVS_NO_ARGCHECK
+CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
+CCFLAGPROJ+= -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
+ 
+# boost/backtrace flags: 
+# -DBOOST_STACKTRACE_USE_BACKTRACE -DUSE_STACKTRACE
 CCFLAGBOOST= 
-CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT
-# -DEIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
-# -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_DONT_VECTORIZE 
+
+# Eigen flags: 
+# Release: -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT  
+# MKL usage: -DEIGEN_USE_MKL_ALL
+# License requirements: -DEIGEN_MPL2_ONLY
+CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_MPL2_ONLY
+
+# Tetgen flag to use as library: -DTETLIBRARY
 CCFLAGETETGEN= -DTETLIBRARY 
 CCFLAGUSER= 
 
@@ -116,13 +123,14 @@ ifeq ($(MAKECMDGOALS), distribution)
 	OPTIMLVL= 3
 	CCFLAGDBG= 
 	CCFLAGPROJ= -DTIME_EXEC $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
-	CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT
+	CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_MPL2_ONLY
 endif
 
 ifeq ($(DEBUG), true)
 	OPTIMLVL= 0
 	CCFLAGDBG= -g -ggdb
-	CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
+	CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
+	CCFLAGPROJ+= -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
 	CCFLAGEIG= 
 endif
 
@@ -141,19 +149,19 @@ CCFLAGETETGEN += $(CCFLAGDBG)
 
 ifneq (,$(filter $(CC),gcc g++))
 ifneq ($(USE_BOOST),true)
-GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
-GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
+	GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
+	GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
 
-# $(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
+	# $(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
 
-ifneq "$(GCCVERSIONMAJOR)" "7"
-$(warning Attempting to use GCC != v7 without Boost is not supported on windows)
-# space to define the flag specifying the correct file system
-CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM_EXPERIMENTAL
-else
-# space to define the flag specifying the correct file system
-# CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM
-endif
+	ifneq "$(GCCVERSIONMAJOR)" "7"
+		$(warning Attempting to use GCC != v7 without Boost is not supported on windows)
+		# space to define the flag specifying the correct file system
+		CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM_EXPERIMENTAL
+	else
+		# space to define the flag specifying the correct file system
+		# CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM
+	endif
 endif
 endif
 
@@ -167,12 +175,12 @@ LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
 ifeq ($(USE_BOOST),true)
-LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
-LDFILE += $(LDFILEBOOSTWITHVERSION)
-CCFLAGCUSTOM += -DUSE_BOOST
+	LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
+	LDFILE += $(LDFILEBOOSTWITHVERSION)
+	CCFLAGCUSTOM += -DUSE_BOOST
 else
-# Leave empty
-LDDIRBOOST = 
+	# Leave empty
+	LDDIRBOOST = 
 endif
 
 LDDIR = $(LDDIRBOOST) 
