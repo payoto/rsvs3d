@@ -1,3 +1,6 @@
 [submodule "SRCC/modules/tetgen"]
 	path = SRCC/modules/tetgen
 	url = git@github.com:payoto/tetgen.git
+[submodule "SRCC/modules/rsvs3d-externals"]
+	path = SRCC/modules/rsvs3d-externals
+	url = git@github.com:payoto/rsvs3d-externals.git

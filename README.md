@@ -1,5 +1,5 @@
 # 3D-RSVS #
-[![JSON for Modern C++](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
+[![3D Restricted Snakes Volume of Solid Parameterisation](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
 
 The 3D-RSVS is a geometry generation tool using volume specification to build
 smooth surfaces. Papers describing the method are available on 
@@ -7,7 +7,7 @@ smooth surfaces. Papers describing the method are available on
 and [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0045793018304730).
 
 
-Last updated 12/03/2019
+Last updated 12/11/2019
 [Full documentation](https://payoto.github.io/rsvs3d_docs/)
 available.
 
@@ -21,18 +21,40 @@ Relevant publications for the 2D RSVS are at the end of this readme.
 
 The compiled binary is available for download for Windows 64bits and Linux 64bits.
 
-# Pre-requisites #
+# Install notes #
+
+## Get the code: ##
+
+This project uses git submodules to handle dependencies:
+
+	git clone --recurse-submodules https://github.com/payoto/rsvs3d
+
+or
+
+	git clone https://github.com/payoto/rsvs3d
+	git submodule update --init --recursive
+
+
+## Required tools for compilation: ##
 
 For this code to work necessary programs:
 
- + MATLAB installed (2015a or later) - including parallel toolbox  
- + c++ compiler compatible with MATLAB for the compilation of mex files  
  + Standalone c++11 compiler for the compilation of console programs 
-   (GCC/G++ v7.1 used for development)  
- + `make` to build the `RSVS3D` executable.  
+   (GCC/G++ v7.1 used for development)
+ + `make` to build the `RSVS3D` executable.
+
+## Wrappers: ##
+
+Execution wrappers:
+
+ + MATLAB installed (2016a or later)  
+ + c++ compiler compatible with MATLAB for the compilation of mex files  
  + fortran (90+) compiler for compilation of flow solvers   
 
-Required 3rd party open source libraries for compilation:  
+## External libraries ##
+
+Required 3rd party open source libraries for compilation 
+(dependencies available at [`github/payoto/rsvs3d-dependencies`](https://github.com/payoto/rsvs3d-externals)):
 
  + [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page): Library for linear algebra
    (templated, header only).
@@ -47,6 +69,8 @@ Optional 3rd party open source library:
  + [Tetgen](http://tetgen.org) : A Quality Tetrahedral Mesh Generator and a 3D Delaunay
  Triangulator. Download my modified version for this project 
  [payoto/tetgen](https://github.com/payoto/tetgen).
+
+All dependencies are intended to be handled via git submodules, to install them using submodules, run `git submodule update --init --recursive`.
 
 # License #
 
@@ -131,6 +155,7 @@ on the command line) followed by
  patameter;
  + default-config: Outputs a configuration file with all the default value assigned to the
  parameters.
+ + test: Runs the specified test suite one of `new`, `short` or `all`. May be disabled in releases.
 
 ## Parameter control ##
 

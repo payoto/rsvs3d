@@ -78,7 +78,8 @@
 			"-std=c++11",
 			"-DTETLIBRARY",
 			"-DEIGEN_NO_DEBUG",
-			"-DEIGEN_NO_STATIC_ASSERT"
+			"-DEIGEN_NO_STATIC_ASSERT",
+			"-DEIGEN_MPL2_ONLY"
 		],
 		"rulers":
 		[
