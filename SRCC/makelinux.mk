@@ -3,9 +3,9 @@
 #                 TARGET COMPILER
 #------------------------------------------------------
 # Specify compiler (only g++ is supported)
-CC=g++ 
+CC=g++-9 
 # Specify linker
-LINK=g++
+LINK=g++-9
 
 #------------------------------------------------------
 #                 DIRECTORIES and INCLUDES
