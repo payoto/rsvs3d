@@ -145,8 +145,7 @@ int rsvstest::tetgenprocesses(){
 	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing", 26); 
 	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing", 30); 
 	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS", 78); 
-	gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,
-		"tegen API testing - Voro to RSVS", 42);
+	// gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS", 42);
 	return (gridTest.ReturnErrCount());
 }
 

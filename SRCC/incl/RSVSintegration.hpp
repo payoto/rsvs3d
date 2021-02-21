@@ -56,16 +56,16 @@ namespace integrate {
 	namespace constants {
 		namespace outputs {
 			static const int numberdefined = 7;
-				auto printBaseSnake = [&](int lvl) -> bool  {
+				auto printBaseSnake = [](int lvl) -> bool  {
 					return lvl==2 || lvl==5 || lvl==7;
 				};
-				auto printFullSnake = [&](int lvl) -> bool  {
+				auto printFullSnake = [](int lvl) -> bool  {
 					return lvl==3 || lvl==4 || numberdefined<lvl;
 				};
-				auto printGradientsSnake = [&](int lvl) -> bool  {
+				auto printGradientsSnake = [](int lvl) -> bool  {
 					return lvl==4 || lvl==5 || lvl==7 || numberdefined<lvl;
 				};
-				auto printVectorSnake = [&](int lvl) -> bool  {
+				auto printVectorSnake = [](int lvl) -> bool  {
 					return lvl==6 || lvl==7 || numberdefined<lvl;
 				};
 		}
