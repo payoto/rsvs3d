@@ -47,10 +47,17 @@ int rsvstest::shorttest(){
 	gridTest.Run(rsvstest::RSVSprocesses,"Test RSVS process",150);
 	gridTest.Run(rsvstest::tetgenprocesses,"Tetgen interface tests",200);
 	gridTest.RunSilent(rsvstest::JSONprocesses,"Parameter and JSON tests", 1);
-
-	gridTest.RunSilent(rsvstest::RSVS2Dprocesses,"Test 2D-RSVS process", 6);
 	
 	return(gridTest.ReturnErrCount());
+}
+int rsvstest::failingtest(){
+	customtest gridTest("failing tests (expected run time: 1-mn to 7h)");
+	gridTest.RunSilent(rsvstest::RSVS2Dprocesses,"Test 2D-RSVS process", 6);
+	gridTest.Run(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS"); 
+	gridTest.Run(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS");
+	
+	return(gridTest.ReturnErrCount());
+
 }
 
 int rsvstest::arraystructtemplates(){
@@ -144,7 +151,7 @@ int rsvstest::tetgenprocesses(){
 	// Tetgen interface tests
 	gridTest.RunSilent(tetgen::test::CFD,"tegen API testing - CFD meshing", 26); 
 	gridTest.RunSilent(tetgen::test::call,"tegen API testing - RSVS meshing", 30); 
-	gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS", 78); 
+	// gridTest.RunSilent(tetgen::test::RSVSVORO,"tegen API testing - Voro to RSVS", 78); 
 	// gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS", 42);
 	return (gridTest.ReturnErrCount());
 }

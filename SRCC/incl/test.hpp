@@ -89,6 +89,7 @@ namespace rsvstest {
 	int maintest();
 	int shorttest();
 	int newtest();
+	int failingtest();
 	int arraystructtemplates();
 	int meshprocesses();
 	int snakeprocesses();
