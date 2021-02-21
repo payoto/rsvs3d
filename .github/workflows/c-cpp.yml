@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Build and test RSVS3D
 
 on:
   push:
@@ -23,17 +23,7 @@ jobs:
       - name: run tests
         run: ./RSVS3D --test
         working-directory: SRCC/
-  test-linux:
-    needs: build-linux
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: RSVS3D-ubuntu
-      - name: update permissions
-        run: chmod +x ./RSVS3D
-      - name: run tests
-        run: ./RSVS3D --test
+
   build-windows:
     runs-on: windows-latest
     steps:
@@ -50,15 +40,5 @@ jobs:
           name: RSVS3D-windows
           path: SRCC/RSVS3D*
       - name: run tests
-        run: RSVS3D.exe --test
+        run: bin/RSVS3D.exe --test
         working-directory: SRCC/
-
-  test-windows:
-    needs: build-windows
-    runs-on: windows-latest
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: RSVS3D-windows
-      - name: run tests
-        run: ./RSVS3D --test
