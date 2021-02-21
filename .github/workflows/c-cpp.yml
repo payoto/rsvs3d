@@ -20,21 +20,9 @@ jobs:
         with:
           name: RSVS3D-ubuntu
           path: SRCC/RSVS3D
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: "recursive"
-      - name: install dependencies
-        run: choco install make llvm
-      - name: make
-        run: make -f makewin.mk all -j 2
+      - name: run tests
+        run: ./RSVS3D --test
         working-directory: SRCC/
-      - uses: actions/upload-artifact@v2
-        with:
-          name: RSVS3D-windows
-          path: SRCC/RSVS3D*
   test-linux:
     needs: build-linux
     runs-on: ubuntu-20.04
@@ -46,6 +34,24 @@ jobs:
         run: chmod +x ./RSVS3D
       - name: run tests
         run: ./RSVS3D --test
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: install dependencies
+        run: choco install make mingw
+      - name: make
+        run: make -f makewin.mk all -j 2
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-windows
+          path: SRCC/RSVS3D*
+      - name: run tests
+        run: RSVS3D.exe --test
+        working-directory: SRCC/
 
   test-windows:
     needs: build-windows
