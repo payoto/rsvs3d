@@ -7,15 +7,50 @@ on:
     branches: [develop]
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  build-linux:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: "recursive"
       - name: make
-        run: make -f makelinux.mk all
+        run: make -f makelinux.mk all -j 2
         working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-{{ runner.os }}
+          path: SRCC/RSVS3D
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: install dependencies
+        run: choco install make mingw
+      - name: make
+        run: make -f makewin.mk all -j 2
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-{{ runner.os }}
+          path: SRCC/RSVS3D*
+  test-linux:
+    needs: build-linux
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: RSVS3D-{{ runner.os }}
       - name: run tests
         run: ./RSVS3D --test
-        working-directory: SRCC/
+
+  test-windows:
+    needs: build-windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: RSVS3D-{{ runner.os }}
+      - name: run tests
+        run: ./RSVS3D --test
