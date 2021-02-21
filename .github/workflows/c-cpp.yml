@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -18,7 +18,7 @@ jobs:
         working-directory: SRCC/
       - uses: actions/upload-artifact@v2
         with:
-          name: RSVS3D-{{ runner.os }}
+          name: RSVS3D-ubuntu
           path: SRCC/RSVS3D
   build-windows:
     runs-on: windows-latest
@@ -27,13 +27,13 @@ jobs:
         with:
           submodules: "recursive"
       - name: install dependencies
-        run: choco install make mingw
+        run: choco install make llvm
       - name: make
         run: make -f makewin.mk all -j 2
         working-directory: SRCC/
       - uses: actions/upload-artifact@v2
         with:
-          name: RSVS3D-{{ runner.os }}
+          name: RSVS3D-windows
           path: SRCC/RSVS3D*
   test-linux:
     needs: build-linux
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: RSVS3D-{{ runner.os }}
+          name: RSVS3D-ubuntu
       - name: run tests
         run: ./RSVS3D --test
 
@@ -51,6 +51,6 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: RSVS3D-{{ runner.os }}
+          name: RSVS3D-windows
       - name: run tests
         run: ./RSVS3D --test

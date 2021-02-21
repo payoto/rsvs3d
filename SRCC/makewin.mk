@@ -3,9 +3,9 @@
 #                 TARGET COMPILER
 #------------------------------------------------------
 # Specify compiler (only g++ is supported)
-CC=g++ 
+CC=clang++ 
 # Specify linker
-LINK=g++
+LINK=clang++
 
 #------------------------------------------------------
 #                 DIRECTORIES and INCLUDES
@@ -39,7 +39,7 @@ WARNFLAGS= -Wall -Wextra -fpermissive
 # -Werror
 #
 OPTIMLVL=3
-CCPSTD=11
+CCPSTD=17
 DEBUG=false
 
 #------------------------------------------------------
@@ -51,7 +51,7 @@ DEBUG=false
 # Boost is needed for the <boost/filesystem> header 
 # except under std=c++17 which added a standard filesystem header
 # (Broken on GCC v8.1 + MinGW, must still use boost)
-USE_BOOST = true
+USE_BOOST = false
 BOOST_VERSION_NUMBER = 1_68
 BOOST_BUILD_TOOLCHAIN = mgw63-mt-sd-x64
 DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/include
