@@ -1,0 +1,9 @@
+
+extraction:
+  cpp:
+    prepare:    # Customizable step used by all languages.
+      packages:
+        - g++-9
+    index:    # Customizable step used by all languages.
+      build_command:
+        - cd SRCC && make -f makelinux.mk all -j2
