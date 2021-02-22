@@ -1,3 +1,6 @@
+path_classifiers:
+  Library:
+    - SRCC/modules
 
 extraction:
   cpp:
