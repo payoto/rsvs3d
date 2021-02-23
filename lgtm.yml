@@ -1,3 +1,6 @@
+path_classifiers:
+  library:
+    - modules
 
 extraction:
   cpp:
