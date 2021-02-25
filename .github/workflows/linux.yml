@@ -1,0 +1,25 @@
+name: Linux build
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: make
+        run: make -f makelinux.mk all -j2
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-ubuntu
+          path: SRCC/RSVS3D
+      - name: run tests
+        run: ./RSVS3D --test
+        working-directory: SRCC/
