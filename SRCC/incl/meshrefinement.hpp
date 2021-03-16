@@ -1,6 +1,6 @@
 /**
- * Tools for the refinement and coarsening of meshes. 
- *  
+ * Tools for the refinement and coarsening of meshes.
+ *
  *@file
  */
 
@@ -24,35 +24,30 @@
 #endif
 #endif
 
-
 //=================================
 // forward declared dependencies
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
-
 //=================================
 // included dependencies
- 
+
 #include "mesh.hpp"
 
 //==================================
 // Code
-// NOTE: function in a class definition are IMPLICITELY INLINED 
+// NOTE: function in a class definition are IMPLICITELY INLINED
 //       ie replaced by their code at compile time
-
-
-
 
 // Forward declared templated functions
 
 // Base class
 
 void CoarsenMesh(const mesh &meshchild, mesh &newparent, const std::vector<int> &elmMapping);
-void CartesianMapping(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
-void CartesianMapping2D(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
-void CartesianMapping3D(const mesh& meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
-//test functions
+void CartesianMapping(const mesh &meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
+void CartesianMapping2D(const mesh &meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
+void CartesianMapping3D(const mesh &meshin, std::vector<int> &elmMapping, std::vector<int> &dims);
+// test functions
 
 int Test_MeshRefinement();
 
