@@ -49,7 +49,7 @@ void Coord(tecplotfile &tecout, const mesh &meshout, int nVert, int nVertDat)
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            tecout.Print("%lf ", 0);
+            tecout.Print("%lf ", 0.0);
         }
         tecout.NewLine();
     }
@@ -159,7 +159,7 @@ int tecplotfile::VolDataBlock(const mesh &meshout, int nVert, int nVolu, int nVe
         {
             for (ii = 0; ii < nVert; ++ii)
             {
-                this->Print("%lf ", 0);
+                this->Print("%lf ", 0.0);
             }
             this->NewLine();
         }
@@ -331,7 +331,7 @@ int tecplotfile::VertDataBlock(const mesh &meshout, int nVert, int nVertDat, int
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -396,7 +396,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout, int nSurf)
     int verts[2], vertsPast[2];
     for (ii = 0; ii < nSurf; ++ii)
     { // Print Number of vertices per face
-        this->Print("%i ", meshout.surfs(ii)->edgeind.size());
+        this->Print("%i ", int(meshout.surfs(ii)->edgeind.size()));
     }
     this->NewLine();
 
@@ -466,7 +466,7 @@ int tecplotfile::VolFaceMap(const mesh &meshout, const std::vector<int> &surfLis
     int verts[2], vertsPast[2];
     for (auto ii : meshout.surfs.find_list(surfList))
     { // Print Number of vertices per face
-        this->Print("%i ", meshout.surfs(ii)->edgeind.size());
+        this->Print("%i ", int(meshout.surfs(ii)->edgeind.size()));
     }
     this->NewLine();
     HashedVector<int, int> verthash;
@@ -941,7 +941,7 @@ int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulatio
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -949,17 +949,17 @@ int tecplotfile::VolDataBlock(const triangulation &triout, triarray triangulatio
     // Print Cell Data
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     return (0);
@@ -1003,7 +1003,7 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulati
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -1011,17 +1011,17 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, triarray triangulati
     // Print Cell Data
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     return (0);
@@ -1069,7 +1069,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -1127,7 +1127,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, triarray triangulati
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -1406,7 +1406,7 @@ int tecplotfile::VolDataBlock(const triangulation &triout, trisurfarray triangul
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -1414,17 +1414,17 @@ int tecplotfile::VolDataBlock(const triangulation &triout, trisurfarray triangul
     // Print Cell Data
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nVolu; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     return (0);
@@ -1468,7 +1468,7 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, trisurfarray triangu
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
@@ -1476,17 +1476,17 @@ int tecplotfile::SurfDataBlock(const triangulation &triout, trisurfarray triangu
     // Print Cell Data
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     for (ii = 0; ii < nSurf; ++ii)
     {
-        this->Print("%.16lf ", 0);
+        this->Print("%.16lf ", 0.0);
     }
     this->NewLine();
     return (0);
@@ -1534,7 +1534,7 @@ int tecplotfile::LineDataBlock(const triangulation &triout, trisurfarray triangu
     {
         for (ii = 0; ii < nVert; ++ii)
         {
-            this->Print("%lf ", 0);
+            this->Print("%lf ", 0.0);
         }
         this->NewLine();
     }
