@@ -31,8 +31,8 @@ class RSVScalc;
 #include <vector>
 
 #include "arraystructures.hpp"
+#include "mesh.hpp"
 #include "vectorarray.hpp"
-
 // Declarations
 
 /**
