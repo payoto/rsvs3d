@@ -2,9 +2,13 @@
 
 [![Linux build](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml)
 [![Windows build](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/payoto/rsvs3d.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/payoto/rsvs3d/alerts/)
+[![Documentation](https://github.com/payoto/rsvs3d/actions/workflows/doxygen.yml/badge.svg)](https://payoto.github.io/rsvs3d/)
+[![pre-commit](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml)
+
+[![License](https://img.shields.io/badge/license-LGPL-blue.svg)](https://github.com/payoto/rsvs3d/blob/develop/LICENSE)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/payoto/rsvs3d/develop.svg)](https://results.pre-commit.ci/latest/github/payoto/rsvs3d/develop)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/payoto/rsvs3d.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/payoto/rsvs3d/alerts/)
+[![CodeFactor](https://www.codefactor.io/repository/github/payoto/rsvs3d/badge)](https://www.codefactor.io/repository/github/payoto/rsvs3d)
 
 [![3D Restricted Snakes Volume of Solid Parameterisation](https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif)](https://github.com/payoto/rsvs3d/releases)
 
