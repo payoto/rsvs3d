@@ -3,7 +3,7 @@
 #                 TARGET COMPILER
 #------------------------------------------------------
 # Specify compiler (only g++ is supported)
-CC=g++ 
+CC=g++
 # Specify linker
 LINK=g++
 
@@ -48,7 +48,7 @@ DEBUG=false
 # Some libraries are optional in certain conditions
 # Specify by "true" or "false" whether they should be used
 
-# Boost is needed for the <boost/filesystem> header 
+# Boost is needed for the <boost/filesystem> header
 # except under std=c++17 which added a standard filesystem header
 # (Broken on GCC v8.1 + MinGW, must still use boost)
 USE_BOOST = true
@@ -60,14 +60,14 @@ DIRBOOST= $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/include
 LDDIRBOOST = $(SHAREINCLROOTDIR)/boost_$(BOOST_VERSION_NUMBER)/lib
 # boost libraries to load: boost_<library>
 LDFILEBOOST = boost_filesystem boost_system
-# boost version appropriate to the system 
+# boost version appropriate to the system
 BOOSTVERSION = -$(BOOST_BUILD_TOOLCHAIN)-$(BOOST_VERSION_NUMBER)
 
-# intel MKL libraries for faster Eigen maths 
+# intel MKL libraries for faster Eigen maths
 # Not compatible with GCC on windows
-DIRMKL = 
+DIRMKL =
 # -isystem$(DIRMKL)
-INCL= 
+INCL=
 
 SRCTREE+= $(DIRTETGEN)
 INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
@@ -81,35 +81,35 @@ INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 # Compilation flags
 # gdb (debug) flags:
-#  -g -ggdb 
-CCFLAGDBG= 
+#  -g -ggdb
+CCFLAGDBG=
 
-# Flags defined by the RSVS project: 
-# -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC 
-# -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE -DRSVS_DIAGNOSTIC_RESOLVED 
+# Flags defined by the RSVS project:
+# -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC
+# -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE -DRSVS_DIAGNOSTIC_RESOLVED
 # -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS -DTIME_EXEC
 # -DRSVS_NO_ARGCHECK
 CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
 CCFLAGPROJ+= -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
- 
-# boost/backtrace flags: 
-# -DBOOST_STACKTRACE_USE_BACKTRACE -DUSE_STACKTRACE
-CCFLAGBOOST= 
 
-# Eigen flags: 
-# Release: -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT  
+# boost/backtrace flags:
+# -DBOOST_STACKTRACE_USE_BACKTRACE -DUSE_STACKTRACE
+CCFLAGBOOST=
+
+# Eigen flags:
+# Release: -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT
 # MKL usage: -DEIGEN_USE_MKL_ALL
 # License requirements: -DEIGEN_MPL2_ONLY
 CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_MPL2_ONLY
 
 # Tetgen flag to use as library: -DTETLIBRARY
-CCFLAGETETGEN= -DTETLIBRARY 
-CCFLAGUSER= 
+CCFLAGETETGEN= -DTETLIBRARY
+CCFLAGUSER=
 
 # Flags to add when the target is "testall"
 # -DTEST_ALL_WORKING
-CFTESTFLAG= -DTEST_ALL 
-CF_NORSVSTESTFLAG= -DRSVS_NOTESTS 
-CF_DISTRIBUTIONFLAG= -DRSVS_HIDETESTS 
+CFTESTFLAG= -DTEST_ALL
+CF_NORSVSTESTFLAG= -DRSVS_NOTESTS
+CF_DISTRIBUTIONFLAG= -DRSVS_HIDETESTS
 
 include makefile

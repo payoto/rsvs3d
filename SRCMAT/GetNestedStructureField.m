@@ -1,9 +1,9 @@
 function [varargout] = GetNestedStructureField(obj,varargin) %#ok<INUSL>
-    
+
     varargout = cell(1,numel(varargin)*2);
     nVarArg=numel(varargin);
     nObj = numel(obj);
-    
+
     strIndex = @(jj)['(',int2str(jj),')'];
     strRun = @(strEval,jj) ['varargout{ii}',strIndex(jj),' = obj',...
         strIndex(jj),strEval, ';'];
@@ -20,7 +20,7 @@ function [varargout] = GetNestedStructureField(obj,varargin) %#ok<INUSL>
                 strEval = [strEval,'.', varargin{ii}{kk}]; %#ok<*AGROW>
             end
             varargout{nVarArg+ii} = strEval;
-        else % need to test for 
+        else % need to test for
             for kk = 1:nArg
                 if ischar(varargin{ii}{kk})
                     strEval = [strEval,'.', varargin{ii}{kk}];
@@ -46,7 +46,7 @@ function [varargout] = GetNestedStructureField(obj,varargin) %#ok<INUSL>
         if nObj>1
             varargout{ii} = repmat(varargout{ii},[nObj,1]);
         end
-        for jj = 2:nObj     
+        for jj = 2:nObj
             try
                 eval(strRun(strEval, jj));
             catch ME
@@ -56,7 +56,7 @@ function [varargout] = GetNestedStructureField(obj,varargin) %#ok<INUSL>
                 rethrow(ME2);
             end
         end
-        
+
     end
-    
+
 end

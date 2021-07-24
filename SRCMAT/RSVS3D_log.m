@@ -1,9 +1,9 @@
 classdef RSVS3D_log < RSVS3D_DerivativeStudy
-    
-  
-    
+
+
+
     methods(Access=protected)
-        
+
         function BuildStructure(obj,varargin)
             % Function which builds the data structure at the core of the
             % object.
@@ -28,7 +28,7 @@ classdef RSVS3D_log < RSVS3D_DerivativeStudy
                 obj.Plot('convergence');
             end
         end
-        
+
         function [ax]=Plot(obj, plotType, varargin)
             ax=Plot@RSVS3D_DerivativeStudy(obj, plotType, varargin{:});
             switch plotType
@@ -38,9 +38,9 @@ classdef RSVS3D_log < RSVS3D_DerivativeStudy
                 otherwise
                     return;
             end
-            obj.figs(end).varargin = varargin; 
+            obj.figs(end).varargin = varargin;
         end
-        
+
         function [ax]=PlotConvergence(obj)
             fig = figure('Name','convergence');
             ax = axes;
@@ -62,14 +62,14 @@ classdef RSVS3D_log < RSVS3D_DerivativeStudy
             print(fig,[obj.derivDirectory,filesep,obj.derivFileName,'.png'],...
                 '-dpng','-r300');
         end
-        
+
         function mainLine=EnvelopeLines(obj,ax,fieldName, x,color, marker)
-            
+
             statList = {{fieldName,'.',{'mean','min','max'}}};
             statList  = RSVS3D_DerivativeStudy.ParseStatLists(statList);
-                        
+
             [means, mins, maxs]=GetNestedStructureField(obj.statsout, statList{:});
-            
+
             l= plot(ax,x, means);
             mainLine = l;
             l(2)= plot(ax,x, mins);

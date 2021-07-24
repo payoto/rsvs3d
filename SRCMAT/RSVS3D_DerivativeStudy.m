@@ -1,5 +1,5 @@
 classdef RSVS3D_DerivativeStudy < handle
-    
+
     properties
         % Raw data
         resout;
@@ -11,7 +11,7 @@ classdef RSVS3D_DerivativeStudy < handle
         derivFileName;
         % Figure plots
         figs = repmat(struct('handle',[],'type','','data',[],'stats',[],'links',[],'varargin',{}),[0,1]);
-        
+
     end
     properties %(Access=protected)
         % list of indices
@@ -26,9 +26,9 @@ classdef RSVS3D_DerivativeStudy < handle
         layoutCoeffs = cell(0,3);
         staleLayout = true;
     end
-    
+
     methods(Access=protected)
-        
+
         function BuildStructure(obj,varargin)
             % Function which builds the data structure at the core of the
             % object.
@@ -42,7 +42,7 @@ classdef RSVS3D_DerivativeStudy < handle
             end
         end
     end
-    
+
     methods
 %% Interfaces
 
@@ -55,31 +55,31 @@ classdef RSVS3D_DerivativeStudy < handle
                 obj.derivFileName = '';
             end
         end
-        
-        
+
+
         function Parse(obj,varargin)
-            % 
+            %
             obj.BuildStructure(varargin{:})
             obj.MakeStale();
             if isempty(obj.layoutFields)
                 obj.setLayoutFields();
             end
         end
-        
+
         function Stats(obj)
             [obj.statsout]=Structure2Statistics(obj.resout, obj.derivDirectory,...
                 obj.derivFileName);
         end % function
-        
+
         function Save(obj)
             fileOut = [obj.derivDirectory,filesep,'object_',obj.derivFileName,'.mat'];
             save(fileOut,'obj');
         end
-        
+
         function SaveLight(obj)
             objlight = RSVS3D_DerivativeStudy(obj.derivDirectory, obj.derivFileName);
             objlight.figs = obj.figs;
-            
+
             fileOut = [objlight.derivDirectory,filesep,'objectlight_',...
                 objlight.derivFileName,'.mat'];
             save(fileOut,'objlight');
@@ -102,21 +102,21 @@ classdef RSVS3D_DerivativeStudy < handle
                 otherwise
                     return;
             end
-            obj.figs(end).varargin = varargin; 
+            obj.figs(end).varargin = varargin;
         end
-        
+
         function RePlot(obj)
             for ii = 1:numel(obj.figs)
                 obj.Plot(obj.figs(ii).type,obj.figs(ii).varargin{:});
             end
         end
-        
+
         function ClearPlots(obj)
             if numel(obj.figs)>1
                 obj.figs = repmat(obj.figs(1),[0,1]);
             end
         end
-        
+
         function []=PlotSparsity(obj, indices, figindex)
             % plots the sparsity of a matrix
             if ~exist('figindex','var')
@@ -125,7 +125,7 @@ classdef RSVS3D_DerivativeStudy < handle
                     figindex = 1;
                 end
             end
-            
+
             [pos]=obj.recordpos(indices);
             obj.figs(figindex).data = indices;
             obj.figs(figindex).handle = figure('Name', ['Sparsity ',...
@@ -139,7 +139,7 @@ classdef RSVS3D_DerivativeStudy < handle
                 hlag = obj.resout(p).HConstr+obj.resout(p).HObj;
                 s = size(hlag);
                 r = symrcm(hlag);
-                
+
                 [i,j] = find(hlag);
                 i = s(1)-i+1;
                 l(k,1) = plot(ax(1), i , j,...
@@ -155,7 +155,7 @@ classdef RSVS3D_DerivativeStudy < handle
             legend(l(:,1))
             legend(l(:,2))
         end
-        
+
         function [ax]=PlotStat3D(obj, statList, varargin)
             % Plots surfaces associated with the statistics
             p = inputParser;
@@ -168,13 +168,13 @@ classdef RSVS3D_DerivativeStudy < handle
             for ii = 1:numel(inputVars)
                 eval([inputVars{ii},'=p.Results.(inputVars{ii});']);
             end
-            
+
             obj.figs(figindex).stat = statList;
-            
+
             % PreProcessing of statList, these can be "packed" to have a recursive
             % pattern definition.
             statList = RSVS3D_DerivativeStudy.ParseStatLists(statList);
-            
+
             nAx = numel(statList);
             obj.figs(figindex).handle = figure;
             % Build the plots
@@ -192,20 +192,20 @@ classdef RSVS3D_DerivativeStudy < handle
             [X,Y] = meshgrid(obj.layoutCoeffs{1:2});
             colors = get(gca,'ColorOrder');
             colorcycle = @(x) colors(mod(x-1,size(colors,1))+1,:);
-            
+
             escape_= @(str)regexprep(str,'_','\\_');
             for ii = 1:nAx
                 % Concatenates a nested structure field
                 [tempArray,varName] = GetNestedStructureField(...
                     obj.statsout,statList{ii});
                 varName = escape_(varName);
-                
+
                 s=[];
                 for jj = 1:nLayers
                     extraDimSub = num2cell(mod(floor(...
                         ones(1,nExtraDim)*(jj-1)./layerThickness(1:end-1)),...
                         layerSize)+1);
-                    
+
                     Z = tempArray(layout(:,:,extraDimSub{:}));
                     dataSetName = '';
                     for kk = 1:numel(extraDimSub)
@@ -230,11 +230,11 @@ classdef RSVS3D_DerivativeStudy < handle
             for ii= 1:numel(ax)
                 SetNestedStructureField(ax(ii),axesSettings{:}); %#ok<IDISVAR,USENS>
             end
-            
+
             obj.figs(figindex).links=linkprop(ax,{'XLim','YLim','CameraPosition'});
         end
-        
-        
+
+
     %% Getters Setters and accessors
         function [pos]=recordpos(obj,indices, recalc)
             if ~exist('recalc','var')
@@ -245,14 +245,14 @@ classdef RSVS3D_DerivativeStudy < handle
             end
             pos = FindObjNum([],indices, obj.indexList);
         end
-        
+
         function MakeStale(obj)
             obj.staleIndex = true;
-            obj.staleLayout= true; 
+            obj.staleLayout= true;
         end
-        
+
         function setLayoutFields(obj,varargin)
-            
+
             if numel(varargin)==0
                 fields = fieldnames(obj.resout);
                 for ii=1:numel(fields)
@@ -262,18 +262,18 @@ classdef RSVS3D_DerivativeStudy < handle
                     end
                 end
             end
-            
+
             obj.layoutFields=varargin;
             obj.staleLayout = true;
         end
-        
+
         function reIndex(obj)
             cellInd = num2cell(1:numel(obj.resout));
             [obj.resout.index] = deal(cellInd{:});
             [obj.statsout.index] = deal(cellInd{:});
             obj.MakeStale();
         end
-        
+
         function layout = getLayout(obj)
             if obj.staleLayout
                 if isempty(obj.layoutFields)
@@ -296,14 +296,14 @@ classdef RSVS3D_DerivativeStudy < handle
             end
             layout = obj.layoutData;
         end
-        
+
         function obj_small = downSelect(obj, selectFunc, newName)
             % Selects only part of the structure to use
             if~exist('newName','var')
                  newName = 'part';
             end
             newDirBase = [obj.derivDirectory,filesep,newName];
-            flag = true; 
+            flag = true;
             ii = 0;
             while flag
                 ii = ii + 1;
@@ -315,7 +315,7 @@ classdef RSVS3D_DerivativeStudy < handle
             obj_small.resout = obj.resout(arrayfun(selectFunc, obj.resout));
             % only makes the directory after succesfull splitting.
             mkdir(newDir)
-            
+
         end
     end
     methods(Static)
@@ -371,17 +371,3 @@ classdef RSVS3D_DerivativeStudy < handle
 
     end % methods
 end % classdef
-
-
-
-
-
-
-
-
-
-
-
-
-
-

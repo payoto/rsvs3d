@@ -12,7 +12,7 @@ function TightenAxes(ax, m, n, concatenateFigure)
     %	ax(4) - left bottom
     %	etc
     % copyright Matt Edwards 2019
-    
+
     if ~exist('concatenateFigure','var')
         concatenateFigure =false;
     end
@@ -52,7 +52,7 @@ function TightenAxes(ax, m, n, concatenateFigure)
             vOffset = ax(ii).TightInset(2);
         end
     end
-    
+
     %now loop over the axes calculating their nn and mm index position in
     % the matrix of figures and aligning the axes.
     for ii = 1:numel(ax)
@@ -62,11 +62,11 @@ function TightenAxes(ax, m, n, concatenateFigure)
         bottom = (m-mm)*(1/m) + vOffset;
         ax(ii).Position = [left, bottom, w, h];
     end
-    
+
 end
 
 function [ax] = ConcatenateFigures(ax)
-    
+
     sameParents = true;
     ii = 1;
     while sameParents && ii <= numel(ax)
@@ -84,7 +84,7 @@ function [ax] = ConcatenateFigures(ax)
         fig = figure('Name',newFigName, 'position', [200,200, sizeFig]);
         ax = copyobj(ax, fig);
     end
-    
+
 end
 
 function [m,n] = CalculateLayout(charIn, tot)

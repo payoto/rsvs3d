@@ -31,7 +31,7 @@ function [resout]=ReadDerivativeIn(fileIn, resout)
             varTemp = deblank(regexprep(varNames{1},'^>\s*(.*):','$1'));
             var = matlab.lang.makeValidName(varTemp);
             resout(end).(var) = str2num(varNames{2}); %#ok<*ST2NM>
-            
+
             if numel(resout(end).(var))==5 && varTemp(end)~='s'
                 cellDat = {'norm','mean','std','max','min'};
                 cellDat(2,:) = num2cell(reshape(resout(end).(var),[1,5]));

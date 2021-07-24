@@ -35,7 +35,7 @@ SRCC/docs/latex/*
 SRCC/noexec_rsvsconfig.json
 SRCC/tetgen-tmpfile*.vtk
 defaultconfigRSVS3D.json*
-# Sublime text 
+# Sublime text
 *.sublime-workspace
 *.sublime-syntax
 
@@ -49,6 +49,3 @@ defaultconfigRSVS3D.json*
 # Matlab spam files
 *.dXYZ
 surface_analysis.dat
-
-
-

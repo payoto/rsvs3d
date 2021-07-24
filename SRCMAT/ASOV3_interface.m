@@ -1,11 +1,11 @@
 function [] = ASOV3_interface()
     %FUNCTIONLIST allows local functions to be used globally once it has
     %been used.
-    
+
     funcHandles=localfunctions;
     funcDir=[cd,'\Automated_Function_Directory'];
     HeaderActivation(funcHandles,funcDir)
-    
+
 end
 
 
@@ -13,7 +13,7 @@ end
 
 % Generate geom object
 function [geom]=Grid2Geom3(grid)
-    
+
     vertInd= [grid.vert.index];
     edgeInd= [grid.edge.index];
 
@@ -26,9 +26,9 @@ function [geom]=Grid2Geom3(grid)
             faceInput{ii} = flip(faceInput{ii});
         end
     end
-    
+
     vertCoord = vertcat(grid.vert.coord);
     geom = geom3.UnstrucSurf(faceInput, vertCoord);
 end
 
-% 
+%

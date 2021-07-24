@@ -1,9 +1,9 @@
 function [obj] = SetNestedStructureField(obj,varargin)
-    
+
     if mod(numel(varargin),2)
         error('Field name-value pairs are expected. An even number of varargs should be provided');
     end
-    
+
     for ii = 1:2:numel(varargin)-1
         if(ischar(varargin{ii}))
             varargin{ii} = regexp(varargin{ii},'[\.]','split');
@@ -32,7 +32,7 @@ function [obj] = SetNestedStructureField(obj,varargin)
             end
         else
             strEval = 'obj';
-            
+
             if isnumeric(varargin{ii+1})
                 openArray = '(';
                 closeArray = ')';
@@ -40,10 +40,10 @@ function [obj] = SetNestedStructureField(obj,varargin)
                 openArray = '{';
                 closeArray = '}';
             end
-            
+
             nArg = numel(varargin{ii});
             prevIsNum = false;
-            
+
             for kk = 1:nArg
                 if ischar(varargin{ii}{kk})
                     if prevIsNum
@@ -52,7 +52,7 @@ function [obj] = SetNestedStructureField(obj,varargin)
                     strEval = [strEval,'.', varargin{ii}{kk}];
                 elseif isnumeric(varargin{ii}{kk}) && varargin{ii}{kk}>0 ...
                         && isfinite(varargin{ii}{kk})
-                    if ~prevIsNum 
+                    if ~prevIsNum
                         strEval = [strEval,openArray];
                     else
                         strEval = [strEval,','];
@@ -73,8 +73,8 @@ function [obj] = SetNestedStructureField(obj,varargin)
                 warning(['Cause of error : ', strEval])
                 rethrow(ME);
             end
-                
+
         end
     end
-    
+
 end

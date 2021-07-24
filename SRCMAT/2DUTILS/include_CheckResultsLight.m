@@ -3,11 +3,11 @@
 function [] = include_CheckResultsLight()
     %FUNCTIONLIST allows local functions to be used globally once it has
     %been used.
-    
+
     funcHandles=localfunctions;
     funcDir=[cd,'\Automated_Function_Directory'];
     HeaderActivation(funcHandles,funcDir)
-    
+
 end
 
 
@@ -22,12 +22,12 @@ function [movFrame]=CheckResults(iter,unstructured,oldGrid,snakposition,snaxel,m
         hold on
         title(['Iteration  ',int2str(iter)],'fontsize',16)
         colString='bgcmyk';
-        
+
         isEdgeSub=find(unstructured.edge.boundaryis1);
         for ii=1:length(isEdgeSub)
             PlotEdge(figh,axh,unstructured,isEdgeSub(ii),'bo')
         end
-        
+
         isEdgeSub=find(unstructured.edge.boundaryis1);
         for ii=1:length(isEdgeSub)
             PlotEdge(figh,axh,unstructured,isEdgeSub(ii),'b-')
@@ -46,15 +46,15 @@ function [movFrame]=CheckResults(iter,unstructured,oldGrid,snakposition,snaxel,m
         %PlotSnaxelLoop(figh,axh,snakposition,snaxel)
         PlotSnaxelLoopDir(figh,axh,snakposition,snaxel)
         PlotSnaxelIndex(figh,axh,snakposition)
-        
+
         if exist('volumefraction','var')
             oldCellIndUnstructInd=[oldGrid.cell(:).index];
-            
+
             oldCellIndUnstructSub=FindObjNum(oldGrid.cell,oldCellIndUnstructInd);
             oldCellIndVolFracSub=FindObjNum(volumefraction,...
                 oldCellIndUnstructInd,[volumefraction(:).oldCellInd]);
 %             for ii=1:length(oldCellIndUnstructInd)
-%                 
+%
 %                 coord=oldGrid.cell(oldCellIndUnstructSub(ii)).coord;
 %                 % frac=volumefraction(oldCellIndVolFracSub(ii)).volumefraction...
 %                 %     -volumefraction(oldCellIndVolFracSub(ii)).targetfill;
@@ -62,23 +62,23 @@ function [movFrame]=CheckResults(iter,unstructured,oldGrid,snakposition,snaxel,m
 %                 PlotVolFrac(figh,axh,coord,frac)
 %             end
         end
-        
+
         %         [normalcontourvec]=ContourNormal2(snaxel,snakposition);
         %         PlotContVec(figh,axh,snakposition,normalcontourvec)
-        
-        
+
+
         axis equal
         axis([domainBounds(1,1:2) domainBounds(2,1:2)])
         if makeMovie
             movFrame=getframe(figh);
         end
     end
-    
+
 end
 
 function [figh]=CheckResultsLight(unstructured,snakposition,snaxel,figh)
     global nDim domainBounds
-    
+
     if nDim==2
         if nargin==3
             figh=figure;
@@ -87,20 +87,20 @@ function [figh]=CheckResultsLight(unstructured,snakposition,snaxel,figh)
         end
         axh=axes;
         hold on
-        
+
         colString='bgcmyk';
-        
+
         isEdgeIndex=find(unstructured.edge.boundaryis1);
         for ii=1:length(isEdgeIndex)
             %PlotEdge(figh,axh,unstructured,isEdgeIndex(ii),'bo')
         end
-        
+
         isEdgeIndex=find(unstructured.edge.boundaryis0);
         for ii=1:length(isEdgeIndex)
             %PlotEdge(figh,axh,unstructured,isEdgeIndex(ii),'b-')
         end
-        
-        
+
+
         isCellFull=find(unstructured.cell.fill);
         for ii=1:length( isCellFull)
             %PlotCell(figh,axh,unstructured, isCellFull(ii),'bs')
@@ -109,38 +109,38 @@ function [figh]=CheckResultsLight(unstructured,snakposition,snaxel,figh)
         %PlotSnaxelLoop(figh,axh,snakposition,snaxel)
         PlotSnaxelLoopDir(figh,axh,snakposition,snaxel)
         %PlotSnaxelIndex(figh,axh,snakposition)
-        
+
         %[normalcontourvec]=ContourNormal(snaxel,snakposition);
         %PlotContVec(figh,axh,snakposition,normalcontourvec)
-        
+
         axis equal
         axis([domainBounds(1,1:2) domainBounds(2,1:2)])
     end
-    
+
 end
 
 function []=PlotEdge(figh,axh,unstructured,subEdge,format)
     figure(figh)
     %axes(axh)
-    
+
     vertices=unstructured.edge.vertexindex(subEdge,:);
     vertsub(1)=find(unstructured.vertex.index==vertices(1));
     vertsub(2)=find(unstructured.vertex.index==vertices(2));
     coord=unstructured.vertex.coord(vertsub,:);
-    
-    
+
+
     plot(coord(:,1),coord(:,2),format)
-    
+
 end
 
 function []=PlotVert(figh,axh,unstructured,subVert,format)
     figure(figh)
     %axes(axh)
-    
+
     coord=unstructured.vertex.coord(subVert,:);
-    
+
     plot(coord(:,1),coord(:,2),format)
-    
+
 end
 
 function []=PlotSnaxel(figh,axh,snakposition,snaxel)
@@ -164,7 +164,7 @@ function []=PlotSnaxel(figh,axh,snakposition,snaxel)
     axes(axh)
     quiver(X,Y,U,V,0,'r-')
     plot(X,Y,'rs')
-    
+
 end
 
 function []=PlotContVec(figh,axh,snakposition,normalContVec)
@@ -186,7 +186,7 @@ function []=PlotContVec(figh,axh,snakposition,normalContVec)
     figure(figh)
     axes(axh)
     quiver(X,Y,U,V,0,'r-')
-    
+
 end
 
 function []=PlotSnaxelIndex(figh,axh,snakposition)
@@ -201,9 +201,9 @@ function []=PlotSnaxelIndex(figh,axh,snakposition)
         str=num2str(snakposition(ii).index);
         text(X(ii)+U(ii),Y(ii)+V(ii),str)
     end
-    
-    
-    
+
+
+
 end
 
 function []=PlotSnaxelLoop(figh,axh,snakposition,snaxel)
@@ -220,7 +220,7 @@ function []=PlotSnaxelLoop(figh,axh,snakposition,snaxel)
         end
         plot(X,Y,'o--')
     end
-    
+
 end
 
 function []=PlotSnaxelLoopDir(figh,axh,snakposition,snaxel)
@@ -234,14 +234,14 @@ function []=PlotSnaxelLoopDir(figh,axh,snakposition,snaxel)
             currSnaxSub=FindObjNum(snakposition,line(ii),snaxInd);
             X(ii)=snakposition(currSnaxSub).coord(1);
             Y(ii)=snakposition(currSnaxSub).coord(2);
-            
+
         end
         U=X(2)-X(1);
-        
+
         V=Y(2)-Y(1);
         quiver(X(1),Y(1),U,V,0)
     end
-    
+
 end
 
 function []=PlotVolFrac(figh,axh,coord,frac)
