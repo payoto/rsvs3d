@@ -1,4 +1,10 @@
-
+# The default settings (flags, dependencies, libraries) for linux
+# and windows are stored in their own makefiles.
+ifeq ($(OS),Windows_NT)
+	include makewin.mk
+else
+	include makelinux.mk
+endif
 #------------------------------------------------------
 #          PARSE compiler flags
 #------------------------------------------------------
