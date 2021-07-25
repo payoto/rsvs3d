@@ -1,7 +1,6 @@
 var triangulate_8hpp =
 [
     [ "TriStruct", "class_tri_struct.html", "class_tri_struct" ],
-    [ "TriStruct", "class_tri_struct.html", "class_tri_struct" ],
     [ "triarray", "classtriarray.html", null ],
     [ "tripointarray", "classtripointarray.html", null ],
     [ "trisurfarray", "classtrisurfarray.html", null ],

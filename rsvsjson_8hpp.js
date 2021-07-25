@@ -1,6 +1,5 @@
 var rsvsjson_8hpp =
 [
-    [ "filltype", "structparam_1_1filltype.html", "structparam_1_1filltype" ],
     [ "json", "rsvsjson_8hpp.html#a2d21a04d2c6164d67a0f0bf50c8b053d", null ],
     [ "flatupdate", "rsvsjson_8hpp.html#a2d6e454b2138575660057c249497f48c", null ],
     [ "from_json", "rsvsjson_8hpp.html#a10cb013cdb988c99ff70ec6e53fc8e99", null ],

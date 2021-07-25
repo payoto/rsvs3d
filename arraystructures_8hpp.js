@@ -1,9 +1,6 @@
 var arraystructures_8hpp =
 [
     [ "ArrayStruct", "class_array_struct.html", "class_array_struct" ],
-    [ "HashedVector", "class_hashed_vector.html", "class_hashed_vector" ],
-    [ "SnakStruct", "class_snak_struct.html", "class_snak_struct" ],
-    [ "ArrayStruct", "class_array_struct.html", "class_array_struct" ],
     [ "SnakStruct", "class_snak_struct.html", "class_snak_struct" ],
     [ "ModiftrackArray", "class_modiftrack_array.html", "class_modiftrack_array" ],
     [ "HashedVector", "class_hashed_vector.html", "class_hashed_vector" ],

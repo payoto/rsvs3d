@@ -2,13 +2,26 @@ var hierarchy =
 [
     [ "tetgen::apiparam", "classtetgen_1_1apiparam.html", null ],
     [ "ArrayStruct< T >", "class_array_struct.html", [
-      [ "ModiftrackArray< T >", "class_modiftrack_array.html", null ]
-    ] ],
-    [ "ArrayStruct< edge >", "class_array_struct.html", [
-      [ "ModiftrackArray< edge >", "class_modiftrack_array.html", null ]
-    ] ],
-    [ "ArrayStruct< surf >", "class_array_struct.html", [
-      [ "ModiftrackArray< surf >", "class_modiftrack_array.html", null ]
+      [ "ModiftrackArray< surf >", "class_modiftrack_array.html", null ],
+      [ "ModiftrackArray< edge >", "class_modiftrack_array.html", null ],
+      [ "SnakStruct< snaxedge >", "class_snak_struct.html", null ],
+      [ "SnakStruct< snax >", "class_snak_struct.html", [
+        [ "snaxarray", "classsnaxarray.html", null ]
+      ] ],
+      [ "SnakStruct< snaxsurf >", "class_snak_struct.html", null ],
+      [ "ModiftrackArray< T >", "class_modiftrack_array.html", null ],
+      [ "SnakStruct< T >", "class_snak_struct.html", [
+        [ "TriStruct< trianglepoint >", "class_tri_struct.html", [
+          [ "tripointarray", "classtripointarray.html", null ]
+        ] ],
+        [ "TriStruct< trianglesurf >", "class_tri_struct.html", [
+          [ "trisurfarray", "classtrisurfarray.html", null ]
+        ] ],
+        [ "TriStruct< triangle >", "class_tri_struct.html", [
+          [ "triarray", "classtriarray.html", null ]
+        ] ],
+        [ "TriStruct< T >", "class_tri_struct.html", null ]
+      ] ]
     ] ],
     [ "ArrayStruct< vert >", "class_array_struct.html", null ],
     [ "ArrayStruct< volu >", "class_array_struct.html", null ],
@@ -48,16 +61,14 @@ var hierarchy =
     [ "param::filltype< std::string >", "structparam_1_1filltype.html", null ],
     [ "param::grid", "classparam_1_1grid.html", null ],
     [ "HashedVector< T, Q, R >", "class_hashed_vector.html", [
+      [ "HashedMap< int, int, int >", "class_hashed_map.html", null ],
+      [ "HashedVectorSafe< int, int >", "class_hashed_vector_safe.html", null ],
       [ "HashedMap< T, Q, R >", "class_hashed_map.html", null ],
       [ "HashedVectorPair< T, Q, R, S >", "class_hashed_vector_pair.html", [
         [ "SparseMatrixTriplet", "class_sparse_matrix_triplet.html", null ]
       ] ]
     ] ],
     [ "HashedVector< int, int >", "class_hashed_vector.html", null ],
-    [ "HashedVector< int, int, int >", "class_hashed_vector.html", [
-      [ "HashedMap< int, int, int >", "class_hashed_map.html", null ],
-      [ "HashedVectorSafe< int, int >", "class_hashed_vector_safe.html", null ]
-    ] ],
     [ "HashedVector< T, Q, int >", "class_hashed_vector.html", [
       [ "HashedVectorSafe< T, Q, R >", "class_hashed_vector_safe.html", null ]
     ] ],
@@ -90,12 +101,6 @@ var hierarchy =
       [ "trianglepoint", "classtrianglepoint.html", null ],
       [ "trianglesurf", "classtrianglesurf.html", null ]
     ] ],
-    [ "SnakStruct< T >", "class_snak_struct.html", null ],
-    [ "SnakStruct< snax >", "class_snak_struct.html", [
-      [ "snaxarray", "classsnaxarray.html", null ]
-    ] ],
-    [ "SnakStruct< snaxedge >", "class_snak_struct.html", null ],
-    [ "SnakStruct< snaxsurf >", "class_snak_struct.html", null ],
     [ "sparsetripletelement< T >", "classsparsetripletelement.html", null ],
     [ "tecplotfile", "classtecplotfile.html", null ],
     [ "tetgenio", null, [
@@ -106,16 +111,6 @@ var hierarchy =
     [ "TriFunc", "class_tri_func.html", [
       [ "Area", "class_area.html", null ],
       [ "Volume", "class_volume.html", null ]
-    ] ],
-    [ "TriStruct< T >", "class_tri_struct.html", null ],
-    [ "TriStruct< triangle >", "class_tri_struct.html", [
-      [ "triarray", "classtriarray.html", null ]
-    ] ],
-    [ "TriStruct< trianglepoint >", "class_tri_struct.html", [
-      [ "tripointarray", "classtripointarray.html", null ]
-    ] ],
-    [ "TriStruct< trianglesurf >", "class_tri_struct.html", [
-      [ "trisurfarray", "classtrisurfarray.html", null ]
     ] ],
     [ "param::voronoi", "classparam_1_1voronoi.html", null ],
     [ "param::voxel", "classparam_1_1voxel.html", null ]
