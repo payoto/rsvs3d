@@ -1,5 +1,5 @@
 function [statsout]=Structure2Statistics(resin, folderIn, derivFileName)
-    % Function for the processing of standard metric 
+    % Function for the processing of standard metric
     if ~exist('folderIn','var')
         folderIn = '';
         isSave = false;
@@ -17,7 +17,7 @@ end% function
 
 
 function [statsstruct]=AnalyseAnyFormat(derivIn)
-    
+
     if isnumeric(derivIn)
         if numel(derivIn)>1
             statsstruct = ProcessNumeric(derivIn);
@@ -39,8 +39,8 @@ function [statsstruct]=AnalyseAnyFormat(derivIn)
             [statsstruct{ii}]=AnalyseAnyFormat(derivIn{ii});
         end
     end
-    
-    
+
+
 end
 
 function [statsstruct]=AnalyseScalarStructure(derivIn)
@@ -66,7 +66,7 @@ function [stats]=ProcessNumeric(arr, basefieldname)
         calcs{end+1} = 'eig';
         calcs{end+1} = 'rcond';
     end
-    
+
     stats = struct();
     for ii = 1:numel(calcs)
         calc = calcs{ii};

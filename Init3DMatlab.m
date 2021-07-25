@@ -13,22 +13,22 @@
 function []=Init3DMatlab()
     comStr=computer;
     if strcmp(comStr(1:2),'PC')
-        
+
     else
         clear all
-        setenv('TMP','/local/') 
+        setenv('TMP','/local/')
     end
-    
+
     singleFolder={''};
     rootTreeFolders={'SRCMAT'};
 
-    
+
     [addSingleDir]=FormulateValidFolders(singleFolder);
     [rootTreeDirs]=FormulateValidFolders(rootTreeFolders);
     [branchesDir]=ExploreFolderTree(rootTreeDirs);
-    
+
     addFolders=[addSingleDir,rootTreeDirs,branchesDir];
-    
+
     AddFoldersToPath(addFolders)
 end
 
@@ -60,7 +60,7 @@ function [addFolders]=ExploreFolderTree(rootDir)
             addFolders=[addFolders,addSubFolders];
         end
     end
-    
+
 end
 
 function []=AddFoldersToPath(addFolders)
@@ -72,5 +72,3 @@ function []=AddFoldersToPath(addFolders)
     end
     addpath(newPaths);
 end
-
-

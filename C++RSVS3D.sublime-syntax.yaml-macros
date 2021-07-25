@@ -19,4 +19,3 @@ contexts: !merge
 
   types: !prepend
     - include: user-types
-

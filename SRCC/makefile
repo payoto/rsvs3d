@@ -9,7 +9,7 @@
 ifeq ($(MAKECMDGOALS), distribution)
 	# distribution requires optimisation and No debug and test flags
 	OPTIMLVL= 3
-	CCFLAGDBG= 
+	CCFLAGDBG=
 	CCFLAGPROJ= -DTIME_EXEC $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
 	CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_MPL2_ONLY
 endif
@@ -19,7 +19,7 @@ ifeq ($(DEBUG), true)
 	CCFLAGDBG= -g -ggdb
 	CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
 	CCFLAGPROJ+= -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
-	CCFLAGEIG= 
+	CCFLAGEIG=
 endif
 
 # O3 comes with spurious warnings which is ugly to deal in the code
@@ -28,7 +28,7 @@ WARNFLAGS += -Wno-maybe-uninitialized
 endif
 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
-# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation 
+# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation
 # beyond O3. It will break using -march and/or -ffast-math and co...
 CCFLAGETETGEN += $(CCFLAGDBG)
 #------------------------------------------------------
@@ -56,9 +56,9 @@ endif
 #------------------------------------------------------
 #                 LINKER FLAGS
 #------------------------------------------------------
-# LDFILE are the library names, LDDIR are the library 
+# LDFILE are the library names, LDDIR are the library
 # directories
-LDFILE = stdc++ 
+LDFILE = stdc++
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
@@ -68,10 +68,10 @@ ifeq ($(USE_BOOST),true)
 	CCFLAGCUSTOM += -DUSE_BOOST
 else
 	# Leave empty
-	LDDIRBOOST = 
+	LDDIRBOOST =
 endif
 
-LDDIR = $(LDDIRBOOST) 
+LDDIR = $(LDDIRBOOST)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
 
 
@@ -80,10 +80,10 @@ LDDIR = $(LDDIRBOOST)
 #            PARSE FLAGS BEFORE RECIPES
 #------------------------------------------------------
 
-LDFLAGS = 
+LDFLAGS =
 
 # Compile list of flags
-CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) 
+CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL)
 ifeq ($(MAKECMDGOALS),testall)
 CFLAGS+= $(CFTESTFLAG)
 endif
@@ -126,12 +126,12 @@ ifeq ($(MAKECMDGOALS), notests)
 CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG)
 endif
 ifeq ($(MAKECMDGOALS), distribution)
-CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG) 
+CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
 endif
 
 ifeq ($(MAKECMDGOALS), testnew)
 EXECUTABLE = $(TESTEXECUTABLE)
-CCFLAGCUSTOM += -DRSVSTEST 
+CCFLAGCUSTOM += -DRSVSTEST
 endif
 
 ifeq ($(MAKECMDGOALS), testshort)
@@ -163,17 +163,17 @@ endif
 #------------------------------------------------------
 
 # TARGETS
-all : FORCE $(SRCS) $(EXECUTABLE)  
-testnew : FORCE $(SRCS) $(EXECUTABLE) 
-testall : FORCE $(SRCS) $(EXECUTABLE) 
-testshort : FORCE $(SRCS) $(EXECUTABLE) 
-notests : FORCE $(SRCS) $(EXECUTABLE) 
-distribution : FORCE $(SRCS) $(EXECUTABLE) 
+all : FORCE $(SRCS) $(EXECUTABLE)
+testnew : FORCE $(SRCS) $(EXECUTABLE)
+testall : FORCE $(SRCS) $(EXECUTABLE)
+testshort : FORCE $(SRCS) $(EXECUTABLE)
+notests : FORCE $(SRCS) $(EXECUTABLE)
+distribution : FORCE $(SRCS) $(EXECUTABLE)
 
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
-$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) 
+$(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
 	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
@@ -181,52 +181,52 @@ $(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
 .SECONDEXPANSION:
 
 # Compilation recipes to build the object files
-# prerequisites : 
+# prerequisites :
 #	1. the corresponding .cpp file
 #	2. the corresponding .d file (a makefile included in this makefile
 #       which specifies the includes on which the object depends)
 #	3. the corresponding .f file which marks the existence of the folder
 # 	   in which the object file will go.
 #
-# recipe: 
+# recipe:
 # 	COMPILECPP (compiler + flags) $< (the source) -o (output flag) $@ (the object)
 # 	POSTCOMPILE (Dependency actions and flags)
 $(OBJDIR)/%.o : %.cpp
-$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f 
+$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGCUSTOM) $< -o $@
 	$(POSTCOMPILE)
 
 # Special case for this source and object which cannot be compiled without optimisation
 # or the object file is too large on windows
 $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp
-$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f 
+$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGCUSTOM) -O3 $< -o $@
 	$(POSTCOMPILE)
 
 # #  Always on optimisation and disabled warnings in the tetgen module
 $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
-$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
+$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
 $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
-$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
+$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
 # Folder depency used to mirror the SRCTREE into OBJDIR
-# Called by `$$(@D)/.f` in the object recipes 
+# Called by `$$(@D)/.f` in the object recipes
 %/.f:
 	mkdir -p $(dir $@)
 	touch $@
 
-.PHONY: clean 
+.PHONY: clean
 # Clean target
 OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
-	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d 
+	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d
 
-FORCE: 
+FORCE:
 
 
 $(DEPDIR)/%.d: ;

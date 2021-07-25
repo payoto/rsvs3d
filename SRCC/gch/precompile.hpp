@@ -5,7 +5,4 @@
 //#pragma GCC diagnostic ignored "-Wignored-attributes"
 #include <Eigen>
 
-
-
-
-#endif 
+#endif
