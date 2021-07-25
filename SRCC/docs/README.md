@@ -1,4 +1,4 @@
-# API Documentation of C++ source code
+# Build doxygen documentation
 
 The API documentation of the C++ source code is generated from the source code using
 `doxygen`.
