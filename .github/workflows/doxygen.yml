@@ -13,19 +13,21 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: "recursive"
-      - name: install doxygen
+      - name: Download doxygen 1.9.1
         run: |
           sudo apt-get update
-          sudo apt-get install -y doxygen
+          sudo apt-get install -y libclang-cpp9 libclang1-9
+          curl https://www.doxygen.nl/files/doxygen-1.9.1.linux.bin.tar.gz | tar -xvz
+      - name: Install doxygen
+        run: |
+          sudo make install
+        working-directory: doxygen-1.9.1
       - name: Build documentation
         run: |
           doxygen docs/Doxyfile
         working-directory: SRCC
-      - name: Copy documentation
-        run: |
-          cp -r SRCC/docs/html/ ./public_html/
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public_html  # default: public
+          publish_dir: SRCC/docs/html/  # default: public
