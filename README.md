@@ -134,12 +134,22 @@ execution) you will need to call these in the matlab console.
 the `Include_XXXX` files "import" all the local functions defined inside them into the matlab
 workspace avoiding the need to create one matlab file per function.
 
-## Getting help
+## Limitiations and how to get help
+
+### Help
 
 Read the (sparse) [documentation](https://payoto.github.io/rsvs3d/), read Chapter 7 of
 ["Shape and Topology Optimisation of External Flows" (thesis)](https://www.researchgate.net/publication/345149497_Shape_and_Topology_Optimisation_of_External_Flows) also available as a
 [standalone PDF](SRCC/docs/thesis_ADJPAYOT_chap7-3D-RSVS.pdf) of finally use the
 [issues](https://github.com/payoto/rsvs3d/issues) board.
+
+### Limitations
+
+No release of the RSVS has been made as there are a number of known stability and
+convergence issues which means that it is unlikely to work beyond the specific test
+cases that were studied in Chapter 7 of the thesis.
+
+For a discussion of those limitations see [Chapter 7](SRCC/docs/thesis_ADJPAYOT_chap7-3D-RSVS.pdf)
 
 ## Using the 3D-RSVS
 
@@ -424,14 +434,17 @@ Updating your files to be up to date with the master branch can be done using gi
 
 ## I don't get it what does this ACTUALLY do and who do I talk to?
 
-For more information about what the code does (i.e. the science of it)
-[Restricted Snakes: a Flexible Topology Parameterisation Method for Aerodynamic Optimisation](https://arc.aiaa.org/doi/pdf/10.2514/6.2017-1410)
-[Mixing and Refinement of Design Variables for Geometry and Topology Optimization in Aerodynamics](https://arc.aiaa.org/doi/pdfplus/10.2514/6.2017-3577)
+For more information about what the code does (i.e. the science of it):
+
+- [Restricted Snakes: a Flexible Topology Parameterisation Method for Aerodynamic Optimisation](https://arc.aiaa.org/doi/pdf/10.2514/6.2017-1410)
+- [Mixing and Refinement of Design Variables for Geometry and Topology Optimization in Aerodynamics](https://arc.aiaa.org/doi/pdfplus/10.2514/6.2017-3577)
+- [Shape and Topology Optimisation of External Flows (thesis)](https://www.researchgate.net/publication/345149497_Shape_and_Topology_Optimisation_of_External_Flows)
 
 (Also available on research gate)
 
-Alexandre Payot - a.payot@bristol.ac.uk
-[ResearchGate profile](https://www.researchgate.net/profile/Alexandre_Payot)
-[Google Scholar profile](https://scholar.google.co.uk/citations?user=JX_AmkwAAAAJ&hl=en)
-[personal GitHub/payoto](https://www.github.com/payoto)
-[Research group GitHub/farg-bristol](https://www.github.com/farg-bristol)
+Alexandre Payot
+
+- [ResearchGate profile](https://www.researchgate.net/profile/Alexandre_Payot)
+- [Google Scholar profile](https://scholar.google.co.uk/citations?user=JX_AmkwAAAAJ&hl=en)
+- [personal GitHub/payoto](https://www.github.com/payoto)
+- [Research group GitHub/farg-bristol](https://www.github.com/farg-bristol)
