@@ -16,7 +16,7 @@ jobs:
       - name: install dependencies
         run: choco install make mingw
       - name: make
-        run: make -f makewin.mk all -j2
+        run: make all -j2
         working-directory: SRCC/
       - uses: actions/upload-artifact@v2
         with:
