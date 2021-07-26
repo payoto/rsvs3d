@@ -25,9 +25,12 @@ jobs:
       - name: Build documentation
         run: |
           doxygen docs/Doxyfile
+          mkdir --parents docs/html/SRCC/docs
+          cp docs/thesis*.pdf docs/html/SRCC/docs/
+          cp docs/*.png docs/html/SRCC/docs/
         working-directory: SRCC
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: SRCC/docs/html/  # default: public
+          publish_dir: SRCC/docs/html/
