@@ -25,7 +25,32 @@
 var NAVTREE =
 [
   [ "rsvs3D", "index.html", [
-    [ "3D-RSVS", "index.html", null ],
+    [ "3D-RSVS", "index.html", [
+      [ "What is this repository for?", "index.html#autotoc_md1", null ],
+      [ "Get the code", "index.html#autotoc_md2", null ],
+      [ "Required tools for compilation", "index.html#autotoc_md3", null ],
+      [ "External libraries", "index.html#autotoc_md4", null ],
+      [ "License", "index.html#autotoc_md5", null ],
+      [ "First setup", "index.html#autotoc_md6", null ],
+      [ "Limitiations and how to get help", "index.html#autotoc_md7", null ],
+      [ "Using the 3D-RSVS", "index.html#autotoc_md8", null ],
+      [ "Note on using git to update a private copy of the code", "index.html#autotoc_md9", null ],
+      [ "I don't get it what does this ACTUALLY do and who do I talk to?", "index.html#autotoc_md10", null ]
+    ] ],
+    [ "C++ code structure", "md__r_e_a_d_m_e.html", [
+      [ "Contents", "md__r_e_a_d_m_e.html#autotoc_md12", null ],
+      [ "Building", "md__r_e_a_d_m_e.html#autotoc_md13", null ],
+      [ "Usage", "md__r_e_a_d_m_e.html#autotoc_md14", null ],
+      [ "Testing", "md__r_e_a_d_m_e.html#autotoc_md15", null ]
+    ] ],
+    [ "Matlab helper scripts", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html", [
+      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html#autotoc_md17", null ]
+    ] ],
+    [ "Build doxygen documentation", "md_docs__r_e_a_d_m_e.html", [
+      [ "Build", "md_docs__r_e_a_d_m_e.html#autotoc_md19", null ],
+      [ "View", "md_docs__r_e_a_d_m_e.html#autotoc_md20", null ],
+      [ "Dependencies", "md_docs__r_e_a_d_m_e.html#autotoc_md21", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -63,8 +88,8 @@ var NAVTREEINDEX =
 "classparam_1_1dev_1_1devparam.html",
 "classsnaxsurf.html#a235e3b0b4be7dc599c98943623c948d8",
 "classvolu.html#a2ac9b41f2a631249d1dd82583e89044d",
-"namespacersvs3d.html#af9db5507068caa569015164007d71543",
-"tetgenrsvs_8hpp.html#aea952aeda95a78100c9378043a216c02"
+"namespaceparam_1_1dev.html#adaa359f33b0e9d4c0771b743571faced",
+"tetgenrsvs_8hpp.html#a9591fe16a135b21a3e0450461eef50b8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
