@@ -151,7 +151,36 @@ For basic usage information from the command line use:
 :Note:
 Running `RSVS3D` with no command line arguments does nothing.
 
-## Command line options
+### Example
+
+```bash
+$ cd SRCC/
+$ RSVS3D -l config/dumbell.json
+Start RSVS preparation
+Output folder: ../out/Archive_2021_07/Day_21-07-25/rsvs3d_210725T105154_sphere2
+Meshes prepared...
+fill loaded : 3 - 0.3 0.3 0.3  |
+Vertices : 0 (interal), 1026 (border);
+Initialisation DONE!
+Preparation finished - start iteration
+Step    0 ...
+Step   49  deriv:   124ms;  solve:    33ms;  conv: (vol) 9.63e-07  (vel) 0.0072   (Dobj) 0.0405  ; Impact:      0ms; Spawn:      4ms; Impact:      2ms; Merge:      2ms; Clean:      9ms;  - Connec Update:
+     18ms; none ;  spawn step:     2ms;  triangulate:    23ms;
+RSVS iteration finished
+Iteration finished - start PostProcessing
+ conv: (vol) 9.63e-07 (vel) 0.0342   (Dobj) 0.0326  ;
+PostProcessing finished - start Exporting
+Exporting finished - close.
+3D-RSVS completed in 16 seconds.
+```
+
+This will create in the output folder reported at the start of the execution the following geometry
+
+![Dumbell geometry outcome](SRCC/docs/dumbell.png)
+
+The output can be visualised using Tecplot by opening the file:
+
+`../out/Archive_XX/Day_XX/rsvs3d_<time>_sphere2/RSVS_loglvl3_<time>_sphere2.lay`
 
 ### Command line options
 
