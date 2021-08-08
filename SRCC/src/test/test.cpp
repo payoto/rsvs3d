@@ -14,13 +14,13 @@
 #include "mesh.hpp"
 #include "meshrefinement.hpp"
 #include "parameters.hpp"
+#include "polyscopersvs.hpp"
 #include "postprocessing.hpp"
 #include "snake.hpp"
 #include "snakeengine.hpp"
 #include "tetgenrsvs.hpp"
 #include "triangulate.hpp"
 #include "voxel.hpp"
-
 using namespace rsvstest;
 using namespace std;
 
@@ -153,7 +153,14 @@ int rsvstest::tetgenprocesses()
     // gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS", 42);
     return (gridTest.ReturnErrCount());
 }
-
+int rsvstest::polyscopeprocesses()
+{
+    customtest gridTest("Test polyscope processes");
+    gridTest.RunSilent(polyscopersvs::test::init, "Initialise polyscope");
+    gridTest.RunSilent(polyscopersvs::test::init, "Try to initialise polyscope twice");
+    gridTest.RunSilent(polyscopersvs::test::show, "Show the polyscope window");
+    return (gridTest.ReturnErrCount());
+}
 int rsvstest::JSONprocesses()
 {
     customtest gridTest("Parameter and JSON tests");
@@ -200,12 +207,14 @@ int rsvstest::newtest()
     gridTest.Run(integrate::test::CompareDerivativesSpikeNoDPos, "Test spike issues no dPos");
     gridTest.Run(integrate::test::StudyDerivatives, "Generate Derivative study");
 #endif
+#ifdef IGNORE_THESE_TESTS
     // Parameter and JSON tests
     gridTest.Run(tetgen::test::CFD, "tegen API testing - CFD meshing");
     gridTest.Run(tetgen::test::call, "tegen API testing - RSVS meshing");
     gridTest.Run(tetgen::test::RSVSVORO, "tegen API testing - Voro to RSVS");
     gridTest.Run(tetgen::test::RSVSVORO_Contain, "tegen API testing - Voro to RSVS");
-
+#endif
+    gridTest.Run(rsvstest::polyscopeprocesses, "Test polyscope processes");
     return (gridTest.ReturnErrCount());
 }
 

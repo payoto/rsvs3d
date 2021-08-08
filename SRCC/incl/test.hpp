@@ -107,6 +107,7 @@ int RSVS2Dprocesses();
 int tetgenprocesses();
 int JSONprocesses();
 int integrationprocesses();
+int polyscopeprocesses();
 } // namespace rsvstest
 
 // member function definition template <class T>
