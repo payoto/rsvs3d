@@ -77,9 +77,9 @@ else
 	LDDIRBOOST =
 endif
 
-LDDIR = $(LDDIRBOOST) $(LDPOLYSCOPE)
+LDDIR = $(LDDIRBOOST) $(LDPOLYSCOPE) $(LDPOLYSCOPEDEPS)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
-
+POLYSCOPELIBFILE= $(LDPOLYSCOPE)/libpolyscope.a
 
 
 #------------------------------------------------------
@@ -179,7 +179,7 @@ distribution : FORCE $(SRCS) $(EXECUTABLE)
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
-$(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
+$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) $(POLYSCOPELIBFILE)
 	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
@@ -220,17 +220,29 @@ $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
+# Build the polyscope library
+$(POLYSCOPELIBFILE):
+	mkdir -p modules/polyscope/build
+	cd modules/polyscope/build && cmake .. -G "Unix Makefiles"
+	cd modules/polyscope/build && make
+
+echo:
+	@echo $(POLYSCOPELIBFILE)
+
 # Folder depency used to mirror the SRCTREE into OBJDIR
 # Called by `$$(@D)/.f` in the object recipes
 %/.f:
 	mkdir -p $(dir $@)
 	touch $@
 
-.PHONY: clean
+.PHONY: clean clean-deps
 # Clean target
 OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
 	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d
+
+clean-deps:
+	rm -r modules/polyscope/build
 
 FORCE:
 

@@ -33,10 +33,11 @@ DIRTETGEN= modules/tetgen
 DIRPOLYSCOPE= modules/polyscope
 INCLPOLYSCOPE= $(DIRPOLYSCOPE)/include $(DIRPOLYSCOPE)/deps/glm
 INCLPOLYSCOPE+=$(DIRPOLYSCOPE)/deps/imgui/imgui
-LDPOLYSCOPE= $(DIRPOLYSCOPE)/build/src $(DIRPOLYSCOPE)/build/deps/stb
-LDPOLYSCOPE+= $(DIRPOLYSCOPE)/build/deps/glad/src
-LDPOLYSCOPE+= $(DIRPOLYSCOPE)/build/deps/glfw/src
-LDPOLYSCOPE+= $(DIRPOLYSCOPE)/build/deps/imgui
+LDPOLYSCOPE=$(DIRPOLYSCOPE)/build/src
+LDPOLYSCOPEDEPS= $(DIRPOLYSCOPE)/build/deps/stb
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
 #------------------------------------------------------
 #           WARNING AND OPTIMISATION FLAGS
 #------------------------------------------------------

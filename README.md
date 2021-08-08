@@ -72,7 +72,7 @@ Required 3rd party open source libraries for compilation
   (header only).
 - [JSON for Modern C++](https://github.com/nlohmann/json/releases): JSON handling for c++. Used
   for the parameter handling of the RSVS3D framework (single include header).
-- Polyscope
+- [Polyscope](https://polyscope.run/) for handling GUI visualisation of the meshes.
 
 (Optional) 3rd party open source library:
 
