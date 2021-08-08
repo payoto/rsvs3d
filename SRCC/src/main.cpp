@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
 int main_rsvs3d(int argc, char *argv[])
 #endif
 {
-
 // Execution paths for different compilation flags allows building test
 // executables
 #ifndef RSVSTEST
