@@ -39,8 +39,13 @@ LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
 
+ifeq ($(HEADLESS), true)
+# glad glfw3 may not be available in headless mode you may also need to
+# LIBPOLYSCOPE= polyscope stb imgui pthread
 LIBPOLYSCOPE= polyscope stb glad glfw3 imgui dl X11 pthread
-
+else
+LIBPOLYSCOPE= polyscope stb glad glfw3 imgui dl X11 pthread
+endif
 #------------------------------------------------------
 #           WARNING AND OPTIMISATION FLAGS
 #------------------------------------------------------

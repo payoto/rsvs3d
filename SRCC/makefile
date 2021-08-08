@@ -5,6 +5,11 @@ ifeq ($(OS),Windows_NT)
 else
 	include makelinux.mk
 endif
+
+# This flag is meant to be controlled from the command line and governs
+# the behaviour of polyscope
+HEADLESS=false
+
 #------------------------------------------------------
 #          PARSE compiler flags
 #------------------------------------------------------
@@ -150,6 +155,14 @@ EXECUTABLE = $(TESTALLEXECUTABLE)
 CCFLAGCUSTOM += -DRSVSTEST -DTEST_KNOWN_FAILURES
 endif
 
+
+# make polyscope be built only with the mocked backend
+ifeq ($(HEADLESS), true)
+# At the moment cannot build with only the mock backend.
+# POLYSCOPE_CMAKE_FLAG= -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=OFF
+CCFLAGCUSTOM += -DHEADLESS
+endif
+
 # $(info $(SRCS))
 # $(info sources printed after filter)
 
@@ -223,7 +236,7 @@ $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/
 # Build the polyscope library
 $(POLYSCOPELIBFILE):
 	mkdir -p modules/polyscope/build
-	cd modules/polyscope/build && cmake .. -G "Unix Makefiles"
+	cd modules/polyscope/build && cmake .. -G "Unix Makefiles" $(POLYSCOPE_CMAKE_FLAG)
 	cd modules/polyscope/build && make
 
 echo:
