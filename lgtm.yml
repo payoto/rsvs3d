@@ -4,9 +4,13 @@ path_classifiers:
 
 extraction:
   cpp:
-    prepare:    # Customizable step used by all languages.
+    prepare:
       packages:
-        - g++-9
-    index:    # Customizable step used by all languages.
+      - "g++-9"
+      - "xorg-dev"
+      - "libglu1-mesa-dev"
+      - "xserver-xorg-video-dummy"
+      - "freeglut3-dev"
+    index:
       build_command:
-        - cd SRCC && make -f makelinux.mk all -j2
+        - cd SRCC && make all -j2
