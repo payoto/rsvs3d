@@ -30,6 +30,18 @@ DIRJSON= $(SHAREINCLROOTDIR)/json/include
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 DIRTETGEN= modules/tetgen
 
+DIRPOLYSCOPE= modules/polyscope
+INCLPOLYSCOPE= $(DIRPOLYSCOPE)/include $(DIRPOLYSCOPE)/deps/glm
+INCLPOLYSCOPE+=$(DIRPOLYSCOPE)/deps/imgui/imgui
+LDPOLYSCOPE=$(DIRPOLYSCOPE)/build/src
+LDPOLYSCOPEDEPS= $(DIRPOLYSCOPE)/build/deps/stb
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
+
+LIBPOLYSCOPE= polyscope stb glad glfw3 imgui gdi32 pthread
+
+
 #------------------------------------------------------
 #           WARNING AND OPTIMISATION FLAGS
 #------------------------------------------------------
@@ -70,7 +82,7 @@ DIRMKL =
 INCL=
 
 SRCTREE+= $(DIRTETGEN)
-INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
+INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN) $(INCLPOLYSCOPE)
 INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 

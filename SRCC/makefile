@@ -64,7 +64,7 @@ endif
 #------------------------------------------------------
 # LDFILE are the library names, LDDIR are the library
 # directories
-LDFILE = stdc++ polyscope stb glad glfw3 imgui dl X11 pthread
+LDFILE = stdc++ $(LIBPOLYSCOPE)
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
@@ -228,6 +228,7 @@ $(POLYSCOPELIBFILE):
 
 echo:
 	@echo $(POLYSCOPELIBFILE)
+	@echo $(LIBPOLYSCOPE)
 
 # Folder depency used to mirror the SRCTREE into OBJDIR
 # Called by `$$(@D)/.f` in the object recipes

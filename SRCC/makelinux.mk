@@ -38,6 +38,9 @@ LDPOLYSCOPEDEPS= $(DIRPOLYSCOPE)/build/deps/stb
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
+
+LIBPOLYSCOPE= polyscope stb glad glfw3 imgui dl X11 pthread
+
 #------------------------------------------------------
 #           WARNING AND OPTIMISATION FLAGS
 #------------------------------------------------------
