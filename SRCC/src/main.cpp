@@ -8,6 +8,7 @@
 #include "cxxopts.hpp"
 #include "makeontargetchange.h"
 #include "parameters.hpp"
+#include "polyscope/polyscope.h"
 
 #ifdef RSVSTEST
 #include "test.hpp"
@@ -27,6 +28,20 @@ int main(int argc, char *argv[])
 int main_rsvs3d(int argc, char *argv[])
 #endif
 {
+    // Initialize polyscope, creating graphics contexts and constructing a window.
+    // Should be called exactly once.
+    polyscope::init();
+
+    // Pass control flow to polyscope, displaying the interactive window.
+    // Function will return when user closes the window.
+    polyscope::show();
+
+    // More of your code
+    // ...
+
+    // Show again. Data is preserved between calls to show()
+    // unless explicitly removed.
+    polyscope::show();
 // Execution paths for different compilation flags allows building test
 // executables
 #ifndef RSVSTEST

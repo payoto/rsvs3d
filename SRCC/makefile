@@ -64,7 +64,7 @@ endif
 #------------------------------------------------------
 # LDFILE are the library names, LDDIR are the library
 # directories
-LDFILE = stdc++
+LDFILE = stdc++ polyscope stb glad glfw3 imgui dl X11 pthread
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
@@ -77,7 +77,7 @@ else
 	LDDIRBOOST =
 endif
 
-LDDIR = $(LDDIRBOOST)
+LDDIR = $(LDDIRBOOST) $(LDPOLYSCOPE)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
 
 
