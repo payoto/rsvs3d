@@ -72,6 +72,7 @@ Required 3rd party open source libraries for compilation
   (header only).
 - [JSON for Modern C++](https://github.com/nlohmann/json/releases): JSON handling for c++. Used
   for the parameter handling of the RSVS3D framework (single include header).
+- [Polyscope](https://polyscope.run/) for handling GUI visualisation of the meshes.
 
 (Optional) 3rd party open source library:
 
@@ -80,6 +81,19 @@ Required 3rd party open source libraries for compilation
   [payoto/tetgen](https://github.com/payoto/tetgen).
 
 All dependencies are intended to be handled via git submodules, to install them using submodules, run `git submodule update --init --recursive`.
+
+### Running on WSL2
+
+All these dependencies may not be needed but this is what it took:
+
+```bash
+ sudo apt-get install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev libgl1-mesa-glx libglfw3-dev
+
+# See this answer:
+# https://stackoverflow.com/a/66506098/15399205
+export LIBGL_ALWAYS_INDIRECT=0
+export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0 # in WSL 2
+```
 
 ## License
 

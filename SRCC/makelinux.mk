@@ -30,6 +30,22 @@ DIRJSON= $(SHAREINCLROOTDIR)/json/include
 DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
 DIRTETGEN= modules/tetgen
 
+DIRPOLYSCOPE= modules/polyscope
+INCLPOLYSCOPE= $(DIRPOLYSCOPE)/include $(DIRPOLYSCOPE)/deps/glm
+INCLPOLYSCOPE+=$(DIRPOLYSCOPE)/deps/imgui/imgui
+LDPOLYSCOPE=$(DIRPOLYSCOPE)/build/src
+LDPOLYSCOPEDEPS= $(DIRPOLYSCOPE)/build/deps/stb
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
+LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
+
+ifeq ($(HEADLESS), true)
+# glad glfw3 may not be available in headless mode you may also need to
+# LIBPOLYSCOPE= polyscope stb imgui pthread
+LIBPOLYSCOPE= polyscope stb glad glfw3 imgui dl X11 pthread
+else
+LIBPOLYSCOPE= polyscope stb glad glfw3 imgui dl X11 pthread
+endif
 #------------------------------------------------------
 #           WARNING AND OPTIMISATION FLAGS
 #------------------------------------------------------
@@ -70,7 +86,7 @@ DIRMKL =
 INCL=
 
 SRCTREE+= $(DIRTETGEN)
-INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
+INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN) $(INCLPOLYSCOPE)
 INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
 
 

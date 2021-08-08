@@ -5,6 +5,11 @@ ifeq ($(OS),Windows_NT)
 else
 	include makelinux.mk
 endif
+
+# This flag is meant to be controlled from the command line and governs
+# the behaviour of polyscope
+HEADLESS=false
+
 #------------------------------------------------------
 #          PARSE compiler flags
 #------------------------------------------------------
@@ -64,7 +69,7 @@ endif
 #------------------------------------------------------
 # LDFILE are the library names, LDDIR are the library
 # directories
-LDFILE = stdc++
+LDFILE = stdc++ $(LIBPOLYSCOPE)
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
@@ -77,9 +82,9 @@ else
 	LDDIRBOOST =
 endif
 
-LDDIR = $(LDDIRBOOST)
+LDDIR = $(LDDIRBOOST) $(LDPOLYSCOPE) $(LDPOLYSCOPEDEPS)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
-
+POLYSCOPELIBFILE= $(LDPOLYSCOPE)/libpolyscope.a
 
 
 #------------------------------------------------------
@@ -150,6 +155,14 @@ EXECUTABLE = $(TESTALLEXECUTABLE)
 CCFLAGCUSTOM += -DRSVSTEST -DTEST_KNOWN_FAILURES
 endif
 
+
+# make polyscope be built only with the mocked backend
+ifeq ($(HEADLESS), true)
+# At the moment cannot build with only the mock backend.
+# POLYSCOPE_CMAKE_FLAG= -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=OFF
+CCFLAGCUSTOM += -DHEADLESS
+endif
+
 # $(info $(SRCS))
 # $(info sources printed after filter)
 
@@ -179,7 +192,7 @@ distribution : FORCE $(SRCS) $(EXECUTABLE)
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
-$(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
+$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) $(POLYSCOPELIBFILE)
 	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
@@ -220,17 +233,30 @@ $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
+# Build the polyscope library
+$(POLYSCOPELIBFILE):
+	mkdir -p modules/polyscope/build
+	cd modules/polyscope/build && cmake .. -G "Unix Makefiles" $(POLYSCOPE_CMAKE_FLAG)
+	cd modules/polyscope/build && make
+
+echo:
+	@echo $(POLYSCOPELIBFILE)
+	@echo $(LIBPOLYSCOPE)
+
 # Folder depency used to mirror the SRCTREE into OBJDIR
 # Called by `$$(@D)/.f` in the object recipes
 %/.f:
 	mkdir -p $(dir $@)
 	touch $@
 
-.PHONY: clean
+.PHONY: clean clean-deps
 # Clean target
 OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
 	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d
+
+clean-deps:
+	rm -r modules/polyscope/build
 
 FORCE:
 

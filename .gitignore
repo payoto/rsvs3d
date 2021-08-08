@@ -4,6 +4,7 @@
 out/*
 .gitattributes
 temp/*
+.vscode/*
 
 !*.lay
 *.mat
@@ -26,6 +27,9 @@ SRCC/obj*
 SRCC/matrices*
 SRCC/modules/external*
 SRCC/bisect/*
+SRCC/bin/*
+noexec_config*
+SRCC/*RSVS3D
 
 SRCC/gch/*
 SRCC/config/*
@@ -49,3 +53,6 @@ defaultconfigRSVS3D.json*
 # Matlab spam files
 *.dXYZ
 surface_analysis.dat
+
+.polyscope.ini
+imgui.ini
