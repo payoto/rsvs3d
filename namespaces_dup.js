@@ -105,6 +105,7 @@ var namespaces_dup =
       [ "CommandLineParser", "main_8hpp.html#af4669b38f12fc7b4718913005be29e00", null ],
       [ "StringParser", "main_8hpp.html#a8d9973c8bc58e568e12b395ee8dcd33a", null ]
     ] ],
+    [ "polyscopersvs", "namespacepolyscopersvs.html", "namespacepolyscopersvs" ],
     [ "rsvs3d", "namespacersvs3d.html", "namespacersvs3d" ],
     [ "rsvsjson", null, [
       [ "json", "rsvsjson_8hpp.html#a2d21a04d2c6164d67a0f0bf50c8b053d", null ],

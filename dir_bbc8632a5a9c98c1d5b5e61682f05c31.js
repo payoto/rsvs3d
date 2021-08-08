@@ -10,6 +10,7 @@ var dir_bbc8632a5a9c98c1d5b5e61682f05c31 =
     [ "meshprocessing.hpp", "meshprocessing_8hpp.html", "meshprocessing_8hpp" ],
     [ "meshrefinement.hpp", "meshrefinement_8hpp.html", "meshrefinement_8hpp" ],
     [ "parameters.hpp", "parameters_8hpp.html", "parameters_8hpp" ],
+    [ "polyscopersvs.hpp", "polyscopersvs_8hpp.html", "polyscopersvs_8hpp" ],
     [ "postprocessing.hpp", "postprocessing_8hpp.html", "postprocessing_8hpp" ],
     [ "RSVSalgorithm.hpp", "_r_s_v_salgorithm_8hpp.html", "_r_s_v_salgorithm_8hpp" ],
     [ "RSVScalc.hpp", "_r_s_v_scalc_8hpp.html", "_r_s_v_scalc_8hpp" ],

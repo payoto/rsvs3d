@@ -26,6 +26,9 @@ var annotated_dup =
     [ "parse", null, [
       [ "ParserOutput", "classparse_1_1_parser_output.html", "classparse_1_1_parser_output" ]
     ] ],
+    [ "polyscopersvs", "namespacepolyscopersvs.html", [
+      [ "PolyScopeRSVS", "classpolyscopersvs_1_1_poly_scope_r_s_v_s.html", "classpolyscopersvs_1_1_poly_scope_r_s_v_s" ]
+    ] ],
     [ "rsvs3d", "namespacersvs3d.html", [
       [ "rsvs_exception", "classrsvs3d_1_1rsvs__exception.html", null ]
     ] ],

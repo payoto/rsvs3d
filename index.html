@@ -126,13 +126,22 @@ External libraries</h1>
 <li><a href="https://www.boost.org/">boost/filesytem</a>: Use some filesystem command for interface (needs to be compiled).</li>
 <li><a href="https://github.com/jarro2783/cxxopts/releases">cxxopts</a>: Handling of command line arguments (header only).</li>
 <li><a href="https://github.com/nlohmann/json/releases">JSON for Modern C++</a>: JSON handling for c++. Used for the parameter handling of the RSVS3D framework (single include header).</li>
+<li><a href="https://polyscope.run/">Polyscope</a> for handling GUI visualisation of the meshes.</li>
 </ul>
 <p>(Optional) 3rd party open source library:</p>
 <ul>
 <li><a href="http://tetgen.org">Tetgen</a> : A Quality Tetrahedral Mesh Generator and a 3D Delaunay Triangulator. Download my modified version for this project <a href="https://github.com/payoto/tetgen">payoto/tetgen</a>.</li>
 </ul>
 <p>All dependencies are intended to be handled via git submodules, to install them using submodules, run <code>git submodule update --init --recursive</code>.</p>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h2>Running on WSL2</h2>
+<p>All these dependencies may not be needed but this is what it took:</p>
+<div class="fragment"><div class="line"> sudo apt-get install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev libgl1-mesa-glx libglfw3-dev</div>
+<div class="line"> </div>
+<div class="line"># See this answer:</div>
+<div class="line"># https://stackoverflow.com/a/66506098/15399205</div>
+<div class="line">export LIBGL_ALWAYS_INDIRECT=0</div>
+<div class="line">export DISPLAY=$(awk &#39;/nameserver / {print $2; exit}&#39; /etc/resolv.conf 2&gt;/dev/null):0 # in WSL 2</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
 License</h1>
 <p>Any code using the Tetgen interface and functionalities is under the GNU Affero GPL license which is more restrictive than the LGPL of this project (this is not legal advice, but my understanding):</p>
 <ul>

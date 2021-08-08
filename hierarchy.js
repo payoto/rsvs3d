@@ -86,6 +86,7 @@ var hierarchy =
     ] ],
     [ "param::parameters", "classparam_1_1parameters.html", null ],
     [ "parse::ParserOutput", "classparse_1_1_parser_output.html", null ],
+    [ "polyscopersvs::PolyScopeRSVS", "classpolyscopersvs_1_1_poly_scope_r_s_v_s.html", null ],
     [ "param::rsvs", "classparam_1_1rsvs.html", null ],
     [ "RSVScalc", "class_r_s_v_scalc.html", null ],
     [ "integrate::RSVSclass", "classintegrate_1_1_r_s_v_sclass.html", null ],

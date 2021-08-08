@@ -9,6 +9,7 @@ var namespacersvstest =
     [ "maintest", "namespacersvstest.html#a10532949bb9539f76f0c3ba092fb0d73", null ],
     [ "meshprocesses", "namespacersvstest.html#adccc5fbc6f900a2315d24e30efdddb55", null ],
     [ "newtest", "namespacersvstest.html#ad95efad04b644b92e782fa503bf306a0", null ],
+    [ "polyscopeprocesses", "namespacersvstest.html#a935b0c5bb0e59350b0e043be7b95f116", null ],
     [ "RSVS2Dprocesses", "namespacersvstest.html#a0be20f1661a667b1cb2ef97c93792155", null ],
     [ "RSVSprocesses", "namespacersvstest.html#ac81fc02478d54aa9e7ed4b3c5f75ddb5", null ],
     [ "shorttest", "namespacersvstest.html#ae160e85b601796dbb8e3ac639d38d1fa", null ],
