@@ -600,6 +600,24 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj)
     std::cerr.rdbuf(cerrbuff);
 }
 
+void integrate::execute::Interactive(integrate::RSVSclass &RSVSobj)
+{
+    auto coutbuff = std::cout.rdbuf();
+    auto cerrbuff = std::cerr.rdbuf();
+
+    auto startTime = rsvs3d::TimeStamp(NULL, 0);
+    std::cout << "Start RSVS preparation" << std::endl;
+    integrate::Prepare(RSVSobj);
+
+    RSVSobj.viewer.setInteractiveCallback(RSVSobj);
+    RSVSobj.viewer.show();
+    auto endTime = rsvs3d::TimeStamp(NULL, 0);
+    std::cout << "3D-RSVS completed in " << ceil(rsvs3d::Clock2ms(endTime - startTime) / 1000.0) << " seconds.";
+
+    std::cout.rdbuf(coutbuff);
+    std::cerr.rdbuf(cerrbuff);
+}
+
 integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &RSVSobj)
 {
     vector<double> dt;

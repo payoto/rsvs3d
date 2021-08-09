@@ -1,4 +1,6 @@
 #include "polyscopersvs.hpp"
+#include "RSVSclass.hpp"
+#include "RSVSintegration.hpp"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 #include "voxel.hpp"
@@ -83,6 +85,57 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
     }
 
     polyscope::registerSurfaceMesh(name, points, faces);
+}
+
+/**
+ * @brief A method which sets the polyscope userCallback to a UI controlling the giving
+ *   RSVS object.
+ *
+ * This will make the current object active in the session.
+ *
+ * @param RSVSobj A fully formed RSVSclass which allows handling of the RSVS iteration process.
+ *
+ */
+void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &RSVSobj)
+{
+    integrate::iteratereturns iterateInfo(0, 0, 0.0);
+
+    auto callback = [&iterateInfo, &RSVSobj, this] {
+        ImGui::PushItemWidth(100);
+
+        if (ImGui::Button("View surfaces"))
+        {
+            // executes when button is pressed
+            RSVSobj.rsvsSnake.PrepareForUse();
+            RSVSobj.voluMesh.PrepareForUse();
+            integrate::execute::logging::SnakePolyscope(RSVSobj.viewer, RSVSobj.rsvsSnake);
+            this->addMesh("Snaking mesh", *RSVSobj.rsvsSnake.snakemesh());
+            this->addMesh("Volume mesh", RSVSobj.voluMesh);
+
+            polyscope::getSurfaceMesh("Snaking mesh")->setEnabled(false);
+            polyscope::getSurfaceMesh("Volume mesh")->setTransparency(0.5);
+            auto snakeSurfaceMesh = polyscope::getSurfaceMesh(integrate::constants::polyscopeSnakeName);
+            snakeSurfaceMesh->setEdgeColor({0, 0, 0});
+            snakeSurfaceMesh->setEdgeWidth(1);
+            snakeSurfaceMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
+        }
+        if (ImGui::Button("Run RSVS"))
+        {
+            // executes when button is pressed
+            iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+        }
+        ImGui::SameLine();
+        ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
+
+        if (ImGui::Button("Postprocess RSVS"))
+        {
+            // executes when button is pressed
+            integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
+            integrate::execute::Exporting(RSVSobj);
+        }
+        ImGui::PopItemWidth();
+    };
+    polyscope::state::userCallback = callback;
 }
 
 /**

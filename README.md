@@ -30,6 +30,7 @@ the MATLAB code is here as it was used to prototype and test ideas.
 Relevant publications for the 2D RSVS are at the end of this readme.
 
 The compiled binary is available for download for Windows 64bits and Linux 64bits.
+This program provides both a command line interface (CLI) and a GUI for visualising your results.
 
 ## Get the code
 
@@ -179,7 +180,7 @@ Running `RSVS3D` with no command line arguments does nothing.
 
 ```bash
 $ cd SRCC/
-$ RSVS3D -l config/dumbell.json
+$ RSVS3D -l config/dumbell.json -i
 Start RSVS preparation
 Output folder: ../out/Archive_2021_07/Day_21-07-25/rsvs3d_210725T105154_sphere2
 Meshes prepared...
@@ -215,6 +216,7 @@ on the command line) followed by
 - help (`-h`): Display command line help;
 - noexec (`-n`): Do not run the RSVS process and output the configuration file;
 - exec (`-e`): Execute the RSVS3D for the default case;
+- interactive (`-i`): Execute the RSVS process in interactive mode using a GUI;
 - use-config (`-u`): Use system configuration `STRING` (none specified yet);
 - load-config (`-l`): Load a configuration file from `FILE`;
 - param (`-p`): Overwrite a specific parameter specified by `KEY:VAL`. "key" is the name of that

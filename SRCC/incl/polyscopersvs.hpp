@@ -17,6 +17,11 @@
 #ifndef POLYSCOPERSVS_H_INCLUDED
 #define POLYSCOPERSVS_H_INCLUDED
 
+namespace integrate
+{
+class RSVSclass;
+}
+
 #include "mesh.hpp"
 /**
  * @brief Namespace containing interfaces to polyscope for RSVS objects
@@ -38,6 +43,7 @@ class PolyScopeRSVS
     PolyScopeRSVS();
     void show(size_t forFrames = 18446744073709551615);
     void addMesh(std::string name, const mesh &meshIn);
+    void setInteractiveCallback(integrate::RSVSclass &RSVSobj);
 };
 
 /// Test functions for polyscope
