@@ -153,14 +153,17 @@ int rsvstest::tetgenprocesses()
     // gridTest.RunSilent(tetgen::test::RSVSVORO_Contain,"tegen API testing - Voro to RSVS", 42);
     return (gridTest.ReturnErrCount());
 }
+
 int rsvstest::polyscopeprocesses()
 {
     customtest gridTest("Test polyscope processes");
     gridTest.RunSilent(polyscopersvs::test::init, "Initialise polyscope");
     gridTest.RunSilent(polyscopersvs::test::init, "Try to initialise polyscope twice");
     gridTest.RunSilent(polyscopersvs::test::show, "Show the polyscope window");
+    gridTest.RunSilent(polyscopersvs::test::meshShow, "Print a mesh");
     return (gridTest.ReturnErrCount());
 }
+
 int rsvstest::JSONprocesses()
 {
     customtest gridTest("Parameter and JSON tests");

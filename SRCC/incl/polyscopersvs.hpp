@@ -17,7 +17,7 @@
 #ifndef POLYSCOPERSVS_H_INCLUDED
 #define POLYSCOPERSVS_H_INCLUDED
 
-#include "triangulate.hpp"
+#include "mesh.hpp"
 /**
  * @brief Namespace containing interfaces to polyscope for RSVS objects
  *
@@ -36,7 +36,8 @@ class PolyScopeRSVS
 {
   public:
     PolyScopeRSVS();
-    void show();
+    void show(size_t forFrames = 18446744073709551615);
+    void addMesh(std::string name, const mesh &meshIn);
 };
 
 /// Test functions for polyscope
@@ -44,6 +45,7 @@ namespace test
 {
 int init();
 int show();
+int meshShow();
 } // namespace test
 
 } // namespace polyscopersvs
