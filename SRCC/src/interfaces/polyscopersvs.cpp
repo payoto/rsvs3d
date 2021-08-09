@@ -88,6 +88,73 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 }
 
 /**
+ * @brief
+ *
+ * @param name
+ * @param meshIn
+ * @param cellIndices
+ * @param isIndex
+ * @return float : This is the volume of the last cell that was encountered
+ */
+float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshIn, const std::vector<int> &&cellIndices,
+                                             bool isIndex)
+{
+    if (!meshIn.isready())
+    {
+        RSVS3D_ERROR("Mesh is not ready, cannot add to polyscope. Call `PrepareForUse` first.");
+    }
+    std::vector<std::vector<double>> points;
+    std::vector<std::vector<int>> faces;
+    points.reserve(meshIn.verts.size());
+    faces.reserve(meshIn.surfs.size());
+    float outputVolume = 0.0;
+
+    for (size_t i = 0; i < meshIn.verts.size(); ++i)
+    {
+        if (meshIn.verts(i)->coord.size() != 3)
+        {
+            RSVS3D_ERROR_RANGE(
+                (std::string("Vertex at position ") + std::to_string(i) + " has invalid coordinate.").c_str());
+        }
+
+        points.push_back(meshIn.verts(i)->coord);
+    }
+    std::vector<int> volumePositions;
+    if (isIndex)
+    {
+        volumePositions = meshIn.volus.find_list(cellIndices);
+    }
+    else
+    {
+        volumePositions = cellIndices;
+    }
+    for (auto volumePosition : volumePositions)
+    {
+        if (volumePosition < 0)
+        {
+            polyscope::warning("Failed to find cell", "ID : " + std::to_string(volumePosition));
+            continue;
+        }
+        std::cout << "Display cell " << meshIn.volus(volumePosition)->index << " at position [" << volumePosition << "]"
+                  << std::endl;
+        outputVolume = meshIn.volus(volumePosition)->volume;
+        for (auto surfaceIndex : meshIn.volus(volumePosition)->surfind)
+        {
+            auto faceIndices = meshIn.verts.find_list(meshIn.surfs.isearch(surfaceIndex)->OrderedVerts(&meshIn));
+            if (faceIndices.size() < 3)
+            {
+                RSVS3D_ERROR_RANGE(
+                    (std::string("Surface ") + std::to_string(surfaceIndex) + " has less than 3 vertices.").c_str());
+            }
+            faces.push_back(faceIndices);
+        }
+    }
+
+    polyscope::registerSurfaceMesh(name, points, faces);
+    return outputVolume;
+}
+
+/**
  * @brief A method which sets the polyscope userCallback to a UI controlling the giving
  *   RSVS object.
  *
@@ -99,8 +166,10 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &RSVSobj)
 {
     integrate::iteratereturns iterateInfo(0, 0, 0.0);
-
-    auto callback = [&iterateInfo, &RSVSobj, this] {
+    int inspectId = 1;
+    bool volumeByIndex = true;
+    float newVolumeValue = 0.0;
+    auto callback = [&] {
         ImGui::PushItemWidth(100);
 
         if (ImGui::Button("View surfaces"))
@@ -119,19 +188,52 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             snakeSurfaceMesh->setEdgeWidth(1);
             snakeSurfaceMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
         }
-        if (ImGui::Button("Run RSVS"))
-        {
-            // executes when button is pressed
-            iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
-        }
-        ImGui::SameLine();
-        ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
 
-        if (ImGui::Button("Postprocess RSVS"))
+        if (ImGui::CollapsingHeader("Configuration"))
         {
-            // executes when button is pressed
-            integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone, iterateInfo.stepNum);
-            integrate::execute::Exporting(RSVSobj);
+
+            ImGui::InputInt("Cell ID", &inspectId);
+            ImGui::SameLine();
+            if (ImGui::Button("View cell"))
+            {
+                RSVSobj.voluMesh.PrepareForUse();
+                newVolumeValue = this->addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
+            }
+            ImGui::SameLine();
+            ImGui::Checkbox("Use ID (or position)", &volumeByIndex);
+            ImGui::InputFloat("New volume", &newVolumeValue);
+            ImGui::SameLine();
+            if (ImGui::Button("Set volume"))
+            {
+                // executes when button is pressed
+                RSVSobj.voluMesh.PrepareForUse();
+                int volumePosition = inspectId;
+                if (volumeByIndex)
+                {
+                    volumePosition = RSVSobj.voluMesh.volus.find(inspectId);
+                }
+                RSVSobj.voluMesh.volus[volumePosition].volume =
+                    newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+                RSVSobj.voluMesh.PrepareForUse();
+            }
+        }
+        if (ImGui::CollapsingHeader("Execution"))
+        {
+            if (ImGui::Button("Run RSVS"))
+            {
+                // executes when button is pressed
+                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+            }
+            ImGui::SameLine();
+            ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
+
+            if (ImGui::Button("Postprocess RSVS"))
+            {
+                // executes when button is pressed
+                integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone,
+                                                   iterateInfo.stepNum);
+                integrate::execute::Exporting(RSVSobj);
+            }
         }
         ImGui::PopItemWidth();
     };
