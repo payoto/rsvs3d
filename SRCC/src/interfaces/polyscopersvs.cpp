@@ -234,6 +234,11 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
                                                    iterateInfo.stepNum);
                 integrate::execute::Exporting(RSVSobj);
             }
+            ImGui::SameLine();
+            if (ImGui::Button("Reset"))
+            {
+                integrate::Prepare(RSVSobj);
+            }
         }
         ImGui::PopItemWidth();
     };

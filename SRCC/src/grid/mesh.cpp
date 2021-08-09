@@ -909,7 +909,6 @@ void meshdependence::RemoveParent(mesh *meshin)
         if (meshin == parentmesh[i])
         {
             parentmesh.erase(parentmesh.begin() + i);
-            parentconn.erase(parentconn.begin() + i);
             break;
         }
     }

@@ -43,6 +43,7 @@ class PolyScopeRSVS
     PolyScopeRSVS();
     void show(size_t forFrames = 18446744073709551615);
     void addMesh(std::string name, const mesh &meshIn);
+    float addCells(std::string name, const mesh &meshIn, const std::vector<int> &&cellIndices, bool isIndex = true);
     void setInteractiveCallback(integrate::RSVSclass &RSVSobj);
 };
 

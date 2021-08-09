@@ -307,12 +307,24 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj)
     origconf = RSVSobj.paramconf;
     RSVSobj.paramconf.PrepareForUse();
 
+    RSVSobj.rsvsSnake.clear();
+    RSVSobj.voluMesh.clear();
+    RSVSobj.snakeMesh.clear();
+    RSVSobj.rsvsTri.clear();
+
     integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.paramconf.files.ioin, RSVSobj.snakeMesh, RSVSobj.voluMesh);
     integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.paramconf.rsvs, RSVSobj.paramconf.files.ioin,
                               RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
     integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
     integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.outgradientsnake,
                                RSVSobj.outvectorsnake, RSVSobj.logFile, RSVSobj.coutFile, RSVSobj.cerrFile);
+
+    RSVSobj.voluMesh.SetEdgeLengths();
+    RSVSobj.voluMesh.PrepareForUse();
+    RSVSobj.snakeMesh.SetEdgeLengths();
+    RSVSobj.snakeMesh.PrepareForUse();
+    RSVSobj.rsvsSnake.PrepareForUse();
+    RSVSobj.rsvsTri.PrepareForUse();
 }
 
 void integrate::ApplyDevSettings(integrate::RSVSclass &RSVSobj)
