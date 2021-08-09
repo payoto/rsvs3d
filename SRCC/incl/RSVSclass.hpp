@@ -20,6 +20,7 @@
 #include "RSVScalc.hpp"
 #include "mesh.hpp"
 #include "parameters.hpp"
+#include "polyscopersvs.hpp"
 #include "postprocessing.hpp"
 #include "snake.hpp"
 #include "triangulate.hpp"
@@ -45,6 +46,7 @@ class RSVSclass
     tecplotfile outSnake;
     tecplotfile outgradientsnake;
     tecplotfile outvectorsnake;
+    polyscopersvs::PolyScopeRSVS viewer;
     snake rsvsSnake;
     mesh snakeMesh;
     mesh voluMesh;

@@ -657,6 +657,17 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
     return (retStruct);
 }
 
+bool integrate::constants::outputs::plotSnakeInPolyscope(int lvl)
+{
+#ifndef HEADLESS
+    return integrate::constants::outputs::printBaseSnake(lvl) || integrate::constants::outputs::printFullSnake(lvl) ||
+           integrate::constants::outputs::printGradientsSnake(lvl) ||
+           integrate::constants::outputs::printVectorSnake(lvl);
+#else
+    return false;
+#endif
+}
+
 void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int nVoluZone, int stepNum)
 {
     // Simple function which directs to the correct output
@@ -688,6 +699,10 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
         integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake, RSVSobj.rsvsSnake, totT);
+    }
+    if (integrate::constants::outputs::plotSnakeInPolyscope(logLvl))
+    {
+        integrate::execute::logging::SnakePolyscope(RSVSobj.viewer, RSVSobj.rsvsSnake);
     }
 }
 
@@ -729,6 +744,10 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj, double to
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
         integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake, RSVSobj.rsvsSnake, totT);
+    }
+    if (integrate::constants::outputs::plotSnakeInPolyscope(logLvl))
+    {
+        RSVSobj.viewer.show();
     }
 }
 
@@ -874,6 +893,13 @@ void integrate::execute::logging::SnakeVectors(tecplotfile &outSnake, snake &rsv
     outSnake.PrintSnake(rsvs3d::constants::tecplot::snakedata::direction, rsvsSnake, 4, totT,
                         rsvs3d::constants::tecplot::polygon, zoneShare);
 }
+
+void integrate::execute::logging::SnakePolyscope(polyscopersvs::PolyScopeRSVS &viewer, const snake &rsvsSnake)
+{
+    viewer.addMesh(integrate::constants::polyscopeSnakeName, rsvsSnake.snakeconn);
+    viewer.show(0);
+}
+
 // ====================
 // integrate
 // 		execute
