@@ -228,6 +228,36 @@ void parameterConfigGui(param::grid &paramConf)
 }
 void parameterConfigGui(param::rsvs &paramConf)
 {
+    bool change = ImGui::Checkbox("Uniform", &paramConf.cstfill.active);
+    if (change && paramConf.cstfill.active)
+    {
+        paramConf.filefill.active = false;
+        paramConf.makefill.active = false;
+    }
+    ImGui::SameLine();
+    ImGui::InputDouble("##Uniform value", &paramConf.cstfill.fill, 0.0, 0.0, "%.2f");
+
+    change = ImGui::Checkbox("File", &paramConf.filefill.active);
+    if (change && paramConf.cstfill.active)
+    {
+        paramConf.makefill.active = false;
+        paramConf.cstfill.active = false;
+    }
+    ImGui::SameLine();
+    paramConf.filefill.fill.reserve(2048);
+    ImGui::InputText("##File value", paramConf.filefill.fill.data(), paramConf.filefill.fill.capacity());
+
+    change = ImGui::Checkbox("Auto", &paramConf.makefill.active);
+    if (change && paramConf.makefill.active)
+    {
+        paramConf.filefill.active = false;
+        paramConf.cstfill.active = false;
+    }
+    ImGui::SameLine();
+    paramConf.makefill.fill.reserve(2048);
+    ImGui::InputText("##Auto value", paramConf.makefill.fill.data(), paramConf.makefill.fill.capacity());
+
+    ImGui::InputInt("Linear solver (0-4)", &paramConf.solveralgorithm);
 }
 void parameterConfigGui(param::snaking &paramConf)
 {
