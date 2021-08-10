@@ -113,6 +113,17 @@ class snake
     void disp() const;
     void displight() const;
     bool isready() const;
+    void clear()
+    {
+        this->snaxs.clear();
+        this->snaxedges.clear();
+        this->snaxsurfs.clear();
+        this->snakeconn.clear();
+        this->isMeshVertIn.clear();
+        this->edgeStepLimit.clear();
+        this->isSetStepLimit = false;
+        this->isFlipped = false;
+    }
     void PrepareForUse(bool needOrder = true);
     void Init(mesh *snakemeshin, int nSnax, int nEdge, int nSurf, int nVolu);
     void SetSnakeMesh(mesh *snakemeshin);

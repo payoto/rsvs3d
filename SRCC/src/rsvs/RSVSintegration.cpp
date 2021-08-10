@@ -307,12 +307,24 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj)
     origconf = RSVSobj.paramconf;
     RSVSobj.paramconf.PrepareForUse();
 
+    RSVSobj.rsvsSnake.clear();
+    RSVSobj.voluMesh.clear();
+    RSVSobj.snakeMesh.clear();
+    RSVSobj.rsvsTri.clear();
+
     integrate::prepare::Mesh(RSVSobj.paramconf.grid, RSVSobj.paramconf.files.ioin, RSVSobj.snakeMesh, RSVSobj.voluMesh);
     integrate::prepare::Snake(RSVSobj.paramconf.snak, RSVSobj.paramconf.rsvs, RSVSobj.paramconf.files.ioin,
                               RSVSobj.snakeMesh, RSVSobj.voluMesh, RSVSobj.rsvsSnake);
     integrate::prepare::Triangulation(RSVSobj.snakeMesh, RSVSobj.rsvsSnake, RSVSobj.rsvsTri);
     integrate::prepare::Output(RSVSobj.paramconf, origconf, RSVSobj.outSnake, RSVSobj.outgradientsnake,
                                RSVSobj.outvectorsnake, RSVSobj.logFile, RSVSobj.coutFile, RSVSobj.cerrFile);
+
+    RSVSobj.voluMesh.SetEdgeLengths();
+    RSVSobj.voluMesh.PrepareForUse();
+    RSVSobj.snakeMesh.SetEdgeLengths();
+    RSVSobj.snakeMesh.PrepareForUse();
+    RSVSobj.rsvsSnake.PrepareForUse();
+    RSVSobj.rsvsTri.PrepareForUse();
 }
 
 void integrate::ApplyDevSettings(integrate::RSVSclass &RSVSobj)
@@ -600,6 +612,24 @@ void integrate::execute::All(integrate::RSVSclass &RSVSobj)
     std::cerr.rdbuf(cerrbuff);
 }
 
+void integrate::execute::Interactive(integrate::RSVSclass &RSVSobj)
+{
+    auto coutbuff = std::cout.rdbuf();
+    auto cerrbuff = std::cerr.rdbuf();
+
+    auto startTime = rsvs3d::TimeStamp(NULL, 0);
+    std::cout << "Start RSVS preparation" << std::endl;
+    integrate::Prepare(RSVSobj);
+
+    RSVSobj.viewer.setInteractiveCallback(RSVSobj);
+    RSVSobj.viewer.show();
+    auto endTime = rsvs3d::TimeStamp(NULL, 0);
+    std::cout << "3D-RSVS completed in " << ceil(rsvs3d::Clock2ms(endTime - startTime) / 1000.0) << " seconds.";
+
+    std::cout.rdbuf(coutbuff);
+    std::cerr.rdbuf(cerrbuff);
+}
+
 integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &RSVSobj)
 {
     vector<double> dt;
@@ -657,6 +687,17 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
     return (retStruct);
 }
 
+bool integrate::constants::outputs::plotSnakeInPolyscope(int lvl)
+{
+#ifndef HEADLESS
+    return integrate::constants::outputs::printBaseSnake(lvl) || integrate::constants::outputs::printFullSnake(lvl) ||
+           integrate::constants::outputs::printGradientsSnake(lvl) ||
+           integrate::constants::outputs::printVectorSnake(lvl);
+#else
+    return false;
+#endif
+}
+
 void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int nVoluZone, int stepNum)
 {
     // Simple function which directs to the correct output
@@ -688,6 +729,10 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
         integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake, RSVSobj.rsvsSnake, totT);
+    }
+    if (integrate::constants::outputs::plotSnakeInPolyscope(logLvl))
+    {
+        integrate::execute::logging::SnakePolyscope(RSVSobj.viewer, RSVSobj.rsvsSnake);
     }
 }
 
@@ -729,6 +774,10 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj, double to
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
         integrate::execute::logging::SnakeVectors(RSVSobj.outvectorsnake, RSVSobj.rsvsSnake, totT);
+    }
+    if (integrate::constants::outputs::plotSnakeInPolyscope(logLvl))
+    {
+        RSVSobj.viewer.show();
     }
 }
 
@@ -874,6 +923,13 @@ void integrate::execute::logging::SnakeVectors(tecplotfile &outSnake, snake &rsv
     outSnake.PrintSnake(rsvs3d::constants::tecplot::snakedata::direction, rsvsSnake, 4, totT,
                         rsvs3d::constants::tecplot::polygon, zoneShare);
 }
+
+void integrate::execute::logging::SnakePolyscope(polyscopersvs::PolyScopeRSVS &viewer, const snake &rsvsSnake)
+{
+    viewer.addMesh(integrate::constants::polyscopeSnakeName, rsvsSnake.snakeconn);
+    viewer.show(0);
+}
+
 // ====================
 // integrate
 // 		execute

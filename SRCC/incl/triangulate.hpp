@@ -108,6 +108,7 @@ class triangulation
     void SetConnectivityStat(int ii);
     void SetConnectivityInter(int ii);
     void SetConnectivityDyna(int ii);
+    void clear();
 
     triangulation()
     {

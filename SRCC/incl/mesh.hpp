@@ -591,6 +591,19 @@ class meshdependence
     {
         return this->parentconn.at(parent).findall(parentVoluIndex);
     }
+    void clear()
+    {
+        this->elemind.clear();
+        this->parentconn.clear();
+        for (auto parent : this->parentmesh)
+        {
+            this->RemoveParent(parent);
+        }
+        for (auto child : this->childmesh)
+        {
+            this->RemoveChild(child);
+        }
+    }
 };
 
 /**
@@ -626,6 +639,19 @@ class mesh
     voluarray volus;
 
     meshdependence meshtree;
+
+    void clear()
+    {
+        this->verts.clear();
+        this->edges.clear();
+        this->surfs.clear();
+        this->volus.clear();
+        this->meshtree.clear();
+        this->borderIsSet = false;
+        this->meshDepIsSet = false;
+        this->facesAreOriented = false;
+        this->edgesLengthsAreSet = false;
+    }
     // Mesh Lineage
     void RemoveFromFamily();
     void AddChild(mesh *meshin);

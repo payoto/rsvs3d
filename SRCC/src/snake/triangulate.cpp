@@ -1334,6 +1334,19 @@ void triangulation::SetConnectivityDyna(int ii)
     dynatri.isHash = prevHash;
 }
 
+/**
+ * @brief Clears the contents of the triangulation making sure we can restart the process.
+ *
+ */
+void triangulation::clear()
+{
+    this->stattri.clear();
+    this->dynatri.clear();
+    this->intertri.clear();
+    this->trivert.clear();
+    this->trisurf.clear();
+    this->acttri.clear();
+}
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void triangle::disp() const

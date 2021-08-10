@@ -237,7 +237,7 @@ $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/
 $(POLYSCOPELIBFILE):
 	mkdir -p modules/polyscope/build
 	cd modules/polyscope/build && cmake .. -G "Unix Makefiles" $(POLYSCOPE_CMAKE_FLAG)
-	cd modules/polyscope/build && make
+	cd modules/polyscope/build && $(MAKE)
 
 echo:
 	@echo $(POLYSCOPELIBFILE)

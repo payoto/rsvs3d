@@ -50,8 +50,18 @@ int RSVSExecution(int argc, char *argv[])
     {
         integrate::RSVSclass RSVSobj;
         RSVSobj.paramconf = paramconf;
-
-        integrate::execute::All(RSVSobj);
+        if (parseOut.execFlow == 1)
+        {
+            integrate::execute::All(RSVSobj);
+        }
+        else if (parseOut.execFlow == 2)
+        {
+            integrate::execute::Interactive(RSVSobj);
+        }
+        else
+        {
+            RSVS3D_ERROR_ARGUMENT("Invalid execution flow");
+        }
     }
     else if (parseOut.execFlow == -3)
     {
@@ -165,7 +175,8 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
                                                          "the resulting configuration file to 'arg'"),
                                              cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"),
                                              "STRING")("e,exec", "Execute RSVS. With no command line argument the "
-                                                                 "program does nothing.")
+                                                                 "program does nothing.")(
+        "i,interactive", "Execute the RSVS in interactive mode using polyscope")
 #ifndef RSVS_HIDETESTS
         ("test",
          std::string("Executes specified tests. requires compilation "
@@ -189,9 +200,9 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
         std::cerr << " see --help for more info" << std::endl;
         exit(-1);
     }
-    else if (result.count("exec") && result.count("test"))
+    else if ((result.count("exec") || result.count("interactive")) && result.count("test"))
     {
-        std::cerr << std::endl << " Invalid specification of -e (exec) and -t (test)";
+        std::cerr << std::endl << " Invalid specification of -e/i (exec/interactive) and -t (test)";
         std::cerr << " on the command line." << std::endl;
         std::cerr << " see --help for more info" << std::endl;
         exit(-1);
@@ -202,6 +213,10 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
         std::cerr << " on the command line." << std::endl;
         std::cerr << " see --help for more info" << std::endl;
         exit(-1);
+    }
+    else if (result.count("interactive"))
+    {
+        parseOut.execFlow = 2;
     }
     else if (result.count("exec"))
     {
