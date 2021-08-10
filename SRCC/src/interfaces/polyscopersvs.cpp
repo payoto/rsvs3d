@@ -1,3 +1,15 @@
+/**
+ * @file polyscopersvs.cpp
+ * @author Alexandre Payot
+ * @brief Provide the integration of the RSVS with the GUI library polyscope
+ * @version 0.1
+ * @date 2021-08-10
+ *
+ * This file provides the interface between the RSVS and polyscope. This interface
+ * relies on the class `polyscopersvs::PolyScopeRSVS`.
+ *
+ * @copyright Copyright (c) 2021
+ */
 #include "polyscopersvs.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
@@ -531,7 +543,7 @@ int polyscopersvs::test::show()
 /**
  * @brief Should display a single small cubic mesh
  *
- * @return int The error code: 0 indicates succes, all other numbers are failures
+ * @return int The error code: 0 indicates success, all other numbers are failures
  */
 int polyscopersvs::test::meshShow()
 {
