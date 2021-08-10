@@ -4,8 +4,10 @@
 #include "parameters.hpp"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
+#include "rsvsjson.hpp"
 #include "voxel.hpp"
 #include <array>
+#include <sstream>
 #include <vector>
 
 bool polyscopersvs::POLYSCOPE_INITIALISED = false;
@@ -166,12 +168,53 @@ namespace parameter_ui
 {
 void parameterConfigGui(param::voronoi &paramConf)
 {
-    paramConf.inputpoints;
+    // Static variable keeps track of which entry is active in the voronoi config.
+    static int activeEntry;
+
     ImGui::InputDouble("Snake coarseness", &paramConf.snakecoarseness, 0.0, 0.0, "%.2f");
     ImGui::InputInt("Voronoi layers", &paramConf.vorosnakelayers);
     ImGui::InputDouble("Bounding box distance", &paramConf.distancebox, 0.0, 0.0, "%.2f");
     paramConf.pointfile.reserve(2048);
     ImGui::InputText("Voronoi points file", paramConf.pointfile.data(), paramConf.pointfile.capacity());
+
+    if (ImGui::Button("Add Voronoi point"))
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            paramConf.inputpoints.push_back(0.5);
+            // Hacky condition to ensure we finish when we hit a multiple of 4.
+            if (paramConf.inputpoints.size() % 4 == 0)
+            {
+                break;
+            }
+        }
+    }
+    int nEntries = paramConf.inputpoints.size() / 4;
+    // This is used to initalise the static variable if it is out of bounds
+    if (!(activeEntry < nEntries && activeEntry >= 0))
+    {
+        activeEntry = 0;
+    }
+
+    if (nEntries > 0)
+    {
+        ImGui::InputInt(("Active Point, max ID: " + std::to_string(nEntries)).c_str(), &activeEntry);
+        if (!(activeEntry < nEntries && activeEntry >= 0))
+        {
+            polyscope::warning("ID to access input point was incorrect.", "Maximum value is " +
+                                                                              std::to_string(nEntries) + " value was " +
+                                                                              std::to_string(activeEntry));
+            activeEntry = 0;
+        }
+        ImGui::Text("Voronoi point definition - Active ID: %i\n   X   ,   Y   ,   Z   , Volume fraction", activeEntry);
+        for (int i = 0; i < 4; ++i)
+        {
+            auto fullName = ("## voropoint setter " + std::to_string(i)).c_str();
+            ImGui::InputDouble(fullName, &(paramConf.inputpoints[activeEntry * 4 + i]), 0.0, 0.0, "%.2f");
+            ImGui::SameLine();
+        }
+        ImGui::NewLine();
+    }
 }
 void parameterConfigGui(param::voxel &paramConf)
 {
