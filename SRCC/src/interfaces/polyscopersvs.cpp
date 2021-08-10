@@ -261,6 +261,12 @@ void parameterConfigGui(param::rsvs &paramConf)
 }
 void parameterConfigGui(param::snaking &paramConf)
 {
+    ImGui::InputDouble("Arrival tolerance", &paramConf.arrivaltolerance, 0.0, 0.0, "%.2e");
+    ImGui::InputDouble("Simulataneous arrival tolerance", &paramConf.multiarrivaltolerance, 0.0, 0.0, "%.2e");
+    ImGui::InputDouble("Max step distance", &paramConf.snaxdiststep, 0.0, 0.0, "%.2e");
+    ImGui::InputDouble("Max step time", &paramConf.snaxtimestep, 0.0, 0.0, "%.2e");
+    ImGui::InputDouble("Spawn position", &paramConf.spawnposition, 0.0, 0.0, "%.2e");
+    ImGui::InputInt("Initialisation boundary (0/1)", &paramConf.initboundary);
 }
 void parameterConfigGui(param::files &paramConf)
 {
