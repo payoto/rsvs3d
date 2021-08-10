@@ -321,7 +321,6 @@ void parameterConfigGui(param::files &paramConf)
 
 void parameterConfigGui(param::dev::devparam &paramConf)
 {
-    paramConf.limitlagrangian;
     ImGui::InputDouble("limitlagrangian", &paramConf.limitlagrangian, 0.0, 0.0, "%.2e");
     ImGui::InputInt("mindesvarsparse", &paramConf.mindesvarsparse);
     ImGui::InputTextWithHint("smoothstepmethod", "Not sure what appropriate values are",
