@@ -130,7 +130,7 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
     }
     for (auto volumePosition : volumePositions)
     {
-        if (volumePosition < 0)
+        if (volumePosition < 0 || volumePosition >= meshIn.volus.size())
         {
             polyscope::warning("Failed to find cell", "ID : " + std::to_string(volumePosition));
             continue;
@@ -192,18 +192,15 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
         if (ImGui::CollapsingHeader("Configuration"))
         {
 
-            ImGui::InputInt("Cell ID", &inspectId);
-            ImGui::SameLine();
-            if (ImGui::Button("View cell"))
+            if (ImGui::InputInt("Cell ID", &inspectId))
             {
                 RSVSobj.voluMesh.PrepareForUse();
                 newVolumeValue = this->addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
             }
             ImGui::SameLine();
             ImGui::Checkbox("Use ID (or position)", &volumeByIndex);
-            ImGui::InputFloat("New volume", &newVolumeValue);
-            ImGui::SameLine();
-            if (ImGui::Button("Set volume"))
+
+            if (ImGui::InputFloat("New volume", &newVolumeValue))
             {
                 // executes when button is pressed
                 RSVSobj.voluMesh.PrepareForUse();
@@ -212,11 +209,31 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
                 {
                     volumePosition = RSVSobj.voluMesh.volus.find(inspectId);
                 }
-                RSVSobj.voluMesh.volus[volumePosition].volume =
-                    newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+                if (volumePosition > -1 && volumePosition < RSVSobj.voluMesh.volus.size())
+                {
+
+                    RSVSobj.voluMesh.volus[volumePosition].volume =
+                        newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+                    RSVSobj.voluMesh.PrepareForUse();
+                }
+                else
+                {
+                    polyscope::warning("Invalid Cell Position", "The cell was not found, it is either out of bounds"
+                                                                " or not a valid index.");
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Set All "))
+            {
                 RSVSobj.voluMesh.PrepareForUse();
+                newVolumeValue = newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+                for (size_t i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+                {
+                    RSVSobj.voluMesh.volus[i].volume = newVolumeValue;
+                }
             }
         }
+        parameter_ui::parameterConfigGui(RSVSobj.paramconf);
         if (ImGui::CollapsingHeader("Execution"))
         {
             if (ImGui::Button("Run RSVS"))
