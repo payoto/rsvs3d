@@ -1,0 +1,27 @@
+name: Windows build
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: install dependencies
+        run: choco install make mingw
+      - name: make
+        run: make all -j2
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-windows
+          path: SRCC/RSVS3D*
+      - name: run tests
+        run: bin/RSVS3D.exe --test
+        working-directory: SRCC/

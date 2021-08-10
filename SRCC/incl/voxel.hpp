@@ -1,6 +1,6 @@
 /**
  * Generation of cartesian grids.
- * 
+ *
  *@file
  */
 
@@ -30,23 +30,19 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
-
 //=================================
 // included dependencies
 
-#include <iostream>
-#include <numeric>      // std::partial_sum
 #include <Eigen>
+#include <iostream>
+#include <numeric> // std::partial_sum
 
 #include "arraystructures.hpp"
 #include "postprocessing.hpp"
 
-
-
-
 //==================================
 // Code
-// NOTE: function in a class definition are IMPLICITELY INLINED 
+// NOTE: function in a class definition are IMPLICITELY INLINED
 //       ie replaced by their code at compile time
 // Templates
 
@@ -62,23 +58,30 @@
  *
  * @return     The cumulative sum.
  */
-template <class T> T cumsum(const T &matIn, int d) {
-	T mat=matIn;
-	if (!d) {
-		for (int i=0;i<mat.rows();++i){
-			for (int j=1;j<mat.cols();++j){
-				mat(i,j)+=mat(i,j-1);
-			}
-		}
-	}else{
-		for (int i=1;i<mat.rows();++i){
-			for (int j=0;j<mat.cols();++j){
-				mat(i,j)+=mat(i-1,j);
-			}
-		}
-	}
-	return(mat);
-
+template <class T> T cumsum(const T &matIn, int d)
+{
+    T mat = matIn;
+    if (!d)
+    {
+        for (int i = 0; i < mat.rows(); ++i)
+        {
+            for (int j = 1; j < mat.cols(); ++j)
+            {
+                mat(i, j) += mat(i, j - 1);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 1; i < mat.rows(); ++i)
+        {
+            for (int j = 0; j < mat.cols(); ++j)
+            {
+                mat(i, j) += mat(i - 1, j);
+            }
+        }
+    }
+    return (mat);
 }
 
 /**
@@ -93,44 +96,53 @@ template <class T> T cumsum(const T &matIn, int d) {
  *
  * @return     The cumulative product.
  */
-template <class T> T cumprod(const T &matIn, int d) {
-	T mat=matIn;
-	if (!d) {
-		for (int i=0;i<mat.rows();++i){
-			for (int j=1;j<mat.cols();++j){
-				mat(i,j)*=mat(i,j-1);
-			}
-		}
-	}else{
-		for (int i=1;i<mat.rows();++i){
-			for (int j=0;j<mat.cols();++j){
-				mat(i,j)*=mat(i-1,j);
-			}
-		}
-	}
-	return(mat);
-
+template <class T> T cumprod(const T &matIn, int d)
+{
+    T mat = matIn;
+    if (!d)
+    {
+        for (int i = 0; i < mat.rows(); ++i)
+        {
+            for (int j = 1; j < mat.cols(); ++j)
+            {
+                mat(i, j) *= mat(i, j - 1);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 1; i < mat.rows(); ++i)
+        {
+            for (int j = 0; j < mat.cols(); ++j)
+            {
+                mat(i, j) *= mat(i - 1, j);
+            }
+        }
+    }
+    return (mat);
 }
 
 // functions
-int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh& blockGrid);
-int BuildBlockGrid(Eigen::RowVector3i dimGrid, mesh& blockGrid);
-int BuildBlockVert(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nVert, 
-	Eigen::Matrix3i edgeProp, Eigen::RowVector3i nEdgeDim);
+int BuildBlockGrid(std::array<int, 3> &dimGrid, mesh &blockGrid);
+int BuildBlockGrid(const Eigen::RowVector3i &dimGrid, mesh &blockGrid);
+int BuildBlockVert(const Eigen::RowVector3i &dimGrid, mesh &blockGrid, int nVert, const Eigen::Matrix3i &edgeProp,
+                   const Eigen::RowVector3i &nEdgeDim);
 
-int BuildBlockEdge(Eigen::RowVector3i dimGrid, mesh& blockGrid, int nEdge ,
-	Eigen::RowVector3i nEdgeDim,  Eigen::RowVector3i nSurfDim, Eigen::Matrix3i edgeProp,
-	Eigen::Matrix3i surfProp );
+int BuildBlockEdge(const Eigen::RowVector3i &dimGrid, mesh &blockGrid, int nEdge, const Eigen::RowVector3i &nEdgeDim,
+                   const Eigen::RowVector3i &nSurfDim, const Eigen::Matrix3i &edgeProp,
+                   const Eigen::Matrix3i &surfProp);
 
-int BuildBlockSurf(Eigen::RowVector3i dimGrid, int nSurf ,mesh& blockGrid ,
-	Eigen::Matrix3i surfProp, Eigen::Matrix3i edgeProp, Eigen::RowVector3i nSurfDim,
-	 Eigen::RowVector3i nEdgeDim);
+int BuildBlockSurf(const Eigen::RowVector3i &dimGrid, int nSurf, mesh &blockGrid, const Eigen::Matrix3i &surfProp,
+                   const Eigen::Matrix3i &edgeProp, const Eigen::RowVector3i &nSurfDim,
+                   const Eigen::RowVector3i &nEdgeDim);
 
-int BuildBlockVolu(Eigen::RowVector3i dimGrid, int nVolu , mesh& blockGrid,
-	Eigen::RowVector3i nSurfDim, Eigen::Matrix3i surfProp);
-//test functions
+int BuildBlockVolu(const Eigen::RowVector3i &dimGrid, int nVolu, mesh &blockGrid, const Eigen::RowVector3i &nSurfDim,
+                   const Eigen::Matrix3i &surfProp);
+// test functions
 int Test_BuildBlockGrid_noout();
 int Test_MeshOut();
+int Test_MeshOut2();
+int Test_MeshOut_Size(Eigen::RowVector3i dimGrid, bool runReOrder = false);
+int Test_MeshReOrder();
 
 #endif // VOXEL_H_INCLUDED
-

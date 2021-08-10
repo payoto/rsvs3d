@@ -1,5 +1,5 @@
 #!MC 1410
-$!CREATECOLORMAP 
+$!CREATECOLORMAP
   NAME = 'Diverging - Pink/white - blue/green Pos compressed'
   NUMCONTROLPOINTS = 7
   CONTROLPOINT 1
@@ -114,7 +114,7 @@ $!CREATECOLORMAP
       B = 33
       }
     }
-$!CREATECOLORMAP 
+$!CREATECOLORMAP
   NAME = 'Diverging - Pink/white - blue/green Pos'
   NUMCONTROLPOINTS = 7
   CONTROLPOINT 1

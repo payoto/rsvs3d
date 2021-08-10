@@ -1,0 +1,13 @@
+{
+  "/grid/voxel/domain/0/0": -1.0,
+  "/grid/voxel/domain/0/1": 1.0,
+  "/grid/voxel/domain/1/0": -1.0,
+  "/grid/voxel/domain/1/1": 1.0,
+  "/grid/voxel/domain/2/0": -1.0,
+  "/grid/voxel/domain/2/1": 1.0,
+  "/grid/voxel/gridsizebackground/0": 10,
+  "/grid/voxel/gridsizebackground/1": 10,
+  "/grid/voxel/gridsizebackground/2": 0,
+  "/snak/maxsteps": 200,
+  "/snak/multiarrivaltolerance": 0.001
+}

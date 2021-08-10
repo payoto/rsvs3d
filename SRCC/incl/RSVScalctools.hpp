@@ -1,6 +1,6 @@
 /**
  * Provides internal tools for RSVS calc.
- * 
+ *
  *@file
  */
 
@@ -27,15 +27,13 @@ class triangle;
 class RSVScalc;
 // Includes
 
-#include <vector>
 #include <Eigen>
+#include <vector>
 
 #include "arraystructures.hpp"
+#include "mesh.hpp"
 #include "vectorarray.hpp"
-
-
-
-// Declarations 
+// Declarations
 
 /**
  * Get all the coordinates needed to define a triangle.
@@ -46,8 +44,7 @@ class RSVScalc;
  * @return     A vector of constant coordinate vectors, these allow the data to
  *             be read but not edited.
  */
-grid::coordlist TrianglePointerCoordinates(const triangle &triIn,
-	const triangulation& triRSVS);
+grid::coordlist TrianglePointerCoordinates(const triangle &triIn, const triangulation &triRSVS);
 
 /**
  * Get the active design variables defined by a triangle object.
@@ -61,9 +58,9 @@ grid::coordlist TrianglePointerCoordinates(const triangle &triIn,
  * @return     A hashed vector of the active design variables from the triangle
  *             object.
  */
-HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
-	const triangulation& triRSVS, const HashedVector<int, int> &objDvMap,
-	bool useSurfCentreDeriv=true);
+HashedVector<int, int> TriangleActiveDesignVariables(const triangle &triIn, const triangulation &triRSVS,
+                                                     const HashedVector<int, int> &objDvMap,
+                                                     bool useSurfCentreDeriv = true);
 
 /**
  * Calculate the positional derivatives of a triangle object.
@@ -84,16 +81,15 @@ HashedVector<int,int> TriangleActiveDesignVariables(const triangle &triIn,
  * @param[in]  useSurfCentreDeriv  The Use the surface centroid derivative in
  *                                 the calculation of dPos and HPos.
  */
-void TrianglePositionDerivatives(const triangle &triIn, 
-	const triangulation &triRSVS, const HashedVector<int,int> &dvListMap,
-	Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos,
-	bool useSurfCentreDeriv=true, bool useSurfCentreHessian=false);
+void TrianglePositionDerivatives(const triangle &triIn, const triangulation &triRSVS,
+                                 const HashedVector<int, int> &dvListMap, Eigen::MatrixXd &dPos, Eigen::MatrixXd &HPos,
+                                 bool useSurfCentreDeriv = true, bool useSurfCentreHessian = false);
 
-void AssignConstraintDerivativesFullMath(RSVScalc &calc, const triangle &triIn,
-	const HashedVector<int,int> &dvListMap,const Eigen::MatrixXd &dConstrPart,
-	const Eigen::MatrixXd &HConstrPart, int constrPos, int cellTarg);
+void AssignConstraintDerivativesFullMath(RSVScalc &calc, const triangle &triIn, const HashedVector<int, int> &dvListMap,
+                                         const Eigen::MatrixXd &dConstrPart, const Eigen::MatrixXd &HConstrPart,
+                                         int constrPos, int cellTarg);
 void AssignConstraintDerivativesSparseMath(RSVScalc &calc, const triangle &triIn,
-	const HashedVector<int,int> &dvListMap,const Eigen::MatrixXd &dConstrPart,
-	const Eigen::MatrixXd &HConstrPart, int constrPos, int cellTarg);
+                                           const HashedVector<int, int> &dvListMap, const Eigen::MatrixXd &dConstrPart,
+                                           const Eigen::MatrixXd &HConstrPart, int constrPos, int cellTarg);
 
 #endif // RSVSCALCTOOLS_HPP

@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+        exclude_types: [json]
+      - id: trailing-whitespace
+  - repo: https://gitlab.com/daverona/pre-commit/cpp
+    rev: 0.8.0 # use the most recent version
+    hooks:
+      - id: clang-format
+        args: ["-style=Microsoft"] # use LLVM Coding Standards

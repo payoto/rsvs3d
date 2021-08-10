@@ -33,6 +33,10 @@ class ioin;
 class ioout;
 class tecplottemplate;
 } // namespace param
+namespace polyscopersvs
+{
+class PolyScopeRSVS;
+} // namespace polyscopersvs
 
 //=================================
 // included dependencies
@@ -55,14 +59,16 @@ namespace constants
 namespace outputs
 {
 static const int numberdefined = 7;
-auto printBaseSnake = [&](int lvl) -> bool { return lvl == 2 || lvl == 5 || lvl == 7; };
-auto printFullSnake = [&](int lvl) -> bool { return lvl == 3 || lvl == 4 || numberdefined < lvl; };
-auto printGradientsSnake = [&](int lvl) -> bool { return lvl == 4 || lvl == 5 || lvl == 7 || numberdefined < lvl; };
-auto printVectorSnake = [&](int lvl) -> bool { return lvl == 6 || lvl == 7 || numberdefined < lvl; };
+auto printBaseSnake = [](int lvl) -> bool { return lvl == 2 || lvl == 5 || lvl == 7; };
+auto printFullSnake = [](int lvl) -> bool { return lvl == 3 || lvl == 4 || numberdefined < lvl; };
+auto printGradientsSnake = [](int lvl) -> bool { return lvl == 4 || lvl == 5 || lvl == 7 || numberdefined < lvl; };
+auto printVectorSnake = [](int lvl) -> bool { return lvl == 6 || lvl == 7 || numberdefined < lvl; };
+bool plotSnakeInPolyscope(int lvl);
 } // namespace outputs
 static const std::string tecplotsnake = "rsvs3D_";
 static const std::string tecplotgradient = "rsvsgradients3D_";
 static const std::string tecplotvectors = "rsvsvectors3D_";
+static const std::string polyscopeSnakeName = "RSVS-Snake";
 } // namespace constants
 class iteratereturns
 {
@@ -103,6 +109,7 @@ namespace execute
 {
 
 void All(integrate::RSVSclass &RSVSobj);
+void Interactive(integrate::RSVSclass &RSVSobj);
 iteratereturns RSVSiterate(RSVSclass &RSVSobj);
 void Logging(RSVSclass &RSVSobj, double totT, int nVoluZone, int stepNum);
 void PostProcessing(RSVSclass &RSVSobj, double totT, int nVoluZone, int stepNum);
@@ -119,6 +126,7 @@ void FullTecplot(tecplotfile &outSnake, snake &rsvsSnake, triangulation &rsvsTri
                  int nVoluZone, int stepNum);
 void Gradients(const RSVScalc &calcObj, const triangulation &rsvsTri, tecplotfile &outgradientsnake, double totT);
 void SnakeVectors(tecplotfile &outSnake, snake &rsvsSnake, double totT);
+void SnakePolyscope(polyscopersvs::PolyScopeRSVS &viewer, const snake &rsvsSnake);
 } // namespace logging
 
 namespace postprocess

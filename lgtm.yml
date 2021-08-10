@@ -1,0 +1,16 @@
+path_classifiers:
+  library:
+    - SRCC/modules
+
+extraction:
+  cpp:
+    prepare:
+      packages:
+      - "g++-9"
+      - "xorg-dev"
+      - "libglu1-mesa-dev"
+      - "xserver-xorg-video-dummy"
+      - "freeglut3-dev"
+    index:
+      build_command:
+        - cd SRCC && make all -j2

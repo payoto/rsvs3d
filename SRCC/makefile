@@ -1,167 +1,100 @@
+# The default settings (flags, dependencies, libraries) for linux
+# and windows are stored in their own makefiles.
+ifeq ($(OS),Windows_NT)
+	include makewin.mk
+else
+	include makelinux.mk
+endif
+
+# This flag is meant to be controlled from the command line and governs
+# the behaviour of polyscope
+HEADLESS=false
 
 #------------------------------------------------------
-#                 TARGET COMPILER
+#          PARSE compiler flags
 #------------------------------------------------------
-# Specify compiler (only g++ is supported)
-CC=g++ 
-# Specify linker
-LINK=g++
+# flags are grouped from the variable in which they are called to the ones
+# in which they are called. There can be dependencies on the target and other
+# flags
 
-#------------------------------------------------------
-#                 DIRECTORIES and INCLUDES
-#------------------------------------------------------
-# Executable name
-MAINEXECUTABLE=RSVS3D
-TESTEXECUTABLE=test_RSVS3D
-TESTALLEXECUTABLE=testall_RSVS3D
+ifeq ($(MAKECMDGOALS), distribution)
+	# distribution requires optimisation and No debug and test flags
+	OPTIMLVL= 3
+	CCFLAGDBG=
+	CCFLAGPROJ= -DTIME_EXEC $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
+	CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -DEIGEN_MPL2_ONLY
+endif
 
-# source, object and dependency directories
-OBJDIR = obj
-SRCTREE = src
-DEPDIR := .d
-BINDIR = bin
-INCLPROJ= incl
-#modules/tetgen/
-
-# Sources which contain the main function for all and test
-MAINALLSRC = src/main.cpp
-MAINTESTSRC = src/test/test.cpp
-
-# NOTNEEDEDNEWTEST = src/rsvs/RSVScalc.cpp
-
-# Include directories
-SHAREINCLROOTDIR = C:/ap1949include
-DIREIGEN= $(SHAREINCLROOTDIR)/Eigen_all/Eigen
-DIRJSON= $(SHAREINCLROOTDIR)/json/single_include/nlohmann
-DIRCXXOPTS= $(SHAREINCLROOTDIR)/cxxopts-2.1.1/include
-DIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace/
-DIRTETGEN= modules/tetgen
-
-#------------------------------------------------------
-#                 USE OF OPTIONAL LIBRARIES
-#------------------------------------------------------
-# Some libraries are optional in certain conditions
-# Specify by "true" or "false" whether they should be used
-
-# Boost is needed for the <boost/filesystem> header 
-# except under std=c++17 which added a standard filesystem header
-# (Broken on GCC v8.1 + MinGW, must still use boost)
-USE_BOOST = true
-DIRBOOST= $(SHAREINCLROOTDIR)/boost_1_68_0
-# BOOST can be ignored if using c++17 (not on GCC v8.1 on Win (25/01/19))
-# boost compiled library file location (for linker)
-LDDIRBOOST = $(DIRBOOST)/stage/lib
-# boost libraries to load: boost_<library>
-LDFILEBOOST = boost_filesystem boost_system
-# boost version appropriate to the system 
-BOOSTVERSION = -mgw63-mt-sd-x64-1_68
-
-# intel MKL libraries for faster Eigen maths 
-# Not compatible with GCC on windows
-DIRMKL = "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2019.1.144\windows\mkl\include"
-# -isystem$(DIRMKL)
-INCL= 
-
-SRCTREE+= $(DIRTETGEN)
-INCLDIR= $(INCLPROJ) $(DIRJSON) $(DIRCXXOPTS) $(DIRTETGEN)
-INCLDIRSYS = $(DIREIGEN) $(DIRBOOST)
-
-#------------------------------------------------------
-#                 COMPILER FLAGS
-#------------------------------------------------------
-# Standard GCC warning, optimisation and c++ standard flags
-WARNFLAGS= -Wall -Wextra -pedantic
-# -Werror
-#
-OPTIMLVL=3
-CCPSTD=11
+ifeq ($(DEBUG), true)
+	OPTIMLVL= 0
+	CCFLAGDBG= -g -ggdb
+	CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC
+	CCFLAGPROJ+= -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
+	CCFLAGEIG=
+endif
 
 # O3 comes with spurious warnings which is ugly to deal in the code
 ifeq ($(OPTIMLVL), 3)
 WARNFLAGS += -Wno-maybe-uninitialized
 endif
 
-# Other compiler flags
-# project flags: # -DDEBUGLVL1 -DSAFE_ACCESS  -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC -DRSVS_VERBOSE
-# -DRSVS_DIAGNOSTIC_RESOLVED -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
-# -DRSVS_NO_ARGCHECK
-# gdb (debug) flags: # -g -ggdb 
-# boost/backtrace flags: # -DBOOST_STACKTRACE_USE_BACKTRACE -DUSE_STACKTRACE
-# eigen flags: # -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native -DEIGEN_USE_MKL_ALL
-# -funroll-all-loops -ffast-math -ffinite-math-only 
-# Tetgen flag to use as library: -DTETLIBRARY
-# cxxopts #
-CCFLAGDBG= 
-#-g -ggdb
-# -DDEBUGLVL1 -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_DIAGNOSTIC
-CCFLAGPROJ= -DRSVS_DEBUG -DSAFE_ACCESS -DSAFE_ALGO -DTIME_EXEC -DRSVS_ACCESS_DEVELOPMENT_PARAMETERS
-# 
-CCFLAGBOOST= 
-CCFLAGEIG= -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
-# -DEIGEN_NO_DEBUG -DEIGEN_NO_STATIC_ASSERT -march=native
-CCFLAGETETGEN= -DTETLIBRARY 
-CCFLAGUSER= 
 CCFLAGCUSTOM= $(CCFLAGDBG) $(CCFLAGPROJ) $(CCFLAGBOOST) $(CCFLAGEIG) $(CCFLAGETETGEN)
-# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation 
+# CCFLAGETETGEN is needed as Tetgen does not tolerate optimisation
 # beyond O3. It will break using -march and/or -ffast-math and co...
 CCFLAGETETGEN += $(CCFLAGDBG)
-# Flags to add when the target is "testall"
-# -DTEST_ALL_WORKING
-CFTESTFLAG= -DTEST_ALL 
-
 #------------------------------------------------------
 #    PARSE correct flags to get FILESYSTEM to work
 #------------------------------------------------------
 
 ifneq (,$(filter $(CC),gcc g++))
 ifneq ($(USE_BOOST),true)
-GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
-GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
+	GCCVERSION = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g')
+	GCCVERSIONMAJOR = $(shell $(CC) --version | grep ^$(CC) | sed 's/^.* //g' | sed 's/^\([0-9]\).*/\1/')
 
-# $(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
+	# $(info Using $(CC) $(GCCVERSION) $(GCCVERSIONMAJOR))
 
-ifneq "$(GCCVERSIONMAJOR)" "7"
-$(warning Attempting to use GCC != v7 without Boost is not supported on windows)
-# space to define the flag specifying the correct file system
-CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM_EXPERIMENTAL
-else
-# space to define the flag specifying the correct file system
-# CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM
-endif
+	ifneq ("$(GCCVERSIONMAJOR)", "7")
+		# $(warning Attempting to use GCC != v7 without Boost is not supported on windows)
+		# space to define the flag specifying the correct file system
+		CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM_EXPERIMENTAL
+	else
+		# space to define the flag specifying the correct file system
+		# CCFLAGCUSTOM += -DUSE_CSTD_FILESYSTEM
+	endif
 endif
 endif
 
 #------------------------------------------------------
 #                 LINKER FLAGS
 #------------------------------------------------------
-# LDFILE are the library names, LDDIR are the library 
+# LDFILE are the library names, LDDIR are the library
 # directories
-LDFILE = stdc++ 
+LDFILE = stdc++ $(LIBPOLYSCOPE)
 LDDIRBACTRACE= $(SHAREINCLROOTDIR)/libbacktrace-build/lib
 # optional boost paths (not needed if using c++17)
 
 ifeq ($(USE_BOOST),true)
-LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
-LDFILE += $(LDFILEBOOSTWITHVERSION)
-CCFLAGCUSTOM += -DUSE_BOOST
+	LDFILEBOOSTWITHVERSION = $(addsuffix $(BOOSTVERSION),$(LDFILEBOOST))
+	LDFILE += $(LDFILEBOOSTWITHVERSION)
+	CCFLAGCUSTOM += -DUSE_BOOST
 else
-# Leave empty
-LDDIRBOOST = 
+	# Leave empty
+	LDDIRBOOST =
 endif
 
-LDDIR = $(LDDIRBOOST) 
+LDDIR = $(LDDIRBOOST) $(LDPOLYSCOPE) $(LDPOLYSCOPEDEPS)
 # backtrace linker flags: # -L"C:\ap1949include\libbacktrace-build\lib" -lbacktrace
-
+POLYSCOPELIBFILE= $(LDPOLYSCOPE)/libpolyscope.a
 
 
 #------------------------------------------------------
 #            PARSE FLAGS BEFORE RECIPES
 #------------------------------------------------------
 
-LDFLAGS = 
+LDFLAGS =
 
 # Compile list of flags
-CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL) 
+CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL)
 ifeq ($(MAKECMDGOALS),testall)
 CFLAGS+= $(CFTESTFLAG)
 endif
@@ -197,22 +130,37 @@ SOURCES = $(foreach d,$(wildcard $(SRCTREE)*),$(call rwildcard,$d/,*.cpp))
 # $(info sources printed)
 # Handling target differences
 SRCS := $(SOURCES)
-# 
-ifeq ($(MAKECMDGOALS), )
+# Set default executable
 EXECUTABLE = $(MAINEXECUTABLE)
+
+ifeq ($(MAKECMDGOALS), notests)
+CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG)
 endif
-ifeq ($(MAKECMDGOALS), all)
-EXECUTABLE = $(MAINEXECUTABLE)
+ifeq ($(MAKECMDGOALS), distribution)
+CCFLAGCUSTOM += $(CF_NORSVSTESTFLAG) $(CF_DISTRIBUTIONFLAG)
 endif
 
 ifeq ($(MAKECMDGOALS), testnew)
 EXECUTABLE = $(TESTEXECUTABLE)
-CCFLAGCUSTOM += -DRSVSTEST 
+CCFLAGCUSTOM += -DRSVSTEST
+endif
+
+ifeq ($(MAKECMDGOALS), testshort)
+EXECUTABLE = $(TESTEXECUTABLE)
+CCFLAGCUSTOM += -DRSVSTEST -DTEST_SHORT
 endif
 
 ifeq ($(MAKECMDGOALS), testall)
 EXECUTABLE = $(TESTALLEXECUTABLE)
 CCFLAGCUSTOM += -DRSVSTEST -DTEST_KNOWN_FAILURES
+endif
+
+
+# make polyscope be built only with the mocked backend
+ifeq ($(HEADLESS), true)
+# At the moment cannot build with only the mock backend.
+# POLYSCOPE_CMAKE_FLAG= -DPOLYSCOPE_BACKEND_OPENGL3_GLFW=OFF
+CCFLAGCUSTOM += -DHEADLESS
 endif
 
 # $(info $(SRCS))
@@ -234,14 +182,17 @@ endif
 #------------------------------------------------------
 
 # TARGETS
-all : FORCE $(SRCS) $(EXECUTABLE)  
-testnew : FORCE $(SRCS) $(EXECUTABLE) 
-testall : FORCE $(SRCS) $(EXECUTABLE) 
-  
+all : FORCE $(SRCS) $(EXECUTABLE)
+testnew : FORCE $(SRCS) $(EXECUTABLE)
+testall : FORCE $(SRCS) $(EXECUTABLE)
+testshort : FORCE $(SRCS) $(EXECUTABLE)
+notests : FORCE $(SRCS) $(EXECUTABLE)
+distribution : FORCE $(SRCS) $(EXECUTABLE)
+
 # Linker recipes for the EXECUTABLES
 $(EXECUTABLE) : $(BINDIR)/$(EXECUTABLE)
 	cp $(BINDIR)/$@ ./
-$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) 
+$(BINDIR)/$(EXECUTABLE) : $(OBJECTS) $(POLYSCOPELIBFILE)
 	$(LINK)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Needed to mirror the dirrectory tree of SRCTREE
@@ -249,52 +200,65 @@ $(BINDIR)/$(EXECUTABLE) : $(OBJECTS)
 .SECONDEXPANSION:
 
 # Compilation recipes to build the object files
-# prerequisites : 
+# prerequisites :
 #	1. the corresponding .cpp file
 #	2. the corresponding .d file (a makefile included in this makefile
 #       which specifies the includes on which the object depends)
 #	3. the corresponding .f file which marks the existence of the folder
 # 	   in which the object file will go.
 #
-# recipe: 
+# recipe:
 # 	COMPILECPP (compiler + flags) $< (the source) -o (output flag) $@ (the object)
 # 	POSTCOMPILE (Dependency actions and flags)
 $(OBJDIR)/%.o : %.cpp
-$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f 
+$(OBJDIR)/%.o : %.cpp $(DEPDIR)/%.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGCUSTOM) $< -o $@
 	$(POSTCOMPILE)
 
 # Special case for this source and object which cannot be compiled without optimisation
 # or the object file is too large on windows
 $(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp
-$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f 
+$(OBJDIR)/src/rsvs/RSVScalc_SQP.o : src/rsvs/RSVScalc_SQP.cpp $(DEPDIR)/RSVScalc_SQP.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGCUSTOM) -O3 $< -o $@
 	$(POSTCOMPILE)
 
 # #  Always on optimisation and disabled warnings in the tetgen module
 $(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp
-$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f 
+$(OBJDIR)/modules/tetgen/tetgen.o : modules/tetgen/tetgen.cpp $(DEPDIR)/tetgen.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
 $(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp
-$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f 
+$(OBJDIR)/modules/tetgen/predicates.o : modules/tetgen/predicates.cpp $(DEPDIR)/predicates.d $$(@D)/.f
 	$(COMPILECPP) $(CCFLAGETETGEN) -O3 -D_CRT_SECURE_NO_WARNINGS $< -o $@
 	$(POSTCOMPILE)
 
+# Build the polyscope library
+$(POLYSCOPELIBFILE):
+	mkdir -p modules/polyscope/build
+	cd modules/polyscope/build && cmake .. -G "Unix Makefiles" $(POLYSCOPE_CMAKE_FLAG)
+	cd modules/polyscope/build && $(MAKE)
+
+echo:
+	@echo $(POLYSCOPELIBFILE)
+	@echo $(LIBPOLYSCOPE)
+
 # Folder depency used to mirror the SRCTREE into OBJDIR
-# Called by `$$(@D)/.f` in the object recipes 
+# Called by `$$(@D)/.f` in the object recipes
 %/.f:
 	mkdir -p $(dir $@)
 	touch $@
 
-.PHONY: clean 
+.PHONY: clean clean-deps
 # Clean target
 OBJDEL = $(call rwildcard,$(OBJDIR)/,*.o)
 clean :
-	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d 
+	rm *.o *.exe $(OBJDEL) $(DEPDIR)/*.d
 
-FORCE: 
+clean-deps:
+	rm -r modules/polyscope/build
+
+FORCE:
 
 
 $(DEPDIR)/%.d: ;

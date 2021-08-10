@@ -1,5 +1,5 @@
 function [coords, deriv]=ReadDerivatives(derivFile, numCoords)
-    
+
     fid= fopen([derivFile,int2str(numCoords),'.csv'], 'r');
     coords = zeros(numCoords,3,0);
     deriv = zeros(3,3*numCoords,0);

@@ -1,11 +1,11 @@
 function [] = include_PostProcessing()
     %FUNCTIONLIST allows local functions to be used globally once it has
     %been used.
-    
+
     funcHandles=localfunctions;
     funcDir=[cd,'\Automated_Function_Directory'];
     HeaderActivation(funcHandles,funcDir)
-    
+
 end
 
 %% General
@@ -16,11 +16,11 @@ print(figh,figname,'-djpeg','-r600')
 end
 
 function [marker,t]=GenerateResultMarker(typDat)
-    
+
     t=now;
     marker=[datestr(t,'yyyy-mm-ddTHHMMSS')...
         ,'_',typDat];
-    
+
 end
 
 function [resultDirectory]=GenerateResultDirectoryName(marker,resultRoot,...
@@ -29,27 +29,27 @@ function [resultDirectory]=GenerateResultDirectoryName(marker,resultRoot,...
     dateSubFolders=['Archive_',datestr(now,'yyyy_mm'),'\Day_',datestr(t,29)];
     resultDirectory=[resultRoot,filesep,archiveName,filesep,dateSubFolders,...
         filesep,'Dir_',marker];
-    
+
     resultDirectory=MakePathCompliant(resultDirectory);
-    
+
     mkdir(resultDirectory)
 end
 
 function pathName=MakePathCompliant(pathName)
-    
+
     compStr=computer;
     if strcmp(compStr(1:2),'PC')
         pathName=regexprep(pathName,'/','\\');
     else
-        
+
         pathName=regexprep(pathName,'\\','/');
     end
 end
 
 function []=WriteToFile(cellLoops,FID)
     % writes the data to the file
-    
-    
+
+
     for ii=1:length(cellLoops)
         if numel(cellLoops{ii})>0
             for jj=1:length(cellLoops{ii}(:,1))
@@ -62,55 +62,55 @@ function []=WriteToFile(cellLoops,FID)
 end
 
 function []=ReorganiseSubPlots(ax,sizSubPlot,outerPad,interPad,fontSizes)
-    
+
     if ~exist('outerPad','var'),outerPad=[0.1,0.1,0.05,0.05];end
     if ~exist('interPad','var'),interPad=[0.05,0.05];end
     if ~exist('fontSizes','var'),fontSizes=[10,12];end
-    
+
     xHeight=1-(outerPad(1)+outerPad(2));
     xLength=(xHeight-interPad(1)*(sizSubPlot(1)-1))/sizSubPlot(1);
     xStart=outerPad(1);
-    
+
     yHeight=1-(outerPad(3)+outerPad(4));
     yLength=(yHeight-interPad(2)*(sizSubPlot(2)-1))/sizSubPlot(2);
     yStart=1-outerPad(4)-yLength;
-    
+
     for ii=1:length(ax)
         jj=ii;
         xInd=rem(jj-1,sizSubPlot(1));
         yInd=ceil(jj/sizSubPlot(1))-1;
-        
+
         loXCorn=(xInd)*(xLength+interPad(1))+xStart;
         loYCorn=-(yInd)*(yLength+interPad(2))+yStart;
-        
+
         posVec=[loXCorn,loYCorn,xLength,yLength];
         set(ax(ii),'position',posVec)
         set(ax(ii),'fontsize',fontSizes(1))
         set(get(ax(ii),'xlabel'),'fontsize',fontSizes(2))
         set(get(ax(ii),'ylabel'),'fontsize',fontSizes(2))
         set(get(ax(ii),'zlabel'),'fontsize',fontSizes(2))
-        
+
     end
-    
+
 end
 
 function []=CreateValidFolder(pathName)
     error('replace this shit by mkdir')
-    
+
 %     if strcmp(compStr(1:2),'PC')
 %         pathName=regexprep(pathName,'/','\\');
 %         system(['md "',pathName,'"']);
 %     else
-%         
+%
 %         pathName=regexprep(pathName,'\\','/');
 %         system(['mkdir ''',pathName,''''])
 %     end
 end
 
-%% Plotting 
+%% Plotting
 
 function [datCol]=ProjectColormap(cMap,cDat,cBounds)
-    
+
     if nargin==2
         cBounds=[min(cDat),max(cDat)];
     end
@@ -118,35 +118,35 @@ function [datCol]=ProjectColormap(cMap,cDat,cBounds)
         cBounds(2)=1+cBounds(2);
     end
     nCol=length(cMap(:,1));
-    
+
     cDat(cDat>max(cBounds))=max(cBounds);
     cDat(cDat<min(cBounds))=min(cBounds);
-    
+
     datMap=linspace(cBounds(1),cBounds(2),nCol)';
-    
-    
+
+
     datCol=interp1(datMap,cMap,cDat);
-    
+
 end
 
 %% Parameter File
 
 function []=GenerateParameterFile(FID,param,t,marker)
-    
+
     paramCell{1}='% Parameter File';
     paramCell{2}=['% ',datestr(t)];
     paramCell{3}=['% ',marker];
     for ii=1:length(param.structdat.vars)
         paramCell=[paramCell,ExtractVariablePathAndValue2(param,ii)];
-        
+
     end
-    
+
     WriteToFile(paramCell,FID);
     fclose(FID);
 end
 
 function [paramStr]=ExtractVariablePathAndValue(param,varNum)
-    
+
     varstruct=param.structdat.vars(varNum);
     actstruct=param;
     pathVar='param';
@@ -154,19 +154,19 @@ function [paramStr]=ExtractVariablePathAndValue(param,varNum)
         pathVar=[pathVar,'.',param.structdat.fields{varstruct.vec(jj)}];
         actstruct=actstruct.(param.structdat.fields{varstruct.vec(jj)});
     end
-    
+
     varVal=actstruct;
     [varStr]=GenerateVariableString(varVal);
     paramStr=[pathVar,' = ',varStr,';'];
 end
 
 function [paramStr]=ExtractVariablePathAndValue2(param,varNum)
-    
+
     varstruct=param.structdat.vars(varNum);
     actstruct=param;
     pathVar{1}='param';
-    
-    
+
+
     for jj=1:length(varstruct.vec)
         tempPath=[];
         tempPath{numel(pathVar)}=[];
@@ -191,13 +191,13 @@ function [paramStr]=ExtractVariablePathAndValue2(param,varNum)
 end
 
 function [varStr]=GenerateVariableString(startVar)
-    
+
     classVar=class(startVar);
     [m,n]=size(startVar);
     varStr='';
     switch classVar
         case 'char'
-            
+
             openStr='[';
             closeStr=']';
             if ~isempty(startVar)
@@ -209,7 +209,7 @@ function [varStr]=GenerateVariableString(startVar)
                 varStr='''''';
             end
         case 'cell'
-            
+
             openStr='{';
             closeStr='}';
             for ii=1:m
@@ -223,7 +223,7 @@ function [varStr]=GenerateVariableString(startVar)
                 [varStr]=[openStr,closeStr];
             end
         case 'double'
-            
+
             openStr='[';
             closeStr=']';
             [varStrCell{1:max([m 1]),1:max([n 1])}]=deal(' ');
@@ -238,7 +238,7 @@ function [varStr]=GenerateVariableString(startVar)
             closeStr=']';
             for ii=1:m
                 for jj=1:n
-                    if startVar(ii,jj) 
+                    if startVar(ii,jj)
                         curStr='true';
                     else
                         curStr='false';
@@ -249,7 +249,7 @@ function [varStr]=GenerateVariableString(startVar)
             [varStr]=RecursiveStringGeneration(openStr,closeStr,varStrCell,m,n);
         otherwise
             if ~isempty(regexp(classVar,'int','once'))
-                
+
             openStr='[';
             closeStr=']';
             for ii=1:m
@@ -261,12 +261,12 @@ function [varStr]=GenerateVariableString(startVar)
             end
             warning('Class is not catered for and will not be printed correctly to parameter file')
     end
-    
+
 end
 
 function [varStr]=RecursiveStringGeneration(openStr,closeStr,varStrCell,m,n)
 
-    
+
     varStr=openStr;
     if m==0
         m=1;
@@ -283,18 +283,18 @@ function [varStr]=RecursiveStringGeneration(openStr,closeStr,varStrCell,m,n)
     for jj=1:n-1
         varStr=[varStr,varStrCell{m,jj},','];
     end
-    
+
     varStr=[varStr,varStrCell{m,n},closeStr];
 end
 
 function []=CopyDiary(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     fileName=['diary_',marker,'.log'];
     originalLayFile=[cd,'\Result_Template\Latest_Diary.log'];
     originalLayFile=MakePathCompliant(originalLayFile);
     copyfile(originalLayFile,MakePathCompliant([writeDirectory,filesep,fileName]))
-    
+
 end
 
 
@@ -302,7 +302,7 @@ end
 %% Boundary Output to .dat file
 
 function []=BoundaryOutput(loop,FID,typeLoop,buildInternal)
-    
+
     if nargin<4
         buildInternal=false;
         if nargin<3
@@ -323,20 +323,20 @@ function []=BoundaryOutput(loop,FID,typeLoop,buildInternal)
     loopout=TrimLoops(loop,typeLoop);
     % format numeric data to printable strings
     cellLoops=DataToString(loopout);
-    
+
     % print string data to file
     WriteToFile(cellLoops,FID)
-    
+
 end
 
 function [G]=BuildMatlabGeometryMatrix(loop,typeLoop)
     [isInternal]=FindInternalLoop(loop,typeLoop);
-    
+
     nPts=0;
     for ii=1:numel(loop)
         nPts=nPts+size(loop(ii).(typeLoop),1);
     end
-    
+
     G=zeros(7,nPts);
     nDone=0;
     for ii=1:numel(loop)
@@ -356,14 +356,14 @@ function [G]=BuildMatlabGeometryMatrix(loop,typeLoop)
             padOnes*mod(isInternal(ii),2)];
         nDone=nDoneNew;
     end
-    
+
 end
 
 function []=OutputFreefempp(loop,typeLoop)
     [isInternal]=FindInternalLoop(loop,typeLoop);
-    
-    
-    
+
+
+
 end
 
 function [loopout]=TrimLoops(loop,typeLoop)
@@ -372,25 +372,25 @@ function [loopout]=TrimLoops(loop,typeLoop)
     if nargin<2
         typeLoop='subdivision';
     end
-    
+
     nLoop=length(loop);
-    
+
     for ii=1:nLoop
         endInd=length(loop(ii).(typeLoop)(:,1));
-        
+
         isNeg2=sum(sum(loop(ii).(typeLoop)(1:2,:)==loop(ii).(typeLoop)(end-1:end,:)))...
             ==numel(loop(ii).(typeLoop)(1:2,:));
         isNeg1=sum(loop(ii).(typeLoop)(1,:)==loop(ii).(typeLoop)(end,:))...
             ==numel(loop(ii).(typeLoop)(1,:));
-        
+
         if isNeg2
             endInd=endInd-2;
         elseif isNeg1
             endInd=endInd-1;
         else
-        
+
         end
-        
+
         if loop(ii).isccw
             loopout.surf(ii).coord=loop(ii).(typeLoop)(1:endInd,:);
         else
@@ -399,21 +399,21 @@ function [loopout]=TrimLoops(loop,typeLoop)
         loopout.surf(ii).nvertex=size(loopout.surf(ii).coord,1);
         loopout.surf(ii).nfaces=loopout.surf(ii).nvertex;
     end
-    
+
     loopout.total.nvertex=sum([loopout.surf(:).nvertex]);
     loopout.total.nfaces=sum([loopout.surf(:).nfaces]);
     loopout.total.nloops=nLoop;
-    
+
 end
 
 function cellLoops=DataToString(loopout)
     % Transforms the data organised in loopout into a cell array of strings
     % ready to be written to a file
-    
+
     cellLoops{1}=int2str(loopout.total.nloops);
     cellLoops{2}=int2str([loopout.total.nvertex, loopout.total.nfaces]);
     kk=3;
-    
+
     % run through the different surfaces
     for ii=1:loopout.total.nloops
         cellLoops{kk}=int2str(loopout.surf(ii).nvertex);
@@ -427,9 +427,9 @@ function cellLoops=DataToString(loopout)
             end
             kk=kk+1;
         end
-        
+
     end
-    
+
 end
 
 function [isInternal]=FindInternalLoop(loop,typeLoop)
@@ -440,10 +440,10 @@ function [isInternal]=FindInternalLoop(loop,typeLoop)
         polygonPoints=loop(ii).(typeLoop);
 %         polyVec=polygonPoints([2:end,1],:)-polygonPoints;
 %         polyNorm=[polyVec(:,2),-polyVec(:,1)];
-%         
+%
 %         numCond=size(polygonPoints,1);
         for jj=[1:ii-1,ii+1:length(loop)]
-            
+
 %             comparePoint=ones([size(polyNorm,1),1])*loop(jj).subdivision(1,:);
 %             conditionNum=sum(polyNorm.*(comparePoint-polygonPoints),2);
 %             allPos=sum(conditionNum>=0)==numCond;
@@ -453,32 +453,32 @@ function [isInternal]=FindInternalLoop(loop,typeLoop)
             isInternal(jj)=isInternal(jj) + (isIn);
         end
     end
-    
+
 end
 
 function [loop]=BoundaryInput(fileName)
-    
+
     fid=fopen(fileName,'r');
-    
+
     if ~feof(fid)
         numLoops=str2double(fgetl(fid));
         numPoints=str2num(fgetl(fid));
-        
+
         loop=repmat(struct('coord',[],'isccw',true,'isinternal',false),[1,numLoops]);
-        
+
         for ii=1:numLoops
             numPts(ii)=str2double(fgetl(fid));
             loop(ii).coord=zeros(numPts(ii),2);
             for jj=1:numPts(ii)
                 loop(ii).coord(jj,:)=str2num(fgetl(fid));
             end
-            
+
         end
-        
+
         if sum(numPts)~=numPoints(1)
             error('Reading loop in did not pass point sum check')
         end
-        
+
         if ~feof(fid)
             error('Reading loop in did not reach end of file')
         end
@@ -486,13 +486,13 @@ function [loop]=BoundaryInput(fileName)
         error(['File failed to open: ',fileName])
     end
     fclose(fid);
-    
+
 end
 
 %% Displacements Output
 
 function []=DisplacementsOutput(catloop,FIDsurf,FIDdisp,typeLoop,buildInternal)
-    
+
     if nargin<5
         buildInternal=false;
         if nargin<4
@@ -514,18 +514,18 @@ function []=DisplacementsOutput(catloop,FIDsurf,FIDdisp,typeLoop,buildInternal)
     % format numeric data to printable strings
     cellPoints=DispToString(trimpoints);
     cellDisplacement=DispToString(trimdisp);
-    
+
     % print string data to file
     WriteToFile(cellPoints,FIDsurf)
     WriteToFile(cellDisplacement,FIDdisp)
-    
+
 end
 
 function [trimpoints,trimdisp]=TrimDisplacementPoints(catloop,typeLoop)
-    % Removes double points and sums them 
+    % Removes double points and sums them
     points=vertcat(catloop(:,1).(typeLoop));
     displacements=vertcat(catloop(:,3).(typeLoop));
-    
+
     cellSimilar=FindIdenticalVector(points);
     trimdisp=zeros([numel(cellSimilar),size(displacements,2)]);
     trimpoints=zeros([numel(cellSimilar),size(displacements,2)]);
@@ -533,7 +533,7 @@ function [trimpoints,trimdisp]=TrimDisplacementPoints(catloop,typeLoop)
         trimdisp(ii,:)=sum(displacements(cellSimilar{ii},:),1);
         trimpoints(ii,:)=points(cellSimilar{ii},:);
     end
-    
+
     if size(trimdisp,2)<3
         trimdisp(:,3)=0;
         trimpoints(:,3)=0;
@@ -543,8 +543,8 @@ end
 function cellLoops=DispToString(array)
     % Transforms the data organised in loopout into a cell array of strings
     % ready to be written to a file
-    
-    
+
+
     kk=1;
     cellLoops{kk}=int2str(size(array,1));
     kk=kk+1;
@@ -557,14 +557,14 @@ function cellLoops=DispToString(array)
         end
         kk=kk+1;
     end
-    
-    
-    
+
+
+
 end
 %% Video Output functions
 
 function []=MakeVideo(movStruct,fps,quality,fileName)
-    
+
     writerObj = VideoWriter(fileName);
     writerObj.FrameRate=fps;
     writerObj.Quality=quality;
@@ -576,7 +576,7 @@ end
 %% Layout Operation functions
 
 function []=PersnaliseLayFile(FID,pltFile)
-    
+
     frewind(FID);
     layData{1}='#!MC 1410';
     layData{2}=['$!VarSet |LFDSFN1| = ''"',pltFile,'"'''];
@@ -595,93 +595,93 @@ function [FID]=OpenBoundaryFile(writeDirectory,marker)
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['boundary_',marker,'.dat'];
     FID=fopen([writeDirectory,filesep,fileName],'w+');
-    
+
 end
 
 function [FID,fileName]=OpenTecPLTFile(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['tec360dat_',marker,'.plt'];
     FID=fopen([writeDirectory,filesep,fileName],'w+');
-    
+
 end
 
 function [FID]=OpenTecLayFile(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['tec360lay_',marker,'.lay'];
     originalLayFile=[cd,'\Result_Template\Layout_Template.lay'];
     originalLayFile=MakePathCompliant(originalLayFile);
     copyfile(originalLayFile,[writeDirectory,filesep,fileName])
     FID=fopen([writeDirectory,filesep,fileName],'r+');
-    
+
 end
 
 function [FID]=OpenParamFile(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['param_',marker,'.dat'];
     FID=fopen([writeDirectory,filesep,fileName],'w+');
-    
+
 end
 
 function [FID]=OpenCommentsFile(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['Comments_',marker,'.txt'];
     FID=fopen([writeDirectory,filesep,fileName],'w+');
-    
+
 end
 
 function [FID]=OpenIndexFile(resultRoot,archiveName)
     % Creates a file in the current directory to write data to.
-    
+
     resultRoot=MakePathCompliant(resultRoot);
     fileName=['Index_',archiveName,'.txt'];
     FID=fopen([resultRoot,filesep,archiveName,filesep,fileName],'a');
-    
+
 end
 
 function [FID]=NameVideoFile(writeDirectory,marker)
     % Creates a file in the current directory to write data to.
-    
+
     writeDirectory=MakePathCompliant(writeDirectory);
     fileName=['Video_',marker,'.avi'];
     FID=[writeDirectory,filesep,fileName];
-    
+
 end
 
 %% Comments File
 
 function [indexEntry]=MakeCommentsFile(FID,param,t,resultDirectory)
-    
+
     varExtract={'typDat','case','noteFiles','tags'};
     [typDat,caseStr,noteFiles,tags]=ExtractVariables(varExtract,param);
-    
-    
+
+
     headerLines=GenerateCommentHeader(t,resultDirectory,typDat,caseStr,tags);
     automatedComments=ConcatenateAutomaticComments(noteFiles);
     indexEntry{1}=GenerateIndexEntry(t,resultDirectory,typDat,caseStr,tags);
-    
+
     kk=1;
     breakLines{kk}=['--------------------------------------------------'];
     kk=kk+1;
     breakLines{kk}=['ADDITIONAL COMMENTS:'];
     kk=kk+1;
     breakLines{kk}=[' '];
-    
+
     WriteToFile(headerLines,FID)
     WriteToFile(automatedComments,FID)
     WriteToFile(breakLines,FID)
-    
+
 end
 
 function automatedComments=ConcatenateAutomaticComments(noteFiles)
-    
+
     for ii=length(noteFiles):-1:1
         noteFileName{ii}=MakePathCompliant([cd,'\Result_Template\Notes_',noteFiles{ii},'.txt']);
         fidNote=fopen(noteFileName{ii},'r');
@@ -707,15 +707,15 @@ function automatedComments=ConcatenateAutomaticComments(noteFiles)
         kk=kk2;
         kk=kk+1;
         automatedComments{kk}=[' '];
-        
+
     end
     kk=kk+1;
     automatedComments{kk}=[' '];
-    
+
 end
 
 function headerLines=GenerateCommentHeader(t,resultDirectory,typDat,caseStr,tags)
-    
+
     kk=1;
     headerLines{kk}=datestr(t);
     kk=kk+1;
@@ -733,12 +733,12 @@ function headerLines=GenerateCommentHeader(t,resultDirectory,typDat,caseStr,tags
     end
     kk=kk+1;
     headerLines{kk}=[' '];
-    
-    
+
+
 end
 
 function indexLine=GenerateIndexEntry(t,resultDirectory,typDat,caseStr,tags)
-    
+
     indexLine='';
     indexLine=[indexLine,datestr(t)];
     indexLine=[indexLine,', '];
@@ -752,18 +752,18 @@ function indexLine=GenerateIndexEntry(t,resultDirectory,typDat,caseStr,tags)
     indexLine=[indexLine,tags{ii+1}];
     indexLine=[indexLine,', '];
     indexLine=[indexLine,resultDirectory];
-    
+
 end
 
 function []=WriteFullInfoProfile(writeDirectory,nProf,marker,t,nIter)
     fid=fopen([writeDirectory,filesep,'InfoProfile_',int2str(nIter),'_',int2str(nProf),'.dat'],'w');
-    
+
     ii=1;
     cellDat{ii}=marker;ii=ii+1;
     cellDat{ii}=datestr(t);ii=ii+1;
     cellDat{ii}=['iteration : ',int2str(nIter)]; ii=ii+1;
     cellDat{ii}=['Profile : ',int2str(nProf)]; ii=ii+1;
-    
+
     WriteToFile(cellDat,fid);
     fclose(fid);
 end
@@ -772,68 +772,68 @@ end
 
 function [FID]=OpenErrorReportFile(rootOptim,marker)
     % Creates a file in the current directory to write data to.
-    
+
     rootOptim=MakePathCompliant(rootOptim);
     fileName=['ErrorReport_',marker,'.txt'];
     FID=fopen([rootOptim,filesep,fileName],'a');
-    
+
 end
 
 function []=GenerateErrorReportFile(t,marker,FID)
-    
+
     paramCell{1}='# Error Report File';
     paramCell{2}=['# ',datestr(t)];
     paramCell{3}=['# ',marker];
     paramCell{4}=[' '];
-    
+
     WriteToFile(paramCell,FID);
     fclose(FID);
 end
 
 function []=GenerateErrorReportEntries(fID,nIter,errorReports,indexEntries)
-    
+
     writeReport{1}='------------------------------------------------------------';
     writeReport{2}=['   ITERATION ',int2str(nIter)];
     writeReport{3}='------------------------------------------------------------';
     kk=4;
     for ii=1:length(errorReports)
-        
+
         if ~isempty(errorReports{ii})
             writeReport{kk}=indexEntries{ii};
             kk=kk+1;
             writeReport{kk}=errorReports{ii};
             kk=kk+1;
         end
-        
+
     end
 
     WriteToFile(writeReport,fID);
     fclose(fID);
-    
+
 end
 
 %% Generate Restart Binary
 
 function []=GenerateRestartBinary(resultDirectory,marker,restartstruct)
-    
+
     fileName=[resultDirectory,filesep,'restart_',marker,'.mat'];
     save(fileName,'-struct','restartstruct');
-    
+
 end
 
 function []=GenerateProfileBinary(resultDirectory,marker,restartstruct)
-    
+
     fileName=[resultDirectory,filesep,'restart_',marker,'.mat'];
     fileName=MakePathCompliant(fileName);
     save(fileName,'-struct','restartstruct');
-    
+
 end
 
 %% Tecplot
 
 function [cellMesh]=CellEdgeMesh(coordDat,vertIndex,connDat,vectorDat,strandID,time)
-    
-    
+
+
     [numNode,nDim]=size(coordDat);
     [numElm,nConn]=size(connDat);
     % Zone Header
@@ -861,27 +861,27 @@ function [cellMesh]=CellEdgeMesh(coordDat,vertIndex,connDat,vectorDat,strandID,t
             cellConnCoord{ii}=[cellConnCoord{ii},...
                 int2str(FindObjNum([],connDat(ii,jj),vertIndex)),'  '];
         end
-        
+
     end
-    
+
     cellMesh=[cellHeader,cellNodeCoord,cellConnCoord];
-    
+
 end
 
 %% Tecplot Headers for various zone types
 
 function cellHeader=FELINESEGHeader(numNodes,numElm,strandID,time)
-    
+
 %     if ~exist('numNodes','var');numNodes=1;end
 %     if ~exist('numElm','var');numElm=1;end
-    
-    
+
+
     nodesStr=['NODES=',int2str(numNodes),' '];
     elmStr=['ELEMENTS=',int2str(numElm)];
     idStr=['STRANDID=',int2str(strandID)];
-    
+
     kk=1;
-    
+
     cellHeader{kk}=['VARIABLES = "X" ,"Y" ,"U" ,"V", "MAG"']; kk=kk+1;
     cellHeader{kk}=['ZONE']; kk=kk+1;
     cellHeader{kk}=['VARLOCATION=([1-5]=NODAL)']; kk=kk+1;
@@ -894,28 +894,28 @@ function cellHeader=FELINESEGHeader(numNodes,numElm,strandID,time)
     end
     cellHeader{kk}='DATAPACKING=POINT'; kk=kk+1;
     cellHeader{kk}='ZONETYPE=FELINESEG'; kk=kk+1;
-    
-    
-    
+
+
+
 end
 
 function cellHeader=CellCentredDataHeader(numNodes,numElm,nFaces,vararg)
     % vararg is a structure that can be used to specify arguments:
     % Possible vararg fields
     % strandID, time, connecShareZone, varsharezone
-    
+
     varFields=fieldnames(vararg);
     for ii=1:length(varFields)
         eval([varFields{ii},'=vararg.(varFields{ii});'])
     end
-    
-    
+
+
     nodesStr=['NODES=',int2str(numNodes),' '];
     elmStr=['ELEMENTS=',int2str(numElm)];
     faceStr=['FACES=',int2str(nFaces)];
 
     kk=1;
-    
+
     cellHeader{kk}=['VARIABLES = "X" ,"Y" ,"TARGFILL" ,"VOLFRAC", "DIFF"']; kk=kk+1;
     cellHeader{kk}=['ZONE']; kk=kk+1;
     cellHeader{kk}=['VARLOCATION=([1-2]=NODAL ,[3-5]=CELLCENTERED)']; kk=kk+1;
@@ -939,13 +939,13 @@ function cellHeader=CellCentredDataHeader(numNodes,numElm,nFaces,vararg)
     end
     cellHeader{kk}='DATAPACKING=BLOCK'; kk=kk+1;
     cellHeader{kk}='ZONETYPE=FEPOLYGON'; kk=kk+1;
-    
+
 end
 
 function [str]=VariableShareZoneString(varsharezone)
     % Creates teh string for Variable sharing depending on the structure
     % varsharezone with fields .vars and .zone
-    
+
     str='VARSHARELIST=(';
     for ii=1:length(varsharezone)
         str=[str,'['];
@@ -966,7 +966,7 @@ end
 %% Incomplete processing
 
 function [outinfo]=ReconstructOutinfo(optimstruct)
-    
+
     allRootDir=repmat(struct('rootDir',''),[1 numel(optimstruct)]);
     rmR=[];
     for ii=1:numel(optimstruct)
@@ -977,8 +977,8 @@ function [outinfo]=ReconstructOutinfo(optimstruct)
             end
             allRootDir(ii).rootDir=regexprep(optimstruct(ii).population(kk).location,'iteration.*$','');
         catch
-            
-        
+
+
             rmR=[ii];
         end
     end
@@ -998,22 +998,22 @@ function [outinfo]=ReconstructOutinfo(optimstruct)
 end
 
 function [refinestruct,patternList]=IdentifyUniqueOptions(refinestruct,jobfields)
-    
+
     if nargin<2
         jobfields=fieldnames(refinestruct);
     end
-    
+
     %
-    
+
     n=numel(refinestruct);
-    
+
     patternList=cell(0);
     for ii=1:numel(jobfields);
         patternList{ii}={};
-        
+
         for jj=1:n
             optfound=false;
-            
+
             for kk=1:numel(patternList{ii})
                 test=false;
                 if ischar(refinestruct(jj).(jobfields{ii}))
@@ -1033,30 +1033,30 @@ function [refinestruct,patternList]=IdentifyUniqueOptions(refinestruct,jobfields
             end
         end
     end
-    
-    
-    
-    
+
+
+
+
 end
 
 function [t,marker]=FindTime(pathStr)
-    
+
     [returnPath,returnName]=FindDir(pathStr,'Comments',false);
-    
+
     fid=fopen(returnPath{1},'r');
-    
+
     t=datenum(fgetl(fid));
-    
+
     returnName=regexprep(returnName{1},'Comments_','');
     marker=regexprep(returnName,'.txt','');
-    
+
 end
 
 function [pathStr,t,marker]=FindTime2(pathStr)
-    
+
     splitPath=regexp(pathStr,'[\\,/]','split');
     pathStr=regexprep(pathStr,'[\\,/]$','');
-    
+
     dirLoc=flip(find(~cellfun(@isempty,regexp(splitPath,'Dir'))));
     dirName=splitPath{dirLoc};
     splitDir=regexp(dirName,'_');
@@ -1072,7 +1072,7 @@ function [paramoptim]=ReconstructParameter(pathStr,marker)
             error('Failure to load')
         end
     catch
-        
+
         [rootParam,nameParam]=FindDir(pathStr,'param',0);
         isOptParam=cellfun(@isempty,regexp(nameParam,'_parametrisation'));
         matName=matlab.lang.makeValidName(regexprep(nameParam{isOptParam},'.dat',''));
@@ -1080,7 +1080,7 @@ function [paramoptim]=ReconstructParameter(pathStr,marker)
         eval(matName)
         paramoptim=param;
         paramoptim.structdat=GetStructureData(paramoptim);
-        
+
         copyfile(rootParam{~isOptParam},['.',filesep,matName,'.m']);
         eval(matName)
         paramoptim.parametrisation=param;
@@ -1090,30 +1090,30 @@ function [paramoptim]=ReconstructParameter(pathStr,marker)
 end
 
 function [iterstruct]=ReconstructIterationStructure(pathStr,nIter,paramoptim)
-    
+
     varExtract={'direction','optimMethod'};
     [direction,optimMethod]=ExtractVariables(varExtract,paramoptim);
-    
+
     if numel(nIter)>1
         nIterStart=nIter(1);
         nIterEnd=nIter(2);
         nIter=nIter(2)-nIter(1)+1;
     end
-    
+
     iterstruct=struct([]);
     iterstruct=repmat(iterstruct,[nIter,1]);
-    
+
     for ii=nIterStart:nIterEnd
-        
+
         [iterPath,~]=FindDir(pathStr,['iteration_',int2str(ii)],true);
-        
+
         datName=['population_iteration_',int2str(ii)];
         [returnPath,~]=FindDir(iterPath{1},datName,false);
         load(returnPath{1},'population');
         iterstruct(ii-nIterStart+1).population=population;
-        
+
     end
-    
+
     if TestGreed(optimMethod)
         for ii=2:nIter
             iterPrecedent=[iterstruct(ii-1).population(:).objective];
@@ -1130,11 +1130,11 @@ function [iterstruct]=ReconstructIterationStructure(pathStr,nIter,paramoptim)
 
         end
     end
-    
+
 end
 
 function [isgreedy]=TestGreed(optimMethod)
-    
+
    isgreedy=true;
    switch optimMethod
        case 'DE'
@@ -1146,9 +1146,9 @@ function [isgreedy]=TestGreed(optimMethod)
        otherwise
            error('Need to say if optimisation method is greedy or not')
    end
-    
-    
-    
+
+
+
 end
 
 %% Triangles support
@@ -1174,11 +1174,11 @@ function [polystruct,structmesh]=OutputLoop2TrianglePoly(fileName,loop,typeLoop,
     boundaryMarkers=structmesh.boundaryMarkers;
     flagInOut=structmesh.flagInOut;
     domainBound=structmesh.domainBound;
-    
+
     polystruct=struct('vertex',zeros([0,4]),'segment',zeros([0,4]),'hole',zeros([0,3]),'region',zeros([0,4]));
     % Builds Loops as .poly
     [polystruct]=BuildPolyStruct(polystruct,loop,typeLoop,boundaryMarkers.loop,flagInOut);
-    
+
     % Builds domain boundary if needed
     if flagInOut
         coord=vertcat(loop.(typeLoop));
@@ -1191,7 +1191,7 @@ function [polystruct,structmesh]=OutputLoop2TrianglePoly(fileName,loop,typeLoop,
             abs(CalculatePolyArea(ldom.coord)/domainBound(2))];
         polystruct.region=[polystruct.region;tempHole];
     end
-    
+
     [polystruct]=TriangleConstructSubDomains(loop,typeLoop,polystruct,structmesh);
     % output to file
     FID=fopen(fileName,'w');
@@ -1201,26 +1201,26 @@ function [polystruct,structmesh]=OutputLoop2TrianglePoly(fileName,loop,typeLoop,
 end
 
 function [polystruct]=TriangleConstructSubDomains(loop,typeLoop,polystruct,structmesh)
-    
+
     normRep=@(v) repmat(sqrt(sum(v.^2,2)),[1 2]);
     plotPoints= @(points) points;%plot(points([1:end,1],1),points([1:end,1],2),'-o');
-    
+
     coord=vertcat(loop.(typeLoop));
     ldom.coordbase=coord(convhull(coord(:,1),coord(:,2)),:);
-    
+
     plotPoints(ldom.coordbase);
     ldom.coordbase(1:2:size(ldom.coordbase,1)*2,:)=ldom.coordbase;
     ldom.coordbase(2:2:end+1,:)=(ldom.coordbase(1:2:end,:)+ldom.coordbase([3:2:end,1],:))/2;
-     
+
     plotPoints(ldom.coordbase);
-    
-    
+
+
     ldom.normVec=(ldom.coordbase([2:end,1],:)-ldom.coordbase)./...
         normRep(ldom.coordbase([2:end,1],:)-ldom.coordbase)+...
         (ldom.coordbase-ldom.coordbase([end,1:end-1],:))./...
         normRep(ldom.coordbase-ldom.coordbase([end,1:end-1],:));
     ldom.normVec=([0 1;-1 0]*ldom.normVec')'./normRep(ldom.normVec);
-    
+
     plotPoints(ldom.coordbase);
     dist=[max(ldom.coordbase);min(ldom.coordbase)];
     dist=dist(1,:)-dist(2,:);
@@ -1234,8 +1234,8 @@ function [polystruct]=TriangleConstructSubDomains(loop,typeLoop,polystruct,struc
         (ldom.coordbase-ldom.coordbase([end,1:end-1],:))./...
         normRep(ldom.coordbase-ldom.coordbase([end,1:end-1],:));
     ldom.normVec=([0 1;-1 0]*ldom.normVec')'./normRep(ldom.normVec);
-    
-    
+
+
     for ii=1:size(structmesh.subDomains,1) %find(isfinite(structmesh.subDomains(:,1)))'%
         m=structmesh.subDomains(ii,1);
         if isfinite(m) % build a new region and hole
@@ -1266,10 +1266,10 @@ function [polystruct]=TriangleConstructSubDomains(loop,typeLoop,polystruct,struc
             tempHole=[size(polystruct.region,1)+1,p,...
                -structmesh.subDomains(ii,2)];
         end
-            
+
         polystruct.region=[polystruct.region;tempHole];
     end
-    
+
     %         ldom.coord=ldom.coordbase-[-1 -1; -1 1; 1 1; 1 -1]*max(dist)*m/2;
 %         ldom.coord(:,1)=(ldom.coord(:,1)-mean(ldom.coord(:,1)))*...
 %             (max(r,1)*min(m,2)+max(m-2,2))*max(r,1)...
@@ -1296,7 +1296,7 @@ function [structmesh2]=BoundaryMarkersCharCases(structmesh,nElmZone)
                 structmesh2.subDomains(:,2)=logspace(log10(1),...
                     log10(structmesh2.subDomains(end,1)^2),15)'*nElmZone;
             end
-            
+
         case 'cutcellflow2'
             structmesh2.boundaryMarkers=struct('loop',-1,'outbound',-2,'sym',-3);
             structmesh2.flagInOut=1;
@@ -1307,15 +1307,15 @@ function [structmesh2]=BoundaryMarkersCharCases(structmesh,nElmZone)
             %                 1 nElmZone;2 nElmZone;8 nElmZone];
             nRef=round((log2(max(structmesh2.domainBound)^2)-log2(abs(nElmZone)))/2);
             structmesh2.subDomains(1:nRef,2)=nElmZone*4.^(0:nRef-1)';
-            
+
             structmesh2.subDomains(:,1)=2*sqrt(abs(structmesh2.subDomains(1:nRef,2))).*logspace(log10(20),...
                 log10(10),nRef)';
             outOffBound=find(structmesh2.subDomains(:,1)>max(structmesh2.domainBound));
             structmesh2.subDomains(outOffBound(1),1)=-inf;
             structmesh2.subDomains(outOffBound(2:end),:)=[];
-            
+
         case 'su2'
-            
+
             error('Not coded yet')
             case 'structures'
                 error('Not coded yet')
@@ -1328,14 +1328,14 @@ function [structmesh2]=BoundaryMarkersCharCases(structmesh,nElmZone)
             warning('unrecognised boundaryMarkers')
             boundaryMarkers=struct('loop',1,'outbound',1,'sym',1);
     end
-    
-    
+
+
 end
 
 function [polyCell]=WritePolyStruct2Cell(polystruct)
-    
+
     ii=1;
-    
+
     dim=2;
     isBoundMarker=1;
     %  <# of vertices> <dimension (must be 2)> <# of attributes> <# of boundary markers (0 or 1)>
@@ -1355,7 +1355,7 @@ function [polyCell]=WritePolyStruct2Cell(polystruct)
     polyCell{ii}=sprintf('%i',size(polystruct.region,1));
     ii=ii+1;
     polyCell{ii}=num2str(polystruct.region,'%i  %.24e    %.24e   %.24e');
-    
+
 end
 
 function [polystruct]=BuildPolyStruct(polystruct,loop,typeLoop,loopBoundMark,flagInOut)
@@ -1370,13 +1370,13 @@ function [polystruct]=BuildPolyStruct(polystruct,loop,typeLoop,loopBoundMark,fla
     % Optional following lines: <region #> <x> <y> <attribute> <maximum area>
     [isInternal]=FindInternalLoop(loop,typeLoop);
     isInternal=xor(isInternal,flagInOut);
-    
+
     for ii=1:numel(loop)
         tempVert=loop(ii).(typeLoop);
-        
+
         tempVert=[size(polystruct.vertex,1)+[1:size(tempVert,1)]',...
             tempVert,ones([size(tempVert,1),1])*loopBoundMark]; %#ok<AGROW>
-        
+
         tempSegment=[size(polystruct.segment,1)+[1:size(tempVert,1)]',...
             [tempVert(:,1),tempVert([2:end,1],1)]...
             ,ones([size(tempVert,1),1])*loopBoundMark];
@@ -1403,7 +1403,7 @@ function [pIn,pOut]=FindInternalPoint(coord)
             pr=(p1+p2)/2;
             pvec=p1-p2;
             if sqrt(sum(pvec.^2))>epsNorm
-                
+
                 pvec=([0 1; -1 0]*(pvec/sqrt(sum(pvec.^2))*eps)')';
                 pTest=repmat(pr,[2 1])+[1;-1]*pvec;
                 isIn=inpolygon(pTest(:,1),pTest(:,2),coord(:,1),coord(:,2));

@@ -1,0 +1,29 @@
+name: Linux build
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+
+      - name: install packages
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev xpra xserver-xorg-video-dummy freeglut3-dev
+
+      - name: make
+        run: make all -j2
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-ubuntu
+          path: SRCC/RSVS3D
+      - name: run tests
+        run: ./RSVS3D --test
+        working-directory: SRCC/

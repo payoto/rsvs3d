@@ -1,14 +1,12 @@
 /**
  * Functions which are part of the RSVS algorithm but not core to the snaking
  * process.
- *  
+ *
  *@file
  */
 
-
-#ifndef RSVSALGORITHM_H_INCLUDED 
-#define RSVSALGORITHM_H_INCLUDED 
-
+#ifndef RSVSALGORITHM_H_INCLUDED
+#define RSVSALGORITHM_H_INCLUDED
 
 //=================================
 // forward declared dependencies
@@ -25,20 +23,15 @@ class snake;
 
 //==================================
 // Code
-// NOTE: function in a class definition are IMPLICITELY INLINED 
+// NOTE: function in a class definition are IMPLICITELY INLINED
 //       ie replaced by their code at compile time
-	
-std::vector<int> FindSpawnVerts(const mesh &meshin, std::vector<int> &vertList,
-	std::vector<int> &voluOutList, int outerBorder=1);
-void SpawnRSVS(snake &snakein, int outerBorder=1);
-void RemoveSnakeInVolu(snake &snakein, std::vector<int> &voluInd, 
-	int outerBorder);
-void RemoveSnakeInSurf(snake &snakein, std::vector<int> &voluInd, 
-	int outerBorder);
+
+std::vector<int> FindSpawnVerts(const mesh &meshin, std::vector<int> &vertList, std::vector<int> &voluOutList,
+                                int outerBorder = 1);
+void SpawnRSVS(snake &snakein, int outerBorder = 1);
+void RemoveSnakeInVolu(snake &snakein, std::vector<int> &voluInd, int outerBorder);
+void RemoveSnakeInSurf(snake &snakein, std::vector<int> &voluInd, int outerBorder);
 void SpawnSnakeAndMove(snake &snakein, std::vector<int> vertSpawn);
-
-
-
 
 int Test_RSVSalgo_init();
 int Test_RSVSalgo();

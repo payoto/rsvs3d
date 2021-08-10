@@ -4,6 +4,7 @@
 out/*
 .gitattributes
 temp/*
+.vscode/*
 
 !*.lay
 *.mat
@@ -25,6 +26,10 @@ SRCC/dbg*
 SRCC/obj*
 SRCC/matrices*
 SRCC/modules/external*
+SRCC/bisect/*
+SRCC/bin/*
+noexec_config*
+SRCC/*RSVS3D
 
 SRCC/gch/*
 SRCC/config/*
@@ -34,7 +39,7 @@ SRCC/docs/latex/*
 SRCC/noexec_rsvsconfig.json
 SRCC/tetgen-tmpfile*.vtk
 defaultconfigRSVS3D.json*
-# Sublime text 
+# Sublime text
 *.sublime-workspace
 *.sublime-syntax
 
@@ -49,5 +54,5 @@ defaultconfigRSVS3D.json*
 *.dXYZ
 surface_analysis.dat
 
-
-
+.polyscope.ini
+imgui.ini

@@ -16,14 +16,14 @@
 function [] = HeaderActivation(funcHandles,funcDir)
     %FUNCTIONLIST allows local functions to be used globally once it has
     %been used.
-    
+
     c=evalc('display(funcHandles)');
     pattern='@\w*';
     fprintf('\nWRITING AUTOMATIC FUNCTIONS')
     funcHandlesNamesCell=regexp(c,pattern,'match');
     funcDir=MakePathCompliant(funcDir);
     if ~isdir(funcDir)
-        
+
         mkdir(funcDir);
     end
     jj=0;
@@ -46,12 +46,12 @@ function [] = HeaderActivation(funcHandles,funcDir)
 end
 
 function pathName=MakePathCompliant(pathName)
-    
+
     compStr=computer;
     if strcmp(compStr(1:2),'PC')
         pathName=regexprep(pathName,'/','\\');
     else
-        
+
         pathName=regexprep(pathName,'\\','/');
     end
 end
@@ -72,28 +72,28 @@ function []=WriteContainerFunctionFile(funcName,funcDir,callerName)
     funcText{end+1}=['nOut(nOut<0)=nOutReq;'];
     funcText{end+1}=['[varargout{1:nOut}]=',funcName,'_Handle','(varargin{:});'];
     funcText{end+1}=['end'];
-    
+
     for ii=1:length(funcText)
-        
+
         fprintf(fID,[funcText{ii},'\n']);
-        
+
     end
     fclose('all');
-    
+
 end
 
 function [isFound]=isFindFuncFile(rootDir,strDir)
-    
+
     subDir=dir(rootDir);
     subDir(1:2)=[];
     ii=1;
     isFound=false;
     while ~isFound && ii<=numel(subDir)
-        
+
         isFound=strcmp(subDir(ii).name,strDir);
         ii=ii+1;
-        
+
     end
 
-    
+
 end
