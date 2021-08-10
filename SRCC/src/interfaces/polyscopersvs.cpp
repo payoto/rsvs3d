@@ -270,20 +270,43 @@ void parameterConfigGui(param::snaking &paramConf)
 }
 void parameterConfigGui(param::files &paramConf)
 {
+    ImGui::InputText("Case name", paramConf.ioin.casename.data(), paramConf.ioin.casename.capacity());
+    rsvsjson::json out;
+    out = paramConf;
+    std::ostringstream stream;
+    stream << out.dump(2);
+    ImGui::TextUnformatted(stream.str().c_str());
 }
+
 void parameterConfigGui(param::dev::devparam &paramConf)
 {
-}
-void parameterConfigGui(param::dev::rsvseps &paramConf)
-{
+    paramConf.limitlagrangian;
+    ImGui::InputDouble("limitlagrangian", &paramConf.limitlagrangian, 0.0, 0.0, "%.2e");
+    ImGui::InputInt("mindesvarsparse", &paramConf.mindesvarsparse);
+    ImGui::InputTextWithHint("smoothstepmethod", "Not sure what appropriate values are",
+                             paramConf.smoothstepmethod.data(), paramConf.smoothstepmethod.capacity());
+    ImGui::Checkbox("snaxDistanceLimit_conserveShape", &paramConf.snaxDistanceLimit_conserveShape);
+    ImGui::Checkbox("surfcentrehessian", &paramConf.surfcentrehessian);
+    ImGui::Checkbox("surfcentrejacobian", &paramConf.surfcentrejacobian);
+
+    if (ImGui::TreeNode("Smoothing tolerances"))
+    {
+        ImGui::InputDouble("rsvsmath_automatic_eps_centre2", &paramConf.rsvsepsilons.rsvsmath_automatic_eps_centre2,
+                           0.0, 0.0, "%.2e");
+        ImGui::InputDouble("rsvsmath_automatic_eps_centre", &paramConf.rsvsepsilons.rsvsmath_automatic_eps_centre, 0.0,
+                           0.0, "%.2e");
+        ImGui::InputDouble("rsvsmath_automatic_eps_edge", &paramConf.rsvsepsilons.rsvsmath_automatic_eps_edge, 0.0, 0.0,
+                           "%.2e");
+        ImGui::InputDouble("rsvsmath_automatic_eps_surf", &paramConf.rsvsepsilons.rsvsmath_automatic_eps_surf, 0.0, 0.0,
+                           "%.2e");
+        ImGui::InputDouble("rsvsmath_automatic_eps_volu", &paramConf.rsvsepsilons.rsvsmath_automatic_eps_volu, 0.0, 0.0,
+                           "%.2e");
+
+        ImGui::TreePop();
+    }
 }
 void parameterConfigGui(param::parameters &paramConf)
 {
-    paramConf.dev;
-    paramConf.files;
-    paramConf.grid;
-    paramConf.rsvs;
-    paramConf.snak;
     if (ImGui::CollapsingHeader("Parameters"))
     {
         ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
@@ -302,8 +325,9 @@ void parameterConfigGui(param::parameters &paramConf)
             parameterConfigGui(paramConf.snak);
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("Files"))
+        if (ImGui::TreeNode("File setting (view)"))
         {
+
             parameterConfigGui(paramConf.files);
             ImGui::TreePop();
         }
