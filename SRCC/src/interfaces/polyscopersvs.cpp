@@ -1,6 +1,7 @@
 #include "polyscopersvs.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
+#include "parameters.hpp"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 #include "voxel.hpp"
@@ -153,6 +154,131 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
     polyscope::registerSurfaceMesh(name, points, faces);
     return outputVolume;
 }
+
+/**
+ * @brief Contains overloads of functions for displaying and configuring the parameter structure.
+ *
+ * This namespace contains overloads of function `parameterConfigGui` which is used to display a
+ *  UI for the configuration of the RSVS parameters using ImGui.
+ *
+ */
+namespace parameter_ui
+{
+void parameterConfigGui(param::voronoi &paramConf)
+{
+    paramConf.inputpoints;
+    ImGui::InputDouble("Snake coarseness", &paramConf.snakecoarseness, 0.0, 0.0, "%.2f");
+    ImGui::InputInt("Voronoi layers", &paramConf.vorosnakelayers);
+    ImGui::InputDouble("Bounding box distance", &paramConf.distancebox, 0.0, 0.0, "%.2f");
+    paramConf.pointfile.reserve(2048);
+    ImGui::InputText("Voronoi points file", paramConf.pointfile.data(), paramConf.pointfile.capacity());
+}
+void parameterConfigGui(param::voxel &paramConf)
+{
+    ImGui::InputInt3("Background grid", paramConf.gridsizebackground.data());
+    ImGui::InputInt3("Snaking grid", paramConf.gridsizesnake.data());
+}
+
+void parameterConfigGui(std::string name, std::array<param::realbounds, 3> &paramConf)
+{
+    if (ImGui::TreeNode(name.c_str()))
+    {
+        for (int j = 0; j < 2; ++j)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                auto fullName = ("##" + name + std::to_string(i) + "," + std::to_string(j)).c_str();
+                ImGui::InputDouble(fullName, &(paramConf[i][j]), 0.2, 2.0, "%.2f");
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+        }
+        ImGui::TreePop();
+    }
+}
+void parameterConfigGui(param::grid &paramConf)
+{
+
+    if (ImGui::BeginCombo("##Grid Style", paramConf.activegrid.c_str()))
+    {
+        for (auto key : {"voxel", "voronoi"})
+        {
+
+            if (ImGui::Selectable(key, paramConf.activegrid == key))
+            {
+                paramConf.activegrid = key;
+            }
+        }
+        ImGui::EndCombo();
+    }
+    parameterConfigGui("Compute domain", paramConf.domain);
+    parameterConfigGui("Physical domain", paramConf.physdomain);
+    ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
+    if (ImGui::TreeNode("Voxel"))
+    {
+        parameterConfigGui(paramConf.voxel);
+        ImGui::TreePop();
+    }
+    ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
+    if (ImGui::TreeNode("Voronoi"))
+    {
+        parameterConfigGui(paramConf.voronoi);
+        ImGui::TreePop();
+    }
+}
+void parameterConfigGui(param::rsvs &paramConf)
+{
+}
+void parameterConfigGui(param::snaking &paramConf)
+{
+}
+void parameterConfigGui(param::files &paramConf)
+{
+}
+void parameterConfigGui(param::dev::devparam &paramConf)
+{
+}
+void parameterConfigGui(param::dev::rsvseps &paramConf)
+{
+}
+void parameterConfigGui(param::parameters &paramConf)
+{
+    paramConf.dev;
+    paramConf.files;
+    paramConf.grid;
+    paramConf.rsvs;
+    paramConf.snak;
+    if (ImGui::CollapsingHeader("Parameters"))
+    {
+        ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
+        if (ImGui::TreeNode("Grid"))
+        {
+            parameterConfigGui(paramConf.grid);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("RSVS"))
+        {
+            parameterConfigGui(paramConf.rsvs);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Snaking"))
+        {
+            parameterConfigGui(paramConf.snak);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Files"))
+        {
+            parameterConfigGui(paramConf.files);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Development"))
+        {
+            parameterConfigGui(paramConf.dev);
+            ImGui::TreePop();
+        }
+    }
+}
+} // namespace parameter_ui
 
 /**
  * @brief A method which sets the polyscope userCallback to a UI controlling the giving
