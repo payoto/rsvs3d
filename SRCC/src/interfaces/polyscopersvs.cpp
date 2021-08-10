@@ -137,7 +137,7 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
         }
         std::cout << "Display cell " << meshIn.volus(volumePosition)->index << " at position [" << volumePosition << "]"
                   << std::endl;
-        outputVolume = meshIn.volus(volumePosition)->volume;
+        outputVolume = meshIn.volus(volumePosition)->target;
         for (auto surfaceIndex : meshIn.volus(volumePosition)->surfind)
         {
             auto faceIndices = meshIn.verts.find_list(meshIn.surfs.isearch(surfaceIndex)->OrderedVerts(&meshIn));
@@ -212,7 +212,7 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
                 if (volumePosition > -1 && volumePosition < RSVSobj.voluMesh.volus.size())
                 {
 
-                    RSVSobj.voluMesh.volus[volumePosition].volume =
+                    RSVSobj.voluMesh.volus[volumePosition].target =
                         newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
                     RSVSobj.voluMesh.PrepareForUse();
                 }
@@ -229,7 +229,7 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
                 newVolumeValue = newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
                 for (size_t i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
                 {
-                    RSVSobj.voluMesh.volus[i].volume = newVolumeValue;
+                    RSVSobj.voluMesh.volus[i].target = newVolumeValue;
                 }
             }
         }
