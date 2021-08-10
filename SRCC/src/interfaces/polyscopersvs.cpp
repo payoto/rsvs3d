@@ -241,12 +241,10 @@ void parameterConfigGui(std::string name, std::array<param::realbounds, 3> &para
 }
 void parameterConfigGui(param::grid &paramConf)
 {
-
     if (ImGui::BeginCombo("##Grid Style", paramConf.activegrid.c_str()))
     {
         for (auto key : {"voxel", "voronoi"})
         {
-
             if (ImGui::Selectable(key, paramConf.activegrid == key))
             {
                 paramConf.activegrid = key;
@@ -370,7 +368,6 @@ void parameterConfigGui(param::parameters &paramConf)
         }
         if (ImGui::TreeNode("File setting (view)"))
         {
-
             parameterConfigGui(paramConf.files);
             ImGui::TreePop();
         }
@@ -382,6 +379,40 @@ void parameterConfigGui(param::parameters &paramConf)
     }
 }
 } // namespace parameter_ui
+
+namespace polyscopersvs
+{
+void UpdateVolume(integrate::RSVSclass &RSVSobj, int inspectId, bool volumeByIndex, double newVolumeValue)
+{
+    // executes when button is pressed
+    RSVSobj.voluMesh.PrepareForUse();
+    int volumePosition = inspectId;
+    if (volumeByIndex)
+    {
+        volumePosition = RSVSobj.voluMesh.volus.find(inspectId);
+    }
+    if (volumePosition > -1 && volumePosition < RSVSobj.voluMesh.volus.size())
+    {
+        RSVSobj.voluMesh.volus[volumePosition].target =
+            newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+        RSVSobj.voluMesh.PrepareForUse();
+    }
+    else
+    {
+        polyscope::warning("Invalid Cell Position", "The cell was not found, it is either out of bounds"
+                                                    " or not a valid index.");
+    }
+}
+void UpdateVolumes(integrate::RSVSclass &RSVSobj, double newVolumeValue)
+{
+    RSVSobj.voluMesh.PrepareForUse();
+    newVolumeValue = newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
+    for (size_t i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+    {
+        RSVSobj.voluMesh.volus[i].target = newVolumeValue;
+    }
+}
+} // namespace polyscopersvs
 
 /**
  * @brief A method which sets the polyscope userCallback to a UI controlling the giving
@@ -398,6 +429,12 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
     int inspectId = 1;
     bool volumeByIndex = true;
     float newVolumeValue = 0.0;
+
+    /**
+     * @brief A ImGui callback for configuring and controlling the RSVS execution.
+     *
+     * This lambda function is only meant to be used as the user callback of polyscope.
+     */
     auto callback = [&] {
         ImGui::PushItemWidth(100);
 
@@ -420,7 +457,6 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
 
         if (ImGui::CollapsingHeader("Configuration"))
         {
-
             if (ImGui::InputInt("Cell ID", &inspectId))
             {
                 RSVSobj.voluMesh.PrepareForUse();
@@ -431,35 +467,12 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
 
             if (ImGui::InputFloat("New volume", &newVolumeValue))
             {
-                // executes when button is pressed
-                RSVSobj.voluMesh.PrepareForUse();
-                int volumePosition = inspectId;
-                if (volumeByIndex)
-                {
-                    volumePosition = RSVSobj.voluMesh.volus.find(inspectId);
-                }
-                if (volumePosition > -1 && volumePosition < RSVSobj.voluMesh.volus.size())
-                {
-
-                    RSVSobj.voluMesh.volus[volumePosition].target =
-                        newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
-                    RSVSobj.voluMesh.PrepareForUse();
-                }
-                else
-                {
-                    polyscope::warning("Invalid Cell Position", "The cell was not found, it is either out of bounds"
-                                                                " or not a valid index.");
-                }
+                polyscopersvs::UpdateVolume(RSVSobj, inspectId, volumeByIndex, newVolumeValue);
             }
             ImGui::SameLine();
-            if (ImGui::Button("Set All "))
+            if (ImGui::Button("Set All"))
             {
-                RSVSobj.voluMesh.PrepareForUse();
-                newVolumeValue = newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
-                for (size_t i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
-                {
-                    RSVSobj.voluMesh.volus[i].target = newVolumeValue;
-                }
+                polyscopersvs::UpdateVolumes(RSVSobj, newVolumeValue);
             }
         }
         parameter_ui::parameterConfigGui(RSVSobj.paramconf);
