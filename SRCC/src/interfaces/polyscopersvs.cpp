@@ -468,22 +468,26 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
 
         if (ImGui::CollapsingHeader("Configuration"))
         {
-            if (ImGui::InputInt("Cell ID", &inspectId))
-            {
-                RSVSobj.voluMesh.PrepareForUse();
-                newVolumeValue = this->addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
-            }
+            bool cellIdChange = ImGui::InputInt("Cell ID", &inspectId);
             ImGui::SameLine();
             ImGui::Checkbox("Use ID (or position)", &volumeByIndex);
-
-            if (ImGui::InputFloat("New volume", &newVolumeValue))
+            bool volumeHasChanged = ImGui::InputFloat("New volume", &newVolumeValue);
+            ImGui::SameLine();
+            bool volumesHaveChanged = ImGui::Button("Set All");
+            if (volumeHasChanged)
             {
                 polyscopersvs::UpdateVolume(RSVSobj, inspectId, volumeByIndex, newVolumeValue);
             }
-            ImGui::SameLine();
-            if (ImGui::Button("Set All"))
+            if (volumesHaveChanged)
             {
                 polyscopersvs::UpdateVolumes(RSVSobj, newVolumeValue);
+            }
+            if (cellIdChange || volumeHasChanged || volumesHaveChanged)
+            {
+                RSVSobj.voluMesh.PrepareForUse();
+                newVolumeValue = this->addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
+                polyscope::getSurfaceMesh("Active Cell")
+                    ->setSurfaceColor({1.0 - newVolumeValue, 1.0 - newVolumeValue, 1.0 - newVolumeValue});
             }
         }
         parameter_ui::parameterConfigGui(RSVSobj.paramconf);
