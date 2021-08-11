@@ -36,11 +36,34 @@ const std::string polyscopeBackend = "";
 /// Should be called exactly once.
 polyscopersvs::PolyScopeRSVS::PolyScopeRSVS()
 {
+#ifndef HEADLESS
+    this->isHeadless = true;
+#else
+    this->isHeadless = false;
+#endif
     if (!(polyscopersvs::POLYSCOPE_INITIALISED))
     {
         polyscopersvs::POLYSCOPE_INITIALISED = true;
         // TODO: support the mocked backend of polyscope
-        polyscope::init(polyscopeBackend);
+        polyscope::init(polyscopersvs::polyscopeBackend);
+    }
+}
+
+polyscopersvs::PolyScopeRSVS::PolyScopeRSVS(bool isHeadless)
+{
+    this->isHeadless = isHeadless;
+    if (!(polyscopersvs::POLYSCOPE_INITIALISED))
+    {
+        polyscopersvs::POLYSCOPE_INITIALISED = true;
+        // TODO: support the mocked backend of polyscope
+        if (isHeadless)
+        {
+            polyscope::init("openGL_mock");
+        }
+        else
+        {
+            polyscope::init();
+        }
     }
 }
 
@@ -52,11 +75,14 @@ polyscopersvs::PolyScopeRSVS::PolyScopeRSVS()
  */
 void polyscopersvs::PolyScopeRSVS::show(size_t forFrames)
 {
-#ifndef HEADLESS
-    polyscope::show(forFrames);
-#else
-    std::cout << "Headless mode, no polyscope window shown." << std::endl;
-#endif
+    if (!(this->isHeadless))
+    {
+        polyscope::show(forFrames);
+    }
+    else
+    {
+        std::cout << "Headless mode, no polyscope window shown." << std::endl;
+    }
 }
 
 /**
@@ -69,6 +95,9 @@ void polyscopersvs::PolyScopeRSVS::show(size_t forFrames)
  */
 void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 {
+    if (this->isHeadless)
+        return;
+
     if (!meshIn.isready())
     {
         RSVS3D_ERROR("Mesh is not ready, cannot add to polyscope. Call `PrepareForUse` first.");
@@ -124,6 +153,7 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
     faces.reserve(meshIn.surfs.size());
     float outputVolume = 0.0;
 
+    // Todo: only access vertices that are in the cell.
     for (size_t i = 0; i < meshIn.verts.size(); ++i)
     {
         if (meshIn.verts(i)->coord.size() != 3)
@@ -153,6 +183,8 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
         std::cout << "Display cell " << meshIn.volus(volumePosition)->index << " at position [" << volumePosition << "]"
                   << std::endl;
         outputVolume = meshIn.volus(volumePosition)->target;
+        if (this->isHeadless)
+            continue;
         for (auto surfaceIndex : meshIn.volus(volumePosition)->surfind)
         {
             auto faceIndices = meshIn.verts.find_list(meshIn.surfs.isearch(surfaceIndex)->OrderedVerts(&meshIn));
@@ -466,7 +498,7 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             snakeSurfaceMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
         }
 
-        if (ImGui::CollapsingHeader("Configuration"))
+        if (ImGui::CollapsingHeader("VOS Configuration"))
         {
             bool cellIdChange = ImGui::InputInt("Cell ID", &inspectId);
             ImGui::SameLine();

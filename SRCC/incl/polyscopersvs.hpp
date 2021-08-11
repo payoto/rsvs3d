@@ -48,15 +48,25 @@ extern bool POLYSCOPE_INITIALISED;
  */
 class PolyScopeRSVS
 {
+  private:
+    /// Captures whether the RSVS window is being displayed or not.
+    bool isHeadless;
+
   public:
     PolyScopeRSVS();
+    /**
+     * @brief Construct a new Poly Scope RSVS object
+     *
+     * @param isHeadless Whether to use the headless mode or not, when headless the OpenGL mocked back end is used.
+     */
+    PolyScopeRSVS(bool isHeadless);
     /**
      * @brief Show the polyscope window.
      *
      * @param forFrames The number of frames for which to display the window.
      *                  This can be used to make show non blocking.
      */
-    void show(size_t forFrames = 18446744073709551615);
+    void show(size_t forFrames = SIZE_MAX);
     /**
      * @brief Add a mesh with a given name to the polyscope window
      *

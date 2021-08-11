@@ -48,7 +48,7 @@ int RSVSExecution(int argc, char *argv[])
     auto parseOut = parse::CommandLineParser(argc, argv, paramconf);
     if (parseOut.execFlow > 0)
     {
-        integrate::RSVSclass RSVSobj;
+        integrate::RSVSclass RSVSobj(parseOut.isHeadless);
         RSVSobj.paramconf = paramconf;
         if (parseOut.execFlow == 1)
         {
@@ -173,6 +173,7 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
                     cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"), "STRING")
         ("e,exec", "Execute RSVS. With no command line argument the program does nothing.")
         ("i,interactive", "Execute the RSVS in interactive mode using polyscope")
+        ("no-gui", "Disable all GUI calls and OpenGL functionality.")
 #ifndef RSVS_HIDETESTS
         ("test", std::string("Executes specified tests. requires compilation without flag RSVS_NOTESTS."),
             cxxopts::value(testString)->implicit_value("short"), "STRING")
@@ -235,7 +236,10 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
         }
         std::cout << parseOut.paramFileOut << std::endl;
     }
-
+    if (result.count("no-gui"))
+    {
+        parseOut.isHeadless = true;
+    }
     // Parameter configuration
     // if one of the triggers is found specify that execution
     // should take place

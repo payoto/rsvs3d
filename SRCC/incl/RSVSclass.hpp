@@ -55,6 +55,10 @@ class RSVSclass
     std::ofstream logFile;
     std::ofstream coutFile;
     std::ofstream cerrFile;
+
+    RSVSclass(bool isHeadless = false) : viewer(isHeadless)
+    {
+    }
 };
 } // namespace integrate
 
