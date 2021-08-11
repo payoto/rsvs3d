@@ -151,40 +151,34 @@ parse::ParserOutput parse::CommandLineParser(int argc, char *argv[], param::para
     strDescription += " Volume of Solid in 3D";
     cxxopts::Options options(argv[0], strDescription);
     options.positional_help("[optional args]").show_positional_help();
-
+    // clang-format off
     options.add_options("")("h,help", "Print help");
 
-    options.add_options("Parameter configuration")(
-        "u,use-config", "Use one of the predefined configurations stored in the code.", cxxopts::value(configPredef),
-        "STRING")("l,load-config",
-                  std::string("Load configuration file in JSON format to set parameter "
+    options.add_options("Parameter configuration")
+        ("u,use-config", "Use one of the predefined configurations stored in the code.", cxxopts::value(configPredef),"STRING")
+        ("l,load-config",std::string("Load configuration file in JSON format to set parameter "
                               "structure. Multiple files can be specified and will be processed"
-                              " in order of appearance."),
-                  cxxopts::value(configFiles),
-                  "FILES")("p,param",
-                           "Define a parameter manually on the command line."
-                           " The format must be a flat key into the JSON configuration:"
-                           " (e.g.: '/snak/maxsteps:50' will set 'param.snak.maxsteps=50')",
-                           cxxopts::value(configParam),
-                           "KEY:VAL")("default-config", "Output the default configuration to a file.",
-                                      cxxopts::value<std::string>()->implicit_value("default_config"), "FILE");
+                              " in order of appearance."),cxxopts::value(configFiles), "FILES")
+        ("p,param", "Define a parameter manually on the command line."
+                    " The format must be a flat key into the JSON configuration:"
+                    " (e.g.: '/snak/maxsteps:50' will set 'param.snak.maxsteps=50')",
+                    cxxopts::value(configParam),
+                    "KEY:VAL")
+        ("default-config", "Output the default configuration to a file.",
+                            cxxopts::value<std::string>()->implicit_value("default_config"), "FILE");
 
-    options.add_options("Execution control")("n,noexec",
-                                             std::string("Do not execute RSVS process, "
-                                                         "will only parse the inputs and output "
-                                                         "the resulting configuration file to 'arg'"),
-                                             cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"),
-                                             "STRING")("e,exec", "Execute RSVS. With no command line argument the "
-                                                                 "program does nothing.")(
-        "i,interactive", "Execute the RSVS in interactive mode using polyscope")
+    options.add_options("Execution control")
+        ("n,noexec", std::string("Do not execute RSVS process, will only parse the inputs and output "
+                                 "the resulting configuration file to 'arg'"),
+                    cxxopts::value(noexecStr)->implicit_value("./noexec_config.json"), "STRING")
+        ("e,exec", "Execute RSVS. With no command line argument the program does nothing.")
+        ("i,interactive", "Execute the RSVS in interactive mode using polyscope")
 #ifndef RSVS_HIDETESTS
-        ("test",
-         std::string("Executes specified tests. requires compilation "
-                     "without flag RSVS_NOTESTS."),
-         cxxopts::value(testString)->implicit_value("short"), "STRING")
+        ("test", std::string("Executes specified tests. requires compilation without flag RSVS_NOTESTS."),
+            cxxopts::value(testString)->implicit_value("short"), "STRING")
 #endif
         ;
-
+    // clang-format on
     auto result = options.parse(argc, argv);
     // ""
     if (result.count("help"))
