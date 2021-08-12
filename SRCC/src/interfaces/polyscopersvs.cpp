@@ -479,9 +479,36 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
      * This lambda function is only meant to be used as the user callback of polyscope.
      */
     auto callback = [&] {
+        bool runPreparation = false;
         ImGui::PushItemWidth(100);
 
-        if (ImGui::Button("View surfaces"))
+        bool viewSurfaces = ImGui::Button("View surfaces");
+
+        if (ImGui::CollapsingHeader("RSVS Execution"))
+        {
+            ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
+            if (ImGui::Button("Run"))
+            {
+                // executes when button is pressed
+                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("Postprocess"))
+            {
+                // executes when button is pressed
+                integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone,
+                                                   iterateInfo.stepNum);
+                integrate::execute::Exporting(RSVSobj);
+            }
+            ImGui::SameLine();
+            runPreparation = ImGui::Button("Reset");
+            if (runPreparation)
+            {
+                integrate::Prepare(RSVSobj);
+            }
+        }
+        if (viewSurfaces || runPreparation)
         {
             // executes when button is pressed
             RSVSobj.rsvsSnake.PrepareForUse();
@@ -523,29 +550,7 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             }
         }
         parameter_ui::parameterConfigGui(RSVSobj.paramconf);
-        if (ImGui::CollapsingHeader("Execution"))
-        {
-            if (ImGui::Button("Run RSVS"))
-            {
-                // executes when button is pressed
-                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
-            }
-            ImGui::SameLine();
-            ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
 
-            if (ImGui::Button("Postprocess RSVS"))
-            {
-                // executes when button is pressed
-                integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone,
-                                                   iterateInfo.stepNum);
-                integrate::execute::Exporting(RSVSobj);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Reset"))
-            {
-                integrate::Prepare(RSVSobj);
-            }
-        }
         ImGui::PopItemWidth();
     };
     polyscope::state::userCallback = callback;
