@@ -389,10 +389,69 @@ void parameterConfigGui(param::dev::devparam &paramConf)
         ImGui::TreePop();
     }
 }
+void parameterExportImportGui(param::parameters &paramConf)
+{
+    int fileNameCapacity = 1024;
+    static std::string importFile;
+    static std::string exportFile;
+    static bool flatJsonExport = false;
+    // Make sure the capacity of importFile is large enough
+    if (importFile.capacity() < fileNameCapacity)
+    {
+        importFile.reserve(fileNameCapacity);
+        importFile = "";
+        exportFile.reserve(fileNameCapacity);
+        exportFile = "interactive-export.json";
+    }
+
+    // Buttons to import and export parameters
+    ImGui::PushItemWidth(200);
+    ImGui::InputTextWithHint("##Import", "import.json...", importFile.data(), fileNameCapacity);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button("Import"))
+    {
+        try
+        {
+            param::io::read(importFile, paramConf);
+        }
+        catch (const std::exception &e)
+        {
+            polyscope::error(std::string("Could not import parameters from file '") + importFile + "': " + e.what());
+        }
+    }
+    ImGui::PushItemWidth(200);
+    ImGui::InputTextWithHint("##Export", "export.json...", exportFile.data(), fileNameCapacity);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button("Export"))
+    {
+        try
+        {
+            if (!flatJsonExport)
+            {
+                param::io::write(exportFile, paramConf);
+            }
+            else
+            {
+                param::io::writeflat(exportFile, paramConf);
+            }
+        }
+        catch (const std::exception &e)
+        {
+            polyscope::error(std::string("Could not export parameters to file '") + exportFile + "': " + e.what());
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Checkbox("Flat JSON format", &flatJsonExport);
+}
 void parameterConfigGui(param::parameters &paramConf)
 {
+    // Buttons for configuring the parameter structure
     if (ImGui::CollapsingHeader("Parameters"))
     {
+        parameterExportImportGui(paramConf);
+
         ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
         if (ImGui::TreeNode("Grid"))
         {
