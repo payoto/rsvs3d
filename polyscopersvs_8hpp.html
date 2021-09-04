@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8hpp.html',''); initResi
 
 <p>Provide an interface between the RSVS process and polyscope.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="triangulate_8hpp_source.html">triangulate.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="mesh_8hpp_source.html">mesh.hpp</a>&quot;</code><br />
 </div>
 <p><a href="polyscopersvs_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -112,17 +112,20 @@ Namespaces</h2></td></tr>
 <tr class="memdesc:namespacepolyscopersvs"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace containing interfaces to polyscope for RSVS objects. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacepolyscopersvs_1_1test"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepolyscopersvs_1_1test.html">polyscopersvs::test</a></td></tr>
-<tr class="memdesc:namespacepolyscopersvs_1_1test"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test functions for polyscope. <br /></td></tr>
+<tr class="memdesc:namespacepolyscopersvs_1_1test"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test functions for polyscope-RSVS integration. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a95ad99c498cf19e2bdc100fa1232d918"><td class="memItemLeft" align="right" valign="top"><a id="a95ad99c498cf19e2bdc100fa1232d918"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>polyscopersvs::test::init</b> ()</td></tr>
+<tr class="memitem:a95ad99c498cf19e2bdc100fa1232d918"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepolyscopersvs_1_1test.html#a95ad99c498cf19e2bdc100fa1232d918">polyscopersvs::test::init</a> ()</td></tr>
+<tr class="memdesc:a95ad99c498cf19e2bdc100fa1232d918"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should initialise polyscope.  <a href="namespacepolyscopersvs_1_1test.html#a95ad99c498cf19e2bdc100fa1232d918">More...</a><br /></td></tr>
 <tr class="separator:a95ad99c498cf19e2bdc100fa1232d918"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c154458c0d110533908a5fc762fbf4a"><td class="memItemLeft" align="right" valign="top"><a id="a2c154458c0d110533908a5fc762fbf4a"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>polyscopersvs::test::show</b> ()</td></tr>
+<tr class="memitem:a2c154458c0d110533908a5fc762fbf4a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepolyscopersvs_1_1test.html#a2c154458c0d110533908a5fc762fbf4a">polyscopersvs::test::show</a> ()</td></tr>
+<tr class="memdesc:a2c154458c0d110533908a5fc762fbf4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should display the polyscope window.  <a href="namespacepolyscopersvs_1_1test.html#a2c154458c0d110533908a5fc762fbf4a">More...</a><br /></td></tr>
 <tr class="separator:a2c154458c0d110533908a5fc762fbf4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae013cd51aa4f0d00afed891a76247076"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepolyscopersvs_1_1test.html#ae013cd51aa4f0d00afed891a76247076">polyscopersvs::test::meshShow</a> ()</td></tr>
+<tr class="memdesc:ae013cd51aa4f0d00afed891a76247076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should display a single small cubic mesh.  <a href="namespacepolyscopersvs_1_1test.html#ae013cd51aa4f0d00afed891a76247076">More...</a><br /></td></tr>
+<tr class="separator:ae013cd51aa4f0d00afed891a76247076"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -137,8 +140,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <dl class="section version"><dt>Version</dt><dd>0.1 </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>2021-08-08</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (c) 2021</dd></dl>
-<p>This header includes classes and functions to manage the displaying of RSVS elements through polyscope. </p>
-
+<p>This header includes classes and functions to manage the displaying of RSVS elements through polyscope. The key class for this interaction is the <code>PolyScopeRSVS</code>.</p>
+<p>To use the functionality of this module call: </p><div class="fragment"><div class="line">RSVS3D -i</div>
+</div><!-- fragment --> 
 <p class="definition">Definition in file <a class="el" href="polyscopersvs_8hpp_source.html">polyscopersvs.hpp</a>.</p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->

@@ -12,6 +12,7 @@ var classmesh =
     [ "CalcCentreVolu", "classmesh.html#ae8b92a517ffbb15ba9d64f617a0bcfb3", null ],
     [ "CalcPseudoNormalSurf", "classmesh.html#a9db88168c3f324da1434ede3bdbe3880", null ],
     [ "ChangeIndices", "classmesh.html#a28c1d643f984a231313355017f93aebf", null ],
+    [ "clear", "classmesh.html#aa00c1503d397d0e8a416a9bc05fcb1eb", null ],
     [ "CompareEdges", "classmesh.html#a0f894359f3df32dccefabce835b9306d", null ],
     [ "CompareSurfs", "classmesh.html#abf6ea89d343085420fd849c3d8dcae22", null ],
     [ "CompareVerts", "classmesh.html#a8232d20f788095a7fbdb6691220ce383", null ],

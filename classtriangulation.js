@@ -7,6 +7,7 @@ var classtriangulation =
     [ "CalcTriVertPosDyna", "classtriangulation.html#a57917d9cf9005dad83358c09b8471e14", null ],
     [ "CalcTriVertPosDyna", "classtriangulation.html#a370f3c9011b8e088b16fef743d154df1", null ],
     [ "CleanDynaTri", "classtriangulation.html#ab2c8f3722fb1671e669f2dbe20d8121b", null ],
+    [ "clear", "classtriangulation.html#a0a657c0000b40a1e6b58fd147f3e634f", null ],
     [ "disp", "classtriangulation.html#a0e9a40abf43f6bd0261875b3922e13e8", null ],
     [ "PrepareForUse", "classtriangulation.html#af40aea014931482dba3aaa0c20007532", null ],
     [ "SetActiveStaticTri", "classtriangulation.html#af5a74df52cbee6ccfeb1821cb347188b", null ],

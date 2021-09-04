@@ -15,12 +15,14 @@ var namespaces_dup =
     [ "integrate", null, [
       [ "constants", null, [
         [ "outputs", null, [
+          [ "plotSnakeInPolyscope", "_r_s_v_sintegration_8hpp.html#a296a85a00c649de384a5fc54c3a0286f", null ],
           [ "numberdefined", "_r_s_v_sintegration_8hpp.html#af60585caca991b2938110791d460118d", null ],
           [ "printBaseSnake", "_r_s_v_sintegration_8hpp.html#a9f58d40708805576b4a731691208417d", null ],
           [ "printFullSnake", "_r_s_v_sintegration_8hpp.html#a3de95c67f80fef51b65d385300da0243", null ],
           [ "printGradientsSnake", "_r_s_v_sintegration_8hpp.html#ad232ee8623094e5f11b4194f9a82c424", null ],
           [ "printVectorSnake", "_r_s_v_sintegration_8hpp.html#a016bfa29a4d45bd4c8799335460879cd", null ]
         ] ],
+        [ "polyscopeSnakeName", "_r_s_v_sintegration_8hpp.html#a8f2e8015bf330e8f458f8ddd0352c674", null ],
         [ "tecplotgradient", "_r_s_v_sintegration_8hpp.html#a2dd843e80b96afee4add380d5a9cadb7", null ],
         [ "tecplotsnake", "_r_s_v_sintegration_8hpp.html#a82e50a59c2afa7c238c8bc9f42b7fdf5", null ],
         [ "tecplotvectors", "_r_s_v_sintegration_8hpp.html#a18d02a574dee5b60d2c7ca7be9f35acc", null ]
@@ -34,6 +36,7 @@ var namespaces_dup =
           [ "Gradients", "_r_s_v_sintegration_8hpp.html#aea0c50854573690bb8f95838ae9a4e37", null ],
           [ "Log", "_r_s_v_sintegration_8hpp.html#acb66ce0cb5af136f6fb003105234cf51", null ],
           [ "Snake", "_r_s_v_sintegration_8hpp.html#ae7876d189de32e4347074d0670491e84", null ],
+          [ "SnakePolyscope", "_r_s_v_sintegration_8hpp.html#a541df444d44626ccdbae7f01a9914112", null ],
           [ "SnakeVectors", "_r_s_v_sintegration_8hpp.html#aee93305180f276eaee9fc52bbf12845d", null ]
         ] ],
         [ "postprocess", null, [
@@ -44,6 +47,7 @@ var namespaces_dup =
         ] ],
         [ "All", "_r_s_v_sintegration_8hpp.html#a937c17494e1ac59f6ef7aa485fc101ac", null ],
         [ "Exporting", "_r_s_v_sintegration_8hpp.html#afd66e7aa7cf523dce9ebb144242d9c5c", null ],
+        [ "Interactive", "_r_s_v_sintegration_8hpp.html#a9c2dd3796876c978c247b7661c2f911a", null ],
         [ "Logging", "_r_s_v_sintegration_8hpp.html#a09f81601a5bd671f9f6a4d114f564948", null ],
         [ "PostProcessing", "_r_s_v_sintegration_8hpp.html#aea062610ebf1be0dfa9941268896168f", null ],
         [ "RSVSiterate", "_r_s_v_sintegration_8hpp.html#aec32c29dbd9d69923557043359b0d0f6", null ]
@@ -96,6 +100,18 @@ var namespaces_dup =
       [ "VerticesDistanceSquared", "mesh_8cpp.html#a96d6a85230d76bdb70075b0babf25e05", null ]
     ] ],
     [ "param", "namespaceparam.html", "namespaceparam" ],
+    [ "parameter_ui", "namespaceparameter__ui.html", [
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a3423bc84ce443c703ccc45369544f70d", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a1cca5124a7ca589f0a3518d41b91386c", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#ae3ce98b5e64aba0f2948d841609ce597", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a09378ed1d451585eb73daeb50a9f31af", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#ad3137c965024a1d6f10b3c0b1187f598", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a5500664189683f2db53b0d877d4798d8", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a316bd3e33fe7579d9383850b03d6dec3", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#a73e0edad1fdd4d5cc60278a67c5c7342", null ],
+      [ "parameterConfigGui", "namespaceparameter__ui.html#af185b0252c0ff9c1a145e2b7d8814b64", null ],
+      [ "parameterExportImportGui", "namespaceparameter__ui.html#a66af0747a91242a50b77dcc3ef782e92", null ]
+    ] ],
     [ "parse", null, [
       [ "config", null, [
         [ "loadconfig", "main_8hpp.html#aa4fa96189d072f2c1d93b0e7b5116330", null ],
@@ -156,5 +172,11 @@ var namespaces_dup =
       [ "RSVSVoronoiMesh", "tetgenrsvs_8hpp.html#adcc8dcb44216e9a74a00d670ba8ab8f0", null ],
       [ "SnakeToSU2", "tetgenrsvs_8hpp.html#aea7ab659de884d39c855a249c7f69faf", null ],
       [ "to_json", "rsvsjson_8hpp.html#a60ce6b8ddbb78597c650b7f5f8b2ac9c", null ]
+    ] ],
+    [ "vos_ui", null, [
+      [ "UpdateVolume", "polyscopersvs_8cpp.html#a839844fa0214e3a782254341f94bfb6e", null ],
+      [ "UpdateVolumes", "polyscopersvs_8cpp.html#a5c43ab658486d883e7bc923930cfe8e8", null ],
+      [ "vosControlGui", "polyscopersvs_8cpp.html#ade5ec4d4bd2fc296946eddc0ec895616", null ],
+      [ "vosExportImportGui", "polyscopersvs_8cpp.html#a75fdf0792e8c8755f410010e1d633c77", null ]
     ] ]
 ];

@@ -131,23 +131,24 @@ $(document).ready(function(){initNavTree('main_8hpp_source.html',''); initResiza
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">int</span> execFlow = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    std::string paramFileOut = <span class="stringliteral">&quot;noexec_config.json&quot;</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    std::string testCase = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<a class="code" href="classparse_1_1_parser_output.html">ParserOutput</a> <a class="code" href="main_8hpp.html#af4669b38f12fc7b4718913005be29e00">CommandLineParser</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[], <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<a class="code" href="classparse_1_1_parser_output.html">ParserOutput</a> StringParser(std::vector&lt;std::string&gt; &amp;commands, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">namespace </span>config</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keywordtype">void</span> useconfig(<span class="keyword">const</span> std::string &amp;confCase, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keywordtype">void</span> loadconfig(<span class="keyword">const</span> std::string &amp;confCase, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;} <span class="comment">// namespace config</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;} <span class="comment">// namespace parse</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">bool</span> isHeadless = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    std::string paramFileOut = <span class="stringliteral">&quot;noexec_config.json&quot;</span>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    std::string testCase = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<a class="code" href="classparse_1_1_parser_output.html">ParserOutput</a> <a class="code" href="main_8hpp.html#af4669b38f12fc7b4718913005be29e00">CommandLineParser</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[], <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<a class="code" href="classparse_1_1_parser_output.html">ParserOutput</a> StringParser(std::vector&lt;std::string&gt; &amp;commands, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">namespace </span>config</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;{</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keywordtype">void</span> useconfig(<span class="keyword">const</span> std::string &amp;confCase, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keywordtype">void</span> loadconfig(<span class="keyword">const</span> std::string &amp;confCase, <a class="code" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;} <span class="comment">// namespace config</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;} <span class="comment">// namespace parse</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassparam_1_1parameters_html"><div class="ttname"><a href="classparam_1_1parameters.html">param::parameters</a></div><div class="ttdoc">Root class for all the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8hpp_source.html#l00285">parameters.hpp:286</a></div></div>
 <div class="ttc" id="aclassparse_1_1_parser_output_html"><div class="ttname"><a href="classparse_1_1_parser_output.html">parse::ParserOutput</a></div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00044">main.hpp:45</a></div></div>
-<div class="ttc" id="amain_8hpp_html_af4669b38f12fc7b4718913005be29e00"><div class="ttname"><a href="main_8hpp.html#af4669b38f12fc7b4718913005be29e00">parse::CommandLineParser</a></div><div class="ttdeci">ParserOutput CommandLineParser(int argc, char *argv[], param::parameters &amp;paramconf)</div><div class="ttdoc">Takes in the command line arguments and returns an integer specifying the execution flow of the rest ...</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00131">main.cpp:131</a></div></div>
+<div class="ttc" id="amain_8hpp_html_af4669b38f12fc7b4718913005be29e00"><div class="ttname"><a href="main_8hpp.html#af4669b38f12fc7b4718913005be29e00">parse::CommandLineParser</a></div><div class="ttdeci">ParserOutput CommandLineParser(int argc, char *argv[], param::parameters &amp;paramconf)</div><div class="ttdoc">Takes in the command line arguments and returns an integer specifying the execution flow of the rest ...</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00141">main.cpp:141</a></div></div>
 <div class="ttc" id="anamespaceparam_html"><div class="ttname"><a href="namespaceparam.html">param</a></div><div class="ttdoc">Namespace containing the parameter classes used to control execution of the 3D-RSVS program.</div><div class="ttdef"><b>Definition:</b> <a href="main_8hpp_source.html#l00014">main.hpp:15</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

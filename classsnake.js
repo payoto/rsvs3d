@@ -6,6 +6,7 @@ var classsnake =
     [ "ChangeIndicesSnakeMesh", "classsnake.html#a939a824ebb8055bbe639b41fba318126", null ],
     [ "Check3D", "classsnake.html#af4615c9ba0250988aa234c94709af70c", null ],
     [ "CheckConnectivity", "classsnake.html#a3cdb8f36ba60d6f73328d82785205bef", null ],
+    [ "clear", "classsnake.html#a11a74f1313173f64969ce0b9d750bae7", null ],
     [ "Concatenate", "classsnake.html#ad9c8e73de06ff1be37821b4324afab47", null ],
     [ "disp", "classsnake.html#a09fec516a85dc45a8281f8dc74a86180", null ],
     [ "displight", "classsnake.html#a20fbd80d38660f2ef012d69fc4294edb", null ],

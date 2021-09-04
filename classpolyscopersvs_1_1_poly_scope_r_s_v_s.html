@@ -86,6 +86,7 @@ $(document).ready(function(){initNavTree('classpolyscopersvs_1_1_poly_scope_r_s_
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">polyscopersvs::PolyScopeRSVS Class Reference</div>  </div>
@@ -102,17 +103,37 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8ba20e1b90d50306169ad41997622bb4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a8ba20e1b90d50306169ad41997622bb4">PolyScopeRSVS</a> ()</td></tr>
 <tr class="memdesc:a8ba20e1b90d50306169ad41997622bb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize polyscope, creating graphics contexts and constructing a window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a8ba20e1b90d50306169ad41997622bb4">More...</a><br /></td></tr>
 <tr class="separator:a8ba20e1b90d50306169ad41997622bb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25b200db0ff8067f047e2f5b1103ce36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a25b200db0ff8067f047e2f5b1103ce36">show</a> ()</td></tr>
-<tr class="memdesc:a25b200db0ff8067f047e2f5b1103ce36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show the polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a25b200db0ff8067f047e2f5b1103ce36">More...</a><br /></td></tr>
-<tr class="separator:a25b200db0ff8067f047e2f5b1103ce36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1c96e77857a8af11f8182011c8f0724"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#af1c96e77857a8af11f8182011c8f0724">PolyScopeRSVS</a> (bool <a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a76b57b19b957e7345cdf30c1db12f219">isHeadless</a>)</td></tr>
+<tr class="memdesc:af1c96e77857a8af11f8182011c8f0724"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Poly Scope RSVS object.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#af1c96e77857a8af11f8182011c8f0724">More...</a><br /></td></tr>
+<tr class="separator:af1c96e77857a8af11f8182011c8f0724"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb8fc976d883044a1a8f9e6a67082808"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#adb8fc976d883044a1a8f9e6a67082808">show</a> (size_t forFrames=SIZE_MAX)</td></tr>
+<tr class="memdesc:adb8fc976d883044a1a8f9e6a67082808"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show the polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#adb8fc976d883044a1a8f9e6a67082808">More...</a><br /></td></tr>
+<tr class="separator:adb8fc976d883044a1a8f9e6a67082808"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cfa606e2c6f80332eaccb5060b9799d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a2cfa606e2c6f80332eaccb5060b9799d">addMesh</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;meshIn)</td></tr>
+<tr class="memdesc:a2cfa606e2c6f80332eaccb5060b9799d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a mesh with a given name to the polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a2cfa606e2c6f80332eaccb5060b9799d">More...</a><br /></td></tr>
+<tr class="separator:a2cfa606e2c6f80332eaccb5060b9799d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f0978cd68dec09286767038121736a2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">addCells</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;meshIn, const std::vector&lt; int &gt; &amp;&amp;cellIndices, bool isIndex=true)</td></tr>
+<tr class="memdesc:a6f0978cd68dec09286767038121736a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot specified volume elements into polyscope.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">More...</a><br /></td></tr>
+<tr class="separator:a6f0978cd68dec09286767038121736a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc7a4177efc5cef002113c53f38c2c94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#adc7a4177efc5cef002113c53f38c2c94">setInteractiveCallback</a> (<a class="el" href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a> &amp;RSVSobj)</td></tr>
+<tr class="memdesc:adc7a4177efc5cef002113c53f38c2c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set polyscope's user callback to a lambda which allows control of the RSVSobj.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#adc7a4177efc5cef002113c53f38c2c94">More...</a><br /></td></tr>
+<tr class="separator:adc7a4177efc5cef002113c53f38c2c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a76b57b19b957e7345cdf30c1db12f219"><td class="memItemLeft" align="right" valign="top"><a id="a76b57b19b957e7345cdf30c1db12f219"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a76b57b19b957e7345cdf30c1db12f219">isHeadless</a></td></tr>
+<tr class="memdesc:a76b57b19b957e7345cdf30c1db12f219"><td class="mdescLeft">&#160;</td><td class="mdescRight">Captures whether the RSVS window is being displayed or not. <br /></td></tr>
+<tr class="separator:a76b57b19b957e7345cdf30c1db12f219"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A structure containing the information about the polyscope display and the RSVS elements to display. </p>
+<p>The normal lifetime of that class is to call its <code>show</code> method when you want to display the polyscope window. To use the RSVS in interactive mode you can call the <code>setInteractiveCallback</code> method which enables interaction with the RSVS's configuration and execution flow. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8hpp_source.html#l00035">35</a> of file <a class="el" href="polyscopersvs_8hpp_source.html">polyscopersvs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8hpp_source.html#l00049">49</a> of file <a class="el" href="polyscopersvs_8hpp_source.html">polyscopersvs.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8ba20e1b90d50306169ad41997622bb4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ba20e1b90d50306169ad41997622bb4">&#9670;&nbsp;</a></span>PolyScopeRSVS()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ba20e1b90d50306169ad41997622bb4">&#9670;&nbsp;</a></span>PolyScopeRSVS() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,13 +150,188 @@ Public Member Functions</h2></td></tr>
 <p>Initialize polyscope, creating graphics contexts and constructing a window. </p>
 <p>Should be called exactly once. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00016">16</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00037">37</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
+<a id="af1c96e77857a8af11f8182011c8f0724"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1c96e77857a8af11f8182011c8f0724">&#9670;&nbsp;</a></span>PolyScopeRSVS() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">polyscopersvs::PolyScopeRSVS::PolyScopeRSVS </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isHeadless</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a new Poly Scope RSVS object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">isHeadless</td><td>Whether to use the headless mode or not, when headless the OpenGL mocked back end is used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00052">52</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a25b200db0ff8067f047e2f5b1103ce36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25b200db0ff8067f047e2f5b1103ce36">&#9670;&nbsp;</a></span>show()</h2>
+<a id="a6f0978cd68dec09286767038121736a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f0978cd68dec09286767038121736a2">&#9670;&nbsp;</a></span>addCells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float polyscopersvs::PolyScopeRSVS::addCells </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmesh.html">mesh</a> &amp;&#160;</td>
+          <td class="paramname"><em>meshIn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; int &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>cellIndices</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isIndex</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Plot specified volume elements into polyscope. </p>
+<p>This method can be used to highlight specific volume elements in the mesh.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name to give to the polyscope object. </td></tr>
+    <tr><td class="paramname">meshIn</td><td>The mesh from which the elements need to be extracted. </td></tr>
+    <tr><td class="paramname">cellIndices</td><td>The indicies of the volume elements to be displayed. </td></tr>
+    <tr><td class="paramname">isIndex</td><td>Wether an index (true) or the position in the array (false) is used to identify volume elements. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>float The value of the target volume fraction in the last volume cell that was accessed.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td></td></tr>
+    <tr><td class="paramname">meshIn</td><td></td></tr>
+    <tr><td class="paramname">cellIndices</td><td></td></tr>
+    <tr><td class="paramname">isIndex</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>float : This is the volume of the last cell that was encountered </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00143">143</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2cfa606e2c6f80332eaccb5060b9799d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cfa606e2c6f80332eaccb5060b9799d">&#9670;&nbsp;</a></span>addMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void polyscopersvs::PolyScopeRSVS::addMesh </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmesh.html">mesh</a> &amp;&#160;</td>
+          <td class="paramname"><em>meshIn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a mesh with a given name to the polyscope window. </p>
+<p>Add a new surface mesh from a mesh object to polyscope.</p>
+<p>This method plots the given mesh as a surface mesh in polyscope.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name (in polyscope) to give to that mesh, if it is the same as an existing one the previous one will be overwritten. </td></tr>
+    <tr><td class="paramname">meshIn</td><td>The mesh object to plot.</td></tr>
+    <tr><td class="paramname">name</td><td>The name of the surface mesh in polyscope. Using an existing name will allow to overwrite a previous mesh. </td></tr>
+    <tr><td class="paramname">meshIn</td><td>The mesh object that will be parsed for polyscope. This mesh must have been prepared (Using the <code>mesh::PrepareForUse</code> method). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00096">96</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
+<a id="adc7a4177efc5cef002113c53f38c2c94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc7a4177efc5cef002113c53f38c2c94">&#9670;&nbsp;</a></span>setInteractiveCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void polyscopersvs::PolyScopeRSVS::setInteractiveCallback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a> &amp;&#160;</td>
+          <td class="paramname"><em>RSVSobj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set polyscope's user callback to a lambda which allows control of the RSVSobj. </p>
+<p>A method which sets the polyscope userCallback to a UI controlling the giving RSVS object.</p>
+<p>This method is called to run the RSVS process in interactive mode. Once you have initialised the RSVS process you are ready to call this method. The callback it will set captures the RSVS object and allows an interactive configuration, control and visualization.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">RSVSobj</td><td>The main object of the RSVS process. A reference is kept in the callback to allow iteration.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This will make the current object active in the session.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">RSVSobj</td><td>A fully formed RSVSclass which allows handling of the RSVS iteration process. </td></tr>
+  </table>
+  </dd>
+</dl>
+<p>A ImGui callback for configuring and controlling the RSVS execution.</p>
+<p>This lambda function is only meant to be used as the user callback of polyscope.</p>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00629">629</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
+<a id="adb8fc976d883044a1a8f9e6a67082808"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb8fc976d883044a1a8f9e6a67082808">&#9670;&nbsp;</a></span>show()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -143,16 +339,23 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void polyscopersvs::PolyScopeRSVS::show </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>forFrames</em> = <code>SIZE_MAX</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Show the polyscope window. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">forFrames</td><td>The number of frames for which to display the window. This can be used to make show non blocking.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Pass control flow to polyscope, displaying the interactive window. Function will return when user closes the window. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00032">32</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00076">76</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>

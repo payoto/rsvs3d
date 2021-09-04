@@ -112,6 +112,9 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceparam"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceparam.html">param</a></td></tr>
 <tr class="memdesc:namespaceparam"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace containing the parameter classes used to control execution of the 3D-RSVS program. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacepolyscopersvs"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepolyscopersvs.html">polyscopersvs</a></td></tr>
+<tr class="memdesc:namespacepolyscopersvs"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace containing interfaces to polyscope for RSVS objects. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -130,6 +133,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SnakeConnectivityUpda
 <tr class="memitem:ab969d36af08ff34eb80a4b3debc391d9"><td class="memItemLeft" align="right" valign="top"><a id="ab969d36af08ff34eb80a4b3debc391d9"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>SnakePositionUpdate</b> (<a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, std::vector&lt; double &gt; &amp;dt, double snaxtimestep, double snaxdiststep)</td></tr>
 <tr class="separator:ab969d36af08ff34eb80a4b3debc391d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a296a85a00c649de384a5fc54c3a0286f"><td class="memItemLeft" align="right" valign="top"><a id="a296a85a00c649de384a5fc54c3a0286f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::plotSnakeInPolyscope</b> (int lvl)</td></tr>
+<tr class="separator:a296a85a00c649de384a5fc54c3a0286f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a178b5ee13d71c5d1d2b4d8ac906fef54"><td class="memItemLeft" align="right" valign="top"><a id="a178b5ee13d71c5d1d2b4d8ac906fef54"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::Prepare</b> (RSVSclass &amp;RSVSobj)</td></tr>
 <tr class="separator:a178b5ee13d71c5d1d2b4d8ac906fef54"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,6 +166,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::prepare::g
 <tr class="memitem:a937c17494e1ac59f6ef7aa485fc101ac"><td class="memItemLeft" align="right" valign="top"><a id="a937c17494e1ac59f6ef7aa485fc101ac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::All</b> (<a class="el" href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a> &amp;RSVSobj)</td></tr>
 <tr class="separator:a937c17494e1ac59f6ef7aa485fc101ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c2dd3796876c978c247b7661c2f911a"><td class="memItemLeft" align="right" valign="top"><a id="a9c2dd3796876c978c247b7661c2f911a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::Interactive</b> (<a class="el" href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a> &amp;RSVSobj)</td></tr>
+<tr class="separator:a9c2dd3796876c978c247b7661c2f911a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec32c29dbd9d69923557043359b0d0f6"><td class="memItemLeft" align="right" valign="top"><a id="aec32c29dbd9d69923557043359b0d0f6"></a>
 iteratereturns&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::RSVSiterate</b> (RSVSclass &amp;RSVSobj)</td></tr>
 <tr class="separator:aec32c29dbd9d69923557043359b0d0f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +196,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::l
 <tr class="memitem:aee93305180f276eaee9fc52bbf12845d"><td class="memItemLeft" align="right" valign="top"><a id="aee93305180f276eaee9fc52bbf12845d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::SnakeVectors</b> (<a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outSnake, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, double totT)</td></tr>
 <tr class="separator:aee93305180f276eaee9fc52bbf12845d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a541df444d44626ccdbae7f01a9914112"><td class="memItemLeft" align="right" valign="top"><a id="a541df444d44626ccdbae7f01a9914112"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::SnakePolyscope</b> (<a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html">polyscopersvs::PolyScopeRSVS</a> &amp;viewer, const <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake)</td></tr>
+<tr class="separator:a541df444d44626ccdbae7f01a9914112"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af76e8fee1a4770cb444ef9ef3b43419e"><td class="memItemLeft" align="right" valign="top"><a id="af76e8fee1a4770cb444ef9ef3b43419e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Log</b> (std::ofstream &amp;logFile, <a class="el" href="class_r_s_v_scalc.html">RSVScalc</a> &amp;calcObj, int loglvl)</td></tr>
 <tr class="separator:af76e8fee1a4770cb444ef9ef3b43419e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,6 +274,9 @@ static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>i
 <tr class="memitem:a18d02a574dee5b60d2c7ca7be9f35acc"><td class="memItemLeft" align="right" valign="top"><a id="a18d02a574dee5b60d2c7ca7be9f35acc"></a>
 static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::tecplotvectors</b> = &quot;rsvsvectors3D_&quot;</td></tr>
 <tr class="separator:a18d02a574dee5b60d2c7ca7be9f35acc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f2e8015bf330e8f458f8ddd0352c674"><td class="memItemLeft" align="right" valign="top"><a id="a8f2e8015bf330e8f458f8ddd0352c674"></a>
+static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::polyscopeSnakeName</b> = &quot;RSVS-Snake&quot;</td></tr>
+<tr class="separator:a8f2e8015bf330e8f458f8ddd0352c674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Integration into the full 3 dimensional Restricted Snake <a class="el" href="class_volume.html">Volume</a> of Solid method. </p>
@@ -311,7 +326,7 @@ static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>i
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a file path by adding the root directory and the file pattern </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01031">1031</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01087">1087</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
 
 </div>
 </div>
@@ -365,7 +380,7 @@ static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>i
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A string with a file path for RSVS output. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01037">1037</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01093">1093</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
 
 </div>
 </div>

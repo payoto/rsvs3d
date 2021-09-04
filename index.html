@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 What is this repository for?</h1>
 <p>This repository is the C++ implementation of the 3D R-Snake <a class="el" href="class_volume.html">Volume</a> of Solid (RSVS) parameterisation. It includes a main executable that can be built from the <code>SRCC</code> directory and Matlab support codes in <code>SRCMAT</code>. Building and using the 3D-RSVS does not require the MATLAB code is here as it was used to prototype and test ideas.</p>
 <p>Relevant publications for the 2D RSVS are at the end of this readme.</p>
-<p>The compiled binary is available for download for Windows 64bits and Linux 64bits.</p>
+<p>The compiled binary is available for download for Windows 64bits and Linux 64bits. This program provides both a command line interface (CLI) and a GUI for visualising your results.</p>
 <h1><a class="anchor" id="autotoc_md2"></a>
 Get the code</h1>
 <p>This project uses git submodules to handle dependencies: </p><pre class="fragment">git clone --recurse-submodules https://github.com/payoto/rsvs3d
@@ -178,7 +178,7 @@ Using the 3D-RSVS</h1>
 </pre><p> :Note: Running <code>RSVS3D</code> with no command line arguments does nothing.</p>
 <h2>Example</h2>
 <div class="fragment"><div class="line">$ cd SRCC/</div>
-<div class="line">$ RSVS3D -l config/dumbell.json</div>
+<div class="line">$ RSVS3D -l config/dumbell.json -i</div>
 <div class="line">Start RSVS preparation</div>
 <div class="line">Output folder: ../out/Archive_2021_07/Day_21-07-25/rsvs3d_210725T105154_sphere2</div>
 <div class="line">Meshes prepared...</div>
@@ -205,6 +205,7 @@ Using the 3D-RSVS</h1>
 <li>help (<code>-h</code>): Display command line help;</li>
 <li>noexec (<code>-n</code>): Do not run the RSVS process and output the configuration file;</li>
 <li>exec (<code>-e</code>): Execute the RSVS3D for the default case;</li>
+<li>interactive (<code>-i</code>): Execute the RSVS process in interactive mode using a GUI;</li>
 <li>use-config (<code>-u</code>): Use system configuration <code>STRING</code> (none specified yet);</li>
 <li>load-config (<code>-l</code>): Load a configuration file from <code>FILE</code>;</li>
 <li>param (<code>-p</code>): Overwrite a specific parameter specified by <code>KEY:VAL</code>. "key" is the name of that paramaeter as it appears in the flattened JSON parameter files, "val" is the value of that patameter;</li>

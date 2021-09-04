@@ -4,6 +4,7 @@ var classmeshdependence =
     [ "AddParent", "classmeshdependence.html#a923211ffaa02551d80d8e94d35ce5d4e", null ],
     [ "AddParent", "classmeshdependence.html#a21f96cb74b2edcadf074b1963bf0ee4f", null ],
     [ "ChildIndices", "classmeshdependence.html#aaa5d994547cc338930b0f86ed655900b", null ],
+    [ "clear", "classmeshdependence.html#a70041cd0c0d5b0726e7964f9674d88d7", null ],
     [ "NumberOfParents", "classmeshdependence.html#afccf740022801142c605fcd98bcf1d59", null ],
     [ "ParentPointer", "classmeshdependence.html#a69c3b0a5d8ae4712d189fe42ae00bef5", null ],
     [ "RemoveChild", "classmeshdependence.html#a4ffdc254c3e204b1ce8ad57cda240867", null ],

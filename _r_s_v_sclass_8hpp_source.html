@@ -105,54 +105,62 @@ $(document).ready(function(){initNavTree('_r_s_v_sclass_8hpp_source.html',''); i
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_r_s_v_scalc_8hpp.html">RSVScalc.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="mesh_8hpp.html">mesh.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="parameters_8hpp.html">parameters.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="postprocessing_8hpp.html">postprocessing.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="snake_8hpp.html">snake.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="triangulate_8hpp.html">triangulate.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">//==================================</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">// Code</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">// This file defines a god class for conveniently doing the integration</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">// of the various compoments into a cohesive framework</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">namespace </span>integrate</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classintegrate_1_1_r_s_v_stecplot.html">   34</a></span>&#160;<span class="keyword">class </span><a class="code" href="classintegrate_1_1_r_s_v_stecplot.html">RSVStecplot</a></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;{</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outSnake;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outgradientsnake;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outvectorsnake;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;};</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classintegrate_1_1_r_s_v_sclass.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classintegrate_1_1_r_s_v_sclass.html">RSVSclass</a></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;{</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classparam_1_1parameters.html">param::parameters</a> paramconf;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outSnake;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outgradientsnake;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outvectorsnake;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classsnake.html">snake</a> rsvsSnake;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classmesh.html">mesh</a> snakeMesh;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classmesh.html">mesh</a> voluMesh;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classtriangulation.html">triangulation</a> rsvsTri;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="class_r_s_v_scalc.html">RSVScalc</a> calcObj;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    std::ofstream logFile;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    std::ofstream coutFile;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::ofstream cerrFile;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;} <span class="comment">// namespace integrate</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="polyscopersvs_8hpp.html">polyscopersvs.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="postprocessing_8hpp.html">postprocessing.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="snake_8hpp.html">snake.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="triangulate_8hpp.html">triangulate.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">//==================================</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">// Code</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">// This file defines a god class for conveniently doing the integration</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// of the various compoments into a cohesive framework</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span>integrate</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classintegrate_1_1_r_s_v_stecplot.html">   35</a></span>&#160;<span class="keyword">class </span><a class="code" href="classintegrate_1_1_r_s_v_stecplot.html">RSVStecplot</a></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;{</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outSnake;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outgradientsnake;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outvectorsnake;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classintegrate_1_1_r_s_v_sclass.html">   42</a></span>&#160;<span class="keyword">class </span><a class="code" href="classintegrate_1_1_r_s_v_sclass.html">RSVSclass</a></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classparam_1_1parameters.html">param::parameters</a> paramconf;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outSnake;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outgradientsnake;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outvectorsnake;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html">polyscopersvs::PolyScopeRSVS</a> viewer;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classsnake.html">snake</a> rsvsSnake;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classmesh.html">mesh</a> snakeMesh;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="classmesh.html">mesh</a> voluMesh;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classtriangulation.html">triangulation</a> rsvsTri;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="class_r_s_v_scalc.html">RSVScalc</a> calcObj;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::ofstream logFile;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::ofstream coutFile;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    std::ofstream cerrFile;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classintegrate_1_1_r_s_v_sclass.html">RSVSclass</a>(<span class="keywordtype">bool</span> isHeadless = <span class="keyword">false</span>) : viewer(isHeadless)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;};</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;} <span class="comment">// namespace integrate</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="a_r_s_v_scalc_8hpp_html"><div class="ttname"><a href="_r_s_v_scalc_8hpp.html">RSVScalc.hpp</a></div><div class="ttdoc">Provides the infrastructure for calculation of the RSVS equations.</div></div>
 <div class="ttc" id="aclass_r_s_v_scalc_html"><div class="ttname"><a href="class_r_s_v_scalc.html">RSVScalc</a></div><div class="ttdoc">Class to handle the RSVS calculation.</div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_scalc_8hpp_source.html#l00120">RSVScalc.hpp:121</a></div></div>
-<div class="ttc" id="aclassintegrate_1_1_r_s_v_sclass_html"><div class="ttname"><a href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sclass_8hpp_source.html#l00041">RSVSclass.hpp:42</a></div></div>
-<div class="ttc" id="aclassintegrate_1_1_r_s_v_stecplot_html"><div class="ttname"><a href="classintegrate_1_1_r_s_v_stecplot.html">integrate::RSVStecplot</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sclass_8hpp_source.html#l00034">RSVSclass.hpp:35</a></div></div>
-<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00605">mesh.hpp:606</a></div></div>
+<div class="ttc" id="aclassintegrate_1_1_r_s_v_sclass_html"><div class="ttname"><a href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sclass_8hpp_source.html#l00042">RSVSclass.hpp:43</a></div></div>
+<div class="ttc" id="aclassintegrate_1_1_r_s_v_stecplot_html"><div class="ttname"><a href="classintegrate_1_1_r_s_v_stecplot.html">integrate::RSVStecplot</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sclass_8hpp_source.html#l00035">RSVSclass.hpp:36</a></div></div>
+<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00618">mesh.hpp:619</a></div></div>
 <div class="ttc" id="aclassparam_1_1parameters_html"><div class="ttname"><a href="classparam_1_1parameters.html">param::parameters</a></div><div class="ttdoc">Root class for all the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8hpp_source.html#l00285">parameters.hpp:286</a></div></div>
+<div class="ttc" id="aclasspolyscopersvs_1_1_poly_scope_r_s_v_s_html"><div class="ttname"><a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html">polyscopersvs::PolyScopeRSVS</a></div><div class="ttdoc">A structure containing the information about the polyscope display and the RSVS elements to display.</div><div class="ttdef"><b>Definition:</b> <a href="polyscopersvs_8hpp_source.html#l00049">polyscopersvs.hpp:50</a></div></div>
 <div class="ttc" id="aclasssnake_html"><div class="ttname"><a href="classsnake.html">snake</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00081">snake.hpp:82</a></div></div>
 <div class="ttc" id="aclasstecplotfile_html"><div class="ttname"><a href="classtecplotfile.html">tecplotfile</a></div><div class="ttdef"><b>Definition:</b> <a href="postprocessing_8hpp_source.html#l00076">postprocessing.hpp:77</a></div></div>
 <div class="ttc" id="aclasstriangulation_html"><div class="ttname"><a href="classtriangulation.html">triangulation</a></div><div class="ttdef"><b>Definition:</b> <a href="triangulate_8hpp_source.html#l00084">triangulate.hpp:85</a></div></div>
 <div class="ttc" id="amesh_8hpp_html"><div class="ttname"><a href="mesh_8hpp.html">mesh.hpp</a></div><div class="ttdoc">Provides all the mesh tools used for the generation of 3D grids and geometries.</div></div>
 <div class="ttc" id="aparameters_8hpp_html"><div class="ttname"><a href="parameters_8hpp.html">parameters.hpp</a></div><div class="ttdoc">Parameters for the integrated 3DRSVS.</div></div>
+<div class="ttc" id="apolyscopersvs_8hpp_html"><div class="ttname"><a href="polyscopersvs_8hpp.html">polyscopersvs.hpp</a></div><div class="ttdoc">Provide an interface between the RSVS process and polyscope.</div></div>
 <div class="ttc" id="apostprocessing_8hpp_html"><div class="ttname"><a href="postprocessing_8hpp.html">postprocessing.hpp</a></div><div class="ttdoc">Provide tecplot file formating for mesh and snake outputs.</div></div>
 <div class="ttc" id="asnake_8hpp_html"><div class="ttname"><a href="snake_8hpp.html">snake.hpp</a></div><div class="ttdoc">Provides the core restricted surface snake container.</div></div>
 <div class="ttc" id="atriangulate_8hpp_html"><div class="ttname"><a href="triangulate_8hpp.html">triangulate.hpp</a></div><div class="ttdoc">Provides a triangulation for snake and meshes.</div></div>
