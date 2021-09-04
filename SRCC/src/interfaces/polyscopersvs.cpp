@@ -529,54 +529,57 @@ void vosExportImportGui(integrate::RSVSclass &RSVSobj)
         exportFile.reserve(fileNameCapacity);
         exportFile = "interactive-export.fill";
     }
-    ImGui::Text("Export/Import of Volume fractions");
-    // Buttons to import and export parameters
-    ImGui::PushItemWidth(200);
-    ImGui::InputTextWithHint("##Import-vosfill", "import.fill...", importFile.data(), fileNameCapacity);
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-    if (ImGui::Button("Import"))
+    if (ImGui::TreeNode("Export/Import of Volume fractions"))
     {
-        try
+        // Buttons to import and export parameters
+        ImGui::PushItemWidth(200);
+        ImGui::InputTextWithHint("##Import-vosfill", "import.fill...", importFile.data(), fileNameCapacity);
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        if (ImGui::Button("Import"))
         {
-            RSVSobj.voluMesh.LoadTargetFill(importFile);
-        }
-        catch (const std::exception &e)
-        {
-            polyscope::error(std::string("Could not import VOS from file '") + importFile + "': " + e.what());
-        }
-    }
-    ImGui::PushItemWidth(200);
-    ImGui::InputTextWithHint("##Export-vosfill", "export.fill...", exportFile.data(), fileNameCapacity);
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-    if (ImGui::Button("Export"))
-    {
-        try
-        {
-            // Write out the target fill of each Volume cell to the export file
-            std::fstream file(exportFile, std::ios::out);
-            file << std::setprecision(vosPrecision);
-            for (int i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+            try
             {
-                file << RSVSobj.voluMesh.volus[i].target << " ";
-                // every lineLength characters, write a newline
-                if (i % lineLength == lineLength - 1)
-                {
-                    file << std::endl;
-                }
+                RSVSobj.voluMesh.LoadTargetFill(importFile);
+            }
+            catch (const std::exception &e)
+            {
+                polyscope::error(std::string("Could not import VOS from file '") + importFile + "': " + e.what());
             }
         }
-        catch (const std::exception &e)
+        ImGui::PushItemWidth(200);
+        ImGui::InputTextWithHint("##Export-vosfill", "export.fill...", exportFile.data(), fileNameCapacity);
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        if (ImGui::Button("Export"))
         {
-            polyscope::error(std::string("Could not export parameters to file '") + exportFile + "': " + e.what());
+            try
+            {
+                // Write out the target fill of each Volume cell to the export file
+                std::fstream file(exportFile, std::ios::out);
+                file << std::setprecision(vosPrecision);
+                for (int i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+                {
+                    file << RSVSobj.voluMesh.volus[i].target << " ";
+                    // every lineLength characters, write a newline
+                    if (i % lineLength == lineLength - 1)
+                    {
+                        file << std::endl;
+                    }
+                }
+            }
+            catch (const std::exception &e)
+            {
+                polyscope::error(std::string("Could not export parameters to file '") + exportFile + "': " + e.what());
+            }
         }
-    }
 
-    // Input for line length of the output file
-    ImGui::InputInt("Items per line", &lineLength);
-    ImGui::SameLine();
-    ImGui::InputInt("Precision", &vosPrecision);
+        // Input for line length of the output file
+        ImGui::InputInt("Items per line", &lineLength);
+        ImGui::SameLine();
+        ImGui::InputInt("Precision", &vosPrecision);
+        ImGui::TreePop();
+    }
 }
 void vosControlGui(integrate::RSVSclass &RSVSobj)
 {
