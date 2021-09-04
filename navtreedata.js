@@ -43,13 +43,16 @@ var NAVTREE =
       [ "Usage", "md__r_e_a_d_m_e.html#autotoc_md14", null ],
       [ "Testing", "md__r_e_a_d_m_e.html#autotoc_md15", null ]
     ] ],
+    [ "Templates and test outputs", "md__home_runner_work_rsvs3d_rsvs3d__t_e_s_t_o_u_t__r_e_a_d_m_e.html", [
+      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__t_e_s_t_o_u_t__r_e_a_d_m_e.html#autotoc_md17", null ]
+    ] ],
     [ "Matlab helper scripts", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html", [
-      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html#autotoc_md17", null ]
+      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html#autotoc_md19", null ]
     ] ],
     [ "Build doxygen documentation", "md_docs__r_e_a_d_m_e.html", [
-      [ "Build", "md_docs__r_e_a_d_m_e.html#autotoc_md19", null ],
-      [ "View", "md_docs__r_e_a_d_m_e.html#autotoc_md20", null ],
-      [ "Dependencies", "md_docs__r_e_a_d_m_e.html#autotoc_md21", null ]
+      [ "Build", "md_docs__r_e_a_d_m_e.html#autotoc_md21", null ],
+      [ "View", "md_docs__r_e_a_d_m_e.html#autotoc_md22", null ],
+      [ "Dependencies", "md_docs__r_e_a_d_m_e.html#autotoc_md23", null ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -89,8 +92,8 @@ var NAVTREEINDEX =
 "classparam_1_1files.html#a6ec3be3fa86949da6f8dcff6474fee9b",
 "classsnaxsurf.html#ad4d63014793c6d060d9b93a64f241195",
 "classvolu.html#ab41d75788ae83f549c3170e079b2a7cb",
-"namespaceparam_1_1io.html#aef430f64396b1fd89faad2f3aa87c9f1",
-"test_8hpp.html#aac57adea42034e30536f8780737ea32d"
+"namespaceparam_1_1io.html#acf3ed8d51f1e6caff152bb5221314177",
+"test_8hpp.html#aa013f2ca8215445449ef9d9ea51e7e37"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
