@@ -36,11 +36,34 @@ const std::string polyscopeBackend = "";
 /// Should be called exactly once.
 polyscopersvs::PolyScopeRSVS::PolyScopeRSVS()
 {
+#ifndef HEADLESS
+    this->isHeadless = true;
+#else
+    this->isHeadless = false;
+#endif
     if (!(polyscopersvs::POLYSCOPE_INITIALISED))
     {
         polyscopersvs::POLYSCOPE_INITIALISED = true;
         // TODO: support the mocked backend of polyscope
-        polyscope::init(polyscopeBackend);
+        polyscope::init(polyscopersvs::polyscopeBackend);
+    }
+}
+
+polyscopersvs::PolyScopeRSVS::PolyScopeRSVS(bool isHeadless)
+{
+    this->isHeadless = isHeadless;
+    if (!(polyscopersvs::POLYSCOPE_INITIALISED))
+    {
+        polyscopersvs::POLYSCOPE_INITIALISED = true;
+        // TODO: support the mocked backend of polyscope
+        if (isHeadless)
+        {
+            polyscope::init("openGL_mock");
+        }
+        else
+        {
+            polyscope::init();
+        }
     }
 }
 
@@ -52,11 +75,14 @@ polyscopersvs::PolyScopeRSVS::PolyScopeRSVS()
  */
 void polyscopersvs::PolyScopeRSVS::show(size_t forFrames)
 {
-#ifndef HEADLESS
-    polyscope::show(forFrames);
-#else
-    std::cout << "Headless mode, no polyscope window shown." << std::endl;
-#endif
+    if (!(this->isHeadless))
+    {
+        polyscope::show(forFrames);
+    }
+    else
+    {
+        std::cout << "Headless mode, no polyscope window shown." << std::endl;
+    }
 }
 
 /**
@@ -69,6 +95,9 @@ void polyscopersvs::PolyScopeRSVS::show(size_t forFrames)
  */
 void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 {
+    if (this->isHeadless)
+        return;
+
     if (!meshIn.isready())
     {
         RSVS3D_ERROR("Mesh is not ready, cannot add to polyscope. Call `PrepareForUse` first.");
@@ -124,6 +153,7 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
     faces.reserve(meshIn.surfs.size());
     float outputVolume = 0.0;
 
+    // Todo: only access vertices that are in the cell.
     for (size_t i = 0; i < meshIn.verts.size(); ++i)
     {
         if (meshIn.verts(i)->coord.size() != 3)
@@ -153,6 +183,8 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
         std::cout << "Display cell " << meshIn.volus(volumePosition)->index << " at position [" << volumePosition << "]"
                   << std::endl;
         outputVolume = meshIn.volus(volumePosition)->target;
+        if (this->isHeadless)
+            continue;
         for (auto surfaceIndex : meshIn.volus(volumePosition)->surfind)
         {
             auto faceIndices = meshIn.verts.find_list(meshIn.surfs.isearch(surfaceIndex)->OrderedVerts(&meshIn));
@@ -357,10 +389,69 @@ void parameterConfigGui(param::dev::devparam &paramConf)
         ImGui::TreePop();
     }
 }
+void parameterExportImportGui(param::parameters &paramConf)
+{
+    int fileNameCapacity = 1024;
+    static std::string importFile;
+    static std::string exportFile;
+    static bool flatJsonExport = false;
+    // Make sure the capacity of importFile is large enough
+    if (importFile.capacity() < fileNameCapacity)
+    {
+        importFile.reserve(fileNameCapacity);
+        importFile = "";
+        exportFile.reserve(fileNameCapacity);
+        exportFile = "interactive-export.json";
+    }
+
+    // Buttons to import and export parameters
+    ImGui::PushItemWidth(200);
+    ImGui::InputTextWithHint("##Import-parameter", "import.json...", importFile.data(), fileNameCapacity);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button("Import"))
+    {
+        try
+        {
+            param::io::read(importFile, paramConf);
+        }
+        catch (const std::exception &e)
+        {
+            polyscope::error(std::string("Could not import parameters from file '") + importFile + "': " + e.what());
+        }
+    }
+    ImGui::PushItemWidth(200);
+    ImGui::InputTextWithHint("##Export-parameter", "export.json...", exportFile.data(), fileNameCapacity);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+    if (ImGui::Button("Export"))
+    {
+        try
+        {
+            if (!flatJsonExport)
+            {
+                param::io::write(exportFile, paramConf);
+            }
+            else
+            {
+                param::io::writeflat(exportFile, paramConf);
+            }
+        }
+        catch (const std::exception &e)
+        {
+            polyscope::error(std::string("Could not export parameters to file '") + exportFile + "': " + e.what());
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Checkbox("Flat JSON format", &flatJsonExport);
+}
 void parameterConfigGui(param::parameters &paramConf)
 {
+    // Buttons for configuring the parameter structure
     if (ImGui::CollapsingHeader("Parameters"))
     {
+        parameterExportImportGui(paramConf);
+
         ImGui::SetNextTreeNodeOpen(false, ImGuiCond_FirstUseEver);
         if (ImGui::TreeNode("Grid"))
         {
@@ -391,7 +482,7 @@ void parameterConfigGui(param::parameters &paramConf)
 }
 } // namespace parameter_ui
 
-namespace polyscopersvs
+namespace vos_ui
 {
 void UpdateVolume(integrate::RSVSclass &RSVSobj, int inspectId, bool volumeByIndex, double newVolumeValue)
 {
@@ -423,7 +514,108 @@ void UpdateVolumes(integrate::RSVSclass &RSVSobj, double newVolumeValue)
         RSVSobj.voluMesh.volus[i].target = newVolumeValue;
     }
 }
-} // namespace polyscopersvs
+void vosExportImportGui(integrate::RSVSclass &RSVSobj)
+{
+    static int lineLength = 8;
+    static int vosPrecision = 4;
+    int fileNameCapacity = 1024;
+    static std::string importFile;
+    static std::string exportFile;
+    // Make sure the capacity of importFile is large enough
+    if (importFile.capacity() < fileNameCapacity)
+    {
+        importFile.reserve(fileNameCapacity);
+        importFile = "";
+        exportFile.reserve(fileNameCapacity);
+        exportFile = "interactive-export.fill";
+    }
+    if (ImGui::TreeNode("Export/Import of Volume fractions"))
+    {
+        // Buttons to import and export parameters
+        ImGui::PushItemWidth(200);
+        ImGui::InputTextWithHint("##Import-vosfill", "import.fill...", importFile.data(), fileNameCapacity);
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        if (ImGui::Button("Import"))
+        {
+            try
+            {
+                RSVSobj.voluMesh.LoadTargetFill(importFile);
+            }
+            catch (const std::exception &e)
+            {
+                polyscope::error(std::string("Could not import VOS from file '") + importFile + "': " + e.what());
+            }
+        }
+        ImGui::PushItemWidth(200);
+        ImGui::InputTextWithHint("##Export-vosfill", "export.fill...", exportFile.data(), fileNameCapacity);
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        if (ImGui::Button("Export"))
+        {
+            try
+            {
+                // Write out the target fill of each Volume cell to the export file
+                std::fstream file(exportFile, std::ios::out);
+                file << std::setprecision(vosPrecision);
+                for (int i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+                {
+                    file << RSVSobj.voluMesh.volus[i].target << " ";
+                    // every lineLength characters, write a newline
+                    if (i % lineLength == lineLength - 1)
+                    {
+                        file << std::endl;
+                    }
+                }
+            }
+            catch (const std::exception &e)
+            {
+                polyscope::error(std::string("Could not export parameters to file '") + exportFile + "': " + e.what());
+            }
+        }
+
+        // Input for line length of the output file
+        ImGui::InputInt("Items per line", &lineLength);
+        ImGui::SameLine();
+        ImGui::InputInt("Precision", &vosPrecision);
+        ImGui::TreePop();
+    }
+}
+void vosControlGui(integrate::RSVSclass &RSVSobj)
+{
+    static int inspectId = 1;
+    static bool volumeByIndex = true;
+    static float newVolumeValue = 0.0;
+    if (ImGui::CollapsingHeader("VOS Configuration"))
+    {
+        // A button to import and export the VOS configuration
+        vosExportImportGui(RSVSobj);
+        ImGui::Text("\nManual control and viewing Volume fractions");
+        bool cellIdChange = ImGui::InputInt("Cell ID", &inspectId);
+        ImGui::SameLine();
+        ImGui::Checkbox("Use ID (or position)", &volumeByIndex);
+        bool volumeHasChanged = ImGui::InputFloat("New volume", &newVolumeValue);
+        ImGui::SameLine();
+        bool volumesHaveChanged = ImGui::Button("Set All");
+        if (volumeHasChanged)
+        {
+            UpdateVolume(RSVSobj, inspectId, volumeByIndex, newVolumeValue);
+        }
+        if (volumesHaveChanged)
+        {
+            UpdateVolumes(RSVSobj, newVolumeValue);
+        }
+        if (cellIdChange || volumeHasChanged || volumesHaveChanged)
+        {
+            RSVSobj.voluMesh.PrepareForUse();
+            newVolumeValue = RSVSobj.viewer.addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
+            polyscope::getSurfaceMesh("Active Cell")
+                ->setSurfaceColor({1.0 - newVolumeValue, 1.0 - newVolumeValue, 1.0 - newVolumeValue});
+        }
+    }
+}
+
+} // namespace vos_ui
 
 /**
  * @brief A method which sets the polyscope userCallback to a UI controlling the giving
@@ -437,9 +629,6 @@ void UpdateVolumes(integrate::RSVSclass &RSVSobj, double newVolumeValue)
 void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &RSVSobj)
 {
     integrate::iteratereturns iterateInfo(0, 0, 0.0);
-    int inspectId = 1;
-    bool volumeByIndex = true;
-    float newVolumeValue = 0.0;
 
     /**
      * @brief A ImGui callback for configuring and controlling the RSVS execution.
@@ -447,9 +636,36 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
      * This lambda function is only meant to be used as the user callback of polyscope.
      */
     auto callback = [&] {
+        bool runPreparation = false;
         ImGui::PushItemWidth(100);
 
-        if (ImGui::Button("View surfaces"))
+        bool viewSurfaces = ImGui::Button("View surfaces");
+
+        if (ImGui::CollapsingHeader("RSVS Execution"))
+        {
+            ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
+            if (ImGui::Button("Run"))
+            {
+                // executes when button is pressed
+                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("Postprocess"))
+            {
+                // executes when button is pressed
+                integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone,
+                                                   iterateInfo.stepNum);
+                integrate::execute::Exporting(RSVSobj);
+            }
+            ImGui::SameLine();
+            runPreparation = ImGui::Button("Reset");
+            if (runPreparation)
+            {
+                integrate::Prepare(RSVSobj);
+            }
+        }
+        if (viewSurfaces || runPreparation)
         {
             // executes when button is pressed
             RSVSobj.rsvsSnake.PrepareForUse();
@@ -465,51 +681,9 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             snakeSurfaceMesh->setEdgeWidth(1);
             snakeSurfaceMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
         }
-
-        if (ImGui::CollapsingHeader("Configuration"))
-        {
-            if (ImGui::InputInt("Cell ID", &inspectId))
-            {
-                RSVSobj.voluMesh.PrepareForUse();
-                newVolumeValue = this->addCells("Active Cell", RSVSobj.voluMesh, {inspectId}, volumeByIndex);
-            }
-            ImGui::SameLine();
-            ImGui::Checkbox("Use ID (or position)", &volumeByIndex);
-
-            if (ImGui::InputFloat("New volume", &newVolumeValue))
-            {
-                polyscopersvs::UpdateVolume(RSVSobj, inspectId, volumeByIndex, newVolumeValue);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Set All"))
-            {
-                polyscopersvs::UpdateVolumes(RSVSobj, newVolumeValue);
-            }
-        }
+        vos_ui::vosControlGui(RSVSobj);
         parameter_ui::parameterConfigGui(RSVSobj.paramconf);
-        if (ImGui::CollapsingHeader("Execution"))
-        {
-            if (ImGui::Button("Run RSVS"))
-            {
-                // executes when button is pressed
-                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
-            }
-            ImGui::SameLine();
-            ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
 
-            if (ImGui::Button("Postprocess RSVS"))
-            {
-                // executes when button is pressed
-                integrate::execute::PostProcessing(RSVSobj, iterateInfo.timeT, iterateInfo.nVoluZone,
-                                                   iterateInfo.stepNum);
-                integrate::execute::Exporting(RSVSobj);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Reset"))
-            {
-                integrate::Prepare(RSVSobj);
-            }
-        }
         ImGui::PopItemWidth();
     };
     polyscope::state::userCallback = callback;

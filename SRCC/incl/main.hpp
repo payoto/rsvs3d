@@ -45,6 +45,7 @@ class ParserOutput
 {
   public:
     int execFlow = 0;
+    bool isHeadless = false;
     std::string paramFileOut = "noexec_config.json";
     std::string testCase = "";
 };
