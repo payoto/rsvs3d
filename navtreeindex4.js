@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"classsnaxsurf.html#ac393cd215a0b216c1638d225c8baa84c":[6,0,32,12],
 "classsnaxsurf.html#ad4d63014793c6d060d9b93a64f241195":[6,0,32,11],
 "classsnaxsurf.html#adab41b5608817515c9c9a3e87d7b2f2d":[6,0,32,14],
 "classsnaxsurf.html#ae0ad9b97fe88e76ac9a3d0af4f786854":[6,0,32,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX4 =
 "classvolu.html#a62683edbbaf9e17690cab171e0c684cb":[6,0,49,18],
 "classvolu.html#a7c746b31d0ae8d51309a8056662ebbc8":[6,0,49,14],
 "classvolu.html#a8bd7c3d4b820775447f319849ddfcf76":[6,0,49,1],
-"classvolu.html#a9a8765d21816aa43a0fce2cd183a6de1":[6,0,49,8],
-"classvolu.html#aa0a811cc45fde3d7ca8e3a331c806620":[6,0,49,0]
+"classvolu.html#a9a8765d21816aa43a0fce2cd183a6de1":[6,0,49,8]
 };

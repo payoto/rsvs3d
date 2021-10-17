@@ -112,6 +112,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2cfa606e2c6f80332eaccb5060b9799d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a2cfa606e2c6f80332eaccb5060b9799d">addMesh</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;meshIn)</td></tr>
 <tr class="memdesc:a2cfa606e2c6f80332eaccb5060b9799d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a mesh with a given name to the polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a2cfa606e2c6f80332eaccb5060b9799d">More...</a><br /></td></tr>
 <tr class="separator:a2cfa606e2c6f80332eaccb5060b9799d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aeb74ef2e65e6e0ff5aff750389f9f119">addSnake</a> (std::string name, const <a class="el" href="classsnake.html">snake</a> &amp;snakeIn)</td></tr>
+<tr class="memdesc:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLot a snake with it's velocity in the given polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aeb74ef2e65e6e0ff5aff750389f9f119">More...</a><br /></td></tr>
+<tr class="separator:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f0978cd68dec09286767038121736a2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">addCells</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;meshIn, const std::vector&lt; int &gt; &amp;&amp;cellIndices, bool isIndex=true)</td></tr>
 <tr class="memdesc:a6f0978cd68dec09286767038121736a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot specified volume elements into polyscope.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">More...</a><br /></td></tr>
 <tr class="separator:a6f0978cd68dec09286767038121736a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,7 +133,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="textblock"><p>A structure containing the information about the polyscope display and the RSVS elements to display. </p>
 <p>The normal lifetime of that class is to call its <code>show</code> method when you want to display the polyscope window. To use the RSVS in interactive mode you can call the <code>setInteractiveCallback</code> method which enables interaction with the RSVS's configuration and execution flow. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8hpp_source.html#l00049">49</a> of file <a class="el" href="polyscopersvs_8hpp_source.html">polyscopersvs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8hpp_source.html#l00053">53</a> of file <a class="el" href="polyscopersvs_8hpp_source.html">polyscopersvs.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8ba20e1b90d50306169ad41997622bb4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8ba20e1b90d50306169ad41997622bb4">&#9670;&nbsp;</a></span>PolyScopeRSVS() <span class="overload">[1/2]</span></h2>
@@ -244,7 +247,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>float : This is the volume of the last cell that was encountered </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00143">143</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00164">164</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -291,6 +294,47 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a id="aeb74ef2e65e6e0ff5aff750389f9f119"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb74ef2e65e6e0ff5aff750389f9f119">&#9670;&nbsp;</a></span>addSnake()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void polyscopersvs::PolyScopeRSVS::addSnake </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsnake.html">snake</a> &amp;&#160;</td>
+          <td class="paramname"><em>snakeIn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>PLot a snake with it's velocity in the given polyscope window. </p>
+<p>Color a surface mesh using a snake's properties.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name of the mesh which will be used to display the snake. </td></tr>
+    <tr><td class="paramname">snakeIn</td><td>The snake object which will be plotted.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Uses the snake's velocity to color a new surface mesh. </p>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00139">139</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
 <a id="adc7a4177efc5cef002113c53f38c2c94"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adc7a4177efc5cef002113c53f38c2c94">&#9670;&nbsp;</a></span>setInteractiveCallback()</h2>
 
@@ -326,7 +370,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>A ImGui callback for configuring and controlling the RSVS execution.</p>
 <p>This lambda function is only meant to be used as the user callback of polyscope.</p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00629">629</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00650">650</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
