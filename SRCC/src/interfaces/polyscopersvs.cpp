@@ -132,6 +132,27 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 }
 
 /**
+ * @brief Color a surface mesh using a snake's properties
+ *
+ * Uses the snake's velocity to color a new surface mesh.
+ */
+void polyscopersvs::PolyScopeRSVS::addSnake(std::string name, const snake &snakeIn)
+{
+    if (this->isHeadless)
+        return;
+
+    this->addMesh(name, snakeIn.snakeconn);
+    std::vector<double> velocities;
+    velocities.reserve(snakeIn.snaxs.size());
+    for (size_t i = 0; i < snakeIn.snaxs.size(); ++i)
+    {
+
+        velocities.push_back(snakeIn.snaxs(i)->v);
+    }
+    polyscope::getSurfaceMesh(name)->addVertexScalarQuantity("velocity", velocities);
+}
+
+/**
  * @brief
  *
  * @param name

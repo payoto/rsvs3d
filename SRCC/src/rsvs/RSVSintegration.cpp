@@ -926,7 +926,7 @@ void integrate::execute::logging::SnakeVectors(tecplotfile &outSnake, snake &rsv
 
 void integrate::execute::logging::SnakePolyscope(polyscopersvs::PolyScopeRSVS &viewer, const snake &rsvsSnake)
 {
-    viewer.addMesh(integrate::constants::polyscopeSnakeName, rsvsSnake.snakeconn);
+    viewer.addSnake(integrate::constants::polyscopeSnakeName, rsvsSnake);
     viewer.show(0);
 }
 

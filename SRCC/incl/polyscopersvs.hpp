@@ -26,7 +26,11 @@ namespace integrate
 class RSVSclass;
 }
 
-#include "mesh.hpp"
+class mesh;
+class snake;
+#include <string>
+#include <vector>
+
 /**
  * @brief Namespace containing interfaces to polyscope for RSVS objects
  *
@@ -77,6 +81,13 @@ class PolyScopeRSVS
      * @param meshIn The mesh object to plot.
      */
     void addMesh(std::string name, const mesh &meshIn);
+    /**
+     * @brief PLot a snake with it's velocity in the given polyscope window
+     *
+     * @param name The name of the mesh which will be used to display the snake.
+     * @param snakeIn The snake object which will be plotted.
+     */
+    void addSnake(std::string name, const snake &snakeIn);
     /**
      * @brief Plot specified volume elements into polyscope
      *
