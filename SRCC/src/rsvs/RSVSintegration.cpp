@@ -732,7 +732,12 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int
     }
     if (integrate::constants::outputs::plotSnakeInPolyscope(logLvl))
     {
-        integrate::execute::logging::SnakePolyscope(RSVSobj.viewer, RSVSobj.rsvsSnake);
+        RSVSobj.viewer.addSnake(integrate::constants::polyscopeSnakeName, RSVSobj.rsvsSnake);
+        if (integrate::constants::outputs::printVectorSnake(logLvl))
+        {
+            RSVSobj.viewer.addSurfaceProperties(integrate::constants::polyscopeSnakeName, RSVSobj.rsvsSnake.snakeconn);
+        }
+        RSVSobj.viewer.show(0);
     }
 }
 

@@ -89,6 +89,11 @@ class PolyScopeRSVS
      */
     void addSnake(std::string name, const snake &snakeIn);
     /**
+     * @brief Adds properties of the surface of a snake to it's mesh as scalar quantities.
+     *
+     */
+    void addSurfaceProperties(std::string name, const mesh &surfaceMesh);
+    /**
      * @brief Plot specified volume elements into polyscope
      *
      * This method can be used to highlight specific volume elements in the mesh.

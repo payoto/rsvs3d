@@ -13,6 +13,7 @@
 #include "polyscopersvs.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
+#include "meshprocessing.hpp"
 #include "parameters.hpp"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
@@ -150,6 +151,58 @@ void polyscopersvs::PolyScopeRSVS::addSnake(std::string name, const snake &snake
         velocities.push_back(snakeIn.snaxs(i)->v);
     }
     polyscope::getSurfaceMesh(name)->addVertexScalarQuantity("velocity", velocities);
+}
+
+/**
+ * @brief Wrap a vector to allow for (i,j) indexing as if it was a 2D
+ * array of coordinates.
+ *
+ * Stride is hard coded at 3. No checks are run.
+ *
+ */
+class _3dVectorWrapper
+{
+  public:
+    _3dVectorWrapper(const std::vector<double> &vec, double multiplier = 1.0) : vec(vec), multiplier(multiplier)
+    {
+    }
+    double operator()(size_t i, size_t j) const
+    {
+        return vec[i * 3 + j] * this->multiplier;
+    }
+    size_t size() const
+    {
+        return vec.size() / 3;
+    }
+
+  private:
+    const std::vector<double> &vec;
+    double multiplier = 1.0;
+};
+
+/**
+ * @brief Plots all the available surface quantities on a surface mesh.
+ *
+ * @param name
+ * @param surfaceMesh
+ */
+void polyscopersvs::PolyScopeRSVS::addSurfaceProperties(std::string name, const mesh &surfaceMesh)
+{
+    if (this->isHeadless)
+        return;
+
+    std::vector<double> properties;
+
+    auto psMesh = polyscope::getSurfaceMesh(name);
+
+    psMesh->addEdgeScalarQuantity("edge-curvature", CalculateEdgeCurvature(surfaceMesh));
+    psMesh->addEdgeScalarQuantity("edge-length", CalculateEdgeLengths(surfaceMesh));
+    psMesh->addVertexScalarQuantity("vertex-curvature", CalculateVertexCurvature(surfaceMesh, 1));
+    psMesh->addVertexScalarQuantity("vertex-minimum-length", CalculateVertexMinEdgeLength(surfaceMesh));
+    psMesh->addVertexScalarQuantity("vertex-maximum-length", CalculateVertexMaxEdgeLength(surfaceMesh));
+    psMesh->addVertexScalarQuantity("vertex-mean-length", CalculateVertexMeanEdgeLength(surfaceMesh));
+    psMesh->addVertexVectorQuantity("vertex-normal", _3dVectorWrapper(MeshUnitNormals(surfaceMesh)));
+    psMesh->addVertexVectorQuantity("vertex-laplacians-(flipped)", _3dVectorWrapper(MeshLaplacians(surfaceMesh), -1.0));
 }
 
 /**
