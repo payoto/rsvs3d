@@ -550,6 +550,11 @@ int tecplotfile::VolFaceMap(const mesh &meshout, const std::vector<int> &surfLis
 int tecplotfile::PrintMesh(const mesh &meshout, int strandID, double timeStep, int forceOutType,
                            const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat;
 
     ExtractMeshData(meshout, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -677,6 +682,11 @@ int tecplotfile::PrintSnake(const snake &snakeout, int strandID, double timeStep
 int tecplotfile::PrintSnake(std::string snakeData, const snake &snakeout, int strandID, double timeStep,
                             int forceOutType, int coordConnShareZone, const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat;
 
     ExtractMeshData(snakeout.snakeconn, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -861,6 +871,11 @@ int tecplotfile::DefShareZoneVolume(int shareZone, int nVertDat)
 
 int tecplotfile::PrintSnakeInternalPts(const snake &snakein, int strandID, double timeStep)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int jj;
     std::vector<int> vertList;
     vertList.clear();
@@ -1275,6 +1290,11 @@ int tecplotfile::VolFaceMap(const triangulation &triout, triarray triangulation:
 int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triangulation::*mp, int strandID,
                                     double timeStep, int forceOutType, const vector<int> &triList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat;
 
     if (triList.size() == 0 || forceOutType != 3)
@@ -1653,6 +1673,11 @@ int tecplotfile::VolFaceMap(const triangulation &triout, trisurfarray triangulat
 int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray triangulation::*mp, int strandID,
                                     double timeStep, int forceOutType)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat;
 
     ExtractTriData(triout, mp, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -1799,6 +1824,11 @@ void tecplotfile::ZoneHeaderOrdered(int nVert, int nVertDat, int nCellDat, int n
 int tecplotfile::PrintSnakeSensitivity(const triangulation &triRSVS, const RSVScalc &calcObj, int strandID,
                                        double timeStep, int forceOutType, const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat, nSensDat;
     const snake &snakeout = *triRSVS.snakeDep;
     ExtractMeshData(snakeout.snakeconn, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -1894,6 +1924,11 @@ int tecplotfile::PrintSnakeSensitivity(const triangulation &triRSVS, const RSVSc
 int tecplotfile::PrintSnakeGradients(const triangulation &triRSVS, const RSVScalc &calcObj, int strandID,
                                      double timeStep, int forceOutType, const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat, nSensDat;
     const snake &snakeout = *triRSVS.snakeDep;
     ExtractMeshData(snakeout.snakeconn, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -1995,6 +2030,11 @@ int tecplotfile::PrintSnakeGradients(const triangulation &triRSVS, const RSVScal
 int tecplotfile::RSVScalcDataBlock(const triangulation &triRSVS, const RSVScalc &calcObj, int nVert, int nSensDat,
                                    int sensStart, int methodProcess)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     // Prints the Coord and Fill Data blocks to the tecplot file
 
     int ii, jj;
@@ -2030,6 +2070,11 @@ int tecplotfile::RSVScalcDataBlock(const triangulation &triRSVS, const RSVScalc 
 int tecplotfile::RSVScalcVectorDataBlock(const triangulation &triRSVS, const RSVScalc &calcObj, int nVert,
                                          int numConstrPlot, int methodProcess)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     // Prints the Coord and Fill Data blocks to the tecplot file
 
     int ii;
@@ -2081,6 +2126,11 @@ int tecplotfile::RSVScalcVectorDataBlock(const triangulation &triRSVS, const RSV
 int tecplotfile::PrintSnakeSensitivityTime(const triangulation &triRSVS, const RSVScalc &calcObj, int strandID,
                                            double timeStep, int forceOutType, const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat, nSensDat, nSensStep;
     const snake &snakeout = *triRSVS.snakeDep;
     ExtractMeshData(snakeout.snakeconn, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);
@@ -2209,6 +2259,11 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation &triRSVS, const R
 int tecplotfile::PrintSnakeSensitivityVector(const triangulation &triRSVS, const RSVScalc &calcObj, int strandID,
                                              double timeStep, int forceOutType, const vector<int> &vertList)
 {
+    if (!this->isOpen())
+    {
+        RSVS3D_ERROR_NOTHROW("File not open, no data printed.");
+        return -1;
+    }
     int nVert, nEdge, nVolu, nSurf, totNumFaceNode, nVertDat, nCellDat, nSensDat, nSensStep;
     const snake &snakeout = *triRSVS.snakeDep;
     ExtractMeshData(snakeout.snakeconn, &nVert, &nEdge, &nVolu, &nSurf, &totNumFaceNode);

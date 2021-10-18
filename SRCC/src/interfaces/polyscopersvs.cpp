@@ -376,6 +376,7 @@ void parameterConfigGui(param::snaking &paramConf)
 }
 void parameterConfigGui(param::files &paramConf)
 {
+    ImGui::InputInt("Logging level [0-7]", &paramConf.ioout.logginglvl);
     ImGui::InputText("Case name", paramConf.ioin.casename.data(), paramConf.ioin.casename.capacity());
     rsvsjson::json out;
     out = paramConf;

@@ -77,7 +77,7 @@ class tecplotfile
 {
   private:
     HashedVector<int, int> strands;
-    FILE *fid;
+    FILE *fid = nullptr;
     int lengthLine;
     int nZones = 0;
     bool isloud;
@@ -88,6 +88,10 @@ class tecplotfile
         return rsvs3d::logicals::__isfound(this->strands.find(strandID));
     }
     int OpenFile(const char *str, const char *mode = "w");
+    bool isOpen()
+    {
+        return this->fid != nullptr;
+    }
     void CloseFile();
     int ZoneNum() const
     {
