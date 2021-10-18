@@ -115,6 +115,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aeb74ef2e65e6e0ff5aff750389f9f119">addSnake</a> (std::string name, const <a class="el" href="classsnake.html">snake</a> &amp;snakeIn)</td></tr>
 <tr class="memdesc:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLot a snake with it's velocity in the given polyscope window.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aeb74ef2e65e6e0ff5aff750389f9f119">More...</a><br /></td></tr>
 <tr class="separator:aeb74ef2e65e6e0ff5aff750389f9f119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6e02717223f0c10149d27a12b5a5905"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aa6e02717223f0c10149d27a12b5a5905">addSurfaceProperties</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;surfaceMesh)</td></tr>
+<tr class="memdesc:aa6e02717223f0c10149d27a12b5a5905"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds properties of the surface of a snake to it's mesh as scalar quantities.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#aa6e02717223f0c10149d27a12b5a5905">More...</a><br /></td></tr>
+<tr class="separator:aa6e02717223f0c10149d27a12b5a5905"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f0978cd68dec09286767038121736a2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">addCells</a> (std::string name, const <a class="el" href="classmesh.html">mesh</a> &amp;meshIn, const std::vector&lt; int &gt; &amp;&amp;cellIndices, bool isIndex=true)</td></tr>
 <tr class="memdesc:a6f0978cd68dec09286767038121736a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot specified volume elements into polyscope.  <a href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html#a6f0978cd68dec09286767038121736a2">More...</a><br /></td></tr>
 <tr class="separator:a6f0978cd68dec09286767038121736a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,7 +156,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Initialize polyscope, creating graphics contexts and constructing a window. </p>
 <p>Should be called exactly once. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00037">37</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00038">38</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -181,7 +184,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00052">52</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00053">53</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -247,7 +250,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>float : This is the volume of the last cell that was encountered </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00164">164</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00217">217</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +293,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00096">96</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00097">97</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -331,7 +334,47 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <p>Uses the snake's velocity to color a new surface mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00139">139</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00140">140</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa6e02717223f0c10149d27a12b5a5905"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6e02717223f0c10149d27a12b5a5905">&#9670;&nbsp;</a></span>addSurfaceProperties()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void polyscopersvs::PolyScopeRSVS::addSurfaceProperties </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmesh.html">mesh</a> &amp;&#160;</td>
+          <td class="paramname"><em>surfaceMesh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds properties of the surface of a snake to it's mesh as scalar quantities. </p>
+<p>Plots all the available surface quantities on a surface mesh.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td></td></tr>
+    <tr><td class="paramname">surfaceMesh</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00189">189</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +413,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>A ImGui callback for configuring and controlling the RSVS execution.</p>
 <p>This lambda function is only meant to be used as the user callback of polyscope.</p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00650">650</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00704">704</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>
@@ -399,7 +442,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <p>Pass control flow to polyscope, displaying the interactive window. Function will return when user closes the window. </p>
 
-<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00076">76</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="polyscopersvs_8cpp_source.html#l00077">77</a> of file <a class="el" href="polyscopersvs_8cpp_source.html">polyscopersvs.cpp</a>.</p>
 
 </div>
 </div>

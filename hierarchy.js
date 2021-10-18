@@ -1,5 +1,6 @@
 var hierarchy =
 [
+    [ "_3dVectorWrapper", "class__3d_vector_wrapper.html", null ],
     [ "tetgen::apiparam", "classtetgen_1_1apiparam.html", null ],
     [ "ArrayStruct< T >", "class_array_struct.html", [
       [ "ModiftrackArray< surf >", "class_modiftrack_array.html", null ],

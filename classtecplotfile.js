@@ -5,6 +5,7 @@ var classtecplotfile =
     [ "~tecplotfile", "classtecplotfile.html#a492bd250e3732f18eb248992b618fb31", null ],
     [ "CloseFile", "classtecplotfile.html#a870e09bd3b36b996b2aaf18ed63eaa51", null ],
     [ "DefShareZoneVolume", "classtecplotfile.html#ab876ba94e78289322aea4682cb86efc5", null ],
+    [ "isOpen", "classtecplotfile.html#a071686f4914c87ac4dd1328df551f788", null ],
     [ "isStrand", "classtecplotfile.html#a098f5c2567ef0cf4681c09ddc8cdec22", null ],
     [ "LineDataBlock", "classtecplotfile.html#aa142d7f136af621fb015cd633508f8ec", null ],
     [ "LineDataBlock", "classtecplotfile.html#a2dd798c5e339699a4f227f5cbfc4fcb4", null ],

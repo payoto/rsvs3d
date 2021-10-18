@@ -1,5 +1,6 @@
 var polyscopersvs_8cpp =
 [
+    [ "_3dVectorWrapper", "class__3d_vector_wrapper.html", "class__3d_vector_wrapper" ],
     [ "parameterConfigGui", "polyscopersvs_8cpp.html#a3423bc84ce443c703ccc45369544f70d", null ],
     [ "parameterConfigGui", "polyscopersvs_8cpp.html#a1cca5124a7ca589f0a3518d41b91386c", null ],
     [ "parameterConfigGui", "polyscopersvs_8cpp.html#ae3ce98b5e64aba0f2948d841609ce597", null ],

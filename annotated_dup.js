@@ -39,6 +39,7 @@ var annotated_dup =
       [ "io_safe", "classtetgen_1_1io__safe.html", "classtetgen_1_1io__safe" ],
       [ "apiparam", "classtetgen_1_1apiparam.html", "classtetgen_1_1apiparam" ]
     ] ],
+    [ "_3dVectorWrapper", "class__3d_vector_wrapper.html", "class__3d_vector_wrapper" ],
     [ "Area", "class_area.html", "class_area" ],
     [ "ArrayStruct", "class_array_struct.html", "class_array_struct" ],
     [ "ArrayStructpart", "class_array_structpart.html", "class_array_structpart" ],
