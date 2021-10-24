@@ -232,18 +232,6 @@ class volu : public meshpart
         std::cout << "volu #" << index << " Was created " << surfind.size() << std::endl;
 #endif
     }
-    volu(const volu &oldVolu)
-    { // Copy-Constructor
-        this->index = oldVolu.index;
-        this->fill = oldVolu.fill;
-        this->target = oldVolu.target;
-        this->error = oldVolu.error;
-        this->surfind = oldVolu.surfind;
-
-#ifdef TEST_ARRAYSTRUCT
-        std::cout << "copyvolu #" << index << " Was created " << surfind.size() << std::endl;
-#endif
-    }
     ~volu()
     { // Destructor
         surfind.clear();
@@ -341,16 +329,6 @@ class surf : public meshpart, public modiftrackpart
         edgeind.clear();
         voluind.clear();
     }
-    surf(const surf &oldSurf)
-    { // Copy-Constructor
-        index = oldSurf.index;
-        fill = oldSurf.fill;
-        target = oldSurf.target;
-        error = oldSurf.error;
-        edgeind = oldSurf.edgeind;
-        voluind = oldSurf.voluind;
-        isordered = oldSurf.isordered;
-    }
     void operator=(const surf *other)
     {
         index = other->index;
@@ -442,6 +420,7 @@ class edge : public meshpart, public modiftrackpart
         vertind = oldEdge.vertind;
         surfind = oldEdge.surfind;
     }
+    edge &operator=(const edge &other) = default;
     ~edge()
     { // Destructor
 
@@ -506,12 +485,6 @@ class vert : public meshpart
         index = 0;
         coord.reserve(3); // reserves 2 as this is the size of the array
         coord.assign(3, 0);
-    }
-    vert(const vert &oldEdge)
-    { // Copy-Constructor
-        index = oldEdge.index;
-        edgeind = oldEdge.edgeind;
-        coord = oldEdge.coord;
     }
     ~vert()
     { // Destructor
