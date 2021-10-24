@@ -958,7 +958,7 @@ std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers)
 
         for (auto vertSub : surfVerts)
         {
-            for (size_t j = 0; j < nLayers; ++j)
+            for (size_t j = 0; j < size_t(nLayers); ++j)
             {
                 for (size_t k = 0; k < 3; ++k)
                 {

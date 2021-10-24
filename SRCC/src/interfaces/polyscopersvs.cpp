@@ -108,7 +108,7 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
     points.reserve(meshIn.verts.size());
     faces.reserve(meshIn.surfs.size());
 
-    for (size_t i = 0; i < meshIn.verts.size(); ++i)
+    for (size_t i = 0; i < size_t(meshIn.verts.size()); ++i)
     {
         if (meshIn.verts(i)->coord.size() != 3)
         {
@@ -118,7 +118,7 @@ void polyscopersvs::PolyScopeRSVS::addMesh(std::string name, const mesh &meshIn)
 
         points.push_back(meshIn.verts(i)->coord);
     }
-    for (size_t i = 0; i < meshIn.surfs.size(); ++i)
+    for (size_t i = 0; i < size_t(meshIn.surfs.size()); ++i)
     {
         auto faceIndices = meshIn.verts.find_list(meshIn.surfs(i)->OrderedVerts(&meshIn));
         if (faceIndices.size() < 3)
@@ -145,7 +145,7 @@ void polyscopersvs::PolyScopeRSVS::addSnake(std::string name, const snake &snake
     this->addMesh(name, snakeIn.snakeconn);
     std::vector<double> velocities;
     velocities.reserve(snakeIn.snaxs.size());
-    for (size_t i = 0; i < snakeIn.snaxs.size(); ++i)
+    for (size_t i = 0; i < size_t(snakeIn.snaxs.size()); ++i)
     {
 
         velocities.push_back(snakeIn.snaxs(i)->v);
@@ -228,7 +228,7 @@ float polyscopersvs::PolyScopeRSVS::addCells(std::string name, const mesh &meshI
     float outputVolume = 0.0;
 
     // Todo: only access vertices that are in the cell.
-    for (size_t i = 0; i < meshIn.verts.size(); ++i)
+    for (size_t i = 0; i < size_t(meshIn.verts.size()); ++i)
     {
         if (meshIn.verts(i)->coord.size() != 3)
         {
@@ -471,7 +471,7 @@ void parameterExportImportGui(param::parameters &paramConf)
     static std::string exportFile;
     static bool flatJsonExport = false;
     // Make sure the capacity of importFile is large enough
-    if (importFile.capacity() < fileNameCapacity)
+    if (importFile.capacity() < size_t(fileNameCapacity))
     {
         importFile.reserve(fileNameCapacity);
         importFile = "";
@@ -584,7 +584,7 @@ void UpdateVolumes(integrate::RSVSclass &RSVSobj, double newVolumeValue)
 {
     RSVSobj.voluMesh.PrepareForUse();
     newVolumeValue = newVolumeValue > 0.0 ? (newVolumeValue <= 1.0 ? newVolumeValue : 1.0) : 0.0;
-    for (size_t i = 0; i < RSVSobj.voluMesh.volus.size(); ++i)
+    for (size_t i = 0; i < size_t(RSVSobj.voluMesh.volus.size()); ++i)
     {
         RSVSobj.voluMesh.volus[i].target = newVolumeValue;
     }
@@ -593,7 +593,7 @@ void vosExportImportGui(integrate::RSVSclass &RSVSobj)
 {
     static int lineLength = 8;
     static int vosPrecision = 4;
-    int fileNameCapacity = 1024;
+    size_t fileNameCapacity = 1024;
     static std::string importFile;
     static std::string exportFile;
     // Make sure the capacity of importFile is large enough
