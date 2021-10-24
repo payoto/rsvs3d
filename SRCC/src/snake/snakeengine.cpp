@@ -1214,7 +1214,7 @@ void IdentifyMergeEdgeGeneralChain(const snake &snakein, vector<bool> &isObjDone
         }
 
 #ifdef SAFE_ALGO
-        if (jj > (2) || jj < 0)
+        if (jj > (2))
         {
             cerr << "Error: Algorithm not conceived for this case " << endl;
             cerr << " jj>3 Unsafe read has happened " << endl;

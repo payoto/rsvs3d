@@ -661,9 +661,6 @@ void RSVScalc::CalcTriangleEdgeLength(const triangle &triIn, const triangulation
                     triRSVS.meshDep->verts(subTemp2)->coord[jj] - triRSVS.meshDep->verts(subTemp1)->coord[jj];
             }
         }
-        else if (triIn.pointtype[ii] == meshtypes::triangulation && false)
-        {
-        }
     }
     // Total
 

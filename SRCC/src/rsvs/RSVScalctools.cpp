@@ -188,8 +188,8 @@ void TrianglePositionDerivatives(const triangle &triIn, const triangulation &tri
                 auto hesCentre = surfCentre.hes_ptr();
                 ConnVertFromConnEdge(triRSVS.snakeDep->snakeconn, surfCurr->edgeind, vertsSurf);
                 // Check that the triangle and the surface
-                int count = vertsSurf.size();
-                for (int j = 0; j < count; ++j)
+                size_t count = vertsSurf.size();
+                for (size_t j = 0; j < count; ++j)
                 {
                     int dvSub = dvListMap.find(vertsSurf[j]);
                     auto currSnax = triRSVS.snakeDep->snaxs.isearch(vertsSurf[j]);
@@ -198,9 +198,9 @@ void TrianglePositionDerivatives(const triangle &triIn, const triangulation &tri
 
                     if (dvSub != __notfound)
                     {
-                        for (int k = 0; k < 3; ++k)
+                        for (size_t k = 0; k < 3; ++k)
                         {
-                            for (int l = 0; l < 3; ++l)
+                            for (size_t l = 0; l < 3; ++l)
                             {
                                 dPos(ii * 3 + k, dvSub) +=
                                     cleanup(jacCentre[k][j + count * l] * (toVert->coord[l] - fromVert->coord[l]))
@@ -217,12 +217,12 @@ void TrianglePositionDerivatives(const triangle &triIn, const triangulation &tri
                 {
                     MatrixXd dPosd(count * 3, count);
                     dPosd.setZero(count * 3, count);
-                    for (int j = 0; j < count; ++j)
+                    for (size_t j = 0; j < count; ++j)
                     {
                         auto currSnax = triRSVS.snakeDep->snaxs.isearch(vertsSurf[j]);
                         auto fromVert = triRSVS.meshDep->verts.isearch(currSnax->fromvert);
                         auto toVert = triRSVS.meshDep->verts.isearch(currSnax->tovert);
-                        for (int k = 0; k < 3; ++k)
+                        for (size_t k = 0; k < 3; ++k)
 
                         {
                             dPosd(j + k * count, j) += (toVert->coord[k] - fromVert->coord[k]);
@@ -230,22 +230,22 @@ void TrianglePositionDerivatives(const triangle &triIn, const triangulation &tri
                     }
                     MatrixXd HVal(count * 3, count * 3 * 3), HPosTemp(count, count * 3);
                     ArrayVec2MatrixXd(hesCentre, HVal);
-                    for (int j = 0; j < 3; ++j)
+                    for (size_t j = 0; j < 3; ++j)
                     {
                         HPosTemp.block(0, j * count, count, count) =
                             dPosd.transpose() * HVal.block(0, j * count * 3, count * 3, count * 3) * dPosd;
                     }
-                    for (int j = 0; j < count; ++j)
+                    for (size_t j = 0; j < count; ++j)
                     {
                         int dvSub = dvListMap.find(vertsSurf[j]);
                         if (dvSub != __notfound)
                         {
-                            for (int j2 = 0; j2 < count; ++j2)
+                            for (size_t j2 = 0; j2 < count; ++j2)
                             {
                                 int dvSub2 = dvListMap.find(vertsSurf[j2]);
                                 if (dvSub2 != __notfound)
                                 {
-                                    for (int k = 0; k < 3; ++k)
+                                    for (size_t k = 0; k < 3; ++k)
                                     {
                                         HPos(dvSub, dvSub2 + (ii * 3 + k) * nDvAct) +=
                                             cleanup(HPosTemp(j, j2 + k * count));

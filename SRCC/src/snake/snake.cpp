@@ -2205,7 +2205,6 @@ void snax::ValidateDistance(snake &snakein)
     }
     else if (nEdge > 1)
     {
-        int nChanges = 0;
         static std::vector<int> snaxSubs;
         snaxSubs.clear();
         snakein.snaxs.findsiblings(this->edgeind, snaxSubs);
@@ -2248,10 +2247,6 @@ void snax::ValidateDistance(snake &snakein)
                     this->d = 1.0 - this->d;
                 }
             }
-        }
-        if (nChanges > 0)
-        {
-            std::cout << " " << nChanges << "," << this->d << ",";
         }
     }
     else
