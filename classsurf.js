@@ -2,7 +2,6 @@ var classsurf =
 [
     [ "surf", "classsurf.html#ac27fc20bfe776baeca390fba37c32057", null ],
     [ "~surf", "classsurf.html#aee32a940beaa6e1f294ca602144fffb4", null ],
-    [ "surf", "classsurf.html#a2bb8da6345b15a1cc92cfac3fce7f527", null ],
     [ "ChangeIndices", "classsurf.html#a91099acc1c9cccfa54505b9a3372ddc4", null ],
     [ "disp", "classsurf.html#aee0f815cc15e66cf939ce6d796ef584c", null ],
     [ "disptree", "classsurf.html#add1ce1d46cb70bb62aebf0667cb92696", null ],

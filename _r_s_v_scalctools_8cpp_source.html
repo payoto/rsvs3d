@@ -272,8 +272,8 @@ $(document).ready(function(){initNavTree('_r_s_v_scalctools_8cpp_source.html',''
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                <span class="keyword">auto</span> hesCentre = surfCentre.hes_ptr();</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                ConnVertFromConnEdge(triRSVS.snakeDep-&gt;snakeconn, surfCurr-&gt;edgeind, vertsSurf);</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                <span class="comment">// Check that the triangle and the surface</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                <span class="keywordtype">int</span> count = vertsSurf.size();</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; count; ++j)</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                <span class="keywordtype">size_t</span> count = vertsSurf.size();</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; count; ++j)</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                {</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                    <span class="keywordtype">int</span> dvSub = dvListMap.find(vertsSurf[j]);</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                    <span class="keyword">auto</span> currSnax = triRSVS.snakeDep-&gt;snaxs.isearch(vertsSurf[j]);</div>
@@ -282,9 +282,9 @@ $(document).ready(function(){initNavTree('_r_s_v_scalctools_8cpp_source.html',''
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                    <span class="keywordflow">if</span> (dvSub != __notfound)</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                    {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; 3; ++k)</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> k = 0; k &lt; 3; ++k)</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                        {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> l = 0; l &lt; 3; ++l)</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> l = 0; l &lt; 3; ++l)</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                            {</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                                dPos(ii * 3 + k, dvSub) +=</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                                    cleanup(jacCentre[k][j + count * l] * (toVert-&gt;coord[l] - fromVert-&gt;coord[l]))</div>
@@ -301,12 +301,12 @@ $(document).ready(function(){initNavTree('_r_s_v_scalctools_8cpp_source.html',''
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;                {</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                    MatrixXd dPosd(count * 3, count);</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;                    dPosd.setZero(count * 3, count);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; count; ++j)</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; count; ++j)</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;                    {</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;                        <span class="keyword">auto</span> currSnax = triRSVS.snakeDep-&gt;snaxs.isearch(vertsSurf[j]);</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                        <span class="keyword">auto</span> fromVert = triRSVS.meshDep-&gt;verts.isearch(currSnax-&gt;fromvert);</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;                        <span class="keyword">auto</span> toVert = triRSVS.meshDep-&gt;verts.isearch(currSnax-&gt;tovert);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; 3; ++k)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> k = 0; k &lt; 3; ++k)</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                        {</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                            dPosd(j + k * count, j) += (toVert-&gt;coord[k] - fromVert-&gt;coord[k]);</div>
@@ -314,22 +314,22 @@ $(document).ready(function(){initNavTree('_r_s_v_scalctools_8cpp_source.html',''
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                    }</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                    MatrixXd HVal(count * 3, count * 3 * 3), HPosTemp(count, count * 3);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;                    ArrayVec2MatrixXd(hesCentre, HVal);</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; 3; ++j)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; 3; ++j)</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                    {</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                        HPosTemp.block(0, j * count, count, count) =</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                            dPosd.transpose() * HVal.block(0, j * count * 3, count * 3, count * 3) * dPosd;</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                    }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; count; ++j)</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; count; ++j)</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                    {</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;                        <span class="keywordtype">int</span> dvSub = dvListMap.find(vertsSurf[j]);</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;                        <span class="keywordflow">if</span> (dvSub != __notfound)</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                        {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j2 = 0; j2 &lt; count; ++j2)</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j2 = 0; j2 &lt; count; ++j2)</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;                            {</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                                <span class="keywordtype">int</span> dvSub2 = dvListMap.find(vertsSurf[j2]);</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                                <span class="keywordflow">if</span> (dvSub2 != __notfound)</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                                {</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; 3; ++k)</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                                    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> k = 0; k &lt; 3; ++k)</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                                    {</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                                        HPos(dvSub, dvSub2 + (ii * 3 + k) * nDvAct) +=</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                                            cleanup(HPosTemp(j, j2 + k * count));</div>

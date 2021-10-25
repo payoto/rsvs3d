@@ -1,7 +1,6 @@
 var classvolu =
 [
     [ "volu", "classvolu.html#aa0a811cc45fde3d7ca8e3a331c806620", null ],
-    [ "volu", "classvolu.html#a8bd7c3d4b820775447f319849ddfcf76", null ],
     [ "~volu", "classvolu.html#a2974278abf02bdc4d225a7f7d5f2bc5e", null ],
     [ "ChangeIndices", "classvolu.html#afc7f7945d1d0e6132c5ec3c9069fa00e", null ],
     [ "disp", "classvolu.html#aff5e7f3885739b506b160bb26444cb27", null ],

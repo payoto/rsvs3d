@@ -14,6 +14,7 @@ var classedge =
     [ "Key", "classedge.html#a2ea8f5ed2323576f3e1b6db8350e6b08", null ],
     [ "Length", "classedge.html#a1cce365b7d1ef452df84f1fa2d7d86cc", null ],
     [ "LengthSquared", "classedge.html#a29f496890e8d360522f5c0f3b447d56c", null ],
+    [ "operator=", "classedge.html#af00e8e50a08a192e04ddb9fd40a862f8", null ],
     [ "operator=", "classedge.html#ad78a8ebec6fcabb4e0b048b0d4e4e8ae", null ],
     [ "PrepareForUse", "classedge.html#ab689b7936068b0e22d467a1b7b945291", null ],
     [ "read", "classedge.html#aff4c62d2c4fdf4c60772a818fec0d03c", null ],

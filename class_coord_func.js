@@ -4,7 +4,7 @@ var class_coord_func =
     [ "CoordFunc", "class_coord_func.html#a6af31bf1a75665f23441b09eb8f6c187", null ],
     [ "CoordFunc", "class_coord_func.html#a44a17d1fec8a2f567a9fb1902a214059", null ],
     [ "CoordFunc", "class_coord_func.html#a43020b5db5efd8fed9b7e7cd42e24006", null ],
-    [ "~CoordFunc", "class_coord_func.html#a20d610dba40f3416c317295a0e890758", null ],
+    [ "~CoordFunc", "class_coord_func.html#a4c34ef526b9c652d655861e057326fb8", null ],
     [ "assign", "class_coord_func.html#a2b1bf2606a9b138b9ce0d23cf16b990e", null ],
     [ "assign", "class_coord_func.html#a472d7292f9a0130d99cffd7613a9d70b", null ],
     [ "Calc", "class_coord_func.html#a83d3ea3cfb5ab9e4b26d6e2afa89725c", null ],

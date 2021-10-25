@@ -171,7 +171,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    points.reserve(meshIn.verts.size());</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    faces.reserve(meshIn.surfs.size());</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; meshIn.verts.size(); ++i)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size_t(meshIn.verts.size()); ++i)</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    {</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">if</span> (meshIn.verts(i)-&gt;coord.size() != 3)</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        {</div>
@@ -181,7 +181,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        points.push_back(meshIn.verts(i)-&gt;coord);</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; meshIn.surfs.size(); ++i)</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size_t(meshIn.surfs.size()); ++i)</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    {</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keyword">auto</span> faceIndices = meshIn.verts.find_list(meshIn.surfs(i)-&gt;OrderedVerts(&amp;meshIn));</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">if</span> (faceIndices.size() &lt; 3)</div>
@@ -203,7 +203,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    this-&gt;addMesh(name, snakeIn.snakeconn);</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    std::vector&lt;double&gt; velocities;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    velocities.reserve(snakeIn.snaxs.size());</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; snakeIn.snaxs.size(); ++i)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size_t(snakeIn.snaxs.size()); ++i)</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    {</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        velocities.push_back(snakeIn.snaxs(i)-&gt;v);</div>
@@ -264,7 +264,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordtype">float</span> outputVolume = 0.0;</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">// Todo: only access vertices that are in the cell.</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; meshIn.verts.size(); ++i)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size_t(meshIn.verts.size()); ++i)</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    {</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordflow">if</span> (meshIn.verts(i)-&gt;coord.size() != 3)</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        {</div>
@@ -500,7 +500,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;    <span class="keyword">static</span> std::string exportFile;</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> flatJsonExport = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    <span class="comment">// Make sure the capacity of importFile is large enough</span></div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    <span class="keywordflow">if</span> (importFile.capacity() &lt; fileNameCapacity)</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    <span class="keywordflow">if</span> (importFile.capacity() &lt; <span class="keywordtype">size_t</span>(fileNameCapacity))</div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    {</div>
 <div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        importFile.reserve(fileNameCapacity);</div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        importFile = <span class="stringliteral">&quot;&quot;</span>;</div>
@@ -613,7 +613,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;{</div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    RSVSobj.voluMesh.PrepareForUse();</div>
 <div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    newVolumeValue = newVolumeValue &gt; 0.0 ? (newVolumeValue &lt;= 1.0 ? newVolumeValue : 1.0) : 0.0;</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; RSVSobj.voluMesh.volus.size(); ++i)</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; size_t(RSVSobj.voluMesh.volus.size()); ++i)</div>
 <div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    {</div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;        RSVSobj.voluMesh.volus[i].target = newVolumeValue;</div>
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    }</div>
@@ -622,7 +622,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;{</div>
 <div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> lineLength = 8;</div>
 <div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> vosPrecision = 4;</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="keywordtype">int</span> fileNameCapacity = 1024;</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="keywordtype">size_t</span> fileNameCapacity = 1024;</div>
 <div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;    <span class="keyword">static</span> std::string importFile;</div>
 <div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keyword">static</span> std::string exportFile;</div>
 <div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    <span class="comment">// Make sure the capacity of importFile is large enough</span></div>
@@ -811,7 +811,7 @@ $(document).ready(function(){initNavTree('polyscopersvs_8cpp_source.html',''); i
 <div class="ttc" id="aclass__3d_vector_wrapper_html"><div class="ttname"><a href="class__3d_vector_wrapper.html">_3dVectorWrapper</a></div><div class="ttdoc">Wrap a vector to allow for (i,j) indexing as if it was a 2D array of coordinates.</div><div class="ttdef"><b>Definition:</b> <a href="polyscopersvs_8cpp_source.html#l00163">polyscopersvs.cpp:164</a></div></div>
 <div class="ttc" id="aclassintegrate_1_1_r_s_v_sclass_html"><div class="ttname"><a href="classintegrate_1_1_r_s_v_sclass.html">integrate::RSVSclass</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sclass_8hpp_source.html#l00042">RSVSclass.hpp:43</a></div></div>
 <div class="ttc" id="aclassintegrate_1_1iteratereturns_html"><div class="ttname"><a href="classintegrate_1_1iteratereturns.html">integrate::iteratereturns</a></div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_sintegration_8hpp_source.html#l00072">RSVSintegration.hpp:73</a></div></div>
-<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00618">mesh.hpp:619</a></div></div>
+<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00591">mesh.hpp:592</a></div></div>
 <div class="ttc" id="aclassparam_1_1dev_1_1devparam_html"><div class="ttname"><a href="classparam_1_1dev_1_1devparam.html">param::dev::devparam</a></div><div class="ttdoc">Class for development parameters.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8hpp_source.html#l00269">parameters.hpp:270</a></div></div>
 <div class="ttc" id="aclassparam_1_1files_html"><div class="ttname"><a href="classparam_1_1files.html">param::files</a></div><div class="ttdoc">Class containing all parameter settings for file operations.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8hpp_source.html#l00227">parameters.hpp:228</a></div></div>
 <div class="ttc" id="aclassparam_1_1grid_html"><div class="ttname"><a href="classparam_1_1grid.html">param::grid</a></div><div class="ttdoc">Class for parameters of the grid generation.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8hpp_source.html#l00164">parameters.hpp:165</a></div></div>

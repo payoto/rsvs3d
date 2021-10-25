@@ -2240,591 +2240,586 @@ $(document).ready(function(){initNavTree('snake_8cpp_source.html',''); initResiz
 <div class="line"><a name="l02205"></a><span class="lineno"> 2205</span>&#160;    }</div>
 <div class="line"><a name="l02206"></a><span class="lineno"> 2206</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (nEdge &gt; 1)</div>
 <div class="line"><a name="l02207"></a><span class="lineno"> 2207</span>&#160;    {</div>
-<div class="line"><a name="l02208"></a><span class="lineno"> 2208</span>&#160;        <span class="keywordtype">int</span> nChanges = 0;</div>
-<div class="line"><a name="l02209"></a><span class="lineno"> 2209</span>&#160;        <span class="keyword">static</span> std::vector&lt;int&gt; snaxSubs;</div>
-<div class="line"><a name="l02210"></a><span class="lineno"> 2210</span>&#160;        snaxSubs.clear();</div>
-<div class="line"><a name="l02211"></a><span class="lineno"> 2211</span>&#160;        snakein.snaxs.findsiblings(this-&gt;edgeind, snaxSubs);</div>
-<div class="line"><a name="l02212"></a><span class="lineno"> 2212</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> snaxtest : snaxSubs)</div>
-<div class="line"><a name="l02213"></a><span class="lineno"> 2213</span>&#160;        {</div>
-<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;            <span class="keyword">auto</span> tempSnax = snakein.snaxs(snaxtest);</div>
-<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;            <span class="keywordflow">if</span> (this-&gt;index != tempSnax-&gt;index)</div>
-<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;            {</div>
-<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160;                <span class="comment">// Indicates if snakes are moving in different directions along the edge</span></div>
-<div class="line"><a name="l02218"></a><span class="lineno"> 2218</span>&#160;                <span class="comment">// Impacts how to test equality between distances</span></div>
-<div class="line"><a name="l02219"></a><span class="lineno"> 2219</span>&#160;                <span class="keywordtype">bool</span> snaxDifferentDir = this-&gt;fromvert != tempSnax-&gt;fromvert;</div>
-<div class="line"><a name="l02220"></a><span class="lineno"> 2220</span>&#160;                <span class="comment">// Checks if the edge is being travelled on in reversed or direct</span></div>
-<div class="line"><a name="l02221"></a><span class="lineno"> 2221</span>&#160;                <span class="comment">// order.</span></div>
-<div class="line"><a name="l02222"></a><span class="lineno"> 2222</span>&#160;                <span class="keywordtype">bool</span> inOrder = tempSnax-&gt;fromvert &lt; tempSnax-&gt;tovert;</div>
-<div class="line"><a name="l02223"></a><span class="lineno"> 2223</span>&#160;                <span class="comment">// Checks what the ordering is along that edge</span></div>
-<div class="line"><a name="l02224"></a><span class="lineno"> 2224</span>&#160;                <span class="keywordtype">bool</span> tempIsAfter = this-&gt;orderedge &lt; tempSnax-&gt;orderedge;</div>
-<div class="line"><a name="l02225"></a><span class="lineno"> 2225</span>&#160;                <span class="comment">// Those three booleans provide all the necessary information to</span></div>
-<div class="line"><a name="l02226"></a><span class="lineno"> 2226</span>&#160;                <span class="comment">// know if the snaxels have crossed over and what operations to apply</span></div>
-<div class="line"><a name="l02227"></a><span class="lineno"> 2227</span>&#160;                <span class="keywordflow">if</span> (snaxDifferentDir)</div>
-<div class="line"><a name="l02228"></a><span class="lineno"> 2228</span>&#160;                {</div>
-<div class="line"><a name="l02229"></a><span class="lineno"> 2229</span>&#160;                    this-&gt;d = 1.0 - this-&gt;d;</div>
-<div class="line"><a name="l02230"></a><span class="lineno"> 2230</span>&#160;                }</div>
-<div class="line"><a name="l02231"></a><span class="lineno"> 2231</span>&#160;                <span class="comment">// (inOrder ^ tempIsAfter)   -&gt; tells us to test superiority or</span></div>
-<div class="line"><a name="l02232"></a><span class="lineno"> 2232</span>&#160;                <span class="comment">// inferiority</span></div>
-<div class="line"><a name="l02233"></a><span class="lineno"> 2233</span>&#160;                <span class="comment">//    1            1       0 -&gt; this &gt; temp (modify cases)</span></div>
-<div class="line"><a name="l02234"></a><span class="lineno"> 2234</span>&#160;                <span class="comment">//    1            0       1 -&gt; this &lt; temp</span></div>
-<div class="line"><a name="l02235"></a><span class="lineno"> 2235</span>&#160;                <span class="comment">//    0            1       1 -&gt; this &lt; temp</span></div>
-<div class="line"><a name="l02236"></a><span class="lineno"> 2236</span>&#160;                <span class="comment">//    0            0       0 -&gt; this &gt; temp</span></div>
-<div class="line"><a name="l02237"></a><span class="lineno"> 2237</span>&#160;                <span class="keywordflow">if</span> ((inOrder ^ tempIsAfter) &amp;&amp; this-&gt;d &lt; tempSnax-&gt;d)</div>
-<div class="line"><a name="l02238"></a><span class="lineno"> 2238</span>&#160;                {</div>
-<div class="line"><a name="l02239"></a><span class="lineno"> 2239</span>&#160;                    this-&gt;d = tempSnax-&gt;d;</div>
-<div class="line"><a name="l02240"></a><span class="lineno"> 2240</span>&#160;                }</div>
-<div class="line"><a name="l02241"></a><span class="lineno"> 2241</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!(inOrder ^ tempIsAfter) &amp;&amp; this-&gt;d &gt; tempSnax-&gt;d)</div>
-<div class="line"><a name="l02242"></a><span class="lineno"> 2242</span>&#160;                {</div>
-<div class="line"><a name="l02243"></a><span class="lineno"> 2243</span>&#160;                    this-&gt;d = tempSnax-&gt;d;</div>
-<div class="line"><a name="l02244"></a><span class="lineno"> 2244</span>&#160;                }</div>
-<div class="line"><a name="l02245"></a><span class="lineno"> 2245</span>&#160; </div>
-<div class="line"><a name="l02246"></a><span class="lineno"> 2246</span>&#160;                <span class="keywordflow">if</span> (snaxDifferentDir)</div>
-<div class="line"><a name="l02247"></a><span class="lineno"> 2247</span>&#160;                {</div>
-<div class="line"><a name="l02248"></a><span class="lineno"> 2248</span>&#160;                    this-&gt;d = 1.0 - this-&gt;d;</div>
-<div class="line"><a name="l02249"></a><span class="lineno"> 2249</span>&#160;                }</div>
-<div class="line"><a name="l02250"></a><span class="lineno"> 2250</span>&#160;            }</div>
-<div class="line"><a name="l02251"></a><span class="lineno"> 2251</span>&#160;        }</div>
-<div class="line"><a name="l02252"></a><span class="lineno"> 2252</span>&#160;        <span class="keywordflow">if</span> (nChanges &gt; 0)</div>
-<div class="line"><a name="l02253"></a><span class="lineno"> 2253</span>&#160;        {</div>
-<div class="line"><a name="l02254"></a><span class="lineno"> 2254</span>&#160;            std::cout &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; nChanges &lt;&lt; <span class="stringliteral">&quot;,&quot;</span> &lt;&lt; this-&gt;d &lt;&lt; <span class="stringliteral">&quot;,&quot;</span>;</div>
-<div class="line"><a name="l02255"></a><span class="lineno"> 2255</span>&#160;        }</div>
-<div class="line"><a name="l02256"></a><span class="lineno"> 2256</span>&#160;    }</div>
-<div class="line"><a name="l02257"></a><span class="lineno"> 2257</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02258"></a><span class="lineno"> 2258</span>&#160;    {</div>
-<div class="line"><a name="l02259"></a><span class="lineno"> 2259</span>&#160;        <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Parent hashing returned a number &lt;=0&quot;</span>);</div>
-<div class="line"><a name="l02260"></a><span class="lineno"> 2260</span>&#160;    }</div>
+<div class="line"><a name="l02208"></a><span class="lineno"> 2208</span>&#160;        <span class="keyword">static</span> std::vector&lt;int&gt; snaxSubs;</div>
+<div class="line"><a name="l02209"></a><span class="lineno"> 2209</span>&#160;        snaxSubs.clear();</div>
+<div class="line"><a name="l02210"></a><span class="lineno"> 2210</span>&#160;        snakein.snaxs.findsiblings(this-&gt;edgeind, snaxSubs);</div>
+<div class="line"><a name="l02211"></a><span class="lineno"> 2211</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> snaxtest : snaxSubs)</div>
+<div class="line"><a name="l02212"></a><span class="lineno"> 2212</span>&#160;        {</div>
+<div class="line"><a name="l02213"></a><span class="lineno"> 2213</span>&#160;            <span class="keyword">auto</span> tempSnax = snakein.snaxs(snaxtest);</div>
+<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;            <span class="keywordflow">if</span> (this-&gt;index != tempSnax-&gt;index)</div>
+<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;            {</div>
+<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;                <span class="comment">// Indicates if snakes are moving in different directions along the edge</span></div>
+<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160;                <span class="comment">// Impacts how to test equality between distances</span></div>
+<div class="line"><a name="l02218"></a><span class="lineno"> 2218</span>&#160;                <span class="keywordtype">bool</span> snaxDifferentDir = this-&gt;fromvert != tempSnax-&gt;fromvert;</div>
+<div class="line"><a name="l02219"></a><span class="lineno"> 2219</span>&#160;                <span class="comment">// Checks if the edge is being travelled on in reversed or direct</span></div>
+<div class="line"><a name="l02220"></a><span class="lineno"> 2220</span>&#160;                <span class="comment">// order.</span></div>
+<div class="line"><a name="l02221"></a><span class="lineno"> 2221</span>&#160;                <span class="keywordtype">bool</span> inOrder = tempSnax-&gt;fromvert &lt; tempSnax-&gt;tovert;</div>
+<div class="line"><a name="l02222"></a><span class="lineno"> 2222</span>&#160;                <span class="comment">// Checks what the ordering is along that edge</span></div>
+<div class="line"><a name="l02223"></a><span class="lineno"> 2223</span>&#160;                <span class="keywordtype">bool</span> tempIsAfter = this-&gt;orderedge &lt; tempSnax-&gt;orderedge;</div>
+<div class="line"><a name="l02224"></a><span class="lineno"> 2224</span>&#160;                <span class="comment">// Those three booleans provide all the necessary information to</span></div>
+<div class="line"><a name="l02225"></a><span class="lineno"> 2225</span>&#160;                <span class="comment">// know if the snaxels have crossed over and what operations to apply</span></div>
+<div class="line"><a name="l02226"></a><span class="lineno"> 2226</span>&#160;                <span class="keywordflow">if</span> (snaxDifferentDir)</div>
+<div class="line"><a name="l02227"></a><span class="lineno"> 2227</span>&#160;                {</div>
+<div class="line"><a name="l02228"></a><span class="lineno"> 2228</span>&#160;                    this-&gt;d = 1.0 - this-&gt;d;</div>
+<div class="line"><a name="l02229"></a><span class="lineno"> 2229</span>&#160;                }</div>
+<div class="line"><a name="l02230"></a><span class="lineno"> 2230</span>&#160;                <span class="comment">// (inOrder ^ tempIsAfter)   -&gt; tells us to test superiority or</span></div>
+<div class="line"><a name="l02231"></a><span class="lineno"> 2231</span>&#160;                <span class="comment">// inferiority</span></div>
+<div class="line"><a name="l02232"></a><span class="lineno"> 2232</span>&#160;                <span class="comment">//    1            1       0 -&gt; this &gt; temp (modify cases)</span></div>
+<div class="line"><a name="l02233"></a><span class="lineno"> 2233</span>&#160;                <span class="comment">//    1            0       1 -&gt; this &lt; temp</span></div>
+<div class="line"><a name="l02234"></a><span class="lineno"> 2234</span>&#160;                <span class="comment">//    0            1       1 -&gt; this &lt; temp</span></div>
+<div class="line"><a name="l02235"></a><span class="lineno"> 2235</span>&#160;                <span class="comment">//    0            0       0 -&gt; this &gt; temp</span></div>
+<div class="line"><a name="l02236"></a><span class="lineno"> 2236</span>&#160;                <span class="keywordflow">if</span> ((inOrder ^ tempIsAfter) &amp;&amp; this-&gt;d &lt; tempSnax-&gt;d)</div>
+<div class="line"><a name="l02237"></a><span class="lineno"> 2237</span>&#160;                {</div>
+<div class="line"><a name="l02238"></a><span class="lineno"> 2238</span>&#160;                    this-&gt;d = tempSnax-&gt;d;</div>
+<div class="line"><a name="l02239"></a><span class="lineno"> 2239</span>&#160;                }</div>
+<div class="line"><a name="l02240"></a><span class="lineno"> 2240</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!(inOrder ^ tempIsAfter) &amp;&amp; this-&gt;d &gt; tempSnax-&gt;d)</div>
+<div class="line"><a name="l02241"></a><span class="lineno"> 2241</span>&#160;                {</div>
+<div class="line"><a name="l02242"></a><span class="lineno"> 2242</span>&#160;                    this-&gt;d = tempSnax-&gt;d;</div>
+<div class="line"><a name="l02243"></a><span class="lineno"> 2243</span>&#160;                }</div>
+<div class="line"><a name="l02244"></a><span class="lineno"> 2244</span>&#160; </div>
+<div class="line"><a name="l02245"></a><span class="lineno"> 2245</span>&#160;                <span class="keywordflow">if</span> (snaxDifferentDir)</div>
+<div class="line"><a name="l02246"></a><span class="lineno"> 2246</span>&#160;                {</div>
+<div class="line"><a name="l02247"></a><span class="lineno"> 2247</span>&#160;                    this-&gt;d = 1.0 - this-&gt;d;</div>
+<div class="line"><a name="l02248"></a><span class="lineno"> 2248</span>&#160;                }</div>
+<div class="line"><a name="l02249"></a><span class="lineno"> 2249</span>&#160;            }</div>
+<div class="line"><a name="l02250"></a><span class="lineno"> 2250</span>&#160;        }</div>
+<div class="line"><a name="l02251"></a><span class="lineno"> 2251</span>&#160;    }</div>
+<div class="line"><a name="l02252"></a><span class="lineno"> 2252</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02253"></a><span class="lineno"> 2253</span>&#160;    {</div>
+<div class="line"><a name="l02254"></a><span class="lineno"> 2254</span>&#160;        <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Parent hashing returned a number &lt;=0&quot;</span>);</div>
+<div class="line"><a name="l02255"></a><span class="lineno"> 2255</span>&#160;    }</div>
+<div class="line"><a name="l02256"></a><span class="lineno"> 2256</span>&#160;}</div>
+<div class="line"><a name="l02257"></a><span class="lineno"> 2257</span>&#160; </div>
+<div class="line"><a name="l02258"></a><span class="lineno"> 2258</span>&#160;<span class="keywordtype">void</span> snax::Direction(<span class="keyword">const</span> <a class="code" href="classsnake.html">snake</a> &amp;snakein, <a class="code" href="classcoordvec.html">coordvec</a> &amp;dir)<span class="keyword"> const</span></div>
+<div class="line"><a name="l02259"></a><span class="lineno"> 2259</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l02260"></a><span class="lineno"> 2260</span>&#160;    snakein.snakemesh()-&gt;VerticesVector(this-&gt;fromvert, this-&gt;tovert, dir);</div>
 <div class="line"><a name="l02261"></a><span class="lineno"> 2261</span>&#160;}</div>
 <div class="line"><a name="l02262"></a><span class="lineno"> 2262</span>&#160; </div>
-<div class="line"><a name="l02263"></a><span class="lineno"> 2263</span>&#160;<span class="keywordtype">void</span> snax::Direction(<span class="keyword">const</span> <a class="code" href="classsnake.html">snake</a> &amp;snakein, <a class="code" href="classcoordvec.html">coordvec</a> &amp;dir)<span class="keyword"> const</span></div>
-<div class="line"><a name="l02264"></a><span class="lineno"> 2264</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l02265"></a><span class="lineno"> 2265</span>&#160;    snakein.snakemesh()-&gt;VerticesVector(this-&gt;fromvert, this-&gt;tovert, dir);</div>
-<div class="line"><a name="l02266"></a><span class="lineno"> 2266</span>&#160;}</div>
-<div class="line"><a name="l02267"></a><span class="lineno"> 2267</span>&#160; </div>
-<div class="line"><a name="l02268"></a><span class="lineno"> 2268</span>&#160;<span class="comment">// Snake operations</span></div>
-<div class="line"><a name="l02269"></a><span class="lineno"> 2269</span>&#160; </div>
-<div class="line"><a name="l02270"></a><span class="lineno"> 2270</span>&#160;<span class="keywordtype">void</span> snake::ForceCloseContainers()</div>
-<div class="line"><a name="l02271"></a><span class="lineno"> 2271</span>&#160;{</div>
-<div class="line"><a name="l02272"></a><span class="lineno"> 2272</span>&#160;    this-&gt;snakeconn.ForceCloseContainers();</div>
-<div class="line"><a name="l02273"></a><span class="lineno"> 2273</span>&#160;    <span class="keywordflow">if</span> (!Check3D())</div>
-<div class="line"><a name="l02274"></a><span class="lineno"> 2274</span>&#160;    {</div>
-<div class="line"><a name="l02275"></a><span class="lineno"> 2275</span>&#160;        snaxsurfs.elems.clear();</div>
-<div class="line"><a name="l02276"></a><span class="lineno"> 2276</span>&#160;        snaxsurfs.Init(snakeconn.surfs.size());</div>
-<div class="line"><a name="l02277"></a><span class="lineno"> 2277</span>&#160;        snaxsurfs.PopulateIndices();</div>
-<div class="line"><a name="l02278"></a><span class="lineno"> 2278</span>&#160;        snaxsurfs.HashArray();</div>
-<div class="line"><a name="l02279"></a><span class="lineno"> 2279</span>&#160;        this-&gt;SetSnaxSurfs();</div>
-<div class="line"><a name="l02280"></a><span class="lineno"> 2280</span>&#160;    }</div>
-<div class="line"><a name="l02281"></a><span class="lineno"> 2281</span>&#160;}</div>
-<div class="line"><a name="l02282"></a><span class="lineno"> 2282</span>&#160; </div>
-<div class="line"><a name="l02283"></a><span class="lineno"> 2283</span>&#160;<span class="keywordtype">void</span> snake::CalculateTimeStep(vector&lt;double&gt; &amp;dt, <span class="keywordtype">double</span> dtDefault, <span class="keywordtype">double</span> distDefault)</div>
-<div class="line"><a name="l02284"></a><span class="lineno"> 2284</span>&#160;{</div>
-<div class="line"><a name="l02285"></a><span class="lineno"> 2285</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, nEdge;</div>
-<div class="line"><a name="l02286"></a><span class="lineno"> 2286</span>&#160;    vector&lt;bool&gt; isSnaxDone;</div>
-<div class="line"><a name="l02287"></a><span class="lineno"> 2287</span>&#160;    <span class="keywordtype">double</span> newMindDt = dtDefault;</div>
-<div class="line"><a name="l02288"></a><span class="lineno"> 2288</span>&#160;    nSnax = snaxs.size();</div>
-<div class="line"><a name="l02289"></a><span class="lineno"> 2289</span>&#160;    isSnaxDone.assign(nSnax, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l02290"></a><span class="lineno"> 2290</span>&#160; </div>
-<div class="line"><a name="l02291"></a><span class="lineno"> 2291</span>&#160;    <span class="keywordflow">if</span> (!snaxs.checkready())</div>
-<div class="line"><a name="l02292"></a><span class="lineno"> 2292</span>&#160;    {</div>
-<div class="line"><a name="l02293"></a><span class="lineno"> 2293</span>&#160;        snaxs.PrepareForUse();</div>
-<div class="line"><a name="l02294"></a><span class="lineno"> 2294</span>&#160;    }</div>
-<div class="line"><a name="l02295"></a><span class="lineno"> 2295</span>&#160;    <span class="keywordflow">if</span> (this-&gt;snaxDistanceLimit_conserveShape)</div>
-<div class="line"><a name="l02296"></a><span class="lineno"> 2296</span>&#160;    {</div>
-<div class="line"><a name="l02297"></a><span class="lineno"> 2297</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nSnax; ++i)</div>
-<div class="line"><a name="l02298"></a><span class="lineno"> 2298</span>&#160;        {</div>
-<div class="line"><a name="l02299"></a><span class="lineno"> 2299</span>&#160;            <span class="keywordflow">if</span> (fabs(snaxs(i)-&gt;v &gt; __DBL_EPSILON__))</div>
-<div class="line"><a name="l02300"></a><span class="lineno"> 2300</span>&#160;            {</div>
-<div class="line"><a name="l02301"></a><span class="lineno"> 2301</span>&#160;                newMindDt = distDefault / fabs(snaxs(i)-&gt;v);</div>
-<div class="line"><a name="l02302"></a><span class="lineno"> 2302</span>&#160;                dtDefault = newMindDt &lt; dtDefault ? newMindDt : dtDefault;</div>
-<div class="line"><a name="l02303"></a><span class="lineno"> 2303</span>&#160;            }</div>
-<div class="line"><a name="l02304"></a><span class="lineno"> 2304</span>&#160;        }</div>
-<div class="line"><a name="l02305"></a><span class="lineno"> 2305</span>&#160;    }</div>
-<div class="line"><a name="l02306"></a><span class="lineno"> 2306</span>&#160; </div>
-<div class="line"><a name="l02307"></a><span class="lineno"> 2307</span>&#160;    dt.assign(nSnax, dtDefault);</div>
-<div class="line"><a name="l02308"></a><span class="lineno"> 2308</span>&#160;    dt.resize(nSnax);</div>
-<div class="line"><a name="l02309"></a><span class="lineno"> 2309</span>&#160; </div>
-<div class="line"><a name="l02310"></a><span class="lineno"> 2310</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
-<div class="line"><a name="l02311"></a><span class="lineno"> 2311</span>&#160;    {</div>
-<div class="line"><a name="l02312"></a><span class="lineno"> 2312</span>&#160;        <span class="keywordflow">if</span> (!isSnaxDone[ii])</div>
-<div class="line"><a name="l02313"></a><span class="lineno"> 2313</span>&#160;        {</div>
-<div class="line"><a name="l02314"></a><span class="lineno"> 2314</span>&#160;            nEdge = snaxs.countparent(snaxs(ii)-&gt;edgeind);</div>
-<div class="line"><a name="l02315"></a><span class="lineno"> 2315</span>&#160;            <span class="keywordflow">if</span> (nEdge == 1)</div>
-<div class="line"><a name="l02316"></a><span class="lineno"> 2316</span>&#160;            {</div>
-<div class="line"><a name="l02317"></a><span class="lineno"> 2317</span>&#160;                isSnaxDone[ii] = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02318"></a><span class="lineno"> 2318</span>&#160;            }</div>
-<div class="line"><a name="l02319"></a><span class="lineno"> 2319</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (nEdge &gt; 1)</div>
-<div class="line"><a name="l02320"></a><span class="lineno"> 2320</span>&#160;            {</div>
-<div class="line"><a name="l02321"></a><span class="lineno"> 2321</span>&#160;                snaxs.CalculateTimeStepOnEdge(dt, isSnaxDone, snaxs(ii)-&gt;edgeind);</div>
-<div class="line"><a name="l02322"></a><span class="lineno"> 2322</span>&#160;            }</div>
-<div class="line"><a name="l02323"></a><span class="lineno"> 2323</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02324"></a><span class="lineno"> 2324</span>&#160;            {</div>
-<div class="line"><a name="l02325"></a><span class="lineno"> 2325</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: hashParent was not up to date&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l02326"></a><span class="lineno"> 2326</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
-<div class="line"><a name="l02327"></a><span class="lineno"> 2327</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Incorrect hash table provided&quot;</span>);</div>
-<div class="line"><a name="l02328"></a><span class="lineno"> 2328</span>&#160;            }</div>
-<div class="line"><a name="l02329"></a><span class="lineno"> 2329</span>&#160;        }</div>
-<div class="line"><a name="l02330"></a><span class="lineno"> 2330</span>&#160;    }</div>
-<div class="line"><a name="l02331"></a><span class="lineno"> 2331</span>&#160;}</div>
-<div class="line"><a name="l02332"></a><span class="lineno"> 2332</span>&#160; </div>
-<div class="line"><a name="l02333"></a><span class="lineno"> 2333</span>&#160;<span class="keywordtype">void</span> snake::Flip()</div>
-<div class="line"><a name="l02334"></a><span class="lineno"> 2334</span>&#160;{</div>
-<div class="line"><a name="l02335"></a><span class="lineno"> 2335</span>&#160;    <span class="keywordtype">int</span> temp;</div>
-<div class="line"><a name="l02336"></a><span class="lineno"> 2336</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ii = 0; ii &lt; snaxs.size(); ii++)</div>
-<div class="line"><a name="l02337"></a><span class="lineno"> 2337</span>&#160;    {</div>
-<div class="line"><a name="l02338"></a><span class="lineno"> 2338</span>&#160;        temp = snaxs[ii].fromvert;</div>
-<div class="line"><a name="l02339"></a><span class="lineno"> 2339</span>&#160;        snaxs[ii].fromvert = snaxs(ii)-&gt;tovert;</div>
-<div class="line"><a name="l02340"></a><span class="lineno"> 2340</span>&#160;        snaxs[ii].tovert = temp;</div>
-<div class="line"><a name="l02341"></a><span class="lineno"> 2341</span>&#160; </div>
-<div class="line"><a name="l02342"></a><span class="lineno"> 2342</span>&#160;        snaxs[ii].d = 1.0 - snaxs[ii].d;</div>
-<div class="line"><a name="l02343"></a><span class="lineno"> 2343</span>&#160;        snaxs[ii].v = -snaxs[ii].v;</div>
-<div class="line"><a name="l02344"></a><span class="lineno"> 2344</span>&#160;    }</div>
-<div class="line"><a name="l02345"></a><span class="lineno"> 2345</span>&#160;    isFlipped = !isFlipped;</div>
-<div class="line"><a name="l02346"></a><span class="lineno"> 2346</span>&#160;    snaxs.ForceArrayReady();</div>
-<div class="line"><a name="l02347"></a><span class="lineno"> 2347</span>&#160;}</div>
+<div class="line"><a name="l02263"></a><span class="lineno"> 2263</span>&#160;<span class="comment">// Snake operations</span></div>
+<div class="line"><a name="l02264"></a><span class="lineno"> 2264</span>&#160; </div>
+<div class="line"><a name="l02265"></a><span class="lineno"> 2265</span>&#160;<span class="keywordtype">void</span> snake::ForceCloseContainers()</div>
+<div class="line"><a name="l02266"></a><span class="lineno"> 2266</span>&#160;{</div>
+<div class="line"><a name="l02267"></a><span class="lineno"> 2267</span>&#160;    this-&gt;snakeconn.ForceCloseContainers();</div>
+<div class="line"><a name="l02268"></a><span class="lineno"> 2268</span>&#160;    <span class="keywordflow">if</span> (!Check3D())</div>
+<div class="line"><a name="l02269"></a><span class="lineno"> 2269</span>&#160;    {</div>
+<div class="line"><a name="l02270"></a><span class="lineno"> 2270</span>&#160;        snaxsurfs.elems.clear();</div>
+<div class="line"><a name="l02271"></a><span class="lineno"> 2271</span>&#160;        snaxsurfs.Init(snakeconn.surfs.size());</div>
+<div class="line"><a name="l02272"></a><span class="lineno"> 2272</span>&#160;        snaxsurfs.PopulateIndices();</div>
+<div class="line"><a name="l02273"></a><span class="lineno"> 2273</span>&#160;        snaxsurfs.HashArray();</div>
+<div class="line"><a name="l02274"></a><span class="lineno"> 2274</span>&#160;        this-&gt;SetSnaxSurfs();</div>
+<div class="line"><a name="l02275"></a><span class="lineno"> 2275</span>&#160;    }</div>
+<div class="line"><a name="l02276"></a><span class="lineno"> 2276</span>&#160;}</div>
+<div class="line"><a name="l02277"></a><span class="lineno"> 2277</span>&#160; </div>
+<div class="line"><a name="l02278"></a><span class="lineno"> 2278</span>&#160;<span class="keywordtype">void</span> snake::CalculateTimeStep(vector&lt;double&gt; &amp;dt, <span class="keywordtype">double</span> dtDefault, <span class="keywordtype">double</span> distDefault)</div>
+<div class="line"><a name="l02279"></a><span class="lineno"> 2279</span>&#160;{</div>
+<div class="line"><a name="l02280"></a><span class="lineno"> 2280</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, nEdge;</div>
+<div class="line"><a name="l02281"></a><span class="lineno"> 2281</span>&#160;    vector&lt;bool&gt; isSnaxDone;</div>
+<div class="line"><a name="l02282"></a><span class="lineno"> 2282</span>&#160;    <span class="keywordtype">double</span> newMindDt = dtDefault;</div>
+<div class="line"><a name="l02283"></a><span class="lineno"> 2283</span>&#160;    nSnax = snaxs.size();</div>
+<div class="line"><a name="l02284"></a><span class="lineno"> 2284</span>&#160;    isSnaxDone.assign(nSnax, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l02285"></a><span class="lineno"> 2285</span>&#160; </div>
+<div class="line"><a name="l02286"></a><span class="lineno"> 2286</span>&#160;    <span class="keywordflow">if</span> (!snaxs.checkready())</div>
+<div class="line"><a name="l02287"></a><span class="lineno"> 2287</span>&#160;    {</div>
+<div class="line"><a name="l02288"></a><span class="lineno"> 2288</span>&#160;        snaxs.PrepareForUse();</div>
+<div class="line"><a name="l02289"></a><span class="lineno"> 2289</span>&#160;    }</div>
+<div class="line"><a name="l02290"></a><span class="lineno"> 2290</span>&#160;    <span class="keywordflow">if</span> (this-&gt;snaxDistanceLimit_conserveShape)</div>
+<div class="line"><a name="l02291"></a><span class="lineno"> 2291</span>&#160;    {</div>
+<div class="line"><a name="l02292"></a><span class="lineno"> 2292</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nSnax; ++i)</div>
+<div class="line"><a name="l02293"></a><span class="lineno"> 2293</span>&#160;        {</div>
+<div class="line"><a name="l02294"></a><span class="lineno"> 2294</span>&#160;            <span class="keywordflow">if</span> (fabs(snaxs(i)-&gt;v &gt; __DBL_EPSILON__))</div>
+<div class="line"><a name="l02295"></a><span class="lineno"> 2295</span>&#160;            {</div>
+<div class="line"><a name="l02296"></a><span class="lineno"> 2296</span>&#160;                newMindDt = distDefault / fabs(snaxs(i)-&gt;v);</div>
+<div class="line"><a name="l02297"></a><span class="lineno"> 2297</span>&#160;                dtDefault = newMindDt &lt; dtDefault ? newMindDt : dtDefault;</div>
+<div class="line"><a name="l02298"></a><span class="lineno"> 2298</span>&#160;            }</div>
+<div class="line"><a name="l02299"></a><span class="lineno"> 2299</span>&#160;        }</div>
+<div class="line"><a name="l02300"></a><span class="lineno"> 2300</span>&#160;    }</div>
+<div class="line"><a name="l02301"></a><span class="lineno"> 2301</span>&#160; </div>
+<div class="line"><a name="l02302"></a><span class="lineno"> 2302</span>&#160;    dt.assign(nSnax, dtDefault);</div>
+<div class="line"><a name="l02303"></a><span class="lineno"> 2303</span>&#160;    dt.resize(nSnax);</div>
+<div class="line"><a name="l02304"></a><span class="lineno"> 2304</span>&#160; </div>
+<div class="line"><a name="l02305"></a><span class="lineno"> 2305</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
+<div class="line"><a name="l02306"></a><span class="lineno"> 2306</span>&#160;    {</div>
+<div class="line"><a name="l02307"></a><span class="lineno"> 2307</span>&#160;        <span class="keywordflow">if</span> (!isSnaxDone[ii])</div>
+<div class="line"><a name="l02308"></a><span class="lineno"> 2308</span>&#160;        {</div>
+<div class="line"><a name="l02309"></a><span class="lineno"> 2309</span>&#160;            nEdge = snaxs.countparent(snaxs(ii)-&gt;edgeind);</div>
+<div class="line"><a name="l02310"></a><span class="lineno"> 2310</span>&#160;            <span class="keywordflow">if</span> (nEdge == 1)</div>
+<div class="line"><a name="l02311"></a><span class="lineno"> 2311</span>&#160;            {</div>
+<div class="line"><a name="l02312"></a><span class="lineno"> 2312</span>&#160;                isSnaxDone[ii] = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02313"></a><span class="lineno"> 2313</span>&#160;            }</div>
+<div class="line"><a name="l02314"></a><span class="lineno"> 2314</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (nEdge &gt; 1)</div>
+<div class="line"><a name="l02315"></a><span class="lineno"> 2315</span>&#160;            {</div>
+<div class="line"><a name="l02316"></a><span class="lineno"> 2316</span>&#160;                snaxs.CalculateTimeStepOnEdge(dt, isSnaxDone, snaxs(ii)-&gt;edgeind);</div>
+<div class="line"><a name="l02317"></a><span class="lineno"> 2317</span>&#160;            }</div>
+<div class="line"><a name="l02318"></a><span class="lineno"> 2318</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02319"></a><span class="lineno"> 2319</span>&#160;            {</div>
+<div class="line"><a name="l02320"></a><span class="lineno"> 2320</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: hashParent was not up to date&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02321"></a><span class="lineno"> 2321</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
+<div class="line"><a name="l02322"></a><span class="lineno"> 2322</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Incorrect hash table provided&quot;</span>);</div>
+<div class="line"><a name="l02323"></a><span class="lineno"> 2323</span>&#160;            }</div>
+<div class="line"><a name="l02324"></a><span class="lineno"> 2324</span>&#160;        }</div>
+<div class="line"><a name="l02325"></a><span class="lineno"> 2325</span>&#160;    }</div>
+<div class="line"><a name="l02326"></a><span class="lineno"> 2326</span>&#160;}</div>
+<div class="line"><a name="l02327"></a><span class="lineno"> 2327</span>&#160; </div>
+<div class="line"><a name="l02328"></a><span class="lineno"> 2328</span>&#160;<span class="keywordtype">void</span> snake::Flip()</div>
+<div class="line"><a name="l02329"></a><span class="lineno"> 2329</span>&#160;{</div>
+<div class="line"><a name="l02330"></a><span class="lineno"> 2330</span>&#160;    <span class="keywordtype">int</span> temp;</div>
+<div class="line"><a name="l02331"></a><span class="lineno"> 2331</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ii = 0; ii &lt; snaxs.size(); ii++)</div>
+<div class="line"><a name="l02332"></a><span class="lineno"> 2332</span>&#160;    {</div>
+<div class="line"><a name="l02333"></a><span class="lineno"> 2333</span>&#160;        temp = snaxs[ii].fromvert;</div>
+<div class="line"><a name="l02334"></a><span class="lineno"> 2334</span>&#160;        snaxs[ii].fromvert = snaxs(ii)-&gt;tovert;</div>
+<div class="line"><a name="l02335"></a><span class="lineno"> 2335</span>&#160;        snaxs[ii].tovert = temp;</div>
+<div class="line"><a name="l02336"></a><span class="lineno"> 2336</span>&#160; </div>
+<div class="line"><a name="l02337"></a><span class="lineno"> 2337</span>&#160;        snaxs[ii].d = 1.0 - snaxs[ii].d;</div>
+<div class="line"><a name="l02338"></a><span class="lineno"> 2338</span>&#160;        snaxs[ii].v = -snaxs[ii].v;</div>
+<div class="line"><a name="l02339"></a><span class="lineno"> 2339</span>&#160;    }</div>
+<div class="line"><a name="l02340"></a><span class="lineno"> 2340</span>&#160;    isFlipped = !isFlipped;</div>
+<div class="line"><a name="l02341"></a><span class="lineno"> 2341</span>&#160;    snaxs.ForceArrayReady();</div>
+<div class="line"><a name="l02342"></a><span class="lineno"> 2342</span>&#160;}</div>
+<div class="line"><a name="l02343"></a><span class="lineno"> 2343</span>&#160; </div>
+<div class="line"><a name="l02344"></a><span class="lineno"> 2344</span>&#160;<span class="keywordtype">double</span> SnaxImpactDt(<span class="keyword">const</span> <a class="code" href="classsnax.html">snax</a> &amp;snax1, <span class="keyword">const</span> <a class="code" href="classsnax.html">snax</a> &amp;snax2)</div>
+<div class="line"><a name="l02345"></a><span class="lineno"> 2345</span>&#160;{</div>
+<div class="line"><a name="l02346"></a><span class="lineno"> 2346</span>&#160;    <span class="keywordtype">int</span> isSameDir;</div>
+<div class="line"><a name="l02347"></a><span class="lineno"> 2347</span>&#160;    <span class="keywordtype">double</span> dD, dV;</div>
 <div class="line"><a name="l02348"></a><span class="lineno"> 2348</span>&#160; </div>
-<div class="line"><a name="l02349"></a><span class="lineno"> 2349</span>&#160;<span class="keywordtype">double</span> SnaxImpactDt(<span class="keyword">const</span> <a class="code" href="classsnax.html">snax</a> &amp;snax1, <span class="keyword">const</span> <a class="code" href="classsnax.html">snax</a> &amp;snax2)</div>
-<div class="line"><a name="l02350"></a><span class="lineno"> 2350</span>&#160;{</div>
-<div class="line"><a name="l02351"></a><span class="lineno"> 2351</span>&#160;    <span class="keywordtype">int</span> isSameDir;</div>
-<div class="line"><a name="l02352"></a><span class="lineno"> 2352</span>&#160;    <span class="keywordtype">double</span> dD, dV;</div>
+<div class="line"><a name="l02349"></a><span class="lineno"> 2349</span>&#160;    isSameDir = snax1.fromvert == snax2.fromvert;</div>
+<div class="line"><a name="l02350"></a><span class="lineno"> 2350</span>&#160; </div>
+<div class="line"><a name="l02351"></a><span class="lineno"> 2351</span>&#160;    dD = ((1.0 * !isSameDir) + (1.0 + (-2.0) * !isSameDir) * snax2.d) - snax1.d;</div>
+<div class="line"><a name="l02352"></a><span class="lineno"> 2352</span>&#160;    dV = (1.0 + (-2.0) * !isSameDir) * snax2.v - snax1.v;</div>
 <div class="line"><a name="l02353"></a><span class="lineno"> 2353</span>&#160; </div>
-<div class="line"><a name="l02354"></a><span class="lineno"> 2354</span>&#160;    isSameDir = snax1.fromvert == snax2.fromvert;</div>
-<div class="line"><a name="l02355"></a><span class="lineno"> 2355</span>&#160; </div>
-<div class="line"><a name="l02356"></a><span class="lineno"> 2356</span>&#160;    dD = ((1.0 * !isSameDir) + (1.0 + (-2.0) * !isSameDir) * snax2.d) - snax1.d;</div>
-<div class="line"><a name="l02357"></a><span class="lineno"> 2357</span>&#160;    dV = (1.0 + (-2.0) * !isSameDir) * snax2.v - snax1.v;</div>
-<div class="line"><a name="l02358"></a><span class="lineno"> 2358</span>&#160; </div>
-<div class="line"><a name="l02359"></a><span class="lineno"> 2359</span>&#160;    <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(dD, 0.0))</div>
-<div class="line"><a name="l02360"></a><span class="lineno"> 2360</span>&#160;    {</div>
-<div class="line"><a name="l02361"></a><span class="lineno"> 2361</span>&#160;        <span class="keywordflow">return</span> (0.0);</div>
-<div class="line"><a name="l02362"></a><span class="lineno"> 2362</span>&#160;    }</div>
-<div class="line"><a name="l02363"></a><span class="lineno"> 2363</span>&#160;    <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(dV, 0.0))</div>
-<div class="line"><a name="l02364"></a><span class="lineno"> 2364</span>&#160;    {</div>
-<div class="line"><a name="l02365"></a><span class="lineno"> 2365</span>&#160;        <span class="keywordflow">return</span> (-1.0);</div>
-<div class="line"><a name="l02366"></a><span class="lineno"> 2366</span>&#160;    }</div>
-<div class="line"><a name="l02367"></a><span class="lineno"> 2367</span>&#160; </div>
-<div class="line"><a name="l02368"></a><span class="lineno"> 2368</span>&#160;    <span class="keywordflow">return</span> (-dD / dV);</div>
-<div class="line"><a name="l02369"></a><span class="lineno"> 2369</span>&#160;}</div>
-<div class="line"><a name="l02370"></a><span class="lineno"> 2370</span>&#160; </div>
-<div class="line"><a name="l02371"></a><span class="lineno"> 2371</span>&#160;<span class="keywordtype">void</span> snake::SnaxImpactDetection(vector&lt;int&gt; &amp;isImpact)</div>
-<div class="line"><a name="l02372"></a><span class="lineno"> 2372</span>&#160;{</div>
-<div class="line"><a name="l02373"></a><span class="lineno"> 2373</span>&#160;    <span class="comment">// TODO make an approximate arrival</span></div>
-<div class="line"><a name="l02374"></a><span class="lineno"> 2374</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, nEdge;</div>
-<div class="line"><a name="l02375"></a><span class="lineno"> 2375</span>&#160;    vector&lt;bool&gt; isSnaxDone;</div>
+<div class="line"><a name="l02354"></a><span class="lineno"> 2354</span>&#160;    <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(dD, 0.0))</div>
+<div class="line"><a name="l02355"></a><span class="lineno"> 2355</span>&#160;    {</div>
+<div class="line"><a name="l02356"></a><span class="lineno"> 2356</span>&#160;        <span class="keywordflow">return</span> (0.0);</div>
+<div class="line"><a name="l02357"></a><span class="lineno"> 2357</span>&#160;    }</div>
+<div class="line"><a name="l02358"></a><span class="lineno"> 2358</span>&#160;    <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(dV, 0.0))</div>
+<div class="line"><a name="l02359"></a><span class="lineno"> 2359</span>&#160;    {</div>
+<div class="line"><a name="l02360"></a><span class="lineno"> 2360</span>&#160;        <span class="keywordflow">return</span> (-1.0);</div>
+<div class="line"><a name="l02361"></a><span class="lineno"> 2361</span>&#160;    }</div>
+<div class="line"><a name="l02362"></a><span class="lineno"> 2362</span>&#160; </div>
+<div class="line"><a name="l02363"></a><span class="lineno"> 2363</span>&#160;    <span class="keywordflow">return</span> (-dD / dV);</div>
+<div class="line"><a name="l02364"></a><span class="lineno"> 2364</span>&#160;}</div>
+<div class="line"><a name="l02365"></a><span class="lineno"> 2365</span>&#160; </div>
+<div class="line"><a name="l02366"></a><span class="lineno"> 2366</span>&#160;<span class="keywordtype">void</span> snake::SnaxImpactDetection(vector&lt;int&gt; &amp;isImpact)</div>
+<div class="line"><a name="l02367"></a><span class="lineno"> 2367</span>&#160;{</div>
+<div class="line"><a name="l02368"></a><span class="lineno"> 2368</span>&#160;    <span class="comment">// TODO make an approximate arrival</span></div>
+<div class="line"><a name="l02369"></a><span class="lineno"> 2369</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, nEdge;</div>
+<div class="line"><a name="l02370"></a><span class="lineno"> 2370</span>&#160;    vector&lt;bool&gt; isSnaxDone;</div>
+<div class="line"><a name="l02371"></a><span class="lineno"> 2371</span>&#160; </div>
+<div class="line"><a name="l02372"></a><span class="lineno"> 2372</span>&#160;    nSnax = snaxs.size();</div>
+<div class="line"><a name="l02373"></a><span class="lineno"> 2373</span>&#160;    isSnaxDone.assign(nSnax, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l02374"></a><span class="lineno"> 2374</span>&#160;    isImpact.clear();</div>
+<div class="line"><a name="l02375"></a><span class="lineno"> 2375</span>&#160;    isImpact.reserve(nSnax * 2);</div>
 <div class="line"><a name="l02376"></a><span class="lineno"> 2376</span>&#160; </div>
-<div class="line"><a name="l02377"></a><span class="lineno"> 2377</span>&#160;    nSnax = snaxs.size();</div>
-<div class="line"><a name="l02378"></a><span class="lineno"> 2378</span>&#160;    isSnaxDone.assign(nSnax, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l02379"></a><span class="lineno"> 2379</span>&#160;    isImpact.clear();</div>
-<div class="line"><a name="l02380"></a><span class="lineno"> 2380</span>&#160;    isImpact.reserve(nSnax * 2);</div>
+<div class="line"><a name="l02377"></a><span class="lineno"> 2377</span>&#160;    <span class="keywordflow">if</span> (!snaxs.checkready())</div>
+<div class="line"><a name="l02378"></a><span class="lineno"> 2378</span>&#160;    {</div>
+<div class="line"><a name="l02379"></a><span class="lineno"> 2379</span>&#160;        snaxs.PrepareForUse();</div>
+<div class="line"><a name="l02380"></a><span class="lineno"> 2380</span>&#160;    }</div>
 <div class="line"><a name="l02381"></a><span class="lineno"> 2381</span>&#160; </div>
-<div class="line"><a name="l02382"></a><span class="lineno"> 2382</span>&#160;    <span class="keywordflow">if</span> (!snaxs.checkready())</div>
+<div class="line"><a name="l02382"></a><span class="lineno"> 2382</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
 <div class="line"><a name="l02383"></a><span class="lineno"> 2383</span>&#160;    {</div>
-<div class="line"><a name="l02384"></a><span class="lineno"> 2384</span>&#160;        snaxs.PrepareForUse();</div>
-<div class="line"><a name="l02385"></a><span class="lineno"> 2385</span>&#160;    }</div>
-<div class="line"><a name="l02386"></a><span class="lineno"> 2386</span>&#160; </div>
-<div class="line"><a name="l02387"></a><span class="lineno"> 2387</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
-<div class="line"><a name="l02388"></a><span class="lineno"> 2388</span>&#160;    {</div>
-<div class="line"><a name="l02389"></a><span class="lineno"> 2389</span>&#160;        <span class="keywordflow">if</span> (!isSnaxDone[ii])</div>
-<div class="line"><a name="l02390"></a><span class="lineno"> 2390</span>&#160;        {</div>
-<div class="line"><a name="l02391"></a><span class="lineno"> 2391</span>&#160;            nEdge = snaxs.countparent(snaxs(ii)-&gt;edgeind);</div>
-<div class="line"><a name="l02392"></a><span class="lineno"> 2392</span>&#160;            <span class="keywordflow">if</span> (nEdge == 1)</div>
-<div class="line"><a name="l02393"></a><span class="lineno"> 2393</span>&#160;            {</div>
-<div class="line"><a name="l02394"></a><span class="lineno"> 2394</span>&#160;                <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(snaxs(ii)-&gt;d, 0.0) &amp;&amp; (snaxs(ii)-&gt;v &lt;= 0.0))</div>
+<div class="line"><a name="l02384"></a><span class="lineno"> 2384</span>&#160;        <span class="keywordflow">if</span> (!isSnaxDone[ii])</div>
+<div class="line"><a name="l02385"></a><span class="lineno"> 2385</span>&#160;        {</div>
+<div class="line"><a name="l02386"></a><span class="lineno"> 2386</span>&#160;            nEdge = snaxs.countparent(snaxs(ii)-&gt;edgeind);</div>
+<div class="line"><a name="l02387"></a><span class="lineno"> 2387</span>&#160;            <span class="keywordflow">if</span> (nEdge == 1)</div>
+<div class="line"><a name="l02388"></a><span class="lineno"> 2388</span>&#160;            {</div>
+<div class="line"><a name="l02389"></a><span class="lineno"> 2389</span>&#160;                <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(snaxs(ii)-&gt;d, 0.0) &amp;&amp; (snaxs(ii)-&gt;v &lt;= 0.0))</div>
+<div class="line"><a name="l02390"></a><span class="lineno"> 2390</span>&#160;                {</div>
+<div class="line"><a name="l02391"></a><span class="lineno"> 2391</span>&#160;                    isImpact.push_back(snaxs(ii)-&gt;index);</div>
+<div class="line"><a name="l02392"></a><span class="lineno"> 2392</span>&#160;                    isImpact.push_back(-1);</div>
+<div class="line"><a name="l02393"></a><span class="lineno"> 2393</span>&#160;                }</div>
+<div class="line"><a name="l02394"></a><span class="lineno"> 2394</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(snaxs(ii)-&gt;d, 1.0) &amp;&amp; (snaxs(ii)-&gt;v &gt;= 0.0))</div>
 <div class="line"><a name="l02395"></a><span class="lineno"> 2395</span>&#160;                {</div>
 <div class="line"><a name="l02396"></a><span class="lineno"> 2396</span>&#160;                    isImpact.push_back(snaxs(ii)-&gt;index);</div>
-<div class="line"><a name="l02397"></a><span class="lineno"> 2397</span>&#160;                    isImpact.push_back(-1);</div>
+<div class="line"><a name="l02397"></a><span class="lineno"> 2397</span>&#160;                    isImpact.push_back(-2);</div>
 <div class="line"><a name="l02398"></a><span class="lineno"> 2398</span>&#160;                }</div>
-<div class="line"><a name="l02399"></a><span class="lineno"> 2399</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(snaxs(ii)-&gt;d, 1.0) &amp;&amp; (snaxs(ii)-&gt;v &gt;= 0.0))</div>
-<div class="line"><a name="l02400"></a><span class="lineno"> 2400</span>&#160;                {</div>
-<div class="line"><a name="l02401"></a><span class="lineno"> 2401</span>&#160;                    isImpact.push_back(snaxs(ii)-&gt;index);</div>
-<div class="line"><a name="l02402"></a><span class="lineno"> 2402</span>&#160;                    isImpact.push_back(-2);</div>
-<div class="line"><a name="l02403"></a><span class="lineno"> 2403</span>&#160;                }</div>
-<div class="line"><a name="l02404"></a><span class="lineno"> 2404</span>&#160;                isSnaxDone[ii] = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02405"></a><span class="lineno"> 2405</span>&#160;            }</div>
-<div class="line"><a name="l02406"></a><span class="lineno"> 2406</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (nEdge &gt; 1)</div>
-<div class="line"><a name="l02407"></a><span class="lineno"> 2407</span>&#160;            {</div>
-<div class="line"><a name="l02408"></a><span class="lineno"> 2408</span>&#160;                snaxs.DetectImpactOnEdge(isImpact, isSnaxDone, snaxs(ii)-&gt;edgeind);</div>
-<div class="line"><a name="l02409"></a><span class="lineno"> 2409</span>&#160;            }</div>
-<div class="line"><a name="l02410"></a><span class="lineno"> 2410</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02411"></a><span class="lineno"> 2411</span>&#160;            {</div>
-<div class="line"><a name="l02412"></a><span class="lineno"> 2412</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: hashParent was not up to date&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l02413"></a><span class="lineno"> 2413</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
-<div class="line"><a name="l02414"></a><span class="lineno"> 2414</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Incorrect hash table provided&quot;</span>);</div>
-<div class="line"><a name="l02415"></a><span class="lineno"> 2415</span>&#160;            }</div>
-<div class="line"><a name="l02416"></a><span class="lineno"> 2416</span>&#160;        }</div>
-<div class="line"><a name="l02417"></a><span class="lineno"> 2417</span>&#160;    }</div>
-<div class="line"><a name="l02418"></a><span class="lineno"> 2418</span>&#160;}</div>
-<div class="line"><a name="l02419"></a><span class="lineno"> 2419</span>&#160;<span class="keywordtype">void</span> snake::SnaxAlmostImpactDetection(vector&lt;int&gt; &amp;isImpact, <span class="keywordtype">double</span> dDlim)</div>
-<div class="line"><a name="l02420"></a><span class="lineno"> 2420</span>&#160;{</div>
-<div class="line"><a name="l02421"></a><span class="lineno"> 2421</span>&#160;    <span class="keywordtype">int</span> i;</div>
-<div class="line"><a name="l02422"></a><span class="lineno"> 2422</span>&#160;    <span class="keywordtype">int</span> nVerts, nSnax, vertInd;</div>
-<div class="line"><a name="l02423"></a><span class="lineno"> 2423</span>&#160;    vector&lt;int&gt; vertSnaxCloseCnt, vertSnaxMinInd;</div>
-<div class="line"><a name="l02424"></a><span class="lineno"> 2424</span>&#160;    vector&lt;double&gt; vertSnaxMinD;</div>
-<div class="line"><a name="l02425"></a><span class="lineno"> 2425</span>&#160;    <span class="keywordtype">double</span> d;</div>
-<div class="line"><a name="l02426"></a><span class="lineno"> 2426</span>&#160;    <span class="keywordtype">bool</span> flag;</div>
-<div class="line"><a name="l02427"></a><span class="lineno"> 2427</span>&#160; </div>
-<div class="line"><a name="l02428"></a><span class="lineno"> 2428</span>&#160;    nVerts = snakemesh()-&gt;verts.size();</div>
-<div class="line"><a name="l02429"></a><span class="lineno"> 2429</span>&#160;    nSnax = snaxs.size();</div>
-<div class="line"><a name="l02430"></a><span class="lineno"> 2430</span>&#160; </div>
-<div class="line"><a name="l02431"></a><span class="lineno"> 2431</span>&#160;    <span class="comment">// isImpact.clear();</span></div>
-<div class="line"><a name="l02432"></a><span class="lineno"> 2432</span>&#160;    <span class="comment">// isImpact.reserve(nSnax*2);</span></div>
-<div class="line"><a name="l02433"></a><span class="lineno"> 2433</span>&#160; </div>
-<div class="line"><a name="l02434"></a><span class="lineno"> 2434</span>&#160;    vertSnaxCloseCnt.assign(nVerts, 0);</div>
-<div class="line"><a name="l02435"></a><span class="lineno"> 2435</span>&#160;    vertSnaxMinInd.assign(nVerts, 0);</div>
-<div class="line"><a name="l02436"></a><span class="lineno"> 2436</span>&#160;    vertSnaxMinD.assign(nVerts, 1.0);</div>
-<div class="line"><a name="l02437"></a><span class="lineno"> 2437</span>&#160; </div>
-<div class="line"><a name="l02438"></a><span class="lineno"> 2438</span>&#160;    <span class="comment">/*Find the closest snaxel to each vertex and the number of close</span></div>
-<div class="line"><a name="l02439"></a><span class="lineno"> 2439</span>&#160;<span class="comment">    snaxels*/</span></div>
-<div class="line"><a name="l02440"></a><span class="lineno"> 2440</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; nSnax; ++i)</div>
-<div class="line"><a name="l02441"></a><span class="lineno"> 2441</span>&#160;    {</div>
-<div class="line"><a name="l02442"></a><span class="lineno"> 2442</span>&#160;        flag = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l02443"></a><span class="lineno"> 2443</span>&#160;        <span class="keywordflow">if</span> ((snaxs(i)-&gt;d &lt; dDlim) &amp;&amp; (snaxs(i)-&gt;v &lt;= 0.0) &amp;&amp; !rsvs3d::utils::IsAproxEqual(snaxs(i)-&gt;d, 0.0))</div>
-<div class="line"><a name="l02444"></a><span class="lineno"> 2444</span>&#160;        {</div>
-<div class="line"><a name="l02445"></a><span class="lineno"> 2445</span>&#160;            flag = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02446"></a><span class="lineno"> 2446</span>&#160;            vertInd = snaxs(i)-&gt;fromvert;</div>
-<div class="line"><a name="l02447"></a><span class="lineno"> 2447</span>&#160;            d = snaxs(i)-&gt;d;</div>
-<div class="line"><a name="l02448"></a><span class="lineno"> 2448</span>&#160;        }</div>
-<div class="line"><a name="l02449"></a><span class="lineno"> 2449</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (((1.0 - snaxs(i)-&gt;d) &lt; dDlim) &amp;&amp; (snaxs(i)-&gt;v &gt;= 0.0) &amp;&amp;</div>
-<div class="line"><a name="l02450"></a><span class="lineno"> 2450</span>&#160;                 !rsvs3d::utils::IsAproxEqual(snaxs(i)-&gt;d, 1.0))</div>
-<div class="line"><a name="l02451"></a><span class="lineno"> 2451</span>&#160;        {</div>
-<div class="line"><a name="l02452"></a><span class="lineno"> 2452</span>&#160;            flag = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02453"></a><span class="lineno"> 2453</span>&#160;            vertInd = snaxs(i)-&gt;tovert;</div>
-<div class="line"><a name="l02454"></a><span class="lineno"> 2454</span>&#160;            d = 1 - snaxs(i)-&gt;d;</div>
-<div class="line"><a name="l02455"></a><span class="lineno"> 2455</span>&#160;        }</div>
-<div class="line"><a name="l02456"></a><span class="lineno"> 2456</span>&#160;        <span class="keywordflow">if</span> (flag)</div>
-<div class="line"><a name="l02457"></a><span class="lineno"> 2457</span>&#160;        {</div>
-<div class="line"><a name="l02458"></a><span class="lineno"> 2458</span>&#160;            vertInd = snakemesh()-&gt;verts.find(vertInd);</div>
-<div class="line"><a name="l02459"></a><span class="lineno"> 2459</span>&#160;            vertSnaxCloseCnt[vertInd]++;</div>
-<div class="line"><a name="l02460"></a><span class="lineno"> 2460</span>&#160; </div>
-<div class="line"><a name="l02461"></a><span class="lineno"> 2461</span>&#160;            <span class="keywordflow">if</span> (vertSnaxMinD[vertInd] &gt;= d)</div>
-<div class="line"><a name="l02462"></a><span class="lineno"> 2462</span>&#160;            {</div>
-<div class="line"><a name="l02463"></a><span class="lineno"> 2463</span>&#160;                vertSnaxMinD[vertInd] = d;</div>
-<div class="line"><a name="l02464"></a><span class="lineno"> 2464</span>&#160;                vertSnaxMinInd[vertInd] = i;</div>
-<div class="line"><a name="l02465"></a><span class="lineno"> 2465</span>&#160;            }</div>
-<div class="line"><a name="l02466"></a><span class="lineno"> 2466</span>&#160;        }</div>
-<div class="line"><a name="l02467"></a><span class="lineno"> 2467</span>&#160;    }</div>
-<div class="line"><a name="l02468"></a><span class="lineno"> 2468</span>&#160;    <span class="comment">// TODO: Need to add a check for the order of the snaxel on the edge.</span></div>
-<div class="line"><a name="l02469"></a><span class="lineno"> 2469</span>&#160;    <span class="comment">// if it is not 1 or the largest this action will cause crossovers.</span></div>
-<div class="line"><a name="l02470"></a><span class="lineno"> 2470</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; nVerts; ++i)</div>
-<div class="line"><a name="l02471"></a><span class="lineno"> 2471</span>&#160;    {</div>
-<div class="line"><a name="l02472"></a><span class="lineno"> 2472</span>&#160;        <span class="keywordflow">if</span> (vertSnaxCloseCnt[i] &gt;= 2)</div>
-<div class="line"><a name="l02473"></a><span class="lineno"> 2473</span>&#160;        {</div>
-<div class="line"><a name="l02474"></a><span class="lineno"> 2474</span>&#160;            isImpact.push_back(snaxs(vertSnaxMinInd[i])-&gt;index);</div>
-<div class="line"><a name="l02475"></a><span class="lineno"> 2475</span>&#160;            <span class="keywordflow">if</span> (snaxs(vertSnaxMinInd[i])-&gt;d &lt; dDlim)</div>
-<div class="line"><a name="l02476"></a><span class="lineno"> 2476</span>&#160;            {</div>
-<div class="line"><a name="l02477"></a><span class="lineno"> 2477</span>&#160;                <span class="comment">// Collapse on the from vertex</span></div>
-<div class="line"><a name="l02478"></a><span class="lineno"> 2478</span>&#160;                snaxs[vertSnaxMinInd[i]].d = 0.0;</div>
-<div class="line"><a name="l02479"></a><span class="lineno"> 2479</span>&#160;                isImpact.push_back(-1);</div>
-<div class="line"><a name="l02480"></a><span class="lineno"> 2480</span>&#160;            }</div>
-<div class="line"><a name="l02481"></a><span class="lineno"> 2481</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02482"></a><span class="lineno"> 2482</span>&#160;            {</div>
-<div class="line"><a name="l02483"></a><span class="lineno"> 2483</span>&#160;                <span class="comment">// Collapse on the to vertex</span></div>
-<div class="line"><a name="l02484"></a><span class="lineno"> 2484</span>&#160;                snaxs[vertSnaxMinInd[i]].d = 1.0;</div>
-<div class="line"><a name="l02485"></a><span class="lineno"> 2485</span>&#160;                isImpact.push_back(-2);</div>
-<div class="line"><a name="l02486"></a><span class="lineno"> 2486</span>&#160;            }</div>
-<div class="line"><a name="l02487"></a><span class="lineno"> 2487</span>&#160;        }</div>
-<div class="line"><a name="l02488"></a><span class="lineno"> 2488</span>&#160;    }</div>
-<div class="line"><a name="l02489"></a><span class="lineno"> 2489</span>&#160;    snaxs.PrepareForUse();</div>
-<div class="line"><a name="l02490"></a><span class="lineno"> 2490</span>&#160;}</div>
-<div class="line"><a name="l02491"></a><span class="lineno"> 2491</span>&#160; </div>
-<div class="line"><a name="l02492"></a><span class="lineno"> 2492</span>&#160;<span class="keywordtype">void</span> snaxarray::DetectImpactOnEdge(vector&lt;int&gt; &amp;isImpact, vector&lt;bool&gt; &amp;isSnaxDone, <span class="keywordtype">int</span> edgeInd)</div>
-<div class="line"><a name="l02493"></a><span class="lineno"> 2493</span>&#160;{</div>
-<div class="line"><a name="l02494"></a><span class="lineno"> 2494</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, jj, dOrd;</div>
-<div class="line"><a name="l02495"></a><span class="lineno"> 2495</span>&#160;    vector&lt;int&gt; snaxSubs;</div>
-<div class="line"><a name="l02496"></a><span class="lineno"> 2496</span>&#160;    <span class="keywordtype">double</span> impactTime;</div>
-<div class="line"><a name="l02497"></a><span class="lineno"> 2497</span>&#160;    snaxSubs = ReturnDataEqualRange(edgeInd, hashParent);</div>
-<div class="line"><a name="l02498"></a><span class="lineno"> 2498</span>&#160;    nSnax = snaxSubs.size();</div>
-<div class="line"><a name="l02499"></a><span class="lineno"> 2499</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
-<div class="line"><a name="l02500"></a><span class="lineno"> 2500</span>&#160;    {</div>
-<div class="line"><a name="l02501"></a><span class="lineno"> 2501</span>&#160;        isSnaxDone[snaxSubs[ii]] = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02502"></a><span class="lineno"> 2502</span>&#160; </div>
-<div class="line"><a name="l02503"></a><span class="lineno"> 2503</span>&#160;        <span class="keywordflow">for</span> (jj = ii + 1; jj &lt; nSnax; ++jj)</div>
-<div class="line"><a name="l02504"></a><span class="lineno"> 2504</span>&#160;        {</div>
-<div class="line"><a name="l02505"></a><span class="lineno"> 2505</span>&#160;            impactTime = SnaxImpactDt(elems[snaxSubs[ii]], elems[snaxSubs[jj]]);</div>
-<div class="line"><a name="l02506"></a><span class="lineno"> 2506</span>&#160;            dOrd = abs(elems[snaxSubs[ii]].orderedge - elems[snaxSubs[jj]].orderedge);</div>
-<div class="line"><a name="l02507"></a><span class="lineno"> 2507</span>&#160;            <span class="keywordflow">if</span> (dOrd == 1 &amp;&amp; rsvs3d::utils::IsAproxEqual(impactTime, 0.0))</div>
-<div class="line"><a name="l02508"></a><span class="lineno"> 2508</span>&#160;            {</div>
-<div class="line"><a name="l02509"></a><span class="lineno"> 2509</span>&#160;                isImpact.push_back((elems[snaxSubs[ii]].index));</div>
-<div class="line"><a name="l02510"></a><span class="lineno"> 2510</span>&#160;                isImpact.push_back((elems[snaxSubs[jj]].index));</div>
+<div class="line"><a name="l02399"></a><span class="lineno"> 2399</span>&#160;                isSnaxDone[ii] = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02400"></a><span class="lineno"> 2400</span>&#160;            }</div>
+<div class="line"><a name="l02401"></a><span class="lineno"> 2401</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (nEdge &gt; 1)</div>
+<div class="line"><a name="l02402"></a><span class="lineno"> 2402</span>&#160;            {</div>
+<div class="line"><a name="l02403"></a><span class="lineno"> 2403</span>&#160;                snaxs.DetectImpactOnEdge(isImpact, isSnaxDone, snaxs(ii)-&gt;edgeind);</div>
+<div class="line"><a name="l02404"></a><span class="lineno"> 2404</span>&#160;            }</div>
+<div class="line"><a name="l02405"></a><span class="lineno"> 2405</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02406"></a><span class="lineno"> 2406</span>&#160;            {</div>
+<div class="line"><a name="l02407"></a><span class="lineno"> 2407</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: hashParent was not up to date&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02408"></a><span class="lineno"> 2408</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
+<div class="line"><a name="l02409"></a><span class="lineno"> 2409</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot;Incorrect hash table provided&quot;</span>);</div>
+<div class="line"><a name="l02410"></a><span class="lineno"> 2410</span>&#160;            }</div>
+<div class="line"><a name="l02411"></a><span class="lineno"> 2411</span>&#160;        }</div>
+<div class="line"><a name="l02412"></a><span class="lineno"> 2412</span>&#160;    }</div>
+<div class="line"><a name="l02413"></a><span class="lineno"> 2413</span>&#160;}</div>
+<div class="line"><a name="l02414"></a><span class="lineno"> 2414</span>&#160;<span class="keywordtype">void</span> snake::SnaxAlmostImpactDetection(vector&lt;int&gt; &amp;isImpact, <span class="keywordtype">double</span> dDlim)</div>
+<div class="line"><a name="l02415"></a><span class="lineno"> 2415</span>&#160;{</div>
+<div class="line"><a name="l02416"></a><span class="lineno"> 2416</span>&#160;    <span class="keywordtype">int</span> i;</div>
+<div class="line"><a name="l02417"></a><span class="lineno"> 2417</span>&#160;    <span class="keywordtype">int</span> nVerts, nSnax, vertInd;</div>
+<div class="line"><a name="l02418"></a><span class="lineno"> 2418</span>&#160;    vector&lt;int&gt; vertSnaxCloseCnt, vertSnaxMinInd;</div>
+<div class="line"><a name="l02419"></a><span class="lineno"> 2419</span>&#160;    vector&lt;double&gt; vertSnaxMinD;</div>
+<div class="line"><a name="l02420"></a><span class="lineno"> 2420</span>&#160;    <span class="keywordtype">double</span> d;</div>
+<div class="line"><a name="l02421"></a><span class="lineno"> 2421</span>&#160;    <span class="keywordtype">bool</span> flag;</div>
+<div class="line"><a name="l02422"></a><span class="lineno"> 2422</span>&#160; </div>
+<div class="line"><a name="l02423"></a><span class="lineno"> 2423</span>&#160;    nVerts = snakemesh()-&gt;verts.size();</div>
+<div class="line"><a name="l02424"></a><span class="lineno"> 2424</span>&#160;    nSnax = snaxs.size();</div>
+<div class="line"><a name="l02425"></a><span class="lineno"> 2425</span>&#160; </div>
+<div class="line"><a name="l02426"></a><span class="lineno"> 2426</span>&#160;    <span class="comment">// isImpact.clear();</span></div>
+<div class="line"><a name="l02427"></a><span class="lineno"> 2427</span>&#160;    <span class="comment">// isImpact.reserve(nSnax*2);</span></div>
+<div class="line"><a name="l02428"></a><span class="lineno"> 2428</span>&#160; </div>
+<div class="line"><a name="l02429"></a><span class="lineno"> 2429</span>&#160;    vertSnaxCloseCnt.assign(nVerts, 0);</div>
+<div class="line"><a name="l02430"></a><span class="lineno"> 2430</span>&#160;    vertSnaxMinInd.assign(nVerts, 0);</div>
+<div class="line"><a name="l02431"></a><span class="lineno"> 2431</span>&#160;    vertSnaxMinD.assign(nVerts, 1.0);</div>
+<div class="line"><a name="l02432"></a><span class="lineno"> 2432</span>&#160; </div>
+<div class="line"><a name="l02433"></a><span class="lineno"> 2433</span>&#160;    <span class="comment">/*Find the closest snaxel to each vertex and the number of close</span></div>
+<div class="line"><a name="l02434"></a><span class="lineno"> 2434</span>&#160;<span class="comment">    snaxels*/</span></div>
+<div class="line"><a name="l02435"></a><span class="lineno"> 2435</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; nSnax; ++i)</div>
+<div class="line"><a name="l02436"></a><span class="lineno"> 2436</span>&#160;    {</div>
+<div class="line"><a name="l02437"></a><span class="lineno"> 2437</span>&#160;        flag = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l02438"></a><span class="lineno"> 2438</span>&#160;        <span class="keywordflow">if</span> ((snaxs(i)-&gt;d &lt; dDlim) &amp;&amp; (snaxs(i)-&gt;v &lt;= 0.0) &amp;&amp; !rsvs3d::utils::IsAproxEqual(snaxs(i)-&gt;d, 0.0))</div>
+<div class="line"><a name="l02439"></a><span class="lineno"> 2439</span>&#160;        {</div>
+<div class="line"><a name="l02440"></a><span class="lineno"> 2440</span>&#160;            flag = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02441"></a><span class="lineno"> 2441</span>&#160;            vertInd = snaxs(i)-&gt;fromvert;</div>
+<div class="line"><a name="l02442"></a><span class="lineno"> 2442</span>&#160;            d = snaxs(i)-&gt;d;</div>
+<div class="line"><a name="l02443"></a><span class="lineno"> 2443</span>&#160;        }</div>
+<div class="line"><a name="l02444"></a><span class="lineno"> 2444</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (((1.0 - snaxs(i)-&gt;d) &lt; dDlim) &amp;&amp; (snaxs(i)-&gt;v &gt;= 0.0) &amp;&amp;</div>
+<div class="line"><a name="l02445"></a><span class="lineno"> 2445</span>&#160;                 !rsvs3d::utils::IsAproxEqual(snaxs(i)-&gt;d, 1.0))</div>
+<div class="line"><a name="l02446"></a><span class="lineno"> 2446</span>&#160;        {</div>
+<div class="line"><a name="l02447"></a><span class="lineno"> 2447</span>&#160;            flag = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02448"></a><span class="lineno"> 2448</span>&#160;            vertInd = snaxs(i)-&gt;tovert;</div>
+<div class="line"><a name="l02449"></a><span class="lineno"> 2449</span>&#160;            d = 1 - snaxs(i)-&gt;d;</div>
+<div class="line"><a name="l02450"></a><span class="lineno"> 2450</span>&#160;        }</div>
+<div class="line"><a name="l02451"></a><span class="lineno"> 2451</span>&#160;        <span class="keywordflow">if</span> (flag)</div>
+<div class="line"><a name="l02452"></a><span class="lineno"> 2452</span>&#160;        {</div>
+<div class="line"><a name="l02453"></a><span class="lineno"> 2453</span>&#160;            vertInd = snakemesh()-&gt;verts.find(vertInd);</div>
+<div class="line"><a name="l02454"></a><span class="lineno"> 2454</span>&#160;            vertSnaxCloseCnt[vertInd]++;</div>
+<div class="line"><a name="l02455"></a><span class="lineno"> 2455</span>&#160; </div>
+<div class="line"><a name="l02456"></a><span class="lineno"> 2456</span>&#160;            <span class="keywordflow">if</span> (vertSnaxMinD[vertInd] &gt;= d)</div>
+<div class="line"><a name="l02457"></a><span class="lineno"> 2457</span>&#160;            {</div>
+<div class="line"><a name="l02458"></a><span class="lineno"> 2458</span>&#160;                vertSnaxMinD[vertInd] = d;</div>
+<div class="line"><a name="l02459"></a><span class="lineno"> 2459</span>&#160;                vertSnaxMinInd[vertInd] = i;</div>
+<div class="line"><a name="l02460"></a><span class="lineno"> 2460</span>&#160;            }</div>
+<div class="line"><a name="l02461"></a><span class="lineno"> 2461</span>&#160;        }</div>
+<div class="line"><a name="l02462"></a><span class="lineno"> 2462</span>&#160;    }</div>
+<div class="line"><a name="l02463"></a><span class="lineno"> 2463</span>&#160;    <span class="comment">// TODO: Need to add a check for the order of the snaxel on the edge.</span></div>
+<div class="line"><a name="l02464"></a><span class="lineno"> 2464</span>&#160;    <span class="comment">// if it is not 1 or the largest this action will cause crossovers.</span></div>
+<div class="line"><a name="l02465"></a><span class="lineno"> 2465</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; nVerts; ++i)</div>
+<div class="line"><a name="l02466"></a><span class="lineno"> 2466</span>&#160;    {</div>
+<div class="line"><a name="l02467"></a><span class="lineno"> 2467</span>&#160;        <span class="keywordflow">if</span> (vertSnaxCloseCnt[i] &gt;= 2)</div>
+<div class="line"><a name="l02468"></a><span class="lineno"> 2468</span>&#160;        {</div>
+<div class="line"><a name="l02469"></a><span class="lineno"> 2469</span>&#160;            isImpact.push_back(snaxs(vertSnaxMinInd[i])-&gt;index);</div>
+<div class="line"><a name="l02470"></a><span class="lineno"> 2470</span>&#160;            <span class="keywordflow">if</span> (snaxs(vertSnaxMinInd[i])-&gt;d &lt; dDlim)</div>
+<div class="line"><a name="l02471"></a><span class="lineno"> 2471</span>&#160;            {</div>
+<div class="line"><a name="l02472"></a><span class="lineno"> 2472</span>&#160;                <span class="comment">// Collapse on the from vertex</span></div>
+<div class="line"><a name="l02473"></a><span class="lineno"> 2473</span>&#160;                snaxs[vertSnaxMinInd[i]].d = 0.0;</div>
+<div class="line"><a name="l02474"></a><span class="lineno"> 2474</span>&#160;                isImpact.push_back(-1);</div>
+<div class="line"><a name="l02475"></a><span class="lineno"> 2475</span>&#160;            }</div>
+<div class="line"><a name="l02476"></a><span class="lineno"> 2476</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02477"></a><span class="lineno"> 2477</span>&#160;            {</div>
+<div class="line"><a name="l02478"></a><span class="lineno"> 2478</span>&#160;                <span class="comment">// Collapse on the to vertex</span></div>
+<div class="line"><a name="l02479"></a><span class="lineno"> 2479</span>&#160;                snaxs[vertSnaxMinInd[i]].d = 1.0;</div>
+<div class="line"><a name="l02480"></a><span class="lineno"> 2480</span>&#160;                isImpact.push_back(-2);</div>
+<div class="line"><a name="l02481"></a><span class="lineno"> 2481</span>&#160;            }</div>
+<div class="line"><a name="l02482"></a><span class="lineno"> 2482</span>&#160;        }</div>
+<div class="line"><a name="l02483"></a><span class="lineno"> 2483</span>&#160;    }</div>
+<div class="line"><a name="l02484"></a><span class="lineno"> 2484</span>&#160;    snaxs.PrepareForUse();</div>
+<div class="line"><a name="l02485"></a><span class="lineno"> 2485</span>&#160;}</div>
+<div class="line"><a name="l02486"></a><span class="lineno"> 2486</span>&#160; </div>
+<div class="line"><a name="l02487"></a><span class="lineno"> 2487</span>&#160;<span class="keywordtype">void</span> snaxarray::DetectImpactOnEdge(vector&lt;int&gt; &amp;isImpact, vector&lt;bool&gt; &amp;isSnaxDone, <span class="keywordtype">int</span> edgeInd)</div>
+<div class="line"><a name="l02488"></a><span class="lineno"> 2488</span>&#160;{</div>
+<div class="line"><a name="l02489"></a><span class="lineno"> 2489</span>&#160;    <span class="keywordtype">int</span> nSnax, ii, jj, dOrd;</div>
+<div class="line"><a name="l02490"></a><span class="lineno"> 2490</span>&#160;    vector&lt;int&gt; snaxSubs;</div>
+<div class="line"><a name="l02491"></a><span class="lineno"> 2491</span>&#160;    <span class="keywordtype">double</span> impactTime;</div>
+<div class="line"><a name="l02492"></a><span class="lineno"> 2492</span>&#160;    snaxSubs = ReturnDataEqualRange(edgeInd, hashParent);</div>
+<div class="line"><a name="l02493"></a><span class="lineno"> 2493</span>&#160;    nSnax = snaxSubs.size();</div>
+<div class="line"><a name="l02494"></a><span class="lineno"> 2494</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; nSnax; ++ii)</div>
+<div class="line"><a name="l02495"></a><span class="lineno"> 2495</span>&#160;    {</div>
+<div class="line"><a name="l02496"></a><span class="lineno"> 2496</span>&#160;        isSnaxDone[snaxSubs[ii]] = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02497"></a><span class="lineno"> 2497</span>&#160; </div>
+<div class="line"><a name="l02498"></a><span class="lineno"> 2498</span>&#160;        <span class="keywordflow">for</span> (jj = ii + 1; jj &lt; nSnax; ++jj)</div>
+<div class="line"><a name="l02499"></a><span class="lineno"> 2499</span>&#160;        {</div>
+<div class="line"><a name="l02500"></a><span class="lineno"> 2500</span>&#160;            impactTime = SnaxImpactDt(elems[snaxSubs[ii]], elems[snaxSubs[jj]]);</div>
+<div class="line"><a name="l02501"></a><span class="lineno"> 2501</span>&#160;            dOrd = abs(elems[snaxSubs[ii]].orderedge - elems[snaxSubs[jj]].orderedge);</div>
+<div class="line"><a name="l02502"></a><span class="lineno"> 2502</span>&#160;            <span class="keywordflow">if</span> (dOrd == 1 &amp;&amp; rsvs3d::utils::IsAproxEqual(impactTime, 0.0))</div>
+<div class="line"><a name="l02503"></a><span class="lineno"> 2503</span>&#160;            {</div>
+<div class="line"><a name="l02504"></a><span class="lineno"> 2504</span>&#160;                isImpact.push_back((elems[snaxSubs[ii]].index));</div>
+<div class="line"><a name="l02505"></a><span class="lineno"> 2505</span>&#160;                isImpact.push_back((elems[snaxSubs[jj]].index));</div>
+<div class="line"><a name="l02506"></a><span class="lineno"> 2506</span>&#160; </div>
+<div class="line"><a name="l02507"></a><span class="lineno"> 2507</span>&#160;                isImpact.push_back((elems[snaxSubs[jj]].index));</div>
+<div class="line"><a name="l02508"></a><span class="lineno"> 2508</span>&#160;                isImpact.push_back((elems[snaxSubs[ii]].index));</div>
+<div class="line"><a name="l02509"></a><span class="lineno"> 2509</span>&#160;            }</div>
+<div class="line"><a name="l02510"></a><span class="lineno"> 2510</span>&#160;        }</div>
 <div class="line"><a name="l02511"></a><span class="lineno"> 2511</span>&#160; </div>
-<div class="line"><a name="l02512"></a><span class="lineno"> 2512</span>&#160;                isImpact.push_back((elems[snaxSubs[jj]].index));</div>
-<div class="line"><a name="l02513"></a><span class="lineno"> 2513</span>&#160;                isImpact.push_back((elems[snaxSubs[ii]].index));</div>
-<div class="line"><a name="l02514"></a><span class="lineno"> 2514</span>&#160;            }</div>
-<div class="line"><a name="l02515"></a><span class="lineno"> 2515</span>&#160;        }</div>
-<div class="line"><a name="l02516"></a><span class="lineno"> 2516</span>&#160; </div>
-<div class="line"><a name="l02517"></a><span class="lineno"> 2517</span>&#160;        <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d, 0.0) &amp;&amp; (elems[snaxSubs[ii]].v &lt;= 0.0) &amp;&amp;</div>
-<div class="line"><a name="l02518"></a><span class="lineno"> 2518</span>&#160;            elems[snaxSubs[ii]].orderedge == 1)</div>
-<div class="line"><a name="l02519"></a><span class="lineno"> 2519</span>&#160;        {</div>
-<div class="line"><a name="l02520"></a><span class="lineno"> 2520</span>&#160;            isImpact.push_back(elems[snaxSubs[ii]].index);</div>
-<div class="line"><a name="l02521"></a><span class="lineno"> 2521</span>&#160;            isImpact.push_back(-1);</div>
-<div class="line"><a name="l02522"></a><span class="lineno"> 2522</span>&#160;        }</div>
-<div class="line"><a name="l02523"></a><span class="lineno"> 2523</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d, 1.0) &amp;&amp; (elems[snaxSubs[ii]].v &gt;= 0.0) &amp;&amp;</div>
-<div class="line"><a name="l02524"></a><span class="lineno"> 2524</span>&#160;                 elems[snaxSubs[ii]].orderedge == nSnax)</div>
-<div class="line"><a name="l02525"></a><span class="lineno"> 2525</span>&#160;        {</div>
-<div class="line"><a name="l02526"></a><span class="lineno"> 2526</span>&#160;            isImpact.push_back(elems[snaxSubs[ii]].index);</div>
-<div class="line"><a name="l02527"></a><span class="lineno"> 2527</span>&#160;            isImpact.push_back(-2);</div>
-<div class="line"><a name="l02528"></a><span class="lineno"> 2528</span>&#160;        }</div>
-<div class="line"><a name="l02529"></a><span class="lineno"> 2529</span>&#160;    }</div>
-<div class="line"><a name="l02530"></a><span class="lineno"> 2530</span>&#160;}</div>
-<div class="line"><a name="l02531"></a><span class="lineno"> 2531</span>&#160; </div>
-<div class="line"><a name="l02532"></a><span class="lineno"> 2532</span>&#160;<span class="keywordtype">void</span> snake::OrientFaces()</div>
-<div class="line"><a name="l02533"></a><span class="lineno"> 2533</span>&#160;{</div>
-<div class="line"><a name="l02534"></a><span class="lineno"> 2534</span>&#160;    <span class="comment">/*</span></div>
-<div class="line"><a name="l02535"></a><span class="lineno"> 2535</span>&#160;<span class="comment">    Orients either surfaces or edges depending.</span></div>
-<div class="line"><a name="l02536"></a><span class="lineno"> 2536</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l02537"></a><span class="lineno"> 2537</span>&#160;    <span class="keywordflow">if</span> (this-&gt;Check3D())</div>
-<div class="line"><a name="l02538"></a><span class="lineno"> 2538</span>&#160;    {</div>
-<div class="line"><a name="l02539"></a><span class="lineno"> 2539</span>&#160;        this-&gt;OrientSurfaceVolume();</div>
-<div class="line"><a name="l02540"></a><span class="lineno"> 2540</span>&#160;    }</div>
-<div class="line"><a name="l02541"></a><span class="lineno"> 2541</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02542"></a><span class="lineno"> 2542</span>&#160;    {</div>
-<div class="line"><a name="l02543"></a><span class="lineno"> 2543</span>&#160;        this-&gt;OrientEdgeSurface();</div>
-<div class="line"><a name="l02544"></a><span class="lineno"> 2544</span>&#160;    }</div>
-<div class="line"><a name="l02545"></a><span class="lineno"> 2545</span>&#160;}</div>
-<div class="line"><a name="l02546"></a><span class="lineno"> 2546</span>&#160;<span class="keywordtype">void</span> snake::OrientEdgeSurface()</div>
-<div class="line"><a name="l02547"></a><span class="lineno"> 2547</span>&#160;{</div>
-<div class="line"><a name="l02548"></a><span class="lineno"> 2548</span>&#160;    cerr &lt;&lt; <span class="stringliteral">&quot;Warning: not coded yet in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
-<div class="line"><a name="l02549"></a><span class="lineno"> 2549</span>&#160;}</div>
-<div class="line"><a name="l02550"></a><span class="lineno"> 2550</span>&#160;<span class="keywordtype">void</span> snake::OrientSurfaceVolume()</div>
-<div class="line"><a name="l02551"></a><span class="lineno"> 2551</span>&#160;{</div>
-<div class="line"><a name="l02552"></a><span class="lineno"> 2552</span>&#160;    <span class="comment">// Orders the surf.voluind [c0 c1] such that the surface normal vector points</span></div>
-<div class="line"><a name="l02553"></a><span class="lineno"> 2553</span>&#160;    <span class="comment">// from c0 to c1</span></div>
-<div class="line"><a name="l02554"></a><span class="lineno"> 2554</span>&#160;    <span class="comment">// This is done by using the surface normals and checking they go towards</span></div>
-<div class="line"><a name="l02555"></a><span class="lineno"> 2555</span>&#160;    <span class="comment">// the centre of the cell</span></div>
-<div class="line"><a name="l02556"></a><span class="lineno"> 2556</span>&#160; </div>
-<div class="line"><a name="l02557"></a><span class="lineno"> 2557</span>&#160;    <span class="keywordtype">int</span> nBlocks, ii, jj, ni, nj, kk, ll;</div>
-<div class="line"><a name="l02558"></a><span class="lineno"> 2558</span>&#160;    vector&lt;int&gt; surfOrient;</div>
-<div class="line"><a name="l02559"></a><span class="lineno"> 2559</span>&#160;    vector&lt;bool&gt; isFlip;</div>
-<div class="line"><a name="l02560"></a><span class="lineno"> 2560</span>&#160;    <span class="keywordtype">double</span> dotProd;</div>
-<div class="line"><a name="l02561"></a><span class="lineno"> 2561</span>&#160;    <a class="code" href="classcoordvec.html">coordvec</a> centreVolu, normalVec;</div>
-<div class="line"><a name="l02562"></a><span class="lineno"> 2562</span>&#160; </div>
-<div class="line"><a name="l02563"></a><span class="lineno"> 2563</span>&#160;    nBlocks = snakeconn.OrientRelativeSurfaceVolume(surfOrient);</div>
-<div class="line"><a name="l02564"></a><span class="lineno"> 2564</span>&#160;    isFlip.assign(nBlocks, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l02565"></a><span class="lineno"> 2565</span>&#160;    <span class="comment">//========================================</span></div>
-<div class="line"><a name="l02566"></a><span class="lineno"> 2566</span>&#160;    <span class="comment">//  Select direction using coordinate geometry</span></div>
-<div class="line"><a name="l02567"></a><span class="lineno"> 2567</span>&#160;    <span class="comment">//     use a surface</span></div>
-<div class="line"><a name="l02568"></a><span class="lineno"> 2568</span>&#160; </div>
-<div class="line"><a name="l02569"></a><span class="lineno"> 2569</span>&#160;    <span class="keywordflow">for</span> (ii = 1; ii &lt;= nBlocks; ii++)</div>
-<div class="line"><a name="l02570"></a><span class="lineno"> 2570</span>&#160;    {</div>
-<div class="line"><a name="l02571"></a><span class="lineno"> 2571</span>&#160;        jj = -1;</div>
-<div class="line"><a name="l02572"></a><span class="lineno"> 2572</span>&#160;        nj = surfOrient.size();</div>
-<div class="line"><a name="l02573"></a><span class="lineno"> 2573</span>&#160;        <span class="keywordflow">do</span></div>
-<div class="line"><a name="l02574"></a><span class="lineno"> 2574</span>&#160;        {</div>
-<div class="line"><a name="l02575"></a><span class="lineno"> 2575</span>&#160;            jj++;</div>
-<div class="line"><a name="l02576"></a><span class="lineno"> 2576</span>&#160;            <span class="keywordflow">while</span> (jj &lt; nj &amp;&amp; ii != abs(surfOrient[jj]))</div>
-<div class="line"><a name="l02577"></a><span class="lineno"> 2577</span>&#160;            {</div>
-<div class="line"><a name="l02578"></a><span class="lineno"> 2578</span>&#160;                jj++;</div>
-<div class="line"><a name="l02579"></a><span class="lineno"> 2579</span>&#160;            }</div>
-<div class="line"><a name="l02580"></a><span class="lineno"> 2580</span>&#160;            <span class="keywordflow">if</span> (jj == nj)</div>
-<div class="line"><a name="l02581"></a><span class="lineno"> 2581</span>&#160;            { <span class="comment">// if the orientation cannot be defined</span></div>
-<div class="line"><a name="l02582"></a><span class="lineno"> 2582</span>&#160;                dotProd = 1.0;</div>
-<div class="line"><a name="l02583"></a><span class="lineno"> 2583</span>&#160;                kk = 0;</div>
-<div class="line"><a name="l02584"></a><span class="lineno"> 2584</span>&#160;                <span class="comment">// cerr &lt;&lt; &quot;Warning: Cell orientations could not be computed &quot; &lt;&lt; endl;</span></div>
-<div class="line"><a name="l02585"></a><span class="lineno"> 2585</span>&#160;                <span class="comment">// cerr &lt;&lt; &quot;            in &quot; &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</span></div>
-<div class="line"><a name="l02586"></a><span class="lineno"> 2586</span>&#160;                <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l02587"></a><span class="lineno"> 2587</span>&#160;            }</div>
-<div class="line"><a name="l02588"></a><span class="lineno"> 2588</span>&#160;            kk = snakeconn.surfs(jj)-&gt;voluind[0] == 0;</div>
-<div class="line"><a name="l02589"></a><span class="lineno"> 2589</span>&#160;            ll = snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)-&gt;edgeind[0])-&gt;vertind[0])-&gt;tovert;</div>
-<div class="line"><a name="l02590"></a><span class="lineno"> 2590</span>&#160;            centreVolu = snakemesh()-&gt;verts.isearch(ll)-&gt;coord;</div>
-<div class="line"><a name="l02591"></a><span class="lineno"> 2591</span>&#160;            ll = snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)-&gt;edgeind[0])-&gt;vertind[0])-&gt;fromvert;</div>
-<div class="line"><a name="l02592"></a><span class="lineno"> 2592</span>&#160;            centreVolu.substract(snakemesh()-&gt;verts.isearch(ll)-&gt;coord);</div>
+<div class="line"><a name="l02512"></a><span class="lineno"> 2512</span>&#160;        <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d, 0.0) &amp;&amp; (elems[snaxSubs[ii]].v &lt;= 0.0) &amp;&amp;</div>
+<div class="line"><a name="l02513"></a><span class="lineno"> 2513</span>&#160;            elems[snaxSubs[ii]].orderedge == 1)</div>
+<div class="line"><a name="l02514"></a><span class="lineno"> 2514</span>&#160;        {</div>
+<div class="line"><a name="l02515"></a><span class="lineno"> 2515</span>&#160;            isImpact.push_back(elems[snaxSubs[ii]].index);</div>
+<div class="line"><a name="l02516"></a><span class="lineno"> 2516</span>&#160;            isImpact.push_back(-1);</div>
+<div class="line"><a name="l02517"></a><span class="lineno"> 2517</span>&#160;        }</div>
+<div class="line"><a name="l02518"></a><span class="lineno"> 2518</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (rsvs3d::utils::IsAproxEqual(elems[snaxSubs[ii]].d, 1.0) &amp;&amp; (elems[snaxSubs[ii]].v &gt;= 0.0) &amp;&amp;</div>
+<div class="line"><a name="l02519"></a><span class="lineno"> 2519</span>&#160;                 elems[snaxSubs[ii]].orderedge == nSnax)</div>
+<div class="line"><a name="l02520"></a><span class="lineno"> 2520</span>&#160;        {</div>
+<div class="line"><a name="l02521"></a><span class="lineno"> 2521</span>&#160;            isImpact.push_back(elems[snaxSubs[ii]].index);</div>
+<div class="line"><a name="l02522"></a><span class="lineno"> 2522</span>&#160;            isImpact.push_back(-2);</div>
+<div class="line"><a name="l02523"></a><span class="lineno"> 2523</span>&#160;        }</div>
+<div class="line"><a name="l02524"></a><span class="lineno"> 2524</span>&#160;    }</div>
+<div class="line"><a name="l02525"></a><span class="lineno"> 2525</span>&#160;}</div>
+<div class="line"><a name="l02526"></a><span class="lineno"> 2526</span>&#160; </div>
+<div class="line"><a name="l02527"></a><span class="lineno"> 2527</span>&#160;<span class="keywordtype">void</span> snake::OrientFaces()</div>
+<div class="line"><a name="l02528"></a><span class="lineno"> 2528</span>&#160;{</div>
+<div class="line"><a name="l02529"></a><span class="lineno"> 2529</span>&#160;    <span class="comment">/*</span></div>
+<div class="line"><a name="l02530"></a><span class="lineno"> 2530</span>&#160;<span class="comment">    Orients either surfaces or edges depending.</span></div>
+<div class="line"><a name="l02531"></a><span class="lineno"> 2531</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l02532"></a><span class="lineno"> 2532</span>&#160;    <span class="keywordflow">if</span> (this-&gt;Check3D())</div>
+<div class="line"><a name="l02533"></a><span class="lineno"> 2533</span>&#160;    {</div>
+<div class="line"><a name="l02534"></a><span class="lineno"> 2534</span>&#160;        this-&gt;OrientSurfaceVolume();</div>
+<div class="line"><a name="l02535"></a><span class="lineno"> 2535</span>&#160;    }</div>
+<div class="line"><a name="l02536"></a><span class="lineno"> 2536</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02537"></a><span class="lineno"> 2537</span>&#160;    {</div>
+<div class="line"><a name="l02538"></a><span class="lineno"> 2538</span>&#160;        this-&gt;OrientEdgeSurface();</div>
+<div class="line"><a name="l02539"></a><span class="lineno"> 2539</span>&#160;    }</div>
+<div class="line"><a name="l02540"></a><span class="lineno"> 2540</span>&#160;}</div>
+<div class="line"><a name="l02541"></a><span class="lineno"> 2541</span>&#160;<span class="keywordtype">void</span> snake::OrientEdgeSurface()</div>
+<div class="line"><a name="l02542"></a><span class="lineno"> 2542</span>&#160;{</div>
+<div class="line"><a name="l02543"></a><span class="lineno"> 2543</span>&#160;    cerr &lt;&lt; <span class="stringliteral">&quot;Warning: not coded yet in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
+<div class="line"><a name="l02544"></a><span class="lineno"> 2544</span>&#160;}</div>
+<div class="line"><a name="l02545"></a><span class="lineno"> 2545</span>&#160;<span class="keywordtype">void</span> snake::OrientSurfaceVolume()</div>
+<div class="line"><a name="l02546"></a><span class="lineno"> 2546</span>&#160;{</div>
+<div class="line"><a name="l02547"></a><span class="lineno"> 2547</span>&#160;    <span class="comment">// Orders the surf.voluind [c0 c1] such that the surface normal vector points</span></div>
+<div class="line"><a name="l02548"></a><span class="lineno"> 2548</span>&#160;    <span class="comment">// from c0 to c1</span></div>
+<div class="line"><a name="l02549"></a><span class="lineno"> 2549</span>&#160;    <span class="comment">// This is done by using the surface normals and checking they go towards</span></div>
+<div class="line"><a name="l02550"></a><span class="lineno"> 2550</span>&#160;    <span class="comment">// the centre of the cell</span></div>
+<div class="line"><a name="l02551"></a><span class="lineno"> 2551</span>&#160; </div>
+<div class="line"><a name="l02552"></a><span class="lineno"> 2552</span>&#160;    <span class="keywordtype">int</span> nBlocks, ii, jj, ni, nj, kk, ll;</div>
+<div class="line"><a name="l02553"></a><span class="lineno"> 2553</span>&#160;    vector&lt;int&gt; surfOrient;</div>
+<div class="line"><a name="l02554"></a><span class="lineno"> 2554</span>&#160;    vector&lt;bool&gt; isFlip;</div>
+<div class="line"><a name="l02555"></a><span class="lineno"> 2555</span>&#160;    <span class="keywordtype">double</span> dotProd;</div>
+<div class="line"><a name="l02556"></a><span class="lineno"> 2556</span>&#160;    <a class="code" href="classcoordvec.html">coordvec</a> centreVolu, normalVec;</div>
+<div class="line"><a name="l02557"></a><span class="lineno"> 2557</span>&#160; </div>
+<div class="line"><a name="l02558"></a><span class="lineno"> 2558</span>&#160;    nBlocks = snakeconn.OrientRelativeSurfaceVolume(surfOrient);</div>
+<div class="line"><a name="l02559"></a><span class="lineno"> 2559</span>&#160;    isFlip.assign(nBlocks, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l02560"></a><span class="lineno"> 2560</span>&#160;    <span class="comment">//========================================</span></div>
+<div class="line"><a name="l02561"></a><span class="lineno"> 2561</span>&#160;    <span class="comment">//  Select direction using coordinate geometry</span></div>
+<div class="line"><a name="l02562"></a><span class="lineno"> 2562</span>&#160;    <span class="comment">//     use a surface</span></div>
+<div class="line"><a name="l02563"></a><span class="lineno"> 2563</span>&#160; </div>
+<div class="line"><a name="l02564"></a><span class="lineno"> 2564</span>&#160;    <span class="keywordflow">for</span> (ii = 1; ii &lt;= nBlocks; ii++)</div>
+<div class="line"><a name="l02565"></a><span class="lineno"> 2565</span>&#160;    {</div>
+<div class="line"><a name="l02566"></a><span class="lineno"> 2566</span>&#160;        jj = -1;</div>
+<div class="line"><a name="l02567"></a><span class="lineno"> 2567</span>&#160;        nj = surfOrient.size();</div>
+<div class="line"><a name="l02568"></a><span class="lineno"> 2568</span>&#160;        <span class="keywordflow">do</span></div>
+<div class="line"><a name="l02569"></a><span class="lineno"> 2569</span>&#160;        {</div>
+<div class="line"><a name="l02570"></a><span class="lineno"> 2570</span>&#160;            jj++;</div>
+<div class="line"><a name="l02571"></a><span class="lineno"> 2571</span>&#160;            <span class="keywordflow">while</span> (jj &lt; nj &amp;&amp; ii != abs(surfOrient[jj]))</div>
+<div class="line"><a name="l02572"></a><span class="lineno"> 2572</span>&#160;            {</div>
+<div class="line"><a name="l02573"></a><span class="lineno"> 2573</span>&#160;                jj++;</div>
+<div class="line"><a name="l02574"></a><span class="lineno"> 2574</span>&#160;            }</div>
+<div class="line"><a name="l02575"></a><span class="lineno"> 2575</span>&#160;            <span class="keywordflow">if</span> (jj == nj)</div>
+<div class="line"><a name="l02576"></a><span class="lineno"> 2576</span>&#160;            { <span class="comment">// if the orientation cannot be defined</span></div>
+<div class="line"><a name="l02577"></a><span class="lineno"> 2577</span>&#160;                dotProd = 1.0;</div>
+<div class="line"><a name="l02578"></a><span class="lineno"> 2578</span>&#160;                kk = 0;</div>
+<div class="line"><a name="l02579"></a><span class="lineno"> 2579</span>&#160;                <span class="comment">// cerr &lt;&lt; &quot;Warning: Cell orientations could not be computed &quot; &lt;&lt; endl;</span></div>
+<div class="line"><a name="l02580"></a><span class="lineno"> 2580</span>&#160;                <span class="comment">// cerr &lt;&lt; &quot;            in &quot; &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</span></div>
+<div class="line"><a name="l02581"></a><span class="lineno"> 2581</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l02582"></a><span class="lineno"> 2582</span>&#160;            }</div>
+<div class="line"><a name="l02583"></a><span class="lineno"> 2583</span>&#160;            kk = snakeconn.surfs(jj)-&gt;voluind[0] == 0;</div>
+<div class="line"><a name="l02584"></a><span class="lineno"> 2584</span>&#160;            ll = snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)-&gt;edgeind[0])-&gt;vertind[0])-&gt;tovert;</div>
+<div class="line"><a name="l02585"></a><span class="lineno"> 2585</span>&#160;            centreVolu = snakemesh()-&gt;verts.isearch(ll)-&gt;coord;</div>
+<div class="line"><a name="l02586"></a><span class="lineno"> 2586</span>&#160;            ll = snaxs.isearch(snakeconn.edges.isearch(snakeconn.surfs(jj)-&gt;edgeind[0])-&gt;vertind[0])-&gt;fromvert;</div>
+<div class="line"><a name="l02587"></a><span class="lineno"> 2587</span>&#160;            centreVolu.substract(snakemesh()-&gt;verts.isearch(ll)-&gt;coord);</div>
+<div class="line"><a name="l02588"></a><span class="lineno"> 2588</span>&#160; </div>
+<div class="line"><a name="l02589"></a><span class="lineno"> 2589</span>&#160;            normalVec = snakeconn.CalcPseudoNormalSurf(snakeconn.surfs(jj)-&gt;index);</div>
+<div class="line"><a name="l02590"></a><span class="lineno"> 2590</span>&#160; </div>
+<div class="line"><a name="l02591"></a><span class="lineno"> 2591</span>&#160;            dotProd = centreVolu.dot(normalVec.usedata());</div>
+<div class="line"><a name="l02592"></a><span class="lineno"> 2592</span>&#160;        } <span class="keywordflow">while</span> (!isfinite(dotProd) || (fabs(dotProd) &lt; numeric_limits&lt;double&gt;::epsilon()));</div>
 <div class="line"><a name="l02593"></a><span class="lineno"> 2593</span>&#160; </div>
-<div class="line"><a name="l02594"></a><span class="lineno"> 2594</span>&#160;            normalVec = snakeconn.CalcPseudoNormalSurf(snakeconn.surfs(jj)-&gt;index);</div>
-<div class="line"><a name="l02595"></a><span class="lineno"> 2595</span>&#160; </div>
-<div class="line"><a name="l02596"></a><span class="lineno"> 2596</span>&#160;            dotProd = centreVolu.dot(normalVec.usedata());</div>
-<div class="line"><a name="l02597"></a><span class="lineno"> 2597</span>&#160;        } <span class="keywordflow">while</span> (!isfinite(dotProd) || (fabs(dotProd) &lt; numeric_limits&lt;double&gt;::epsilon()));</div>
-<div class="line"><a name="l02598"></a><span class="lineno"> 2598</span>&#160; </div>
-<div class="line"><a name="l02599"></a><span class="lineno"> 2599</span>&#160;        isFlip[ii - 1] = (((dotProd &lt; 0.0) &amp;&amp; (kk == 0)) || ((dotProd &gt; 0.0) &amp;&amp; (kk == 1)));</div>
-<div class="line"><a name="l02600"></a><span class="lineno"> 2600</span>&#160;    }</div>
-<div class="line"><a name="l02601"></a><span class="lineno"> 2601</span>&#160;    <span class="keywordflow">if</span> (nBlocks &gt; 0)</div>
-<div class="line"><a name="l02602"></a><span class="lineno"> 2602</span>&#160;    {</div>
-<div class="line"><a name="l02603"></a><span class="lineno"> 2603</span>&#160;        ni = surfOrient.size();</div>
-<div class="line"><a name="l02604"></a><span class="lineno"> 2604</span>&#160;        <span class="keywordflow">for</span> (ii = 0; ii &lt; ni; ++ii)</div>
-<div class="line"><a name="l02605"></a><span class="lineno"> 2605</span>&#160;        {</div>
-<div class="line"><a name="l02606"></a><span class="lineno"> 2606</span>&#160;            <span class="keywordflow">if</span> (isFlip[abs(surfOrient[ii]) - 1])</div>
-<div class="line"><a name="l02607"></a><span class="lineno"> 2607</span>&#160;            {</div>
-<div class="line"><a name="l02608"></a><span class="lineno"> 2608</span>&#160;                snakeconn.surfs.elems[ii].FlipVolus();</div>
-<div class="line"><a name="l02609"></a><span class="lineno"> 2609</span>&#160;            }</div>
-<div class="line"><a name="l02610"></a><span class="lineno"> 2610</span>&#160;        }</div>
-<div class="line"><a name="l02611"></a><span class="lineno"> 2611</span>&#160;    }</div>
-<div class="line"><a name="l02612"></a><span class="lineno"> 2612</span>&#160;}</div>
-<div class="line"><a name="l02613"></a><span class="lineno"> 2613</span>&#160;<span class="keywordtype">void</span> snake::AssignInternalVerts()</div>
-<div class="line"><a name="l02614"></a><span class="lineno"> 2614</span>&#160;{</div>
-<div class="line"><a name="l02615"></a><span class="lineno"> 2615</span>&#160;    <span class="comment">/*</span></div>
-<div class="line"><a name="l02616"></a><span class="lineno"> 2616</span>&#160;<span class="comment">    Assigns internal vertices to the snake based on the snakemesh() connectivity.</span></div>
-<div class="line"><a name="l02617"></a><span class="lineno"> 2617</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l02618"></a><span class="lineno"> 2618</span>&#160;    <span class="keywordtype">int</span> ii, ni;</div>
-<div class="line"><a name="l02619"></a><span class="lineno"> 2619</span>&#160;    vector&lt;int&gt; vertBlock;</div>
-<div class="line"><a name="l02620"></a><span class="lineno"> 2620</span>&#160; </div>
-<div class="line"><a name="l02621"></a><span class="lineno"> 2621</span>&#160;    FindBlockSnakeMeshVerts(vertBlock);</div>
-<div class="line"><a name="l02622"></a><span class="lineno"> 2622</span>&#160;    this-&gt;isFlipped = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l02623"></a><span class="lineno"> 2623</span>&#160;    ni = vertBlock.size();</div>
-<div class="line"><a name="l02624"></a><span class="lineno"> 2624</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; ni; ++ii)</div>
-<div class="line"><a name="l02625"></a><span class="lineno"> 2625</span>&#160;    {</div>
-<div class="line"><a name="l02626"></a><span class="lineno"> 2626</span>&#160;        isMeshVertIn[ii] = vertBlock[ii] &gt; 0;</div>
-<div class="line"><a name="l02627"></a><span class="lineno"> 2627</span>&#160;    }</div>
-<div class="line"><a name="l02628"></a><span class="lineno"> 2628</span>&#160;}</div>
-<div class="line"><a name="l02629"></a><span class="lineno"> 2629</span>&#160;<span class="keywordtype">int</span> snake::FindBlockSnakeMeshVerts(vector&lt;int&gt; &amp;vertBlock)<span class="keyword"> const</span></div>
-<div class="line"><a name="l02630"></a><span class="lineno"> 2630</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l02631"></a><span class="lineno"> 2631</span>&#160;    <span class="comment">// int mesh::ConnectedVertex(vector&lt;int&gt; &amp;vertBlock) const{</span></div>
-<div class="line"><a name="l02632"></a><span class="lineno"> 2632</span>&#160;    <span class="comment">// Fills a vector with a number for each vertex corresponding to a</span></div>
-<div class="line"><a name="l02633"></a><span class="lineno"> 2633</span>&#160;    <span class="comment">// group of connected edges it is part of , can be used close surfaces in 2D</span></div>
-<div class="line"><a name="l02634"></a><span class="lineno"> 2634</span>&#160;    <span class="comment">// or volumes in 3D. Uses a flood fill with queue method</span></div>
-<div class="line"><a name="l02635"></a><span class="lineno"> 2635</span>&#160; </div>
-<div class="line"><a name="l02636"></a><span class="lineno"> 2636</span>&#160;    <span class="keywordtype">int</span> nVertExplored, nVerts, nBlocks, nCurr, nEdgesCurr, ii, jj, kk, nSnaxs, ll, nl;</div>
-<div class="line"><a name="l02637"></a><span class="lineno"> 2637</span>&#160;    vector&lt;bool&gt; vertStatus, snaxStatus; <span class="comment">// 1 explored 0 not explored</span></div>
-<div class="line"><a name="l02638"></a><span class="lineno"> 2638</span>&#160; </div>
-<div class="line"><a name="l02639"></a><span class="lineno"> 2639</span>&#160;    vector&lt;int&gt; currQueue, nextQueue,</div>
-<div class="line"><a name="l02640"></a><span class="lineno"> 2640</span>&#160;        tempSnax; <span class="comment">// Current and next queues of indices</span></div>
-<div class="line"><a name="l02641"></a><span class="lineno"> 2641</span>&#160; </div>
-<div class="line"><a name="l02642"></a><span class="lineno"> 2642</span>&#160;    <span class="comment">// Preparation of the arrays;</span></div>
-<div class="line"><a name="l02643"></a><span class="lineno"> 2643</span>&#160;    nVerts = snakemesh()-&gt;verts.size();</div>
-<div class="line"><a name="l02644"></a><span class="lineno"> 2644</span>&#160;    nSnaxs = snaxs.size();</div>
-<div class="line"><a name="l02645"></a><span class="lineno"> 2645</span>&#160;    nBlocks = 0;</div>
-<div class="line"><a name="l02646"></a><span class="lineno"> 2646</span>&#160;    nVertExplored = 0;</div>
-<div class="line"><a name="l02647"></a><span class="lineno"> 2647</span>&#160; </div>
-<div class="line"><a name="l02648"></a><span class="lineno"> 2648</span>&#160;    snaxStatus.assign(nSnaxs, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l02649"></a><span class="lineno"> 2649</span>&#160;    vertStatus.assign(nVerts, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l02650"></a><span class="lineno"> 2650</span>&#160;    vertBlock.assign(nVerts, 0);</div>
-<div class="line"><a name="l02651"></a><span class="lineno"> 2651</span>&#160;    currQueue.reserve(nVerts / 2);</div>
-<div class="line"><a name="l02652"></a><span class="lineno"> 2652</span>&#160;    nextQueue.reserve(nVerts / 2);</div>
-<div class="line"><a name="l02653"></a><span class="lineno"> 2653</span>&#160; </div>
-<div class="line"><a name="l02654"></a><span class="lineno"> 2654</span>&#160;    <span class="comment">// While Loop, while not all vertices explored</span></div>
-<div class="line"><a name="l02655"></a><span class="lineno"> 2655</span>&#160;    <span class="keywordflow">while</span> (nVertExplored &lt; nSnaxs)</div>
-<div class="line"><a name="l02656"></a><span class="lineno"> 2656</span>&#160;    {</div>
-<div class="line"><a name="l02657"></a><span class="lineno"> 2657</span>&#160;        <span class="comment">// if currQueue is empty start new block</span></div>
-<div class="line"><a name="l02658"></a><span class="lineno"> 2658</span>&#160;        <span class="keywordflow">if</span> (currQueue.size() &lt; 1)</div>
-<div class="line"><a name="l02659"></a><span class="lineno"> 2659</span>&#160;        {</div>
-<div class="line"><a name="l02660"></a><span class="lineno"> 2660</span>&#160;            <span class="comment">// cout &lt;&lt; &quot;Block &quot; &lt;&lt; nBlocks &lt;&lt; &quot; - &quot; &lt;&lt; nVertExplored &lt;&lt; &quot; - &quot; &lt;&lt;</span></div>
-<div class="line"><a name="l02661"></a><span class="lineno"> 2661</span>&#160;            <span class="comment">// nVerts &lt;&lt; endl;</span></div>
-<div class="line"><a name="l02662"></a><span class="lineno"> 2662</span>&#160;            ii = 0;</div>
-<div class="line"><a name="l02663"></a><span class="lineno"> 2663</span>&#160;            <span class="keywordflow">while</span> (ii &lt; nSnaxs &amp;&amp; snaxStatus[ii])</div>
-<div class="line"><a name="l02664"></a><span class="lineno"> 2664</span>&#160;            {</div>
-<div class="line"><a name="l02665"></a><span class="lineno"> 2665</span>&#160;                ii++;</div>
-<div class="line"><a name="l02666"></a><span class="lineno"> 2666</span>&#160;            }</div>
-<div class="line"><a name="l02667"></a><span class="lineno"> 2667</span>&#160;            <span class="keywordflow">if</span> (snaxStatus[ii])</div>
-<div class="line"><a name="l02668"></a><span class="lineno"> 2668</span>&#160;            {</div>
-<div class="line"><a name="l02669"></a><span class="lineno"> 2669</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error starting point for loop not found despite max number of &quot;</span></div>
-<div class="line"><a name="l02670"></a><span class="lineno"> 2670</span>&#160;                        <span class="stringliteral">&quot;vertex not reached&quot;</span></div>
-<div class="line"><a name="l02671"></a><span class="lineno"> 2671</span>&#160;                     &lt;&lt; endl;</div>
-<div class="line"><a name="l02672"></a><span class="lineno"> 2672</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
-<div class="line"><a name="l02673"></a><span class="lineno"> 2673</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot; : Starting point for block not found&quot;</span>);</div>
-<div class="line"><a name="l02674"></a><span class="lineno"> 2674</span>&#160;            }</div>
-<div class="line"><a name="l02675"></a><span class="lineno"> 2675</span>&#160;            currQueue.push_back(snakemesh()-&gt;verts.find(snaxs(ii)-&gt;fromvert));</div>
-<div class="line"><a name="l02676"></a><span class="lineno"> 2676</span>&#160;            nBlocks++;</div>
-<div class="line"><a name="l02677"></a><span class="lineno"> 2677</span>&#160;        }</div>
-<div class="line"><a name="l02678"></a><span class="lineno"> 2678</span>&#160;        <span class="comment">// Explore current queue</span></div>
-<div class="line"><a name="l02679"></a><span class="lineno"> 2679</span>&#160;        nCurr = currQueue.size();</div>
-<div class="line"><a name="l02680"></a><span class="lineno"> 2680</span>&#160;        <span class="comment">// cout &lt;&lt; &quot;nCurr &quot; &lt;&lt; nCurr &lt;&lt; &quot; nVertExplored &quot; &lt;&lt; nVertExplored &lt;&lt;</span></div>
-<div class="line"><a name="l02681"></a><span class="lineno"> 2681</span>&#160;        <span class="comment">//  &quot; nSnax &quot; &lt;&lt; nSnaxs &lt;&lt; &quot; &quot; &lt;&lt; nBlocks &lt;&lt; endl;</span></div>
-<div class="line"><a name="l02682"></a><span class="lineno"> 2682</span>&#160;        <span class="keywordflow">for</span> (ii = 0; ii &lt; nCurr; ++ii)</div>
-<div class="line"><a name="l02683"></a><span class="lineno"> 2683</span>&#160;        {</div>
-<div class="line"><a name="l02684"></a><span class="lineno"> 2684</span>&#160;            <span class="keywordflow">if</span> (!vertStatus[currQueue[ii]])</div>
-<div class="line"><a name="l02685"></a><span class="lineno"> 2685</span>&#160;            {</div>
-<div class="line"><a name="l02686"></a><span class="lineno"> 2686</span>&#160;                vertBlock[currQueue[ii]] = nBlocks;</div>
-<div class="line"><a name="l02687"></a><span class="lineno"> 2687</span>&#160;                nEdgesCurr = snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind.size();</div>
-<div class="line"><a name="l02688"></a><span class="lineno"> 2688</span>&#160;                <span class="keywordflow">for</span> (jj = 0; jj &lt; nEdgesCurr; ++jj)</div>
-<div class="line"><a name="l02689"></a><span class="lineno"> 2689</span>&#160;                {</div>
-<div class="line"><a name="l02690"></a><span class="lineno"> 2690</span>&#160;                    <span class="comment">// only follow edge if no snaxel exists on it</span></div>
-<div class="line"><a name="l02691"></a><span class="lineno"> 2691</span>&#160;                    <span class="keywordflow">if</span> (snaxs.countparent(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj]) &lt; 1)</div>
-<div class="line"><a name="l02692"></a><span class="lineno"> 2692</span>&#160;                    {</div>
-<div class="line"><a name="l02693"></a><span class="lineno"> 2693</span>&#160;                        kk = int(</div>
-<div class="line"><a name="l02694"></a><span class="lineno"> 2694</span>&#160;                            snakemesh()-&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])-&gt;vertind[0] ==</div>
-<div class="line"><a name="l02695"></a><span class="lineno"> 2695</span>&#160;                            snakemesh()-&gt;verts(currQueue[ii])-&gt;index);</div>
-<div class="line"><a name="l02696"></a><span class="lineno"> 2696</span>&#160;                        nextQueue.push_back(snakemesh()-&gt;verts.find(</div>
-<div class="line"><a name="l02697"></a><span class="lineno"> 2697</span>&#160;                            snakemesh()-&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])-&gt;vertind[kk]));</div>
-<div class="line"><a name="l02698"></a><span class="lineno"> 2698</span>&#160;<span class="preprocessor">#ifdef SAFE_ALGO</span></div>
-<div class="line"><a name="l02699"></a><span class="lineno"> 2699</span>&#160;                        <span class="keywordflow">if</span> (snakemesh()-&gt;verts.find(snakemesh()</div>
-<div class="line"><a name="l02700"></a><span class="lineno"> 2700</span>&#160;                                                        -&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])</div>
-<div class="line"><a name="l02701"></a><span class="lineno"> 2701</span>&#160;                                                        -&gt;vertind[kk]) == -1)</div>
-<div class="line"><a name="l02702"></a><span class="lineno"> 2702</span>&#160;                        {</div>
-<div class="line"><a name="l02703"></a><span class="lineno"> 2703</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Edge index: &quot;</span> &lt;&lt; snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj] &lt;&lt; <span class="stringliteral">&quot; vertex index:&quot;</span></div>
-<div class="line"><a name="l02704"></a><span class="lineno"> 2704</span>&#160;                                 &lt;&lt; snakemesh()</div>
-<div class="line"><a name="l02705"></a><span class="lineno"> 2705</span>&#160;                                        -&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])</div>
-<div class="line"><a name="l02706"></a><span class="lineno"> 2706</span>&#160;                                        -&gt;vertind[kk]</div>
-<div class="line"><a name="l02707"></a><span class="lineno"> 2707</span>&#160;                                 &lt;&lt; endl;</div>
-<div class="line"><a name="l02708"></a><span class="lineno"> 2708</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Edge connected to non existant vertex&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l02709"></a><span class="lineno"> 2709</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
-<div class="line"><a name="l02710"></a><span class="lineno"> 2710</span>&#160;                            <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot; : Vertex not found&quot;</span>);</div>
-<div class="line"><a name="l02711"></a><span class="lineno"> 2711</span>&#160;                        }</div>
-<div class="line"><a name="l02712"></a><span class="lineno"> 2712</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02713"></a><span class="lineno"> 2713</span>&#160;                    }</div>
-<div class="line"><a name="l02714"></a><span class="lineno"> 2714</span>&#160;                    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02715"></a><span class="lineno"> 2715</span>&#160;                    {</div>
-<div class="line"><a name="l02716"></a><span class="lineno"> 2716</span>&#160;                        snaxs.findsiblings(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj], tempSnax);</div>
-<div class="line"><a name="l02717"></a><span class="lineno"> 2717</span>&#160;                        nl = tempSnax.size();</div>
-<div class="line"><a name="l02718"></a><span class="lineno"> 2718</span>&#160;                        <span class="keywordflow">for</span> (ll = 0; ll &lt; nl; ++ll)</div>
-<div class="line"><a name="l02719"></a><span class="lineno"> 2719</span>&#160;                        {</div>
-<div class="line"><a name="l02720"></a><span class="lineno"> 2720</span>&#160;                            <span class="keywordflow">if</span> (snakemesh()-&gt;verts(currQueue[ii])-&gt;index == snaxs(tempSnax[ll])-&gt;fromvert)</div>
-<div class="line"><a name="l02721"></a><span class="lineno"> 2721</span>&#160;                            {</div>
-<div class="line"><a name="l02722"></a><span class="lineno"> 2722</span>&#160;                                nVertExplored += int(!snaxStatus[tempSnax[ll]]);</div>
-<div class="line"><a name="l02723"></a><span class="lineno"> 2723</span>&#160;                                snaxStatus[tempSnax[ll]] = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02724"></a><span class="lineno"> 2724</span>&#160;                            }</div>
-<div class="line"><a name="l02725"></a><span class="lineno"> 2725</span>&#160;                        }</div>
-<div class="line"><a name="l02726"></a><span class="lineno"> 2726</span>&#160;                    }</div>
-<div class="line"><a name="l02727"></a><span class="lineno"> 2727</span>&#160;                }</div>
-<div class="line"><a name="l02728"></a><span class="lineno"> 2728</span>&#160;                vertStatus[currQueue[ii]] = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l02729"></a><span class="lineno"> 2729</span>&#160;            }</div>
-<div class="line"><a name="l02730"></a><span class="lineno"> 2730</span>&#160;        }</div>
-<div class="line"><a name="l02731"></a><span class="lineno"> 2731</span>&#160; </div>
-<div class="line"><a name="l02732"></a><span class="lineno"> 2732</span>&#160;        <span class="comment">// Reset current queue and set to next queue</span></div>
-<div class="line"><a name="l02733"></a><span class="lineno"> 2733</span>&#160;        currQueue.clear();</div>
-<div class="line"><a name="l02734"></a><span class="lineno"> 2734</span>&#160;        currQueue.swap(nextQueue);</div>
-<div class="line"><a name="l02735"></a><span class="lineno"> 2735</span>&#160;    }</div>
-<div class="line"><a name="l02736"></a><span class="lineno"> 2736</span>&#160;    <span class="keywordflow">return</span> (nBlocks);</div>
-<div class="line"><a name="l02737"></a><span class="lineno"> 2737</span>&#160;}</div>
-<div class="line"><a name="l02738"></a><span class="lineno"> 2738</span>&#160;grid::limits snake::Scale(<span class="keyword">const</span> grid::limits &amp;newSize)</div>
-<div class="line"><a name="l02739"></a><span class="lineno"> 2739</span>&#160;{</div>
-<div class="line"><a name="l02740"></a><span class="lineno"> 2740</span>&#160;    <span class="keyword">auto</span> boundBox = this-&gt;snakemesh()-&gt;BoundingBox();</div>
-<div class="line"><a name="l02741"></a><span class="lineno"> 2741</span>&#160;    <span class="comment">// Scales the snakemesh() to the correct size</span></div>
-<div class="line"><a name="l02742"></a><span class="lineno"> 2742</span>&#160;    <span class="keyword">auto</span> <a class="code" href="mesh_8hpp.html#a759e72dbe6e3b6e7549337c242057963">transformation</a> = this-&gt;snakemesh()-&gt;Scale(newSize);</div>
-<div class="line"><a name="l02743"></a><span class="lineno"> 2743</span>&#160;    <span class="comment">// Uses the same transformation on the snakeconn</span></div>
-<div class="line"><a name="l02744"></a><span class="lineno"> 2744</span>&#160;    this-&gt;snakeconn.LinearTransform(transformation);</div>
-<div class="line"><a name="l02745"></a><span class="lineno"> 2745</span>&#160;    <span class="comment">// Applies the transformation to the family of the snakemesh()</span></div>
-<div class="line"><a name="l02746"></a><span class="lineno"> 2746</span>&#160;    <span class="comment">// ie: the VOS mesh.</span></div>
-<div class="line"><a name="l02747"></a><span class="lineno"> 2747</span>&#160;    this-&gt;snakemesh()-&gt;LinearTransformFamily(transformation);</div>
-<div class="line"><a name="l02748"></a><span class="lineno"> 2748</span>&#160; </div>
-<div class="line"><a name="l02749"></a><span class="lineno"> 2749</span>&#160;    <span class="keywordflow">return</span> boundBox;</div>
-<div class="line"><a name="l02750"></a><span class="lineno"> 2750</span>&#160;}</div>
-<div class="line"><a name="l02751"></a><span class="lineno"> 2751</span>&#160; </div>
-<div class="line"><a name="l02752"></a><span class="lineno"> 2752</span>&#160;std::vector&lt;double&gt; snake::MoveDirections()<span class="keyword"> const</span></div>
-<div class="line"><a name="l02753"></a><span class="lineno"> 2753</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l02754"></a><span class="lineno"> 2754</span>&#160;    std::vector&lt;double&gt; coords;</div>
-<div class="line"><a name="l02755"></a><span class="lineno"> 2755</span>&#160;    <span class="keywordtype">int</span> nVert = this-&gt;snaxs.size();</div>
-<div class="line"><a name="l02756"></a><span class="lineno"> 2756</span>&#160;    coords.reserve(nVert * 3);</div>
-<div class="line"><a name="l02757"></a><span class="lineno"> 2757</span>&#160;    <a class="code" href="classcoordvec.html">coordvec</a> lapVec;</div>
-<div class="line"><a name="l02758"></a><span class="lineno"> 2758</span>&#160; </div>
-<div class="line"><a name="l02759"></a><span class="lineno"> 2759</span>&#160;    <a class="code" href="mesh_8hpp.html#a10331edf942a4cd325f15560687efdd2">grid::coordlist</a> neighCoord;</div>
-<div class="line"><a name="l02760"></a><span class="lineno"> 2760</span>&#160; </div>
-<div class="line"><a name="l02761"></a><span class="lineno"> 2761</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nVert; ++i)</div>
-<div class="line"><a name="l02762"></a><span class="lineno"> 2762</span>&#160;    {</div>
-<div class="line"><a name="l02763"></a><span class="lineno"> 2763</span>&#160;        this-&gt;snaxs(i)-&gt;Direction(*<span class="keyword">this</span>, lapVec);</div>
-<div class="line"><a name="l02764"></a><span class="lineno"> 2764</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; 3; ++j)</div>
-<div class="line"><a name="l02765"></a><span class="lineno"> 2765</span>&#160;        {</div>
-<div class="line"><a name="l02766"></a><span class="lineno"> 2766</span>&#160;            coords.push_back(lapVec(j));</div>
-<div class="line"><a name="l02767"></a><span class="lineno"> 2767</span>&#160;        }</div>
-<div class="line"><a name="l02768"></a><span class="lineno"> 2768</span>&#160;    }</div>
-<div class="line"><a name="l02769"></a><span class="lineno"> 2769</span>&#160;    <span class="keywordflow">return</span> coords;</div>
-<div class="line"><a name="l02770"></a><span class="lineno"> 2770</span>&#160;}</div>
-<div class="line"><a name="l02771"></a><span class="lineno"> 2771</span>&#160; </div>
-<div class="line"><a name="l02772"></a><span class="lineno"> 2772</span>&#160;<span class="comment">// -------------------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l02773"></a><span class="lineno"> 2773</span>&#160;<span class="comment">// TEST CODE</span></div>
-<div class="line"><a name="l02774"></a><span class="lineno"> 2774</span>&#160;<span class="comment">// -------------------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l02775"></a><span class="lineno"> 2775</span>&#160; </div>
-<div class="line"><a name="l02776"></a><span class="lineno"> 2776</span>&#160;<span class="comment">// in snakstruct_test.cpp</span></div>
+<div class="line"><a name="l02594"></a><span class="lineno"> 2594</span>&#160;        isFlip[ii - 1] = (((dotProd &lt; 0.0) &amp;&amp; (kk == 0)) || ((dotProd &gt; 0.0) &amp;&amp; (kk == 1)));</div>
+<div class="line"><a name="l02595"></a><span class="lineno"> 2595</span>&#160;    }</div>
+<div class="line"><a name="l02596"></a><span class="lineno"> 2596</span>&#160;    <span class="keywordflow">if</span> (nBlocks &gt; 0)</div>
+<div class="line"><a name="l02597"></a><span class="lineno"> 2597</span>&#160;    {</div>
+<div class="line"><a name="l02598"></a><span class="lineno"> 2598</span>&#160;        ni = surfOrient.size();</div>
+<div class="line"><a name="l02599"></a><span class="lineno"> 2599</span>&#160;        <span class="keywordflow">for</span> (ii = 0; ii &lt; ni; ++ii)</div>
+<div class="line"><a name="l02600"></a><span class="lineno"> 2600</span>&#160;        {</div>
+<div class="line"><a name="l02601"></a><span class="lineno"> 2601</span>&#160;            <span class="keywordflow">if</span> (isFlip[abs(surfOrient[ii]) - 1])</div>
+<div class="line"><a name="l02602"></a><span class="lineno"> 2602</span>&#160;            {</div>
+<div class="line"><a name="l02603"></a><span class="lineno"> 2603</span>&#160;                snakeconn.surfs.elems[ii].FlipVolus();</div>
+<div class="line"><a name="l02604"></a><span class="lineno"> 2604</span>&#160;            }</div>
+<div class="line"><a name="l02605"></a><span class="lineno"> 2605</span>&#160;        }</div>
+<div class="line"><a name="l02606"></a><span class="lineno"> 2606</span>&#160;    }</div>
+<div class="line"><a name="l02607"></a><span class="lineno"> 2607</span>&#160;}</div>
+<div class="line"><a name="l02608"></a><span class="lineno"> 2608</span>&#160;<span class="keywordtype">void</span> snake::AssignInternalVerts()</div>
+<div class="line"><a name="l02609"></a><span class="lineno"> 2609</span>&#160;{</div>
+<div class="line"><a name="l02610"></a><span class="lineno"> 2610</span>&#160;    <span class="comment">/*</span></div>
+<div class="line"><a name="l02611"></a><span class="lineno"> 2611</span>&#160;<span class="comment">    Assigns internal vertices to the snake based on the snakemesh() connectivity.</span></div>
+<div class="line"><a name="l02612"></a><span class="lineno"> 2612</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l02613"></a><span class="lineno"> 2613</span>&#160;    <span class="keywordtype">int</span> ii, ni;</div>
+<div class="line"><a name="l02614"></a><span class="lineno"> 2614</span>&#160;    vector&lt;int&gt; vertBlock;</div>
+<div class="line"><a name="l02615"></a><span class="lineno"> 2615</span>&#160; </div>
+<div class="line"><a name="l02616"></a><span class="lineno"> 2616</span>&#160;    FindBlockSnakeMeshVerts(vertBlock);</div>
+<div class="line"><a name="l02617"></a><span class="lineno"> 2617</span>&#160;    this-&gt;isFlipped = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l02618"></a><span class="lineno"> 2618</span>&#160;    ni = vertBlock.size();</div>
+<div class="line"><a name="l02619"></a><span class="lineno"> 2619</span>&#160;    <span class="keywordflow">for</span> (ii = 0; ii &lt; ni; ++ii)</div>
+<div class="line"><a name="l02620"></a><span class="lineno"> 2620</span>&#160;    {</div>
+<div class="line"><a name="l02621"></a><span class="lineno"> 2621</span>&#160;        isMeshVertIn[ii] = vertBlock[ii] &gt; 0;</div>
+<div class="line"><a name="l02622"></a><span class="lineno"> 2622</span>&#160;    }</div>
+<div class="line"><a name="l02623"></a><span class="lineno"> 2623</span>&#160;}</div>
+<div class="line"><a name="l02624"></a><span class="lineno"> 2624</span>&#160;<span class="keywordtype">int</span> snake::FindBlockSnakeMeshVerts(vector&lt;int&gt; &amp;vertBlock)<span class="keyword"> const</span></div>
+<div class="line"><a name="l02625"></a><span class="lineno"> 2625</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l02626"></a><span class="lineno"> 2626</span>&#160;    <span class="comment">// int mesh::ConnectedVertex(vector&lt;int&gt; &amp;vertBlock) const{</span></div>
+<div class="line"><a name="l02627"></a><span class="lineno"> 2627</span>&#160;    <span class="comment">// Fills a vector with a number for each vertex corresponding to a</span></div>
+<div class="line"><a name="l02628"></a><span class="lineno"> 2628</span>&#160;    <span class="comment">// group of connected edges it is part of , can be used close surfaces in 2D</span></div>
+<div class="line"><a name="l02629"></a><span class="lineno"> 2629</span>&#160;    <span class="comment">// or volumes in 3D. Uses a flood fill with queue method</span></div>
+<div class="line"><a name="l02630"></a><span class="lineno"> 2630</span>&#160; </div>
+<div class="line"><a name="l02631"></a><span class="lineno"> 2631</span>&#160;    <span class="keywordtype">int</span> nVertExplored, nVerts, nBlocks, nCurr, nEdgesCurr, ii, jj, kk, nSnaxs, ll, nl;</div>
+<div class="line"><a name="l02632"></a><span class="lineno"> 2632</span>&#160;    vector&lt;bool&gt; vertStatus, snaxStatus; <span class="comment">// 1 explored 0 not explored</span></div>
+<div class="line"><a name="l02633"></a><span class="lineno"> 2633</span>&#160; </div>
+<div class="line"><a name="l02634"></a><span class="lineno"> 2634</span>&#160;    vector&lt;int&gt; currQueue, nextQueue,</div>
+<div class="line"><a name="l02635"></a><span class="lineno"> 2635</span>&#160;        tempSnax; <span class="comment">// Current and next queues of indices</span></div>
+<div class="line"><a name="l02636"></a><span class="lineno"> 2636</span>&#160; </div>
+<div class="line"><a name="l02637"></a><span class="lineno"> 2637</span>&#160;    <span class="comment">// Preparation of the arrays;</span></div>
+<div class="line"><a name="l02638"></a><span class="lineno"> 2638</span>&#160;    nVerts = snakemesh()-&gt;verts.size();</div>
+<div class="line"><a name="l02639"></a><span class="lineno"> 2639</span>&#160;    nSnaxs = snaxs.size();</div>
+<div class="line"><a name="l02640"></a><span class="lineno"> 2640</span>&#160;    nBlocks = 0;</div>
+<div class="line"><a name="l02641"></a><span class="lineno"> 2641</span>&#160;    nVertExplored = 0;</div>
+<div class="line"><a name="l02642"></a><span class="lineno"> 2642</span>&#160; </div>
+<div class="line"><a name="l02643"></a><span class="lineno"> 2643</span>&#160;    snaxStatus.assign(nSnaxs, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l02644"></a><span class="lineno"> 2644</span>&#160;    vertStatus.assign(nVerts, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l02645"></a><span class="lineno"> 2645</span>&#160;    vertBlock.assign(nVerts, 0);</div>
+<div class="line"><a name="l02646"></a><span class="lineno"> 2646</span>&#160;    currQueue.reserve(nVerts / 2);</div>
+<div class="line"><a name="l02647"></a><span class="lineno"> 2647</span>&#160;    nextQueue.reserve(nVerts / 2);</div>
+<div class="line"><a name="l02648"></a><span class="lineno"> 2648</span>&#160; </div>
+<div class="line"><a name="l02649"></a><span class="lineno"> 2649</span>&#160;    <span class="comment">// While Loop, while not all vertices explored</span></div>
+<div class="line"><a name="l02650"></a><span class="lineno"> 2650</span>&#160;    <span class="keywordflow">while</span> (nVertExplored &lt; nSnaxs)</div>
+<div class="line"><a name="l02651"></a><span class="lineno"> 2651</span>&#160;    {</div>
+<div class="line"><a name="l02652"></a><span class="lineno"> 2652</span>&#160;        <span class="comment">// if currQueue is empty start new block</span></div>
+<div class="line"><a name="l02653"></a><span class="lineno"> 2653</span>&#160;        <span class="keywordflow">if</span> (currQueue.size() &lt; 1)</div>
+<div class="line"><a name="l02654"></a><span class="lineno"> 2654</span>&#160;        {</div>
+<div class="line"><a name="l02655"></a><span class="lineno"> 2655</span>&#160;            <span class="comment">// cout &lt;&lt; &quot;Block &quot; &lt;&lt; nBlocks &lt;&lt; &quot; - &quot; &lt;&lt; nVertExplored &lt;&lt; &quot; - &quot; &lt;&lt;</span></div>
+<div class="line"><a name="l02656"></a><span class="lineno"> 2656</span>&#160;            <span class="comment">// nVerts &lt;&lt; endl;</span></div>
+<div class="line"><a name="l02657"></a><span class="lineno"> 2657</span>&#160;            ii = 0;</div>
+<div class="line"><a name="l02658"></a><span class="lineno"> 2658</span>&#160;            <span class="keywordflow">while</span> (ii &lt; nSnaxs &amp;&amp; snaxStatus[ii])</div>
+<div class="line"><a name="l02659"></a><span class="lineno"> 2659</span>&#160;            {</div>
+<div class="line"><a name="l02660"></a><span class="lineno"> 2660</span>&#160;                ii++;</div>
+<div class="line"><a name="l02661"></a><span class="lineno"> 2661</span>&#160;            }</div>
+<div class="line"><a name="l02662"></a><span class="lineno"> 2662</span>&#160;            <span class="keywordflow">if</span> (snaxStatus[ii])</div>
+<div class="line"><a name="l02663"></a><span class="lineno"> 2663</span>&#160;            {</div>
+<div class="line"><a name="l02664"></a><span class="lineno"> 2664</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error starting point for loop not found despite max number of &quot;</span></div>
+<div class="line"><a name="l02665"></a><span class="lineno"> 2665</span>&#160;                        <span class="stringliteral">&quot;vertex not reached&quot;</span></div>
+<div class="line"><a name="l02666"></a><span class="lineno"> 2666</span>&#160;                     &lt;&lt; endl;</div>
+<div class="line"><a name="l02667"></a><span class="lineno"> 2667</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
+<div class="line"><a name="l02668"></a><span class="lineno"> 2668</span>&#160;                <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot; : Starting point for block not found&quot;</span>);</div>
+<div class="line"><a name="l02669"></a><span class="lineno"> 2669</span>&#160;            }</div>
+<div class="line"><a name="l02670"></a><span class="lineno"> 2670</span>&#160;            currQueue.push_back(snakemesh()-&gt;verts.find(snaxs(ii)-&gt;fromvert));</div>
+<div class="line"><a name="l02671"></a><span class="lineno"> 2671</span>&#160;            nBlocks++;</div>
+<div class="line"><a name="l02672"></a><span class="lineno"> 2672</span>&#160;        }</div>
+<div class="line"><a name="l02673"></a><span class="lineno"> 2673</span>&#160;        <span class="comment">// Explore current queue</span></div>
+<div class="line"><a name="l02674"></a><span class="lineno"> 2674</span>&#160;        nCurr = currQueue.size();</div>
+<div class="line"><a name="l02675"></a><span class="lineno"> 2675</span>&#160;        <span class="comment">// cout &lt;&lt; &quot;nCurr &quot; &lt;&lt; nCurr &lt;&lt; &quot; nVertExplored &quot; &lt;&lt; nVertExplored &lt;&lt;</span></div>
+<div class="line"><a name="l02676"></a><span class="lineno"> 2676</span>&#160;        <span class="comment">//  &quot; nSnax &quot; &lt;&lt; nSnaxs &lt;&lt; &quot; &quot; &lt;&lt; nBlocks &lt;&lt; endl;</span></div>
+<div class="line"><a name="l02677"></a><span class="lineno"> 2677</span>&#160;        <span class="keywordflow">for</span> (ii = 0; ii &lt; nCurr; ++ii)</div>
+<div class="line"><a name="l02678"></a><span class="lineno"> 2678</span>&#160;        {</div>
+<div class="line"><a name="l02679"></a><span class="lineno"> 2679</span>&#160;            <span class="keywordflow">if</span> (!vertStatus[currQueue[ii]])</div>
+<div class="line"><a name="l02680"></a><span class="lineno"> 2680</span>&#160;            {</div>
+<div class="line"><a name="l02681"></a><span class="lineno"> 2681</span>&#160;                vertBlock[currQueue[ii]] = nBlocks;</div>
+<div class="line"><a name="l02682"></a><span class="lineno"> 2682</span>&#160;                nEdgesCurr = snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind.size();</div>
+<div class="line"><a name="l02683"></a><span class="lineno"> 2683</span>&#160;                <span class="keywordflow">for</span> (jj = 0; jj &lt; nEdgesCurr; ++jj)</div>
+<div class="line"><a name="l02684"></a><span class="lineno"> 2684</span>&#160;                {</div>
+<div class="line"><a name="l02685"></a><span class="lineno"> 2685</span>&#160;                    <span class="comment">// only follow edge if no snaxel exists on it</span></div>
+<div class="line"><a name="l02686"></a><span class="lineno"> 2686</span>&#160;                    <span class="keywordflow">if</span> (snaxs.countparent(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj]) &lt; 1)</div>
+<div class="line"><a name="l02687"></a><span class="lineno"> 2687</span>&#160;                    {</div>
+<div class="line"><a name="l02688"></a><span class="lineno"> 2688</span>&#160;                        kk = int(</div>
+<div class="line"><a name="l02689"></a><span class="lineno"> 2689</span>&#160;                            snakemesh()-&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])-&gt;vertind[0] ==</div>
+<div class="line"><a name="l02690"></a><span class="lineno"> 2690</span>&#160;                            snakemesh()-&gt;verts(currQueue[ii])-&gt;index);</div>
+<div class="line"><a name="l02691"></a><span class="lineno"> 2691</span>&#160;                        nextQueue.push_back(snakemesh()-&gt;verts.find(</div>
+<div class="line"><a name="l02692"></a><span class="lineno"> 2692</span>&#160;                            snakemesh()-&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])-&gt;vertind[kk]));</div>
+<div class="line"><a name="l02693"></a><span class="lineno"> 2693</span>&#160;<span class="preprocessor">#ifdef SAFE_ALGO</span></div>
+<div class="line"><a name="l02694"></a><span class="lineno"> 2694</span>&#160;                        <span class="keywordflow">if</span> (snakemesh()-&gt;verts.find(snakemesh()</div>
+<div class="line"><a name="l02695"></a><span class="lineno"> 2695</span>&#160;                                                        -&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])</div>
+<div class="line"><a name="l02696"></a><span class="lineno"> 2696</span>&#160;                                                        -&gt;vertind[kk]) == -1)</div>
+<div class="line"><a name="l02697"></a><span class="lineno"> 2697</span>&#160;                        {</div>
+<div class="line"><a name="l02698"></a><span class="lineno"> 2698</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Edge index: &quot;</span> &lt;&lt; snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj] &lt;&lt; <span class="stringliteral">&quot; vertex index:&quot;</span></div>
+<div class="line"><a name="l02699"></a><span class="lineno"> 2699</span>&#160;                                 &lt;&lt; snakemesh()</div>
+<div class="line"><a name="l02700"></a><span class="lineno"> 2700</span>&#160;                                        -&gt;edges.isearch(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj])</div>
+<div class="line"><a name="l02701"></a><span class="lineno"> 2701</span>&#160;                                        -&gt;vertind[kk]</div>
+<div class="line"><a name="l02702"></a><span class="lineno"> 2702</span>&#160;                                 &lt;&lt; endl;</div>
+<div class="line"><a name="l02703"></a><span class="lineno"> 2703</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Edge connected to non existant vertex&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02704"></a><span class="lineno"> 2704</span>&#160;                            cerr &lt;&lt; <span class="stringliteral">&quot;Error in &quot;</span> &lt;&lt; __PRETTY_FUNCTION__ &lt;&lt; endl;</div>
+<div class="line"><a name="l02705"></a><span class="lineno"> 2705</span>&#160;                            <a class="code" href="warning_8hpp.html#ae7ee4f0fe8635a8869e061cfb5c5bafb">RSVS3D_ERROR_RANGE</a>(<span class="stringliteral">&quot; : Vertex not found&quot;</span>);</div>
+<div class="line"><a name="l02706"></a><span class="lineno"> 2706</span>&#160;                        }</div>
+<div class="line"><a name="l02707"></a><span class="lineno"> 2707</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02708"></a><span class="lineno"> 2708</span>&#160;                    }</div>
+<div class="line"><a name="l02709"></a><span class="lineno"> 2709</span>&#160;                    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02710"></a><span class="lineno"> 2710</span>&#160;                    {</div>
+<div class="line"><a name="l02711"></a><span class="lineno"> 2711</span>&#160;                        snaxs.findsiblings(snakemesh()-&gt;verts(currQueue[ii])-&gt;edgeind[jj], tempSnax);</div>
+<div class="line"><a name="l02712"></a><span class="lineno"> 2712</span>&#160;                        nl = tempSnax.size();</div>
+<div class="line"><a name="l02713"></a><span class="lineno"> 2713</span>&#160;                        <span class="keywordflow">for</span> (ll = 0; ll &lt; nl; ++ll)</div>
+<div class="line"><a name="l02714"></a><span class="lineno"> 2714</span>&#160;                        {</div>
+<div class="line"><a name="l02715"></a><span class="lineno"> 2715</span>&#160;                            <span class="keywordflow">if</span> (snakemesh()-&gt;verts(currQueue[ii])-&gt;index == snaxs(tempSnax[ll])-&gt;fromvert)</div>
+<div class="line"><a name="l02716"></a><span class="lineno"> 2716</span>&#160;                            {</div>
+<div class="line"><a name="l02717"></a><span class="lineno"> 2717</span>&#160;                                nVertExplored += int(!snaxStatus[tempSnax[ll]]);</div>
+<div class="line"><a name="l02718"></a><span class="lineno"> 2718</span>&#160;                                snaxStatus[tempSnax[ll]] = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02719"></a><span class="lineno"> 2719</span>&#160;                            }</div>
+<div class="line"><a name="l02720"></a><span class="lineno"> 2720</span>&#160;                        }</div>
+<div class="line"><a name="l02721"></a><span class="lineno"> 2721</span>&#160;                    }</div>
+<div class="line"><a name="l02722"></a><span class="lineno"> 2722</span>&#160;                }</div>
+<div class="line"><a name="l02723"></a><span class="lineno"> 2723</span>&#160;                vertStatus[currQueue[ii]] = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l02724"></a><span class="lineno"> 2724</span>&#160;            }</div>
+<div class="line"><a name="l02725"></a><span class="lineno"> 2725</span>&#160;        }</div>
+<div class="line"><a name="l02726"></a><span class="lineno"> 2726</span>&#160; </div>
+<div class="line"><a name="l02727"></a><span class="lineno"> 2727</span>&#160;        <span class="comment">// Reset current queue and set to next queue</span></div>
+<div class="line"><a name="l02728"></a><span class="lineno"> 2728</span>&#160;        currQueue.clear();</div>
+<div class="line"><a name="l02729"></a><span class="lineno"> 2729</span>&#160;        currQueue.swap(nextQueue);</div>
+<div class="line"><a name="l02730"></a><span class="lineno"> 2730</span>&#160;    }</div>
+<div class="line"><a name="l02731"></a><span class="lineno"> 2731</span>&#160;    <span class="keywordflow">return</span> (nBlocks);</div>
+<div class="line"><a name="l02732"></a><span class="lineno"> 2732</span>&#160;}</div>
+<div class="line"><a name="l02733"></a><span class="lineno"> 2733</span>&#160;grid::limits snake::Scale(<span class="keyword">const</span> grid::limits &amp;newSize)</div>
+<div class="line"><a name="l02734"></a><span class="lineno"> 2734</span>&#160;{</div>
+<div class="line"><a name="l02735"></a><span class="lineno"> 2735</span>&#160;    <span class="keyword">auto</span> boundBox = this-&gt;snakemesh()-&gt;BoundingBox();</div>
+<div class="line"><a name="l02736"></a><span class="lineno"> 2736</span>&#160;    <span class="comment">// Scales the snakemesh() to the correct size</span></div>
+<div class="line"><a name="l02737"></a><span class="lineno"> 2737</span>&#160;    <span class="keyword">auto</span> <a class="code" href="mesh_8hpp.html#a759e72dbe6e3b6e7549337c242057963">transformation</a> = this-&gt;snakemesh()-&gt;Scale(newSize);</div>
+<div class="line"><a name="l02738"></a><span class="lineno"> 2738</span>&#160;    <span class="comment">// Uses the same transformation on the snakeconn</span></div>
+<div class="line"><a name="l02739"></a><span class="lineno"> 2739</span>&#160;    this-&gt;snakeconn.LinearTransform(transformation);</div>
+<div class="line"><a name="l02740"></a><span class="lineno"> 2740</span>&#160;    <span class="comment">// Applies the transformation to the family of the snakemesh()</span></div>
+<div class="line"><a name="l02741"></a><span class="lineno"> 2741</span>&#160;    <span class="comment">// ie: the VOS mesh.</span></div>
+<div class="line"><a name="l02742"></a><span class="lineno"> 2742</span>&#160;    this-&gt;snakemesh()-&gt;LinearTransformFamily(transformation);</div>
+<div class="line"><a name="l02743"></a><span class="lineno"> 2743</span>&#160; </div>
+<div class="line"><a name="l02744"></a><span class="lineno"> 2744</span>&#160;    <span class="keywordflow">return</span> boundBox;</div>
+<div class="line"><a name="l02745"></a><span class="lineno"> 2745</span>&#160;}</div>
+<div class="line"><a name="l02746"></a><span class="lineno"> 2746</span>&#160; </div>
+<div class="line"><a name="l02747"></a><span class="lineno"> 2747</span>&#160;std::vector&lt;double&gt; snake::MoveDirections()<span class="keyword"> const</span></div>
+<div class="line"><a name="l02748"></a><span class="lineno"> 2748</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l02749"></a><span class="lineno"> 2749</span>&#160;    std::vector&lt;double&gt; coords;</div>
+<div class="line"><a name="l02750"></a><span class="lineno"> 2750</span>&#160;    <span class="keywordtype">int</span> nVert = this-&gt;snaxs.size();</div>
+<div class="line"><a name="l02751"></a><span class="lineno"> 2751</span>&#160;    coords.reserve(nVert * 3);</div>
+<div class="line"><a name="l02752"></a><span class="lineno"> 2752</span>&#160;    <a class="code" href="classcoordvec.html">coordvec</a> lapVec;</div>
+<div class="line"><a name="l02753"></a><span class="lineno"> 2753</span>&#160; </div>
+<div class="line"><a name="l02754"></a><span class="lineno"> 2754</span>&#160;    <a class="code" href="mesh_8hpp.html#a10331edf942a4cd325f15560687efdd2">grid::coordlist</a> neighCoord;</div>
+<div class="line"><a name="l02755"></a><span class="lineno"> 2755</span>&#160; </div>
+<div class="line"><a name="l02756"></a><span class="lineno"> 2756</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nVert; ++i)</div>
+<div class="line"><a name="l02757"></a><span class="lineno"> 2757</span>&#160;    {</div>
+<div class="line"><a name="l02758"></a><span class="lineno"> 2758</span>&#160;        this-&gt;snaxs(i)-&gt;Direction(*<span class="keyword">this</span>, lapVec);</div>
+<div class="line"><a name="l02759"></a><span class="lineno"> 2759</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; 3; ++j)</div>
+<div class="line"><a name="l02760"></a><span class="lineno"> 2760</span>&#160;        {</div>
+<div class="line"><a name="l02761"></a><span class="lineno"> 2761</span>&#160;            coords.push_back(lapVec(j));</div>
+<div class="line"><a name="l02762"></a><span class="lineno"> 2762</span>&#160;        }</div>
+<div class="line"><a name="l02763"></a><span class="lineno"> 2763</span>&#160;    }</div>
+<div class="line"><a name="l02764"></a><span class="lineno"> 2764</span>&#160;    <span class="keywordflow">return</span> coords;</div>
+<div class="line"><a name="l02765"></a><span class="lineno"> 2765</span>&#160;}</div>
+<div class="line"><a name="l02766"></a><span class="lineno"> 2766</span>&#160; </div>
+<div class="line"><a name="l02767"></a><span class="lineno"> 2767</span>&#160;<span class="comment">// -------------------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l02768"></a><span class="lineno"> 2768</span>&#160;<span class="comment">// TEST CODE</span></div>
+<div class="line"><a name="l02769"></a><span class="lineno"> 2769</span>&#160;<span class="comment">// -------------------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l02770"></a><span class="lineno"> 2770</span>&#160; </div>
+<div class="line"><a name="l02771"></a><span class="lineno"> 2771</span>&#160;<span class="comment">// in snakstruct_test.cpp</span></div>
 <div class="ttc" id="aclass_hashed_vector_html"><div class="ttname"><a href="class_hashed_vector.html">HashedVector&lt; int, int &gt;</a></div></div>
 <div class="ttc" id="aclass_snak_struct_html"><div class="ttname"><a href="class_snak_struct.html">SnakStruct</a></div><div class="ttdef"><b>Definition:</b> <a href="arraystructures_8hpp_source.html#l00246">arraystructures.hpp:247</a></div></div>
 <div class="ttc" id="aclasscoordvec_html"><div class="ttname"><a href="classcoordvec.html">coordvec</a></div><div class="ttdoc">Handles the use and norm of a vector for which the norm and the unit value might be needed.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00113">mesh.hpp:114</a></div></div>
-<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00618">mesh.hpp:619</a></div></div>
+<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00591">mesh.hpp:592</a></div></div>
 <div class="ttc" id="aclassmesh_html_aab4da7818aa8ce128e107b886b475633"><div class="ttname"><a href="classmesh.html#aab4da7818aa8ce128e107b886b475633">mesh::SurfFromEdges</a></div><div class="ttdeci">int SurfFromEdges(int e1, int e2, int repetitionBehaviour=-1) const</div><div class="ttdoc">Returns the index of the surface connecting two edges.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l05871">mesh.cpp:5871</a></div></div>
 <div class="ttc" id="aclasssnake_html"><div class="ttname"><a href="classsnake.html">snake</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00081">snake.hpp:82</a></div></div>
 <div class="ttc" id="aclasssnake_html_aa01b10e263b1e20af3dd25212ff440d1"><div class="ttname"><a href="classsnake.html#aa01b10e263b1e20af3dd25212ff440d1">snake::SetEdgeStepLimits</a></div><div class="ttdeci">void SetEdgeStepLimits()</div><div class="ttdoc">Sets the relative edge step limits.</div><div class="ttdef"><b>Definition:</b> <a href="snake_8cpp_source.html#l00901">snake.cpp:901</a></div></div>
 <div class="ttc" id="aclasssnax_html"><div class="ttname"><a href="classsnax.html">snax</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00190">snake.hpp:191</a></div></div>
 <div class="ttc" id="aclasssnaxarray_html"><div class="ttname"><a href="classsnaxarray.html">snaxarray</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00054">snake.hpp:55</a></div></div>
 <div class="ttc" id="aclasssnaxsurf_html"><div class="ttname"><a href="classsnaxsurf.html">snaxsurf</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00282">snake.hpp:283</a></div></div>
-<div class="ttc" id="aclassvert_html"><div class="ttname"><a href="classvert.html">vert</a></div><div class="ttdoc">Class for a vertex in a mesh.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00468">mesh.hpp:469</a></div></div>
+<div class="ttc" id="aclassvert_html"><div class="ttname"><a href="classvert.html">vert</a></div><div class="ttdoc">Class for a vertex in a mesh.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00447">mesh.hpp:448</a></div></div>
 <div class="ttc" id="amesh_8hpp_html"><div class="ttname"><a href="mesh_8hpp.html">mesh.hpp</a></div><div class="ttdoc">Provides all the mesh tools used for the generation of 3D grids and geometries.</div></div>
 <div class="ttc" id="amesh_8hpp_html_a10331edf942a4cd325f15560687efdd2"><div class="ttname"><a href="mesh_8hpp.html#a10331edf942a4cd325f15560687efdd2">grid::coordlist</a></div><div class="ttdeci">std::vector&lt; const std::vector&lt; double &gt; * &gt; coordlist</div><div class="ttdoc">Defines a list of coordinates.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00087">mesh.hpp:87</a></div></div>
 <div class="ttc" id="amesh_8hpp_html_a14e06793fea4657c01cb677a418c1714"><div class="ttname"><a href="mesh_8hpp.html#a14e06793fea4657c01cb677a418c1714">VertexNormal</a></div><div class="ttdeci">std::tuple&lt; coordvec, double &gt; VertexNormal(const std::vector&lt; double &gt; &amp;centre, const grid::coordlist &amp;vecPts)</div><div class="ttdoc">Calculates the vertex normal weighted by surface angle partitions.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l00746">mesh.cpp:746</a></div></div>
 <div class="ttc" id="amesh_8hpp_html_a759e72dbe6e3b6e7549337c242057963"><div class="ttname"><a href="mesh_8hpp.html#a759e72dbe6e3b6e7549337c242057963">grid::transformation</a></div><div class="ttdeci">std::array&lt; std::array&lt; double, 3 &gt;, 3 &gt; transformation</div><div class="ttdoc">Defines a linear transformation to the mesh where for each dimension: {new minimum,...</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00085">mesh.hpp:85</a></div></div>
-<div class="ttc" id="amesh_8hpp_html_a97d106d50af59aeca12e223a4f08935c"><div class="ttname"><a href="mesh_8hpp.html#a97d106d50af59aeca12e223a4f08935c">OrderList</a></div><div class="ttdeci">int OrderList(std::vector&lt; int &gt; &amp;edgeind, const std::vector&lt; int &gt; &amp;edge2Vert, bool warn=true, bool errout=true, const std::vector&lt; int &gt; *edgeIndOrigPtr=NULL)</div><div class="ttdoc">Orders a list of elements defined by pairs of indices.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l03449">mesh.cpp:3449</a></div></div>
+<div class="ttc" id="amesh_8hpp_html_a97d106d50af59aeca12e223a4f08935c"><div class="ttname"><a href="mesh_8hpp.html#a97d106d50af59aeca12e223a4f08935c">OrderList</a></div><div class="ttdeci">int OrderList(std::vector&lt; int &gt; &amp;edgeind, const std::vector&lt; int &gt; &amp;edge2Vert, bool warn=true, bool errout=true, const std::vector&lt; int &gt; *edgeIndOrigPtr=NULL)</div><div class="ttdoc">Orders a list of elements defined by pairs of indices.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l03448">mesh.cpp:3448</a></div></div>
 <div class="ttc" id="amesh_8hpp_html_ae559467e5cbf8097df1fe82ca153589b"><div class="ttname"><a href="mesh_8hpp.html#ae559467e5cbf8097df1fe82ca153589b">meshhelp::NormalShouldFlip</a></div><div class="ttdeci">int NormalShouldFlip(const std::vector&lt; int &gt; orderedList, int elm1, int elm2, const std::vector&lt; int &gt; &amp;voluind, bool innerComparison)</div><div class="ttdoc">Answers if a normal should be flipped to point towards the outside of a volume.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l00776">mesh.cpp:776</a></div></div>
 <div class="ttc" id="ameshprocessing_8hpp_html"><div class="ttname"><a href="meshprocessing_8hpp.html">meshprocessing.hpp</a></div><div class="ttdoc">Tools for the mathematical processing of meshes.</div></div>
 <div class="ttc" id="ameshprocessing_8hpp_html_a1f8605bf8d72e0ddf7281d6f0d4e8bdc"><div class="ttname"><a href="meshprocessing_8hpp.html#a1f8605bf8d72e0ddf7281d6f0d4e8bdc">IntersectLineSphere</a></div><div class="ttdeci">std::array&lt; double, 2 &gt; IntersectLineSphere(const coordvec &amp;lineVec, const coordvec &amp;offset, double sphereRadius)</div><div class="ttdoc">Calculates the parametric position along a line at which it intersects a sphere.</div><div class="ttdef"><b>Definition:</b> <a href="meshprocessing_8cpp_source.html#l01070">meshprocessing.cpp:1070</a></div></div>

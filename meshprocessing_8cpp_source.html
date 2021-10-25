@@ -833,21 +833,21 @@ $(document).ready(function(){initNavTree('meshprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;        <a class="code" href="warning_8hpp.html#af5ebe63ee11f5db1e8d567a8ff8c8f02">RSVS3D_ERROR_ARGUMENT</a>(<span class="stringliteral">&quot;Unknown number of layers.&quot;</span>);</div>
 <div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;    }</div>
 <div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160; </div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    <span class="keywordtype">int</span> nVolu = meshin.volus.size();</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    <span class="keywordtype">size_t</span> nVolu = meshin.volus.size();</div>
 <div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    std::vector&lt;double&gt; vecPts = <a class="code" href="meshprocessing_8hpp.html#aa32706e1c7b2d8be34e2a9c4fca7bbca">VolumeCentroids</a>(meshin);</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;    <span class="keyword">auto</span> multcentre = [&amp;](<span class="keywordtype">int</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(pos + 1) / double(nLayers + 1); };</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    <span class="keyword">auto</span> multvert = [&amp;](<span class="keywordtype">int</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(nLayers - pos) / double(nLayers + 1); };</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;    <span class="keyword">auto</span> multcentre = [&amp;](<span class="keywordtype">size_t</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(pos + 1) / double(nLayers + 1); };</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    <span class="keyword">auto</span> multvert = [&amp;](<span class="keywordtype">size_t</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(nLayers - pos) / double(nLayers + 1); };</div>
 <div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160; </div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    vecPts.reserve(nVolu * 3 * (8 * nLayers + 1));</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nVolu; ++i)</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    vecPts.reserve(nVolu * 3 * (8 * <span class="keywordtype">size_t</span>(nLayers) + 1));</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; nVolu; ++i)</div>
 <div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;    {</div>
 <div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;        <span class="keyword">auto</span> voluVerts = meshin.verts.find_list(meshin.volus(i)-&gt;vertind(meshin));</div>
 <div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160; </div>
 <div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> vertSub : voluVerts)</div>
 <div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        {</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; nLayers; ++j)</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; size_t(nLayers); ++j)</div>
 <div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;            {</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; 3; ++k)</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> k = 0; k &lt; 3; ++k)</div>
 <div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;                {</div>
 <div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;                    vecPts.push_back(vecPts[i * 3 + k] * multcentre(j) + meshin.verts(vertSub)-&gt;coord[k] * multvert(j));</div>
 <div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;                }</div>
@@ -884,13 +884,13 @@ $(document).ready(function(){initNavTree('meshprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;        <a class="code" href="warning_8hpp.html#af5ebe63ee11f5db1e8d567a8ff8c8f02">RSVS3D_ERROR_ARGUMENT</a>(<span class="stringliteral">&quot;Unknown number of layers.&quot;</span>);</div>
 <div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;    }</div>
 <div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160; </div>
-<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;    <span class="keywordtype">int</span> nSurfs = meshin.surfs.size();</div>
+<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;    <span class="keywordtype">size_t</span> nSurfs = meshin.surfs.size();</div>
 <div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;    std::vector&lt;double&gt; vecPts = <a class="code" href="meshprocessing_8hpp.html#a27eee5546f47511fafef8b72b6843a7e">SurfaceCentroids</a>(meshin);</div>
-<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;    <span class="keyword">auto</span> multcentre = [&amp;](<span class="keywordtype">int</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(pos + 1) / double(nLayers + 1); };</div>
-<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;    <span class="keyword">auto</span> multvert = [&amp;](<span class="keywordtype">int</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(nLayers - pos) / double(nLayers + 1); };</div>
+<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;    <span class="keyword">auto</span> multcentre = [&amp;](<span class="keywordtype">size_t</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(pos + 1) / double(nLayers + 1); };</div>
+<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;    <span class="keyword">auto</span> multvert = [&amp;](<span class="keywordtype">size_t</span> pos) -&gt; <span class="keywordtype">double</span> { <span class="keywordflow">return</span> double(nLayers - pos) / double(nLayers + 1); };</div>
 <div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160; </div>
-<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;    vecPts.reserve(nSurfs * 3 * (8 * nLayers + 1));</div>
-<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nSurfs; ++i)</div>
+<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;    vecPts.reserve(nSurfs * 3 * (8 * <span class="keywordtype">size_t</span>(nLayers) + 1));</div>
+<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; nSurfs; ++i)</div>
 <div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;    {</div>
 <div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;        <span class="keyword">auto</span> tempEdge = meshin.edges.find_list(meshin.surfs(i)-&gt;edgeind);</div>
 <div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;        <span class="keyword">auto</span> surfInd = ConcatenateVectorField(meshin.edges, &amp;edge::vertind, tempEdge);</div>
@@ -898,9 +898,9 @@ $(document).ready(function(){initNavTree('meshprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160; </div>
 <div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> vertSub : surfVerts)</div>
 <div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;        {</div>
-<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; nLayers; ++j)</div>
+<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; size_t(nLayers); ++j)</div>
 <div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;            {</div>
-<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; 3; ++k)</div>
+<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> k = 0; k &lt; 3; ++k)</div>
 <div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;                {</div>
 <div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;                    vecPts.push_back(vecPts[i * 3 + k] * multcentre(j) + meshin.verts(vertSub)-&gt;coord[k] * multvert(j));</div>
 <div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;                }</div>
@@ -1066,11 +1066,11 @@ $(document).ready(function(){initNavTree('meshprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160;}</div>
 <div class="ttc" id="aclass_hashed_vector_html"><div class="ttname"><a href="class_hashed_vector.html">HashedVector&lt; int, int &gt;</a></div></div>
 <div class="ttc" id="aclasscoordvec_html"><div class="ttname"><a href="classcoordvec.html">coordvec</a></div><div class="ttdoc">Handles the use and norm of a vector for which the norm and the unit value might be needed.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00113">mesh.hpp:114</a></div></div>
-<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00618">mesh.hpp:619</a></div></div>
+<div class="ttc" id="aclassmesh_html"><div class="ttname"><a href="classmesh.html">mesh</a></div><div class="ttdoc">Class for mesh handling.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00591">mesh.hpp:592</a></div></div>
 <div class="ttc" id="aclassmesh_html_a93e3de4216d1e0490f29522a7c59ff11"><div class="ttname"><a href="classmesh.html#a93e3de4216d1e0490f29522a7c59ff11">mesh::VertFromVertEdge</a></div><div class="ttdeci">int VertFromVertEdge(int v, int e) const</div><div class="ttdoc">Returns the vertex in edges.isearch(e)-&gt;vertind which does not match v.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l05925">mesh.cpp:5925</a></div></div>
 <div class="ttc" id="aclasssnake_html"><div class="ttname"><a href="classsnake.html">snake</a></div><div class="ttdef"><b>Definition:</b> <a href="snake_8hpp_source.html#l00081">snake.hpp:82</a></div></div>
 <div class="ttc" id="aclasstriangulation_html"><div class="ttname"><a href="classtriangulation.html">triangulation</a></div><div class="ttdef"><b>Definition:</b> <a href="triangulate_8hpp_source.html#l00084">triangulate.hpp:85</a></div></div>
-<div class="ttc" id="aclassvert_html"><div class="ttname"><a href="classvert.html">vert</a></div><div class="ttdoc">Class for a vertex in a mesh.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00468">mesh.hpp:469</a></div></div>
+<div class="ttc" id="aclassvert_html"><div class="ttname"><a href="classvert.html">vert</a></div><div class="ttdoc">Class for a vertex in a mesh.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00447">mesh.hpp:448</a></div></div>
 <div class="ttc" id="amesh_8hpp_html_a10331edf942a4cd325f15560687efdd2"><div class="ttname"><a href="mesh_8hpp.html#a10331edf942a4cd325f15560687efdd2">grid::coordlist</a></div><div class="ttdeci">std::vector&lt; const std::vector&lt; double &gt; * &gt; coordlist</div><div class="ttdoc">Defines a list of coordinates.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8hpp_source.html#l00087">mesh.hpp:87</a></div></div>
 <div class="ttc" id="amesh_8hpp_html_a569f524fe67775fa77049c7da9f0b397"><div class="ttname"><a href="mesh_8hpp.html#a569f524fe67775fa77049c7da9f0b397">Angle3Points</a></div><div class="ttdeci">double Angle3Points(const std::vector&lt; double &gt; &amp;centre, const std::vector&lt; double &gt; &amp;planeVert2, const std::vector&lt; double &gt; &amp;planeVert3, coordvec &amp;vec1, coordvec &amp;vec2)</div><div class="ttdoc">Calculates a plane's normal vector.</div><div class="ttdef"><b>Definition:</b> <a href="mesh_8cpp_source.html#l00372">mesh.cpp:372</a></div></div>
 <div class="ttc" id="ameshprocessing_8hpp_html"><div class="ttname"><a href="meshprocessing_8hpp.html">meshprocessing.hpp</a></div><div class="ttdoc">Tools for the mathematical processing of meshes.</div></div>

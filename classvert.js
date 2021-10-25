@@ -1,7 +1,6 @@
 var classvert =
 [
     [ "vert", "classvert.html#ab1965227d322711e44148211fb108f7e", null ],
-    [ "vert", "classvert.html#a63d63d77f6b429c63fa7e67a4c9b5d01", null ],
     [ "~vert", "classvert.html#a228b91c8b87962f4b1b92a19ee725702", null ],
     [ "ChangeIndices", "classvert.html#a059f8fd72c352651869620606c3b6a13", null ],
     [ "disp", "classvert.html#a706c876325cca789bf800f517369c71a", null ],
