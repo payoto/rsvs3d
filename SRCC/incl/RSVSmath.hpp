@@ -161,7 +161,7 @@ class CoordFunc
         nFun = n3;
         InitialiseArrays();
     }
-    ~CoordFunc()
+    virtual ~CoordFunc()
     {
         coords.clear();
     }

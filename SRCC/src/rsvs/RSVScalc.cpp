@@ -272,6 +272,7 @@ void RSVScalc::ReturnGradient(const triangulation &triRSVS, std::vector<double> 
         }
         else
         {
+            RSVS3D_ERROR_NOTHROW("Delta DV output not supported in Sparse maths (easy to implement).");
         }
     }
     else

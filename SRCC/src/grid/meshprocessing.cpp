@@ -873,21 +873,21 @@ std::vector<double> VolumeInternalLayers(const mesh &meshin, int nLayers)
         RSVS3D_ERROR_ARGUMENT("Unknown number of layers.");
     }
 
-    int nVolu = meshin.volus.size();
+    size_t nVolu = meshin.volus.size();
     std::vector<double> vecPts = VolumeCentroids(meshin);
-    auto multcentre = [&](int pos) -> double { return double(pos + 1) / double(nLayers + 1); };
-    auto multvert = [&](int pos) -> double { return double(nLayers - pos) / double(nLayers + 1); };
+    auto multcentre = [&](size_t pos) -> double { return double(pos + 1) / double(nLayers + 1); };
+    auto multvert = [&](size_t pos) -> double { return double(nLayers - pos) / double(nLayers + 1); };
 
-    vecPts.reserve(nVolu * 3 * (8 * nLayers + 1));
-    for (int i = 0; i < nVolu; ++i)
+    vecPts.reserve(nVolu * 3 * (8 * size_t(nLayers) + 1));
+    for (size_t i = 0; i < nVolu; ++i)
     {
         auto voluVerts = meshin.verts.find_list(meshin.volus(i)->vertind(meshin));
 
         for (auto vertSub : voluVerts)
         {
-            for (int j = 0; j < nLayers; ++j)
+            for (size_t j = 0; j < size_t(nLayers); ++j)
             {
-                for (int k = 0; k < 3; ++k)
+                for (size_t k = 0; k < 3; ++k)
                 {
                     vecPts.push_back(vecPts[i * 3 + k] * multcentre(j) + meshin.verts(vertSub)->coord[k] * multvert(j));
                 }
@@ -944,13 +944,13 @@ std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers)
         RSVS3D_ERROR_ARGUMENT("Unknown number of layers.");
     }
 
-    int nSurfs = meshin.surfs.size();
+    size_t nSurfs = meshin.surfs.size();
     std::vector<double> vecPts = SurfaceCentroids(meshin);
-    auto multcentre = [&](int pos) -> double { return double(pos + 1) / double(nLayers + 1); };
-    auto multvert = [&](int pos) -> double { return double(nLayers - pos) / double(nLayers + 1); };
+    auto multcentre = [&](size_t pos) -> double { return double(pos + 1) / double(nLayers + 1); };
+    auto multvert = [&](size_t pos) -> double { return double(nLayers - pos) / double(nLayers + 1); };
 
-    vecPts.reserve(nSurfs * 3 * (8 * nLayers + 1));
-    for (int i = 0; i < nSurfs; ++i)
+    vecPts.reserve(nSurfs * 3 * (8 * size_t(nLayers) + 1));
+    for (size_t i = 0; i < nSurfs; ++i)
     {
         auto tempEdge = meshin.edges.find_list(meshin.surfs(i)->edgeind);
         auto surfInd = ConcatenateVectorField(meshin.edges, &edge::vertind, tempEdge);
@@ -958,9 +958,9 @@ std::vector<double> SurfaceInternalLayers(const mesh &meshin, int nLayers)
 
         for (auto vertSub : surfVerts)
         {
-            for (int j = 0; j < nLayers; ++j)
+            for (size_t j = 0; j < size_t(nLayers); ++j)
             {
-                for (int k = 0; k < 3; ++k)
+                for (size_t k = 0; k < 3; ++k)
                 {
                     vecPts.push_back(vecPts[i * 3 + k] * multcentre(j) + meshin.verts(vertSub)->coord[k] * multvert(j));
                 }

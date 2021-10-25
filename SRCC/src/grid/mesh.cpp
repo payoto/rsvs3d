@@ -1027,7 +1027,7 @@ void mesh::SetMeshDepElm()
 void mesh::ReturnParentMap(vector<int> &currind, vector<int> &parentpos, vector<pair<int, int>> &parentcases,
                            vector<double> &voluVals) const
 {
-    int ii, ni, jj, nj, nElm, nParCases;
+    size_t ii, ni, jj, nj, nElm, nParCases;
     pair<int, int> tempPair;
 
     currind.clear();
@@ -2443,8 +2443,7 @@ void mesh::RemoveIndex(int typeInd, int oldInd)
     else if (typeInd == 5)
     { // Modify vertex index in scoped mode
 
-        cerr << "not coded yet" << endl;
-        throw;
+        RSVS3D_ERROR("Not implemented: Cannot modify vertex in scoped mode.");
     }
     else
     {
@@ -4942,11 +4941,11 @@ coordvec mesh::CalcPseudoNormalSurf(int ind) const
     return (ret);
 }
 
+/** Orients either surfaces or edges depending on the dimensionality
+ * of the object.
+ */
 void mesh::OrientFaces()
 {
-    /*
-    Orients either surfaces or edges depending.
-    */
     if (this->WhatDim() == 3)
     {
         this->OrientSurfaceVolume();
@@ -4957,6 +4956,7 @@ void mesh::OrientFaces()
     }
     else
     {
+        // Could support higher dimensions
     }
 }
 
