@@ -1,12 +1,12 @@
 #include "postprocessing.hpp"
 
-#include <iostream>
-
 #include "RSVScalc.hpp"
 #include "mesh.hpp"
 #include "meshprocessing.hpp"
 #include "triangulate.hpp"
 #include "warning.hpp"
+#include <iostream>
+#include <vector>
 
 namespace tecplotconst = rsvs3d::constants::tecplot;
 

@@ -6,7 +6,7 @@
   "/files/ioin/volumeshname": "",
   "/files/ioout/basenameoutdir": "rsvs3d_",
   "/files/ioout/basenamepattern": "%y%m%dT%H%M%S_",
-  "/files/ioout/logginglvl": 3,
+  "/files/ioout/logginglvl": 7,
   "/files/ioout/outdir": "",
   "/files/ioout/outputlvl": 3,
   "/files/ioout/pathoutdir": "../out",
