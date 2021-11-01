@@ -32,11 +32,14 @@ Relevant publications for the 2D RSVS are at the end of this readme.
 The compiled binary is available for download for Windows 64bits and Linux 64bits.
 This program provides both a command line interface (CLI) and a GUI for visualising your results.
 
+\htmlonly
+
 <iframe width="560" height="315"
 src="https://youtu.be/wHkmY4l3-og"
 frameborder="0"
 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 allowfullscreen></iframe>
+\endhtmlonly
 
 ## Get the code
 
