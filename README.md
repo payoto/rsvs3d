@@ -32,7 +32,12 @@ Relevant publications for the 2D RSVS are at the end of this readme.
 The compiled binary is available for download for Windows 64bits and Linux 64bits.
 This program provides both a command line interface (CLI) and a GUI for visualising your results.
 
-[See the video tour of the GUI on YouTube](https://www.youtube.com/w/wHkmY4l3-og).
+## Get the compiled program
+
+An example of using the GUI to visualise and configure the 3D-RSVS is presented in
+[a video tour on YouTube](https://www.youtube.com/w/wHkmY4l3-og).
+The 3D-RSVS program is available as a binary from the latest build
+
 \htmlonly
 
 <div class="container">
