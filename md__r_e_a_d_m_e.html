@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The <code>SRCC</code> folder contains the C++ source files used to build the executable for the 3D-RSVS software.</p>
-<h1><a class="anchor" id="autotoc_md12"></a>
+<h1><a class="anchor" id="autotoc_md13"></a>
 Contents</h1>
 <p>The files and folders inside the <code>SRCC/</code> folder are:</p>
 <h2>Source directories</h2>
@@ -122,14 +122,14 @@ Contents</h1>
 <li><code>.d</code>: Dependency management artifact to ensure make rebuilds objects when headers change.</li>
 <li><code>obj</code>: Directory for the compiled objects (one per <code>.cpp</code> file in <code>src</code>).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md13"></a>
+<h1><a class="anchor" id="autotoc_md14"></a>
 Building</h1>
 <p>In order to build the fully featured executable run:</p>
 <div class="fragment"><div class="line">make all</div>
 </div><!-- fragment --><p>This will generate the <code>RSVS3D</code> executable. When developing a specific part of the program it can be desirable to build a smaller executable which only compiles parts of the program being tested. The <code>testnew</code> and <code>testall</code> recipes in the makefile fill that role:</p>
 <div class="fragment"><div class="line">make testnew</div>
 </div><!-- fragment --><p>will create the <code>test_RSVS3D</code> executable with debug flags.</p>
-<h1><a class="anchor" id="autotoc_md14"></a>
+<h1><a class="anchor" id="autotoc_md15"></a>
 Usage</h1>
 <p>When the <code>RSVS3D</code> executable has been built the <code>--help</code> flag can be used to return the command line flags.</p>
 <div class="fragment"><div class="line">$ ./RSVS3D --help</div>
@@ -162,7 +162,7 @@ Usage</h1>
 <div class="line">                                will set &#39;param.snak.maxsteps=50&#39;)</div>
 <div class="line">      --default-config [=FILE(=default_config)]</div>
 <div class="line">                                Output the default configuration to a file.</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md16"></a>
 Testing</h1>
 <p>Tests are handled by a custom testing framework developed for this project:</p>
 <ul>

@@ -98,18 +98,21 @@ What is this repository for?</h1>
 <p>This repository is the C++ implementation of the 3D R-Snake <a class="el" href="class_volume.html">Volume</a> of Solid (RSVS) parameterisation. It includes a main executable that can be built from the <code>SRCC</code> directory and Matlab support codes in <code>SRCMAT</code>. Building and using the 3D-RSVS does not require the MATLAB code is here as it was used to prototype and test ideas.</p>
 <p>Relevant publications for the 2D RSVS are at the end of this readme.</p>
 <p>The compiled binary is available for download for Windows 64bits and Linux 64bits. This program provides both a command line interface (CLI) and a GUI for visualising your results.</p>
-<p><a href="https://www.youtube.com/w/wHkmY4l3-og">See the video tour of the GUI on YouTube</a>.  
+<h1><a class="anchor" id="autotoc_md2"></a>
+Get the compiled program</h1>
+<p>An example of using the GUI to visualise and configure the 3D-RSVS is presented in <a href="https://www.youtube.com/w/wHkmY4l3-og">a video tour on YouTube</a>. The 3D-RSVS program is available as a binary from the latest build</p>
+<p> 
 
 <div class="container">
 <iframe class="responsive-iframe" src="https://www.youtube-nocookie.com/embed/wHkmY4l3-og" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 </p>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md3"></a>
 Get the code</h1>
 <p>This project uses git submodules to handle dependencies: </p><pre class="fragment">git clone --recurse-submodules https://github.com/payoto/rsvs3d
 </pre><p> or </p><pre class="fragment">git clone https://github.com/payoto/rsvs3d
 git submodule update --init --recursive
-</pre> <h1><a class="anchor" id="autotoc_md3"></a>
+</pre> <h1><a class="anchor" id="autotoc_md4"></a>
 Required tools for compilation</h1>
 <p>For this code to work necessary programs:</p>
 <ul>
@@ -124,7 +127,7 @@ Required tools for compilation</h1>
 <li>c++ compiler compatible with MATLAB for the compilation of mex files</li>
 <li>Tecplot 360 (2017 or later) to open the <code>.lay</code> files</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4"></a>
+<h1><a class="anchor" id="autotoc_md5"></a>
 External libraries</h1>
 <p>Required 3rd party open source libraries for compilation (dependencies available at <a href="https://github.com/payoto/rsvs3d-externals"><code>github/payoto/rsvs3d-dependencies</code></a>):</p>
 <ul>
@@ -147,7 +150,7 @@ External libraries</h1>
 <div class="line"># https://stackoverflow.com/a/66506098/15399205</div>
 <div class="line">export LIBGL_ALWAYS_INDIRECT=0</div>
 <div class="line">export DISPLAY=$(awk &#39;/nameserver / {print $2; exit}&#39; /etc/resolv.conf 2&gt;/dev/null):0 # in WSL 2</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md5"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
 License</h1>
 <p>Any code using the Tetgen interface and functionalities is under the GNU Affero GPL license which is more restrictive than the LGPL of this project (this is not legal advice, but my understanding):</p>
 <ul>
@@ -156,7 +159,7 @@ License</h1>
 </ul>
 <p>Refer to the full License terms for real information.</p>
 <p>:note: If the LGPL is too restrictive for you get in touch and I can move the code I own to something more permissive.</p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md7"></a>
 First setup</h1>
 <p>You will need <code>make</code> and a <code>gcc</code> toolchain for the default compilation to work on windows you can use <a href="https://chocolatey.org/">chocolatey</a> to install them. Run <code>choco install make mingw</code> in an elevated powershell once chocolatey is installed or check the <a href="https://github.com/payoto/rsvs3d/actions/workflows/windows.yml">windows github action</a> for details.</p>
 <h2>C++</h2>
@@ -171,14 +174,14 @@ First setup</h1>
 <p>Before being able to call the Matlab codes (these are not necessary for the geometry tool execution) you will need to call these in the matlab console. </p><pre class="fragment">    &gt;&gt; Init3DMatlab
     &gt;&gt; Include_3DCheckGrid
 </pre><p> the <code>Include_XXXX</code> files "import" all the local functions defined inside them into the matlab workspace avoiding the need to create one matlab file per function.</p>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Limitiations and how to get help</h1>
 <h2>Help</h2>
 <p>Read the (sparse) <a href="https://payoto.github.io/rsvs3d/">documentation</a>, read Chapter 7 of <a href="https://www.researchgate.net/publication/345149497_Shape_and_Topology_Optimisation_of_External_Flows">"Shape and Topology Optimisation of External Flows" (thesis)</a> also available as a <a href="SRCC/docs/thesis_ADJPAYOT_chap7-3D-RSVS.pdf">standalone PDF</a> of finally use the <a href="https://github.com/payoto/rsvs3d/issues">issues</a> board.</p>
 <h2>Limitations</h2>
 <p>No release of the RSVS has been made as there are a number of known stability and convergence issues which means that it is unlikely to work beyond the specific test cases that were studied in Chapter 7 of the thesis.</p>
 <p>For a discussion of those limitations see <a href="SRCC/docs/thesis_ADJPAYOT_chap7-3D-RSVS.pdf">Chapter 7</a></p>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 Using the 3D-RSVS</h1>
 <p>Generating a geoemtry using the 3D-RSVS method only requires the executable <code>RSVS3D.exe</code>. For basic usage information from the command line use: </p><pre class="fragment">RSVS3D --help
 </pre><p> :Note: Running <code>RSVS3D</code> with no command line arguments does nothing.</p>
@@ -360,7 +363,7 @@ Using the 3D-RSVS</h1>
 <div class="line">&quot;/snak/multiarrivaltolerance&quot;: 0.01,</div>
 <div class="line">&quot;/snak/snaxdiststep&quot;: 0.9,</div>
 <div class="line">&quot;/snak/snaxtimestep&quot;: 0.9</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md10"></a>
 Note on using git to update a private copy of the code</h1>
 <p>Begginning to use git? Follow these <a href="https://dev.to/sublimegeek/git-staging-area-explained-like-im-five-1anh">5mn ELI5 explainer</a> which will help understand what the lingo means, <a href="https://www.atlassian.com/git/tutorials">git begginer guide</a> which should get you up and running, or the full git documentation if you're trying to do something <a href="https://git-scm.com/doc">git documentation</a>.</p>
 <p>Very minimal guide I wrote a while back specific to the repository: Updating your files to be up to date with the master branch can be done using git very efficiently. With a few steps.</p>
@@ -374,7 +377,7 @@ Note on using git to update a private copy of the code</h1>
 <li>Merge the new master with your local branch <code>git merge master</code></li>
 <li>If there are any merge issues resolve them using a text editor (if there are you will need to run <code>git add -u</code> and <code>git commit</code>)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md10"></a>
+<h1><a class="anchor" id="autotoc_md11"></a>
 I don't get it what does this ACTUALLY do and who do I talk to?</h1>
 <p>For more information about what the code does (i.e. the science of it):</p>
 <ul>

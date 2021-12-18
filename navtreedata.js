@@ -27,32 +27,33 @@ var NAVTREE =
   [ "rsvs3D", "index.html", [
     [ "3D-RSVS", "index.html", [
       [ "What is this repository for?", "index.html#autotoc_md1", null ],
-      [ "Get the code", "index.html#autotoc_md2", null ],
-      [ "Required tools for compilation", "index.html#autotoc_md3", null ],
-      [ "External libraries", "index.html#autotoc_md4", null ],
-      [ "License", "index.html#autotoc_md5", null ],
-      [ "First setup", "index.html#autotoc_md6", null ],
-      [ "Limitiations and how to get help", "index.html#autotoc_md7", null ],
-      [ "Using the 3D-RSVS", "index.html#autotoc_md8", null ],
-      [ "Note on using git to update a private copy of the code", "index.html#autotoc_md9", null ],
-      [ "I don't get it what does this ACTUALLY do and who do I talk to?", "index.html#autotoc_md10", null ]
+      [ "Get the compiled program", "index.html#autotoc_md2", null ],
+      [ "Get the code", "index.html#autotoc_md3", null ],
+      [ "Required tools for compilation", "index.html#autotoc_md4", null ],
+      [ "External libraries", "index.html#autotoc_md5", null ],
+      [ "License", "index.html#autotoc_md6", null ],
+      [ "First setup", "index.html#autotoc_md7", null ],
+      [ "Limitiations and how to get help", "index.html#autotoc_md8", null ],
+      [ "Using the 3D-RSVS", "index.html#autotoc_md9", null ],
+      [ "Note on using git to update a private copy of the code", "index.html#autotoc_md10", null ],
+      [ "I don't get it what does this ACTUALLY do and who do I talk to?", "index.html#autotoc_md11", null ]
     ] ],
     [ "C++ code structure", "md__r_e_a_d_m_e.html", [
-      [ "Contents", "md__r_e_a_d_m_e.html#autotoc_md12", null ],
-      [ "Building", "md__r_e_a_d_m_e.html#autotoc_md13", null ],
-      [ "Usage", "md__r_e_a_d_m_e.html#autotoc_md14", null ],
-      [ "Testing", "md__r_e_a_d_m_e.html#autotoc_md15", null ]
+      [ "Contents", "md__r_e_a_d_m_e.html#autotoc_md13", null ],
+      [ "Building", "md__r_e_a_d_m_e.html#autotoc_md14", null ],
+      [ "Usage", "md__r_e_a_d_m_e.html#autotoc_md15", null ],
+      [ "Testing", "md__r_e_a_d_m_e.html#autotoc_md16", null ]
     ] ],
     [ "Templates and test outputs", "md__home_runner_work_rsvs3d_rsvs3d__t_e_s_t_o_u_t__r_e_a_d_m_e.html", [
-      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__t_e_s_t_o_u_t__r_e_a_d_m_e.html#autotoc_md17", null ]
+      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__t_e_s_t_o_u_t__r_e_a_d_m_e.html#autotoc_md18", null ]
     ] ],
     [ "Matlab helper scripts", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html", [
-      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html#autotoc_md19", null ]
+      [ "Contents", "md__home_runner_work_rsvs3d_rsvs3d__s_r_c_m_a_t__r_e_a_d_m_e.html#autotoc_md20", null ]
     ] ],
     [ "Build doxygen documentation", "md_docs__r_e_a_d_m_e.html", [
-      [ "Build", "md_docs__r_e_a_d_m_e.html#autotoc_md21", null ],
-      [ "View", "md_docs__r_e_a_d_m_e.html#autotoc_md22", null ],
-      [ "Dependencies", "md_docs__r_e_a_d_m_e.html#autotoc_md23", null ]
+      [ "Build", "md_docs__r_e_a_d_m_e.html#autotoc_md22", null ],
+      [ "View", "md_docs__r_e_a_d_m_e.html#autotoc_md23", null ],
+      [ "Dependencies", "md_docs__r_e_a_d_m_e.html#autotoc_md24", null ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -86,14 +87,14 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_r_s_v_salgorithm_8cpp_source.html",
-"class_array_structpart.html#aca6af7f32cbd8ba761583d2bbca7e852",
-"class_tri_struct.html",
-"classparam_1_1dev_1_1rsvseps.html#a7edee539c3b1d7017729d944ee5ffd9e",
-"classsnaxsurf.html#a235e3b0b4be7dc599c98943623c948d8",
-"classvolu.html#a2ac9b41f2a631249d1dd82583e89044d",
-"namespaceparam_1_1dev.html#a9ef9a5d91d12a44e38da239aa72db3b4",
-"test_8hpp.html"
+"",
+"class_array_struct.html#a9e15771c2c6132f89ff98c638d51f965",
+"class_surf_centroid.html#a4af0804b10cfe2efe5cd35c807449fc6",
+"classmeshdependence.html#a21f96cb74b2edcadf074b1963bf0ee4f",
+"classsnaxarray.html#a2de61c4c01f172a357aa141225b21760",
+"classtriangulation.html#af5a74df52cbee6ccfeb1821cb347188b",
+"meshrefinement_8hpp_source.html",
+"snakeengine_8hpp.html#a2ecebb0c514843603b3bbf24b71a024b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
