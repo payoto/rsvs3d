@@ -1708,11 +1708,14 @@ void tetgen::test::LoadData(mesh &snakeMesh, mesh &voluMesh, snake &snakein, mes
     */
 
     triangulation triRSVS;
-
-    snakeMesh.read("../TESTOUT/testtetgen/SnakeMesh_181205T193158_sphere2.msh");
-    voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
-    snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
-    // snakein.snakeconn.read("../TESTOUT/testtetgen/SnakeConn_181205T193158_sphere2.msh");
+    int loadErrors = 0;
+    loadErrors += snakeMesh.read("../TESTOUT/testtetgen/SnakeMesh_181205T193158_sphere2.msh");
+    loadErrors += voluMesh.read("../TESTOUT/testtetgen/VoluMesh_181205T193158_sphere2.msh");
+    loadErrors += snakein.read("../TESTOUT/testtetgen/Snake_181205T193158_sphere2.3snk");
+    if (loadErrors > 0)
+    {
+        RSVS3D_ERROR_ARGUMENT("Error loading test data");
+    }
     snakein.SetSnakeMesh(&snakeMesh);
 
     snakeMesh.PrepareForUse();
