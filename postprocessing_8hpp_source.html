@@ -302,12 +302,12 @@ $(document).ready(function(){initNavTree('postprocessing_8hpp_source.html',''); 
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordtype">void</span> NewZone()</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    {</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;ZONE\n&quot;</span>);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;ZONE\n&quot;</span>);</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        nZones++;</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    }</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordtype">void</span> StrandTime(<span class="keywordtype">int</span> strandID, <span class="keywordtype">double</span> timeStep)</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;STRANDID = %i \nSOLUTIONTIME = %.10lf \n&quot;</span>, strandID, timeStep);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;STRANDID = %i \nSOLUTIONTIME = %.10lf \n&quot;</span>, strandID, timeStep);</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <span class="keywordflow">if</span> (!rsvs3d::logicals::__isfound(this-&gt;strands.find(strandID)))</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        {</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            this-&gt;strands.push_back(strandID);</div>
@@ -316,49 +316,52 @@ $(document).ready(function(){initNavTree('postprocessing_8hpp_source.html',''); 
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordtype">int</span> Print(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...)</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    { <span class="comment">// Mimics the printf function hides fid</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        va_list arg;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordtype">int</span> i;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        va_start(arg, format);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        i = vfprintf(fid, format, arg);</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        va_end(arg);</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        lengthLine += i;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="keywordflow">if</span> (lengthLine &gt; 25000)</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        {</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            fprintf(fid, <span class="stringliteral">&quot; \n&quot;</span>);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            lengthLine = 0;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">return</span> (lengthLine);</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordtype">void</span> ResetLine()</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    {</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        lengthLine = 0;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordtype">void</span> NewLine()</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    {</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        fprintf(this-&gt;fid, <span class="stringliteral">&quot;\n&quot;</span>);</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        this-&gt;ResetLine();</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    };</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;};</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="comment">// Derived Classes</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="comment">// functions</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="keyword">namespace </span>dataoutput</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;{</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="keywordtype">void</span> Coord(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshout, <span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nVertDat);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="keywordtype">void</span> Snaxel(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classsnake.html">snake</a> &amp;snakeout, <span class="keywordtype">int</span> nVert);</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="keywordtype">void</span> <a class="code" href="mesh_8hpp.html#a14e06793fea4657c01cb677a418c1714">VertexNormal</a>(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshin, <span class="keywordtype">int</span> nVert);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="keywordtype">void</span> VertexLaplacian(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshin, <span class="keywordtype">int</span> nVert);</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;} <span class="comment">// namespace dataoutput</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keywordtype">int</span> Test_tecplotfile();</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="keywordtype">int</span> TestCompareReadWrite(<span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen, <a class="code" href="classmesh.html">mesh</a> &amp;blockGrid, <a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;outmesh1);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment">// member function definition template &lt;class T&gt;</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// POSTPROCESSING_H_INCLUDED</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;isOpen())</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        va_list arg;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="keywordtype">int</span> i;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        va_start(arg, format);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        i = vfprintf(fid, format, arg);</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        va_end(arg);</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        lengthLine += i;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordflow">if</span> (lengthLine &gt; 25000)</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            fprintf(fid, <span class="stringliteral">&quot; \n&quot;</span>);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            lengthLine = 0;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">return</span> (lengthLine);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    }</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordtype">void</span> ResetLine()</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    {</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        lengthLine = 0;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordtype">void</span> NewLine()</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    {</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        this-&gt;ResetLine();</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    };</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;};</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="comment">// Derived Classes</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment">// functions</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="keyword">namespace </span>dataoutput</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;{</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="keywordtype">void</span> Coord(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshout, <span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nVertDat);</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="keywordtype">void</span> Snaxel(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classsnake.html">snake</a> &amp;snakeout, <span class="keywordtype">int</span> nVert);</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="keywordtype">void</span> <a class="code" href="mesh_8hpp.html#a14e06793fea4657c01cb677a418c1714">VertexNormal</a>(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshin, <span class="keywordtype">int</span> nVert);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keywordtype">void</span> VertexLaplacian(<a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;tecout, <span class="keyword">const</span> <a class="code" href="classmesh.html">mesh</a> &amp;meshin, <span class="keywordtype">int</span> nVert);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;} <span class="comment">// namespace dataoutput</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="keywordtype">int</span> Test_tecplotfile();</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="keywordtype">int</span> TestCompareReadWrite(<span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen, <a class="code" href="classmesh.html">mesh</a> &amp;blockGrid, <a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;outmesh1);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">// member function definition template &lt;class T&gt;</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// POSTPROCESSING_H_INCLUDED</span></div>
 <div class="ttc" id="aarraystructures_8hpp_html"><div class="ttname"><a href="arraystructures_8hpp.html">arraystructures.hpp</a></div><div class="ttdoc">Provide std::vector container with hashed index mapping.</div></div>
 <div class="ttc" id="aclass_hashed_vector_html"><div class="ttname"><a href="class_hashed_vector.html">HashedVector&lt; int, int &gt;</a></div></div>
 <div class="ttc" id="aclass_r_s_v_scalc_html"><div class="ttname"><a href="class_r_s_v_scalc.html">RSVScalc</a></div><div class="ttdoc">Class to handle the RSVS calculation.</div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_scalc_8hpp_source.html#l00120">RSVScalc.hpp:121</a></div></div>

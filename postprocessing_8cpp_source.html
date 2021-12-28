@@ -647,8 +647,8 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    }</div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    {</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; &quot;</span></div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;                     <span class="stringliteral">&quot;,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; &quot;</span></div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;                    <span class="stringliteral">&quot;,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    }</div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;    this-&gt;NewZone();</div>
@@ -780,7 +780,7 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160; </div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    {</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    }</div>
 <div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160; </div>
 <div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    this-&gt;NewZone();</div>
@@ -885,7 +885,7 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    <span class="keywordtype">int</span> forceOutType;</div>
 <div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    {</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    }</div>
 <div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160; </div>
 <div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    this-&gt;NewZone();</div>
@@ -946,8 +946,8 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;}</div>
 <div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;<span class="keywordtype">int</span> tecplotfile::DefShareZoneVolume(<span class="keywordtype">int</span> shareZone, <span class="keywordtype">int</span> nVertDat)</div>
 <div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;{</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;CONNECTIVITYSHAREZONE=%i\n&quot;</span>, shareZone);</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARSHARELIST=([%i-%i]=%i )\n&quot;</span>, 1, nVertDat, shareZone);</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;CONNECTIVITYSHAREZONE=%i\n&quot;</span>, shareZone);</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARSHARELIST=([%i-%i]=%i )\n&quot;</span>, 1, nVertDat, shareZone);</div>
 <div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160; </div>
 <div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;    <span class="keywordflow">return</span> (0);</div>
 <div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;}</div>
@@ -1392,7 +1392,7 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;    {</div>
 <div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;        <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;        {</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;        }</div>
 <div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160; </div>
 <div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;        this-&gt;NewZone();</div>
@@ -1768,7 +1768,7 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;    {</div>
 <div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;        <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;        {</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;        }</div>
 <div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160; </div>
 <div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;        this-&gt;NewZone();</div>
@@ -1821,86 +1821,86 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160; </div>
 <div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderPolyhedron(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nVolu, <span class="keywordtype">int</span> nSurf, <span class="keywordtype">int</span> totNumFaceNode, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat)</div>
 <div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;{</div>
-<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FEPOLYHEDRON\n&quot;</span>);</div>
-<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nVolu);</div>
+<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FEPOLYHEDRON\n&quot;</span>);</div>
+<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nVolu);</div>
 <div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nSurf);</div>
-<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, totNumFaceNode);</div>
-<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
-<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, totNumFaceNode);</div>
+<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
+<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;}</div>
 <div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160; </div>
 <div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderPolygon(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nEdge, <span class="keywordtype">int</span> nSurf, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat)</div>
 <div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;{</div>
-<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FEPOLYGON\n&quot;</span>);</div>
-<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nSurf);</div>
+<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FEPOLYGON\n&quot;</span>);</div>
+<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nSurf);</div>
 <div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nEdge);</div>
-<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, 2 * nEdge);</div>
-<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
-<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, 2 * nEdge);</div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
+<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;}</div>
 <div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160; </div>
 <div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderFelineseg(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nEdge, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat)</div>
 <div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;{</div>
-<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FELINESEG\n&quot;</span>);</div>
-<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nEdge);</div>
+<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FELINESEG\n&quot;</span>);</div>
+<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nEdge);</div>
 <div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nEdge);</div>
-<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
-<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n&quot;</span>, 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);</div>
+<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;}</div>
 <div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160; </div>
 <div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderPolyhedronSnake(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nVolu, <span class="keywordtype">int</span> nSurf, <span class="keywordtype">int</span> totNumFaceNode, <span class="keywordtype">int</span> nVertDat,</div>
 <div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;                                            <span class="keywordtype">int</span> nCellDat, <span class="keywordtype">int</span> nSensDat)</div>
 <div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;{</div>
-<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FEPOLYHEDRON\n&quot;</span>);</div>
-<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nVolu);</div>
+<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FEPOLYHEDRON\n&quot;</span>);</div>
+<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nVolu);</div>
 <div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nSurf);</div>
-<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, totNumFaceNode);</div>
-<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
+<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, totNumFaceNode);</div>
+<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
 <div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160; </div>
-<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;}</div>
 <div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160; </div>
 <div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderPolygonSnake(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nEdge, <span class="keywordtype">int</span> nSurf, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat, <span class="keywordtype">int</span> nSensDat)</div>
 <div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;{</div>
-<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FEPOLYGON\n&quot;</span>);</div>
-<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nSurf);</div>
+<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FEPOLYGON\n&quot;</span>);</div>
+<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nSurf);</div>
 <div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nEdge);</div>
-<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, 2 * nEdge);</div>
-<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
-<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
+<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMFACENODES = %i\n&quot;</span>, 2 * nEdge);</div>
+<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NUMCONNECTEDBOUNDARYFACES = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;TOTALNUMBOUNDARYCONNECTIONS = 0\n&quot;</span>);</div>
+<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
 <div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160; </div>
-<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;}</div>
 <div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160; </div>
 <div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderFelinesegSnake(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nEdge, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat, <span class="keywordtype">int</span> nSensDat)</div>
 <div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;{</div>
-<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = FELINESEG\n&quot;</span>);</div>
-<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nEdge);</div>
+<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = FELINESEG\n&quot;</span>);</div>
+<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;NODES = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ELEMENTS = %i\n&quot;</span>, nEdge);</div>
 <div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;FACES = %i\n&quot;</span>, nEdge);</div>
-<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
+<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
 <div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160; </div>
-<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;}</div>
 <div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160; </div>
 <div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160;<span class="keywordtype">void</span> tecplotfile::ZoneHeaderOrdered(<span class="keywordtype">int</span> nVert, <span class="keywordtype">int</span> nVertDat, <span class="keywordtype">int</span> nCellDat, <span class="keywordtype">int</span> nSensDat)</div>
 <div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160;{</div>
-<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;ZONETYPE = ORDERED\n&quot;</span>);</div>
-<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;I = %i\n&quot;</span>, nVert);</div>
-<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
-<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;    fprintf(fid, <span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
+<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;ZONETYPE = ORDERED\n&quot;</span>);</div>
+<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;I = %i\n&quot;</span>, nVert);</div>
+<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;VARLOCATION=([%i-%i]=NODAL)\n&quot;</span>, 1, nVertDat + nCellDat + nSensDat);</div>
+<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;    this-&gt;Print(<span class="stringliteral">&quot;DATAPACKING=BLOCK\n&quot;</span>);</div>
 <div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160;}</div>
 <div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160; </div>
 <div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160;<span class="comment">// Print snake with sensitivity</span></div>
@@ -1922,12 +1922,12 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160; </div>
 <div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;    {</div>
-<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
 <div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; calcObj.<a class="code" href="class_r_s_v_scalc.html#ac031d193704cfd0f450abd6026ac97df">numConstr</a>(); ++i)</div>
 <div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;        {</div>
-<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
+<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
 <div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;        }</div>
-<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160;    }</div>
 <div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160; </div>
 <div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;    this-&gt;NewZone();</div>
@@ -2022,18 +2022,18 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;    <span class="keywordtype">int</span> nPreConstr = 6;</div>
 <div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;    {</div>
-<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;dObj\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;dLag\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;HObj\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;HConstr\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;HLag\&quot;&quot;</span>);</div>
-<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;, \&quot;deltaDV\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;dObj\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;dLag\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;HObj\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;HConstr\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;HLag\&quot;&quot;</span>);</div>
+<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;, \&quot;deltaDV\&quot;&quot;</span>);</div>
 <div class="line"><a name="l01949"></a><span class="lineno"> 1949</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; calcObj.<a class="code" href="class_r_s_v_scalc.html#ac031d193704cfd0f450abd6026ac97df">numConstr</a>(); ++i)</div>
 <div class="line"><a name="l01950"></a><span class="lineno"> 1950</span>&#160;        {</div>
-<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;, \&quot;dConstr_%i\&quot;&quot;</span>, i);</div>
+<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;, \&quot;dConstr_%i\&quot;&quot;</span>, i);</div>
 <div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160;        }</div>
-<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l01954"></a><span class="lineno"> 1954</span>&#160;    }</div>
 <div class="line"><a name="l01955"></a><span class="lineno"> 1955</span>&#160; </div>
 <div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160;    this-&gt;NewZone();</div>
@@ -2228,12 +2228,12 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l02145"></a><span class="lineno"> 2145</span>&#160; </div>
 <div class="line"><a name="l02146"></a><span class="lineno"> 2146</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l02147"></a><span class="lineno"> 2147</span>&#160;    {</div>
-<div class="line"><a name="l02148"></a><span class="lineno"> 2148</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
+<div class="line"><a name="l02148"></a><span class="lineno"> 2148</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
 <div class="line"><a name="l02149"></a><span class="lineno"> 2149</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nSensDat; ++i)</div>
 <div class="line"><a name="l02150"></a><span class="lineno"> 2150</span>&#160;        {</div>
-<div class="line"><a name="l02151"></a><span class="lineno"> 2151</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
+<div class="line"><a name="l02151"></a><span class="lineno"> 2151</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
 <div class="line"><a name="l02152"></a><span class="lineno"> 2152</span>&#160;        }</div>
-<div class="line"><a name="l02153"></a><span class="lineno"> 2153</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l02153"></a><span class="lineno"> 2153</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l02154"></a><span class="lineno"> 2154</span>&#160;    }</div>
 <div class="line"><a name="l02155"></a><span class="lineno"> 2155</span>&#160; </div>
 <div class="line"><a name="l02156"></a><span class="lineno"> 2156</span>&#160;    this-&gt;NewZone();</div>
@@ -2361,12 +2361,12 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l02278"></a><span class="lineno"> 2278</span>&#160; </div>
 <div class="line"><a name="l02279"></a><span class="lineno"> 2279</span>&#160;    <span class="keywordflow">if</span> (nZones == 0)</div>
 <div class="line"><a name="l02280"></a><span class="lineno"> 2280</span>&#160;    {</div>
-<div class="line"><a name="l02281"></a><span class="lineno"> 2281</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
+<div class="line"><a name="l02281"></a><span class="lineno"> 2281</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;VARIABLES = \&quot;X\&quot; ,\&quot;Y\&quot; , \&quot;Z\&quot; ,\&quot;v1\&quot; ,\&quot;v2\&quot;, \&quot;v3\&quot;&quot;</span>);</div>
 <div class="line"><a name="l02282"></a><span class="lineno"> 2282</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nSensDat; ++i)</div>
 <div class="line"><a name="l02283"></a><span class="lineno"> 2283</span>&#160;        {</div>
-<div class="line"><a name="l02284"></a><span class="lineno"> 2284</span>&#160;            fprintf(fid, <span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
+<div class="line"><a name="l02284"></a><span class="lineno"> 2284</span>&#160;            this-&gt;Print(<span class="stringliteral">&quot;, \&quot;sens_%i\&quot;&quot;</span>, i);</div>
 <div class="line"><a name="l02285"></a><span class="lineno"> 2285</span>&#160;        }</div>
-<div class="line"><a name="l02286"></a><span class="lineno"> 2286</span>&#160;        fprintf(fid, <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l02286"></a><span class="lineno"> 2286</span>&#160;        this-&gt;Print(<span class="stringliteral">&quot;\n&quot;</span>);</div>
 <div class="line"><a name="l02287"></a><span class="lineno"> 2287</span>&#160;    }</div>
 <div class="line"><a name="l02288"></a><span class="lineno"> 2288</span>&#160; </div>
 <div class="line"><a name="l02289"></a><span class="lineno"> 2289</span>&#160;    this-&gt;NewZone();</div>
@@ -2489,69 +2489,73 @@ $(document).ready(function(){initNavTree('postprocessing_8cpp_source.html',''); 
 <div class="line"><a name="l02406"></a><span class="lineno"> 2406</span>&#160;}</div>
 <div class="line"><a name="l02407"></a><span class="lineno"> 2407</span>&#160;<span class="keywordtype">void</span> tecplotfile::CloseFile()</div>
 <div class="line"><a name="l02408"></a><span class="lineno"> 2408</span>&#160;{</div>
-<div class="line"><a name="l02409"></a><span class="lineno"> 2409</span>&#160;    fclose(fid);</div>
-<div class="line"><a name="l02410"></a><span class="lineno"> 2410</span>&#160;}</div>
-<div class="line"><a name="l02411"></a><span class="lineno"> 2411</span>&#160; </div>
-<div class="line"><a name="l02412"></a><span class="lineno"> 2412</span>&#160;<span class="comment">// Test Code</span></div>
-<div class="line"><a name="l02413"></a><span class="lineno"> 2413</span>&#160;<span class="keywordtype">int</span> Test_tecplotfile()</div>
-<div class="line"><a name="l02414"></a><span class="lineno"> 2414</span>&#160;{</div>
-<div class="line"><a name="l02415"></a><span class="lineno"> 2415</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen;</div>
-<div class="line"><a name="l02416"></a><span class="lineno"> 2416</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outmesh;</div>
-<div class="line"><a name="l02417"></a><span class="lineno"> 2417</span>&#160;    <span class="keywordtype">int</span> errFlag;</div>
-<div class="line"><a name="l02418"></a><span class="lineno"> 2418</span>&#160; </div>
-<div class="line"><a name="l02419"></a><span class="lineno"> 2419</span>&#160;    fileToOpen = <span class="stringliteral">&quot;../TESTOUT/tecout.plt&quot;</span>;</div>
-<div class="line"><a name="l02420"></a><span class="lineno"> 2420</span>&#160; </div>
-<div class="line"><a name="l02421"></a><span class="lineno"> 2421</span>&#160;    errFlag = outmesh.OpenFile(fileToOpen);</div>
-<div class="line"><a name="l02422"></a><span class="lineno"> 2422</span>&#160;    <span class="keywordflow">if</span> (errFlag != 0)</div>
-<div class="line"><a name="l02423"></a><span class="lineno"> 2423</span>&#160;    {</div>
-<div class="line"><a name="l02424"></a><span class="lineno"> 2424</span>&#160;        <span class="keywordflow">return</span> (errFlag);</div>
-<div class="line"><a name="l02425"></a><span class="lineno"> 2425</span>&#160;    }</div>
-<div class="line"><a name="l02426"></a><span class="lineno"> 2426</span>&#160;    <span class="keywordflow">return</span> (0);</div>
-<div class="line"><a name="l02427"></a><span class="lineno"> 2427</span>&#160;}</div>
-<div class="line"><a name="l02428"></a><span class="lineno"> 2428</span>&#160; </div>
-<div class="line"><a name="l02429"></a><span class="lineno"> 2429</span>&#160;<span class="keywordtype">int</span> TestCompareReadWrite(<span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen, <a class="code" href="classmesh.html">mesh</a> &amp;blockGrid, <a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;outmesh1)</div>
-<div class="line"><a name="l02430"></a><span class="lineno"> 2430</span>&#160;{</div>
-<div class="line"><a name="l02431"></a><span class="lineno"> 2431</span>&#160;    <span class="keywordtype">int</span> errFlag = 0;</div>
-<div class="line"><a name="l02432"></a><span class="lineno"> 2432</span>&#160;    <span class="keywordtype">int</span> errTest = 0;</div>
-<div class="line"><a name="l02433"></a><span class="lineno"> 2433</span>&#160;    <a class="code" href="classmesh.html">mesh</a> blockGrid2;</div>
-<div class="line"><a name="l02434"></a><span class="lineno"> 2434</span>&#160;    FILE *fid;</div>
-<div class="line"><a name="l02435"></a><span class="lineno"> 2435</span>&#160; </div>
-<div class="line"><a name="l02436"></a><span class="lineno"> 2436</span>&#160;    fid = fopen(fileToOpen, <span class="stringliteral">&quot;w&quot;</span>);</div>
-<div class="line"><a name="l02437"></a><span class="lineno"> 2437</span>&#160;    <span class="keywordflow">if</span> (fid != NULL)</div>
-<div class="line"><a name="l02438"></a><span class="lineno"> 2438</span>&#160;    {</div>
-<div class="line"><a name="l02439"></a><span class="lineno"> 2439</span>&#160;        blockGrid.PrepareForUse();</div>
-<div class="line"><a name="l02440"></a><span class="lineno"> 2440</span>&#160;        blockGrid.SetBorders();</div>
-<div class="line"><a name="l02441"></a><span class="lineno"> 2441</span>&#160;        blockGrid.write(fid);</div>
-<div class="line"><a name="l02442"></a><span class="lineno"> 2442</span>&#160;        fclose(fid);</div>
-<div class="line"><a name="l02443"></a><span class="lineno"> 2443</span>&#160;        fid = fopen(fileToOpen, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><a name="l02444"></a><span class="lineno"> 2444</span>&#160;        <span class="keywordflow">if</span> (fid != NULL)</div>
-<div class="line"><a name="l02445"></a><span class="lineno"> 2445</span>&#160;        {</div>
-<div class="line"><a name="l02446"></a><span class="lineno"> 2446</span>&#160;            blockGrid2.read(fid);</div>
-<div class="line"><a name="l02447"></a><span class="lineno"> 2447</span>&#160;            fclose(fid);</div>
-<div class="line"><a name="l02448"></a><span class="lineno"> 2448</span>&#160;            blockGrid.PrepareForUse();</div>
-<div class="line"><a name="l02449"></a><span class="lineno"> 2449</span>&#160;            blockGrid2.PrepareForUse();</div>
-<div class="line"><a name="l02450"></a><span class="lineno"> 2450</span>&#160; </div>
-<div class="line"><a name="l02451"></a><span class="lineno"> 2451</span>&#160;            outmesh1.PrintMesh(blockGrid2);</div>
-<div class="line"><a name="l02452"></a><span class="lineno"> 2452</span>&#160;            errTest = CompareDisp(blockGrid, blockGrid2);</div>
-<div class="line"><a name="l02453"></a><span class="lineno"> 2453</span>&#160;            <span class="keywordflow">if</span> (!errTest)</div>
-<div class="line"><a name="l02454"></a><span class="lineno"> 2454</span>&#160;            {</div>
-<div class="line"><a name="l02455"></a><span class="lineno"> 2455</span>&#160;                <span class="comment">// blockGrid.disp();</span></div>
-<div class="line"><a name="l02456"></a><span class="lineno"> 2456</span>&#160;                <span class="comment">// blockGrid2.disp();</span></div>
-<div class="line"><a name="l02457"></a><span class="lineno"> 2457</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: Displays were not the same after write read&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l02458"></a><span class="lineno"> 2458</span>&#160;                errFlag++;</div>
-<div class="line"><a name="l02459"></a><span class="lineno"> 2459</span>&#160;            }</div>
-<div class="line"><a name="l02460"></a><span class="lineno"> 2460</span>&#160;        }</div>
-<div class="line"><a name="l02461"></a><span class="lineno"> 2461</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02462"></a><span class="lineno"> 2462</span>&#160;        {</div>
-<div class="line"><a name="l02463"></a><span class="lineno"> 2463</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;File for mesh out failed to open&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02409"></a><span class="lineno"> 2409</span>&#160;    <span class="keywordflow">if</span> (fid != NULL)</div>
+<div class="line"><a name="l02410"></a><span class="lineno"> 2410</span>&#160;    {</div>
+<div class="line"><a name="l02411"></a><span class="lineno"> 2411</span>&#160;        fclose(fid);</div>
+<div class="line"><a name="l02412"></a><span class="lineno"> 2412</span>&#160;        fid = NULL;</div>
+<div class="line"><a name="l02413"></a><span class="lineno"> 2413</span>&#160;    }</div>
+<div class="line"><a name="l02414"></a><span class="lineno"> 2414</span>&#160;}</div>
+<div class="line"><a name="l02415"></a><span class="lineno"> 2415</span>&#160; </div>
+<div class="line"><a name="l02416"></a><span class="lineno"> 2416</span>&#160;<span class="comment">// Test Code</span></div>
+<div class="line"><a name="l02417"></a><span class="lineno"> 2417</span>&#160;<span class="keywordtype">int</span> Test_tecplotfile()</div>
+<div class="line"><a name="l02418"></a><span class="lineno"> 2418</span>&#160;{</div>
+<div class="line"><a name="l02419"></a><span class="lineno"> 2419</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen;</div>
+<div class="line"><a name="l02420"></a><span class="lineno"> 2420</span>&#160;    <a class="code" href="classtecplotfile.html">tecplotfile</a> outmesh;</div>
+<div class="line"><a name="l02421"></a><span class="lineno"> 2421</span>&#160;    <span class="keywordtype">int</span> errFlag;</div>
+<div class="line"><a name="l02422"></a><span class="lineno"> 2422</span>&#160; </div>
+<div class="line"><a name="l02423"></a><span class="lineno"> 2423</span>&#160;    fileToOpen = <span class="stringliteral">&quot;../TESTOUT/tecout.plt&quot;</span>;</div>
+<div class="line"><a name="l02424"></a><span class="lineno"> 2424</span>&#160; </div>
+<div class="line"><a name="l02425"></a><span class="lineno"> 2425</span>&#160;    errFlag = outmesh.OpenFile(fileToOpen);</div>
+<div class="line"><a name="l02426"></a><span class="lineno"> 2426</span>&#160;    <span class="keywordflow">if</span> (errFlag != 0)</div>
+<div class="line"><a name="l02427"></a><span class="lineno"> 2427</span>&#160;    {</div>
+<div class="line"><a name="l02428"></a><span class="lineno"> 2428</span>&#160;        <span class="keywordflow">return</span> (errFlag);</div>
+<div class="line"><a name="l02429"></a><span class="lineno"> 2429</span>&#160;    }</div>
+<div class="line"><a name="l02430"></a><span class="lineno"> 2430</span>&#160;    <span class="keywordflow">return</span> (0);</div>
+<div class="line"><a name="l02431"></a><span class="lineno"> 2431</span>&#160;}</div>
+<div class="line"><a name="l02432"></a><span class="lineno"> 2432</span>&#160; </div>
+<div class="line"><a name="l02433"></a><span class="lineno"> 2433</span>&#160;<span class="keywordtype">int</span> TestCompareReadWrite(<span class="keyword">const</span> <span class="keywordtype">char</span> *fileToOpen, <a class="code" href="classmesh.html">mesh</a> &amp;blockGrid, <a class="code" href="classtecplotfile.html">tecplotfile</a> &amp;outmesh1)</div>
+<div class="line"><a name="l02434"></a><span class="lineno"> 2434</span>&#160;{</div>
+<div class="line"><a name="l02435"></a><span class="lineno"> 2435</span>&#160;    <span class="keywordtype">int</span> errFlag = 0;</div>
+<div class="line"><a name="l02436"></a><span class="lineno"> 2436</span>&#160;    <span class="keywordtype">int</span> errTest = 0;</div>
+<div class="line"><a name="l02437"></a><span class="lineno"> 2437</span>&#160;    <a class="code" href="classmesh.html">mesh</a> blockGrid2;</div>
+<div class="line"><a name="l02438"></a><span class="lineno"> 2438</span>&#160;    FILE *fid;</div>
+<div class="line"><a name="l02439"></a><span class="lineno"> 2439</span>&#160; </div>
+<div class="line"><a name="l02440"></a><span class="lineno"> 2440</span>&#160;    fid = fopen(fileToOpen, <span class="stringliteral">&quot;w&quot;</span>);</div>
+<div class="line"><a name="l02441"></a><span class="lineno"> 2441</span>&#160;    <span class="keywordflow">if</span> (fid != NULL)</div>
+<div class="line"><a name="l02442"></a><span class="lineno"> 2442</span>&#160;    {</div>
+<div class="line"><a name="l02443"></a><span class="lineno"> 2443</span>&#160;        blockGrid.PrepareForUse();</div>
+<div class="line"><a name="l02444"></a><span class="lineno"> 2444</span>&#160;        blockGrid.SetBorders();</div>
+<div class="line"><a name="l02445"></a><span class="lineno"> 2445</span>&#160;        blockGrid.write(fid);</div>
+<div class="line"><a name="l02446"></a><span class="lineno"> 2446</span>&#160;        fclose(fid);</div>
+<div class="line"><a name="l02447"></a><span class="lineno"> 2447</span>&#160;        fid = fopen(fileToOpen, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><a name="l02448"></a><span class="lineno"> 2448</span>&#160;        <span class="keywordflow">if</span> (fid != NULL)</div>
+<div class="line"><a name="l02449"></a><span class="lineno"> 2449</span>&#160;        {</div>
+<div class="line"><a name="l02450"></a><span class="lineno"> 2450</span>&#160;            blockGrid2.read(fid);</div>
+<div class="line"><a name="l02451"></a><span class="lineno"> 2451</span>&#160;            fclose(fid);</div>
+<div class="line"><a name="l02452"></a><span class="lineno"> 2452</span>&#160;            blockGrid.PrepareForUse();</div>
+<div class="line"><a name="l02453"></a><span class="lineno"> 2453</span>&#160;            blockGrid2.PrepareForUse();</div>
+<div class="line"><a name="l02454"></a><span class="lineno"> 2454</span>&#160; </div>
+<div class="line"><a name="l02455"></a><span class="lineno"> 2455</span>&#160;            outmesh1.PrintMesh(blockGrid2);</div>
+<div class="line"><a name="l02456"></a><span class="lineno"> 2456</span>&#160;            errTest = CompareDisp(blockGrid, blockGrid2);</div>
+<div class="line"><a name="l02457"></a><span class="lineno"> 2457</span>&#160;            <span class="keywordflow">if</span> (!errTest)</div>
+<div class="line"><a name="l02458"></a><span class="lineno"> 2458</span>&#160;            {</div>
+<div class="line"><a name="l02459"></a><span class="lineno"> 2459</span>&#160;                <span class="comment">// blockGrid.disp();</span></div>
+<div class="line"><a name="l02460"></a><span class="lineno"> 2460</span>&#160;                <span class="comment">// blockGrid2.disp();</span></div>
+<div class="line"><a name="l02461"></a><span class="lineno"> 2461</span>&#160;                cerr &lt;&lt; <span class="stringliteral">&quot;Error: Displays were not the same after write read&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02462"></a><span class="lineno"> 2462</span>&#160;                errFlag++;</div>
+<div class="line"><a name="l02463"></a><span class="lineno"> 2463</span>&#160;            }</div>
 <div class="line"><a name="l02464"></a><span class="lineno"> 2464</span>&#160;        }</div>
-<div class="line"><a name="l02465"></a><span class="lineno"> 2465</span>&#160;    }</div>
-<div class="line"><a name="l02466"></a><span class="lineno"> 2466</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02467"></a><span class="lineno"> 2467</span>&#160;    {</div>
-<div class="line"><a name="l02468"></a><span class="lineno"> 2468</span>&#160;        cout &lt;&lt; <span class="stringliteral">&quot;File for mesh out failed to open&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02465"></a><span class="lineno"> 2465</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02466"></a><span class="lineno"> 2466</span>&#160;        {</div>
+<div class="line"><a name="l02467"></a><span class="lineno"> 2467</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;File for mesh out failed to open&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02468"></a><span class="lineno"> 2468</span>&#160;        }</div>
 <div class="line"><a name="l02469"></a><span class="lineno"> 2469</span>&#160;    }</div>
-<div class="line"><a name="l02470"></a><span class="lineno"> 2470</span>&#160;    <span class="keywordflow">return</span> (errFlag);</div>
-<div class="line"><a name="l02471"></a><span class="lineno"> 2471</span>&#160;}</div>
+<div class="line"><a name="l02470"></a><span class="lineno"> 2470</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02471"></a><span class="lineno"> 2471</span>&#160;    {</div>
+<div class="line"><a name="l02472"></a><span class="lineno"> 2472</span>&#160;        cout &lt;&lt; <span class="stringliteral">&quot;File for mesh out failed to open&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l02473"></a><span class="lineno"> 2473</span>&#160;    }</div>
+<div class="line"><a name="l02474"></a><span class="lineno"> 2474</span>&#160;    <span class="keywordflow">return</span> (errFlag);</div>
+<div class="line"><a name="l02475"></a><span class="lineno"> 2475</span>&#160;}</div>
 <div class="ttc" id="a_r_s_v_scalc_8hpp_html"><div class="ttname"><a href="_r_s_v_scalc_8hpp.html">RSVScalc.hpp</a></div><div class="ttdoc">Provides the infrastructure for calculation of the RSVS equations.</div></div>
 <div class="ttc" id="aclass_hashed_vector_html"><div class="ttname"><a href="class_hashed_vector.html">HashedVector&lt; int, int &gt;</a></div></div>
 <div class="ttc" id="aclass_r_s_v_scalc_html"><div class="ttname"><a href="class_r_s_v_scalc.html">RSVScalc</a></div><div class="ttdoc">Class to handle the RSVS calculation.</div><div class="ttdef"><b>Definition:</b> <a href="_r_s_v_scalc_8hpp_source.html#l00120">RSVScalc.hpp:121</a></div></div>
