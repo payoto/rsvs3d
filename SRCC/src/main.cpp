@@ -133,7 +133,7 @@ execution flow of the rest of the program.
 
 @param[in]  argc       The number of arguments
 @param      argv       the arguments
-@param      paramconf  The parameter struncture
+@param      paramconf  The parameter structure
 
 @return     Number indicating the state of the program after parsing: 0   does
             nothing; 1   Run RSVS; -1  No exec stops it; -2  Error parsing

@@ -56,6 +56,9 @@ or
     git clone https://github.com/payoto/rsvs3d
     git submodule update --init --recursive
 
+If you are using VS code and are looking to develop the project, my settings for this workspace
+are stored in [this gist](https://gist.github.com/payoto/877dfeb6101850877b74dcdd1bbebe63).
+
 ## Required tools for compilation
 
 For this code to work necessary programs:
