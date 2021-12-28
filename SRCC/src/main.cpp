@@ -66,6 +66,7 @@ int RSVSExecution(int argc, char *argv[])
     else if (parseOut.execFlow == -3)
     {
 #ifndef RSVS_NOTESTS
+        polyscopersvs::test::TEST_HEADLESS = parseOut.isHeadless;
         ExecuteTests(parseOut);
 #else
         RSVS3D_ERROR("Tests not compiled; use `make all` to produce an executable"

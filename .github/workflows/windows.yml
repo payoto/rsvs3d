@@ -23,5 +23,5 @@ jobs:
           name: RSVS3D-windows
           path: SRCC/RSVS3D*
       - name: run tests
-        run: bin/RSVS3D.exe --test
+        run: bin/RSVS3D.exe --test --no-gui
         working-directory: SRCC/

@@ -24,7 +24,7 @@
 #include <vector>
 
 bool polyscopersvs::POLYSCOPE_INITIALISED = false;
-
+bool polyscopersvs::test::TEST_HEADLESS = false;
 namespace polyscopersvs
 {
 #ifdef HEADLESS
@@ -767,12 +767,11 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
 /**
  * @brief Should initialise polyscope
  *
- * @return int The error code: 0 indicates succes, all other numbers are failures
+ * @return int The error code: 0 indicates success, all other numbers are failures
  */
-
 int polyscopersvs::test::init()
 {
-    polyscopersvs::PolyScopeRSVS viewer;
+    polyscopersvs::PolyScopeRSVS viewer(polyscopersvs::test::TEST_HEADLESS);
     assert(polyscopersvs::POLYSCOPE_INITIALISED);
     return 0;
 }
@@ -780,11 +779,11 @@ int polyscopersvs::test::init()
 /**
  * @brief Should display the polyscope window
  *
- * @return int The error code: 0 indicates succes, all other numbers are failures
+ * @return int The error code: 0 indicates success, all other numbers are failures
  */
 int polyscopersvs::test::show()
 {
-    polyscopersvs::PolyScopeRSVS viewer;
+    polyscopersvs::PolyScopeRSVS viewer(polyscopersvs::test::TEST_HEADLESS);
     viewer.show(30);
     return 0;
 }
@@ -797,7 +796,7 @@ int polyscopersvs::test::show()
 int polyscopersvs::test::meshShow()
 {
     int errorOut = 0;
-    polyscopersvs::PolyScopeRSVS viewer;
+    polyscopersvs::PolyScopeRSVS viewer(polyscopersvs::test::TEST_HEADLESS);
     mesh mesh1;
 
     std::array<int, 3> dims = {2, 3, 4};

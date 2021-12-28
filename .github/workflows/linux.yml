@@ -25,5 +25,5 @@ jobs:
           name: RSVS3D-ubuntu
           path: SRCC/RSVS3D
       - name: run tests
-        run: ./RSVS3D --test
+        run: ./RSVS3D --test --no-gui
         working-directory: SRCC/
