@@ -121,6 +121,8 @@ class PolyScopeRSVS
 /// Test functions for polyscope-RSVS integration
 namespace test
 {
+/// Boolean controlling wether tests are run in headless mode or not
+extern bool TEST_HEADLESS;
 int init();
 int show();
 int meshShow();

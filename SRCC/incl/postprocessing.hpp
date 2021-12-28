@@ -217,12 +217,12 @@ class tecplotfile
 
     void NewZone()
     {
-        fprintf(fid, "ZONE\n");
+        this->Print("ZONE\n");
         nZones++;
     }
     void StrandTime(int strandID, double timeStep)
     {
-        fprintf(fid, "STRANDID = %i \nSOLUTIONTIME = %.10lf \n", strandID, timeStep);
+        this->Print("STRANDID = %i \nSOLUTIONTIME = %.10lf \n", strandID, timeStep);
         if (!rsvs3d::logicals::__isfound(this->strands.find(strandID)))
         {
             this->strands.push_back(strandID);
@@ -231,7 +231,10 @@ class tecplotfile
 
     int Print(const char *format, ...)
     { // Mimics the printf function hides fid
-
+        if (!this->isOpen())
+        {
+            return 0;
+        }
         va_list arg;
         int i;
 
@@ -252,7 +255,7 @@ class tecplotfile
     }
     void NewLine()
     {
-        fprintf(this->fid, "\n");
+        this->Print("\n");
         this->ResetLine();
     };
 };

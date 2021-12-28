@@ -564,8 +564,8 @@ int tecplotfile::PrintMesh(const mesh &meshout, int strandID, double timeStep, i
     }
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" "
-                     ",\"v2\", \"v3\"\n");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" "
+                    ",\"v2\", \"v3\"\n");
     }
 
     this->NewZone();
@@ -697,7 +697,7 @@ int tecplotfile::PrintSnake(std::string snakeData, const snake &snakeout, int st
 
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
     }
 
     this->NewZone();
@@ -802,7 +802,7 @@ int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, int strandID
     int forceOutType;
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
     }
 
     this->NewZone();
@@ -863,8 +863,8 @@ int tecplotfile::PrintVolumeDat(const mesh &meshout, int shareZone, int strandID
 }
 int tecplotfile::DefShareZoneVolume(int shareZone, int nVertDat)
 {
-    fprintf(fid, "CONNECTIVITYSHAREZONE=%i\n", shareZone);
-    fprintf(fid, "VARSHARELIST=([%i-%i]=%i )\n", 1, nVertDat, shareZone);
+    this->Print("CONNECTIVITYSHAREZONE=%i\n", shareZone);
+    this->Print("VARSHARELIST=([%i-%i]=%i )\n", 1, nVertDat, shareZone);
 
     return (0);
 }
@@ -1309,7 +1309,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, triarray triang
     {
         if (nZones == 0)
         {
-            fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
+            this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
         }
 
         this->NewZone();
@@ -1685,7 +1685,7 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray tr
     {
         if (nZones == 0)
         {
-            fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
+            this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"\n");
         }
 
         this->NewZone();
@@ -1738,86 +1738,86 @@ int tecplotfile::PrintTriangulation(const triangulation &triout, trisurfarray tr
 
 void tecplotfile::ZoneHeaderPolyhedron(int nVert, int nVolu, int nSurf, int totNumFaceNode, int nVertDat, int nCellDat)
 {
-    fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nVolu);
+    this->Print("ZONETYPE = FEPOLYHEDRON\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nVolu);
     this->Print("FACES = %i\n", nSurf);
-    fprintf(fid, "TOTALNUMFACENODES = %i\n", totNumFaceNode);
-    fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
-    fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("TOTALNUMFACENODES = %i\n", totNumFaceNode);
+    this->Print("NUMCONNECTEDBOUNDARYFACES = 0\n");
+    this->Print("TOTALNUMBOUNDARYCONNECTIONS = 0\n");
+    this->Print("VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderPolygon(int nVert, int nEdge, int nSurf, int nVertDat, int nCellDat)
 {
-    fprintf(fid, "ZONETYPE = FEPOLYGON\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nSurf);
+    this->Print("ZONETYPE = FEPOLYGON\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nSurf);
     this->Print("FACES = %i\n", nEdge);
-    fprintf(fid, "TOTALNUMFACENODES = %i\n", 2 * nEdge);
-    fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
-    fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("TOTALNUMFACENODES = %i\n", 2 * nEdge);
+    this->Print("NUMCONNECTEDBOUNDARYFACES = 0\n");
+    this->Print("TOTALNUMBOUNDARYCONNECTIONS = 0\n");
+    this->Print("VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderFelineseg(int nVert, int nEdge, int nVertDat, int nCellDat)
 {
-    fprintf(fid, "ZONETYPE = FELINESEG\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nEdge);
+    this->Print("ZONETYPE = FELINESEG\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nEdge);
     this->Print("FACES = %i\n", nEdge);
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("VARLOCATION=([%i-%i]=NODAL ,[%i-%i]=CELLCENTERED)\n", 1, nVertDat, nVertDat + 1, nVertDat + nCellDat);
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderPolyhedronSnake(int nVert, int nVolu, int nSurf, int totNumFaceNode, int nVertDat,
                                             int nCellDat, int nSensDat)
 {
-    fprintf(fid, "ZONETYPE = FEPOLYHEDRON\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nVolu);
+    this->Print("ZONETYPE = FEPOLYHEDRON\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nVolu);
     this->Print("FACES = %i\n", nSurf);
-    fprintf(fid, "TOTALNUMFACENODES = %i\n", totNumFaceNode);
-    fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
-    fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
+    this->Print("TOTALNUMFACENODES = %i\n", totNumFaceNode);
+    this->Print("NUMCONNECTEDBOUNDARYFACES = 0\n");
+    this->Print("TOTALNUMBOUNDARYCONNECTIONS = 0\n");
+    this->Print("VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
 
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderPolygonSnake(int nVert, int nEdge, int nSurf, int nVertDat, int nCellDat, int nSensDat)
 {
-    fprintf(fid, "ZONETYPE = FEPOLYGON\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nSurf);
+    this->Print("ZONETYPE = FEPOLYGON\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nSurf);
     this->Print("FACES = %i\n", nEdge);
-    fprintf(fid, "TOTALNUMFACENODES = %i\n", 2 * nEdge);
-    fprintf(fid, "NUMCONNECTEDBOUNDARYFACES = 0\n");
-    fprintf(fid, "TOTALNUMBOUNDARYCONNECTIONS = 0\n");
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
+    this->Print("TOTALNUMFACENODES = %i\n", 2 * nEdge);
+    this->Print("NUMCONNECTEDBOUNDARYFACES = 0\n");
+    this->Print("TOTALNUMBOUNDARYCONNECTIONS = 0\n");
+    this->Print("VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
 
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderFelinesegSnake(int nVert, int nEdge, int nVertDat, int nCellDat, int nSensDat)
 {
-    fprintf(fid, "ZONETYPE = FELINESEG\n");
-    fprintf(fid, "NODES = %i\n", nVert);
-    fprintf(fid, "ELEMENTS = %i\n", nEdge);
+    this->Print("ZONETYPE = FELINESEG\n");
+    this->Print("NODES = %i\n", nVert);
+    this->Print("ELEMENTS = %i\n", nEdge);
     this->Print("FACES = %i\n", nEdge);
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
+    this->Print("VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
 
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 void tecplotfile::ZoneHeaderOrdered(int nVert, int nVertDat, int nCellDat, int nSensDat)
 {
-    fprintf(fid, "ZONETYPE = ORDERED\n");
-    fprintf(fid, "I = %i\n", nVert);
-    fprintf(fid, "VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
-    fprintf(fid, "DATAPACKING=BLOCK\n");
+    this->Print("ZONETYPE = ORDERED\n");
+    this->Print("I = %i\n", nVert);
+    this->Print("VARLOCATION=([%i-%i]=NODAL)\n", 1, nVertDat + nCellDat + nSensDat);
+    this->Print("DATAPACKING=BLOCK\n");
 }
 
 // Print snake with sensitivity
@@ -1839,12 +1839,12 @@ int tecplotfile::PrintSnakeSensitivity(const triangulation &triRSVS, const RSVSc
 
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
         for (int i = 0; i < calcObj.numConstr(); ++i)
         {
-            fprintf(fid, ", \"sens_%i\"", i);
+            this->Print(", \"sens_%i\"", i);
         }
-        fprintf(fid, "\n");
+        this->Print("\n");
     }
 
     this->NewZone();
@@ -1939,18 +1939,18 @@ int tecplotfile::PrintSnakeGradients(const triangulation &triRSVS, const RSVScal
     int nPreConstr = 6;
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
-        fprintf(fid, ", \"dObj\"");
-        fprintf(fid, ", \"dLag\"");
-        fprintf(fid, ", \"HObj\"");
-        fprintf(fid, ", \"HConstr\"");
-        fprintf(fid, ", \"HLag\"");
-        fprintf(fid, ", \"deltaDV\"");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
+        this->Print(", \"dObj\"");
+        this->Print(", \"dLag\"");
+        this->Print(", \"HObj\"");
+        this->Print(", \"HConstr\"");
+        this->Print(", \"HLag\"");
+        this->Print(", \"deltaDV\"");
         for (int i = 0; i < calcObj.numConstr(); ++i)
         {
-            fprintf(fid, ", \"dConstr_%i\"", i);
+            this->Print(", \"dConstr_%i\"", i);
         }
-        fprintf(fid, "\n");
+        this->Print("\n");
     }
 
     this->NewZone();
@@ -2145,12 +2145,12 @@ int tecplotfile::PrintSnakeSensitivityTime(const triangulation &triRSVS, const R
 
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
         for (int i = 0; i < nSensDat; ++i)
         {
-            fprintf(fid, ", \"sens_%i\"", i);
+            this->Print(", \"sens_%i\"", i);
         }
-        fprintf(fid, "\n");
+        this->Print("\n");
     }
 
     this->NewZone();
@@ -2278,12 +2278,12 @@ int tecplotfile::PrintSnakeSensitivityVector(const triangulation &triRSVS, const
 
     if (nZones == 0)
     {
-        fprintf(fid, "VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
+        this->Print("VARIABLES = \"X\" ,\"Y\" , \"Z\" ,\"v1\" ,\"v2\", \"v3\"");
         for (int i = 0; i < nSensDat; ++i)
         {
-            fprintf(fid, ", \"sens_%i\"", i);
+            this->Print(", \"sens_%i\"", i);
         }
-        fprintf(fid, "\n");
+        this->Print("\n");
     }
 
     this->NewZone();
@@ -2406,7 +2406,11 @@ int tecplotfile::OpenFile(const char *str, const char *mode)
 }
 void tecplotfile::CloseFile()
 {
-    fclose(fid);
+    if (fid != NULL)
+    {
+        fclose(fid);
+        fid = NULL;
+    }
 }
 
 // Test Code
