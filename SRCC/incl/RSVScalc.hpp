@@ -27,6 +27,7 @@ class devparam;
 #include <iostream>
 #include <vector>
 
+#include "SnakeVelocityCalculator.hpp"
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
@@ -118,17 +119,6 @@ class SparseMatrixTriplet : protected TripletMap
     void SetEqual(Eigen::MatrixXd &targ);
 };
 
-class RSVScalcBase
-{
-  public:
-    virtual void setDevParameters(const param::dev::devparam &) = 0;
-    virtual void CalculateTriangulation(const triangulation &, int = 0) = 0;
-    virtual void CheckAndCompute(int, bool = false) = 0;
-    virtual void ReturnConstrToMesh(triangulation &) const = 0;
-    virtual void ReturnVelocities(triangulation &) = 0;
-    virtual void ConvergenceLog(std::ofstream &, int = 3) const = 0;
-};
-
 /**
  * Class to handle the RSVS calculation.
  *
@@ -136,7 +126,7 @@ class RSVScalcBase
  * to update the velocity and volumes. It uses an SQP algorithm to compute the
  * velocities.
  */
-class RSVScalc : public RSVScalcBase
+class RSVScalc : public rsvs3d::SnakeVelocityCalculator
 {
   protected:
     /// Number of design variables

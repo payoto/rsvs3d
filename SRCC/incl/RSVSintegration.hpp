@@ -15,13 +15,15 @@
 namespace integrate
 {
 class RSVSclass;
-
 } // namespace integrate
+namespace rsvs3d
+{
+class SnakeVelocityCalculator;
+}
 class triangulation;
 class snake;
 class mesh;
 class tecplotfile;
-class RSVScalcBase;
 namespace param
 {
 class grid;
@@ -47,7 +49,7 @@ class PolyScopeRSVS;
 
 namespace integrate
 {
-typedef std::shared_ptr<RSVScalcBase> RSVSCalculator;
+typedef std::shared_ptr<rsvs3d::SnakeVelocityCalculator> RSVSCalculator;
 } // namespace integrate
 // ================================
 // declarations

@@ -18,7 +18,7 @@
 #include <iostream>
 #include <memory>
 
-#include "RSVScalc.hpp"
+#include "SnakeVelocityCalculator.hpp"
 #include "mesh.hpp"
 #include "parameters.hpp"
 #include "polyscopersvs.hpp"
@@ -33,7 +33,7 @@
 //
 namespace integrate
 {
-typedef std::shared_ptr<RSVScalcBase> RSVSCalculator;
+typedef std::shared_ptr<rsvs3d::SnakeVelocityCalculator> RSVSCalculator;
 class RSVStecplot
 {
   public:
