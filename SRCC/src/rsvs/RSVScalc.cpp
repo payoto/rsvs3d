@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "matrixtools.hpp"
+#include "parameters.hpp"
 #include "snake.hpp"
 #include "triangulate.hpp"
 #include "vectorarray.hpp"
@@ -579,6 +580,15 @@ void RSVScalc::PrintTimers() const
     std::cout << " t1 " << rsvs3d::Clock2ms(this->timer1) << ",";
     std::cout << " t2 " << rsvs3d::Clock2ms(this->timer2) << ",";
     std::cout << " t3 " << rsvs3d::Clock2ms(this->timer3) << ",";
+}
+
+void RSVScalc::setDevParameters(const param::dev::devparam &devset)
+{
+
+    this->limLag = devset.limitlagrangian;
+    this->SetUseSurfCentreDeriv(devset.surfcentrejacobian);
+    this->SetUseSurfCentreHessian(devset.surfcentrehessian);
+    this->SetSparseDVcutoff(devset.mindesvarsparse);
 }
 
 void SparseMatrixTriplet::SetEqual(MatrixXd_sparse &targ)

@@ -99,6 +99,8 @@ the restricted surface.
 class snaking
 {
   public:
+    // Velocity engine
+    std::string engine;
     /// Distance along edge at which a vertex is considered
     /// arrived regardless of "d" and "v"
     double arrivaltolerance;

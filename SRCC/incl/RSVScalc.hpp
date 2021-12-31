@@ -12,6 +12,14 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
+namespace param
+{
+namespace dev
+{
+class devparam;
+}
+} // namespace param
+
 //=================================
 // included dependencies
 #include <Eigen>
@@ -110,6 +118,17 @@ class SparseMatrixTriplet : protected TripletMap
     void SetEqual(Eigen::MatrixXd &targ);
 };
 
+class RSVScalcBase
+{
+  public:
+    virtual void setDevParameters(const param::dev::devparam &) = 0;
+    virtual void CalculateTriangulation(const triangulation &, int = 0) = 0;
+    virtual void CheckAndCompute(int, bool = false) = 0;
+    virtual void ReturnConstrToMesh(triangulation &) const = 0;
+    virtual void ReturnVelocities(triangulation &) = 0;
+    virtual void ConvergenceLog(std::ofstream &, int = 3) const = 0;
+};
+
 /**
  * Class to handle the RSVS calculation.
  *
@@ -117,7 +136,7 @@ class SparseMatrixTriplet : protected TripletMap
  * to update the velocity and volumes. It uses an SQP algorithm to compute the
  * velocities.
  */
-class RSVScalc
+class RSVScalc : public RSVScalcBase
 {
   protected:
     /// Number of design variables
@@ -337,7 +356,7 @@ class RSVScalc
      *
      * @param      triRSVS  The triangulation object.
      */
-    void ReturnConstrToMesh(triangulation &triRSVS) const;
+    void ReturnConstrToMesh(triangulation &triRSVS) const override;
 
     /**
      * @brief      Returns a constraint to the mesh.
@@ -355,7 +374,7 @@ class RSVScalc
      * @param[in]  calcMethod  Calculation method for SQP. Check
      *                         :meth:RSVScalc::ComputeSQPstep for detail.
      */
-    void CheckAndCompute(int calcMethod = 0, bool sensCalc = false);
+    void CheckAndCompute(int calcMethod = 0, bool sensCalc = false) override;
 
     /**
      * Calculates the next SQP step.
@@ -435,7 +454,7 @@ class RSVScalc
      * @param      triRSVS  The triangulation object, affects the
      *                      triangulation::snakeDep attribute.
      */
-    void ReturnVelocities(triangulation &triRSVS);
+    void ReturnVelocities(triangulation &triRSVS) override;
     void ReturnSensitivities(const triangulation &triRSVS, std::vector<double> &sensVec, int constrNum) const;
     void ReturnGradient(const triangulation &triRSVS, std::vector<double> &sensVec, int constrNum) const;
     /**
@@ -467,6 +486,7 @@ class RSVScalc
      */
     void ConvergenceLog(std::ofstream &out, int loglvl = 3) const;
 
+    void setDevParameters(const param::dev::devparam &devset) override;
     void SetUseSurfCentreDeriv(int in)
     {
         this->useSurfCentreDeriv = in;

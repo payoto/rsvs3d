@@ -300,12 +300,19 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj)
     // tecplotfile outSnake;
     // Locally defined
 
-    integrate::ApplyDevSettings(RSVSobj);
-
     param::parameters origconf;
 
     origconf = RSVSobj.paramconf;
     RSVSobj.paramconf.PrepareForUse();
+    if (origconf.snak.engine == "rsvs")
+    {
+        RSVSobj.calcObj = make_shared<RSVScalc>();
+    }
+    else
+    {
+        RSVS3D_ERROR_ARGUMENT("Unknown engine option pqssed to the RSVS");
+    }
+    integrate::ApplyDevSettings(RSVSobj);
 
     RSVSobj.rsvsSnake.clear();
     RSVSobj.voluMesh.clear();
@@ -331,10 +338,7 @@ void integrate::ApplyDevSettings(integrate::RSVSclass &RSVSobj)
 {
     auto &devset = RSVSobj.paramconf.dev;
 
-    RSVSobj.calcObj.limLag = devset.limitlagrangian;
-    RSVSobj.calcObj.SetUseSurfCentreDeriv(devset.surfcentrejacobian);
-    RSVSobj.calcObj.SetUseSurfCentreHessian(devset.surfcentrehessian);
-    RSVSobj.calcObj.SetSparseDVcutoff(devset.mindesvarsparse);
+    RSVSobj.calcObj->setDevParameters(devset);
     RSVSobj.rsvsSnake.SetSnaxDistanceLimit_conserveShape(devset.snaxDistanceLimit_conserveShape);
     SetEnvironmentEpsilon(devset.rsvsepsilons);
 }
@@ -343,7 +347,7 @@ void integrate::prepare::Mesh(const param::grid &gridconf, const param::ioin &io
 {
     /*prepares the snake and volume meshes gor the RSVS process*/
     // Local declaration
-
+    // Used to calculate volumes in the mesh
     RSVScalc calcVolus, calcSnakVolu;
 
     if (gridconf.activegrid.compare("voxel") == 0)
@@ -649,20 +653,20 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
     for (stepNum = 0; stepNum < maxStep; ++stepNum)
     {
         start_s = clock();
-        // RSVSobj.calcObj.limLag=10000.0;
+        // RSVSobj.calcObj->limLag=10000.0;
         std::cout << std::endl << "Step " << std::setw(4) << stepNum << " ";
-        RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
+        RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
         start_s = rsvs3d::TimeStamp(" deriv:", start_s);
-        RSVSobj.calcObj.CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm);
+        RSVSobj.calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm);
         // Second cycle
         // start_s=rsvs3d::TimeStamp(" solve:", start_s);
-        // RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
+        // RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
         // start_s=rsvs3d::TimeStamp(" deriv:", start_s);
-        // RSVSobj.calcObj.CheckAndCompute(
+        // RSVSobj.calcObj->CheckAndCompute(
         // 	RSVSobj.paramconf.rsvs.solveralgorithm);
         // End of Second cycle
-        RSVSobj.calcObj.ReturnConstrToMesh(RSVSobj.rsvsTri);
-        RSVSobj.calcObj.ReturnVelocities(RSVSobj.rsvsTri);
+        RSVSobj.calcObj->ReturnConstrToMesh(RSVSobj.rsvsTri);
+        RSVSobj.calcObj->ReturnVelocities(RSVSobj.rsvsTri);
         start_s = rsvs3d::TimeStamp(" solve:", start_s);
 
         CalculateNoNanSnakeVel(RSVSobj.rsvsSnake);
@@ -724,7 +728,8 @@ void integrate::execute::Logging(integrate::RSVSclass &RSVSobj, double totT, int
     }
     if (integrate::constants::outputs::printGradientsSnake(logLvl))
     {
-        integrate::execute::logging::Gradients(RSVSobj.calcObj, RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT);
+        integrate::execute::logging::Gradients(RSVSobj.calcObj, RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT,
+                                               RSVSobj.paramconf.snak.engine);
     }
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
@@ -774,7 +779,8 @@ void integrate::execute::PostProcessing(integrate::RSVSclass &RSVSobj, double to
     }
     if (integrate::constants::outputs::printGradientsSnake(logLvl))
     {
-        integrate::execute::postprocess::Gradients(RSVSobj.calcObj, RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT);
+        integrate::execute::postprocess::Gradients(RSVSobj.calcObj, RSVSobj.rsvsTri, RSVSobj.outgradientsnake, totT,
+                                                   RSVSobj.paramconf.snak.engine);
     }
     if (integrate::constants::outputs::printVectorSnake(logLvl))
     {
@@ -820,10 +826,14 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj)
             RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
             tecplotfile tecsens;
             tecsens.OpenFile(tecFileToOpen.c_str());
-            RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
-            RSVSobj.calcObj.CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm, true);
+            RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+            RSVSobj.calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm, true);
             RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
-            tecsens.PrintSnakeSensitivityVector(RSVSobj.rsvsTri, RSVSobj.calcObj);
+            if (RSVSobj.paramconf.snak.engine == "rsvs")
+            {
+                const RSVScalc *calcObj = RSVSobj.calcObj.get();
+                tecsens.PrintSnakeSensitivityVector(RSVSobj.rsvsTri, *calcObj);
+            }
         }
         else
         {
@@ -843,11 +853,11 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj)
 // 			logging
 // ====================
 
-void integrate::execute::logging::Log(std::ofstream &logFile, RSVScalc &calcObj, int loglvl)
+void integrate::execute::logging::Log(std::ofstream &logFile, RSVSCalculator &calcObj, int loglvl)
 {
     // Make a logging function for
     // volume convergence and velocity convergence
-    calcObj.ConvergenceLog(logFile, loglvl);
+    calcObj->ConvergenceLog(logFile, loglvl);
 }
 
 void integrate::execute::logging::Snake(tecplotfile &outSnake, snake &rsvsSnake, mesh &voluMesh, double totT,
@@ -910,10 +920,15 @@ void integrate::execute::logging::FullTecplot(tecplotfile &outSnake, snake &rsvs
     }
 }
 
-void integrate::execute::logging::Gradients(const RSVScalc &calcObj, const triangulation &rsvsTri,
-                                            tecplotfile &outgradientsnake, double totT)
+void integrate::execute::logging::Gradients(const RSVSCalculator &calcObj, const triangulation &rsvsTri,
+                                            tecplotfile &outgradientsnake, double totT,
+                                            const std::string &snakingEngine)
 {
-    outgradientsnake.PrintSnakeGradients(rsvsTri, calcObj, 1, totT);
+    if (snakingEngine == "rsvs")
+    {
+        const RSVScalc *calcObjChild = calcObj.get();
+        outgradientsnake.PrintSnakeGradients(rsvsTri, *calcObjChild, 1, totT);
+    }
 }
 
 void integrate::execute::logging::SnakeVectors(tecplotfile &outSnake, snake &rsvsSnake, double totT)
@@ -940,7 +955,7 @@ void integrate::execute::logging::SnakePolyscope(polyscopersvs::PolyScopeRSVS &v
 // 		execute
 // 			postprocess
 // ====================
-void integrate::execute::postprocess::Log(std::ofstream &logFile, RSVScalc &calcObj, int loglvl)
+void integrate::execute::postprocess::Log(std::ofstream &logFile, RSVSCalculator &calcObj, int loglvl)
 {
     integrate::execute::logging::Log(logFile, calcObj, loglvl + 2);
 }
@@ -975,10 +990,11 @@ void integrate::execute::postprocess::FullTecplot(tecplotfile &outSnake, snake &
     integrate::execute::logging::FullTecplot(outSnake, rsvsSnake, rsvsTri, voluMesh, totT, nVoluZone, stepNum);
 }
 
-void integrate::execute::postprocess::Gradients(const RSVScalc &calcObj, const triangulation &rsvsTri,
-                                                tecplotfile &outgradientsnake, double totT)
+void integrate::execute::postprocess::Gradients(const RSVSCalculator &calcObj, const triangulation &rsvsTri,
+                                                tecplotfile &outgradientsnake, double totT,
+                                                const std::string &snakingEngine)
 {
-    integrate::execute::logging::Gradients(calcObj, rsvsTri, outgradientsnake, totT);
+    integrate::execute::logging::Gradients(calcObj, rsvsTri, outgradientsnake, totT, snakingEngine);
 }
 // ====================
 // integrate

@@ -172,6 +172,7 @@ void param::voronoi::ReadPoints()
 
 param::snaking::snaking()
 {
+    this->engine = "rsvs";
     this->arrivaltolerance = 1e-7;
     this->multiarrivaltolerance = 1e-2;
     this->snaxtimestep = 0.9;
@@ -190,7 +191,7 @@ void param::to_json(json &j, const snaking &p)
         {"arrivaltolerance", p.arrivaltolerance}, {"multiarrivaltolerance", p.multiarrivaltolerance},
         {"snaxtimestep", p.snaxtimestep},         {"snaxdiststep", p.snaxdiststep},
         {"initboundary", p.initboundary},         {"maxsteps", p.maxsteps},
-        {"spawnposition", p.spawnposition},
+        {"spawnposition", p.spawnposition},       {"engine", p.engine},
     };
 }
 void param::from_json(const json &j, snaking &p)
@@ -202,6 +203,7 @@ void param::from_json(const json &j, snaking &p)
     j.at("initboundary").get_to(p.initboundary);
     j.at("maxsteps").get_to(p.maxsteps);
     j.at("spawnposition").get_to(p.spawnposition);
+    j.at("engine").get_to(p.engine);
 }
 void param::snaking::PrepareForUse()
 {

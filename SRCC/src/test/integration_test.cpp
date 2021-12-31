@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <tuple>
 
@@ -41,15 +42,16 @@ processed_derivative test_RSVScalcvsFD(integrate::RSVSclass &RSVSobj, bool SetUs
 {
 
     std::tuple<double, Eigen::MatrixXd, double> testtuple;
-
+    auto calcObj = std::make_shared<RSVScalc>();
+    RSVSobj.calcObj = calcObj;
     auto &sn = RSVSobj.rsvsSnake;
-    RSVSobj.calcObj.SetUseSurfCentreDeriv(SetUseSurfCentreDeriv);
-    RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
-    int dvNum = RSVSobj.calcObj.dvMap.find(testVert);
-    auto analyticalDObj = RSVSobj.calcObj.dObj;
-    auto analyticalDConstr = RSVSobj.calcObj.dConstr;
-    auto constrPreFD = RSVSobj.calcObj.constr;
-    auto objPreFd = RSVSobj.calcObj.obj;
+    calcObj->SetUseSurfCentreDeriv(SetUseSurfCentreDeriv);
+    RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+    int dvNum = calcObj->dvMap.find(testVert);
+    auto analyticalDObj = calcObj->dObj;
+    auto analyticalDConstr = calcObj->dConstr;
+    auto constrPreFD = calcObj->constr;
+    auto objPreFd = calcObj->obj;
     sn.snaxs[sn.snaxs.find(testVert)].d += fdStep;
     sn.snaxs.PrepareForUse();
     sn.UpdateCoord();
@@ -60,16 +62,15 @@ processed_derivative test_RSVScalcvsFD(integrate::RSVSclass &RSVSobj, bool SetUs
         RSVSobj.rsvsTri.PrepareForUse();
     }
 
-    RSVSobj.calcObj.CalculateTriangulation(RSVSobj.rsvsTri);
-    auto constrPostFD = RSVSobj.calcObj.constr;
-    auto objPostFd = RSVSobj.calcObj.obj;
+    RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+    auto constrPostFD = calcObj->constr;
+    auto objPostFd = calcObj->obj;
     auto fdDObj = (objPostFd - objPreFd) / fdStep;
     auto fdDconstr = (constrPostFD - constrPreFD) / fdStep;
 
     double diffDObj = (analyticalDObj[dvNum] - fdDObj) / analyticalDObj[dvNum];
-    Eigen::VectorXd diffDConstr =
-        (analyticalDConstr.block(0, dvNum, RSVSobj.calcObj.numConstr(), 1) - fdDconstr).array() /
-        analyticalDConstr.block(0, dvNum, RSVSobj.calcObj.numConstr(), 1).array();
+    Eigen::VectorXd diffDConstr = (analyticalDConstr.block(0, dvNum, calcObj->numConstr(), 1) - fdDconstr).array() /
+                                  analyticalDConstr.block(0, dvNum, calcObj->numConstr(), 1).array();
 
     int nRows = diffDConstr.size();
     for (int i = 0; i < nRows; ++i)
@@ -95,7 +96,7 @@ processed_derivative test_RSVScalcvsFD(integrate::RSVSclass &RSVSobj, bool SetUs
               << analyticalDObj[dvNum] << "   " << fdDObj << "  =  " << diffDObj << std::endl
               << std::endl;
     std::cout << "diffDConstr (ana-fd)/ana = delta: " << std::endl
-              << analyticalDConstr.block(0, dvNum, RSVSobj.calcObj.numConstr(), 1).transpose() << std::endl
+              << analyticalDConstr.block(0, dvNum, calcObj->numConstr(), 1).transpose() << std::endl
               << std::endl
               << fdDconstr.transpose() << std::endl
               << std::endl
@@ -249,8 +250,9 @@ void CompareDerivativesSpikeStepNum(std::string numstr, bool useSurfCentreDeriv 
 {
     integrate::RSVSclass RSVSobj;
     std::vector<std::string> commands;
-
-    RSVSobj.calcObj.SetUseSurfCentreDeriv(useSurfCentreDeriv);
+    auto calcObj = std::make_shared<RSVScalc>();
+    RSVSobj.calcObj = calcObj;
+    calcObj->SetUseSurfCentreDeriv(useSurfCentreDeriv);
 
     commands.push_back("CompareDerivativesSpike" + numstr);
     commands.push_back("-l");
@@ -284,10 +286,10 @@ void CompareDerivativesSpikeStepNum(std::string numstr, bool useSurfCentreDeriv 
 
         std::cout << sumarries.str();
         std::cout << std::endl << "Step number: " << numstr << "+1" << std::endl;
-        std::cout << "DeltaDv: " << RSVSobj.calcObj.deltaDV[RSVSobj.calcObj.dvMap.find(testVert)] << std::endl;
+        std::cout << "DeltaDv: " << calcObj->deltaDV[calcObj->dvMap.find(testVert)] << std::endl;
 
         std::cout << std::endl << "Lagrangian multipliers:" << std::endl;
-        std::cout << RSVSobj.calcObj.lagMult.transpose();
+        std::cout << calcObj->lagMult.transpose();
         std::cout << std::endl << "-------------------------------------------" << std::endl;
     }
 }
@@ -325,9 +327,11 @@ void GenerateDerivatives(bool useSurfCentreDeriv, double eps_overwrite, double s
                          ostream &outPutDeriv = std::cout)
 {
     integrate::RSVSclass RSVSobj;
+    auto c_ptr = std::make_shared<RSVScalc>();
+    RSVSobj.calcObj = c_ptr;
     std::vector<std::string> commands;
     std::stringstream nameCommand, posCommand;
-    RSVSobj.calcObj.SetUseSurfCentreDeriv(useSurfCentreDeriv);
+    c_ptr->SetUseSurfCentreDeriv(useSurfCentreDeriv);
     double rsvsmath_automatic_eps_surfprev = rsvsmath_automatic_eps_surf;
 
     rsvsmath_automatic_eps_surf = eps_overwrite;
@@ -347,7 +351,7 @@ void GenerateDerivatives(bool useSurfCentreDeriv, double eps_overwrite, double s
     RunCommandFromString(RSVSobj, commands);
     rsvsmath_automatic_eps_surf = rsvsmath_automatic_eps_surfprev;
 
-    auto &c = RSVSobj.calcObj;
+    auto &c = *c_ptr;
     outPutDeriv.precision(16);
     outPutDeriv << nameCommand.str() << std::endl;
     outPutDeriv << "dObj," << c.dObj.size() << std::endl;

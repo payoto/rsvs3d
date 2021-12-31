@@ -16,6 +16,7 @@
 // included dependencies
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "RSVScalc.hpp"
 #include "mesh.hpp"
@@ -28,10 +29,11 @@
 //==================================
 // Code
 // This file defines a god class for conveniently doing the integration
-// of the various compoments into a cohesive framework
+// of the various components into a cohesive framework
 //
 namespace integrate
 {
+typedef std::shared_ptr<RSVScalcBase> RSVSCalculator;
 class RSVStecplot
 {
   public:
@@ -51,7 +53,7 @@ class RSVSclass
     mesh snakeMesh;
     mesh voluMesh;
     triangulation rsvsTri;
-    RSVScalc calcObj;
+    RSVSCalculator calcObj;
     std::ofstream logFile;
     std::ofstream coutFile;
     std::ofstream cerrFile;
