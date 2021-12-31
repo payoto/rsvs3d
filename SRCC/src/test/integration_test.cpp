@@ -46,7 +46,7 @@ processed_derivative test_RSVScalcvsFD(integrate::RSVSclass &RSVSobj, bool SetUs
     RSVSobj.calcObj = calcObj;
     auto &sn = RSVSobj.rsvsSnake;
     calcObj->SetUseSurfCentreDeriv(SetUseSurfCentreDeriv);
-    RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+    calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
     int dvNum = calcObj->dvMap.find(testVert);
     auto analyticalDObj = calcObj->dObj;
     auto analyticalDConstr = calcObj->dConstr;
@@ -62,7 +62,7 @@ processed_derivative test_RSVScalcvsFD(integrate::RSVSclass &RSVSobj, bool SetUs
         RSVSobj.rsvsTri.PrepareForUse();
     }
 
-    RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+    calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
     auto constrPostFD = calcObj->constr;
     auto objPostFd = calcObj->obj;
     auto fdDObj = (objPostFd - objPreFd) / fdStep;

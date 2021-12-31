@@ -121,6 +121,7 @@
   },
   "snak": {
     "arrivaltolerance": 1e-07,
+    "engine": "rsvs",
     "initboundary": 1,
     "maxsteps": 50,
     "multiarrivaltolerance": 0.01,

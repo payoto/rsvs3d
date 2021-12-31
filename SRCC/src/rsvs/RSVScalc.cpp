@@ -591,6 +591,23 @@ void RSVScalc::setDevParameters(const param::dev::devparam &devset)
     this->SetSparseDVcutoff(devset.mindesvarsparse);
 }
 
+void RSVScalc::CalculateVelocities(triangulation &triRSVS, int calculationMethod, bool calculateDerivatives,
+                                   int derivativeMethod)
+{
+    this->CalculateTriangulation(triRSVS, derivativeMethod);
+    // start_s = rsvs3d::TimeStamp(" deriv:", start_s);
+    this->CheckAndCompute(calculationMethod, calculateDerivatives);
+    // Second cycle
+    // start_s=rsvs3d::TimeStamp(" solve:", start_s);
+    // this->CalculateTriangulation(triRSVS);
+    // start_s=rsvs3d::TimeStamp(" deriv:", start_s);
+    // this->CheckAndCompute(
+    // 	RSVSobj.paramconf.rsvs.solveralgorithm);
+    // End of Second cycle
+    this->ReturnConstrToMesh(triRSVS);
+    this->ReturnVelocities(triRSVS);
+}
+
 void SparseMatrixTriplet::SetEqual(MatrixXd_sparse &targ)
 {
     int n = this->nonZeros();

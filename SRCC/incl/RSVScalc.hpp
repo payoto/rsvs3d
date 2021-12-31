@@ -346,7 +346,7 @@ class RSVScalc : public rsvs3d::SnakeVelocityCalculator
      *
      * @param      triRSVS  The triangulation object.
      */
-    void ReturnConstrToMesh(triangulation &triRSVS) const override;
+    void ReturnConstrToMesh(triangulation &triRSVS) const;
 
     /**
      * @brief      Returns a constraint to the mesh.
@@ -364,7 +364,7 @@ class RSVScalc : public rsvs3d::SnakeVelocityCalculator
      * @param[in]  calcMethod  Calculation method for SQP. Check
      *                         :meth:RSVScalc::ComputeSQPstep for detail.
      */
-    void CheckAndCompute(int calcMethod = 0, bool sensCalc = false) override;
+    void CheckAndCompute(int calcMethod = 0, bool sensCalc = false);
 
     /**
      * Calculates the next SQP step.
@@ -444,7 +444,7 @@ class RSVScalc : public rsvs3d::SnakeVelocityCalculator
      * @param      triRSVS  The triangulation object, affects the
      *                      triangulation::snakeDep attribute.
      */
-    void ReturnVelocities(triangulation &triRSVS) override;
+    void ReturnVelocities(triangulation &triRSVS);
     void ReturnSensitivities(const triangulation &triRSVS, std::vector<double> &sensVec, int constrNum) const;
     void ReturnGradient(const triangulation &triRSVS, std::vector<double> &sensVec, int constrNum) const;
     /**
@@ -475,7 +475,8 @@ class RSVScalc : public rsvs3d::SnakeVelocityCalculator
      *                     snaxel velocity vector.
      */
     void ConvergenceLog(std::ofstream &out, int loglvl = 3) const;
-
+    void CalculateVelocities(triangulation &triRSVS, int calculationMethod = 0, bool calculateDerivatives = true,
+                             int derivativeMethod = 1) override;
     void setDevParameters(const param::dev::devparam &devset) override;
     void SetUseSurfCentreDeriv(int in)
     {

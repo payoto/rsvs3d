@@ -655,18 +655,7 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
         start_s = clock();
         // RSVSobj.calcObj->limLag=10000.0;
         std::cout << std::endl << "Step " << std::setw(4) << stepNum << " ";
-        RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
-        start_s = rsvs3d::TimeStamp(" deriv:", start_s);
-        RSVSobj.calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm);
-        // Second cycle
-        // start_s=rsvs3d::TimeStamp(" solve:", start_s);
-        // RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
-        // start_s=rsvs3d::TimeStamp(" deriv:", start_s);
-        // RSVSobj.calcObj->CheckAndCompute(
-        // 	RSVSobj.paramconf.rsvs.solveralgorithm);
-        // End of Second cycle
-        RSVSobj.calcObj->ReturnConstrToMesh(RSVSobj.rsvsTri);
-        RSVSobj.calcObj->ReturnVelocities(RSVSobj.rsvsTri);
+        RSVSobj.calcObj->CalculateVelocities(RSVSobj.rsvsTri, RSVSobj.paramconf.rsvs.solveralgorithm);
         start_s = rsvs3d::TimeStamp(" solve:", start_s);
 
         CalculateNoNanSnakeVel(RSVSobj.rsvsSnake);
@@ -826,12 +815,12 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj)
             RSVSobj.rsvsSnake.snakeconn.write(fileToOpen.c_str());
             tecplotfile tecsens;
             tecsens.OpenFile(tecFileToOpen.c_str());
-            RSVSobj.calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
-            RSVSobj.calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm, true);
-            RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
             if (RSVSobj.paramconf.snak.engine == "rsvs")
             {
-                const RSVScalc *calcObj = RSVSobj.calcObj.get();
+                RSVScalc *calcObj = RSVSobj.calcObj.get();
+                calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
+                calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm, true);
+                RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
                 tecsens.PrintSnakeSensitivityVector(RSVSobj.rsvsTri, *calcObj);
             }
         }
