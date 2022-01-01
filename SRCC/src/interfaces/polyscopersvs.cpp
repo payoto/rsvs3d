@@ -739,6 +739,10 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             {
                 integrate::Prepare(RSVSobj);
             }
+
+            RSVSobj.paramconf.snak.engine.reserve(2048);
+            ImGui::InputText("Velocity Engine", RSVSobj.paramconf.snak.engine.data(),
+                             RSVSobj.paramconf.snak.engine.capacity());
         }
         if (viewSurfaces || runPreparation)
         {
