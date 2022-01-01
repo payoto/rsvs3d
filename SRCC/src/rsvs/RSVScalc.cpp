@@ -584,7 +584,6 @@ void RSVScalc::PrintTimers() const
 
 void RSVScalc::setDevParameters(const param::dev::devparam &devset)
 {
-
     this->limLag = devset.limitlagrangian;
     this->SetUseSurfCentreDeriv(devset.surfcentrejacobian);
     this->SetUseSurfCentreHessian(devset.surfcentrehessian);
