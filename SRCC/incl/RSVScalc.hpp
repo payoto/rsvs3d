@@ -12,6 +12,14 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
+namespace param
+{
+namespace dev
+{
+class devparam;
+}
+} // namespace param
+
 //=================================
 // included dependencies
 #include <Eigen>
@@ -19,6 +27,7 @@
 #include <iostream>
 #include <vector>
 
+#include "SnakeVelocityCalculator.hpp"
 #include "arraystructures.hpp"
 #include "mesh.hpp"
 #include "snake.hpp"
@@ -117,7 +126,7 @@ class SparseMatrixTriplet : protected TripletMap
  * to update the velocity and volumes. It uses an SQP algorithm to compute the
  * velocities.
  */
-class RSVScalc
+class RSVScalc : public rsvs3d::SnakeVelocityCalculator
 {
   protected:
     /// Number of design variables
@@ -466,7 +475,9 @@ class RSVScalc
      *                     snaxel velocity vector.
      */
     void ConvergenceLog(std::ofstream &out, int loglvl = 3) const;
-
+    void CalculateVelocities(triangulation &triRSVS, int calculationMethod = 0, bool calculateDerivatives = true,
+                             int derivativeMethod = 1) override;
+    void setDevParameters(const param::dev::devparam &devset) override;
     void SetUseSurfCentreDeriv(int in)
     {
         this->useSurfCentreDeriv = in;

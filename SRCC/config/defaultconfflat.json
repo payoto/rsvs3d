@@ -64,6 +64,7 @@
   "/rsvs/makefill/fill": "",
   "/rsvs/solveralgorithm": 0,
   "/snak/arrivaltolerance": 1e-07,
+  "/snak/engine": "rsvs",
   "/snak/initboundary": 1,
   "/snak/maxsteps": 50,
   "/snak/multiarrivaltolerance": 0.01,

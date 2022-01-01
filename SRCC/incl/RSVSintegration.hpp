@@ -15,12 +15,15 @@
 namespace integrate
 {
 class RSVSclass;
+} // namespace integrate
+namespace rsvs3d
+{
+class SnakeVelocityCalculator;
 }
 class triangulation;
 class snake;
 class mesh;
 class tecplotfile;
-class RSVScalc;
 namespace param
 {
 class grid;
@@ -40,9 +43,14 @@ class PolyScopeRSVS;
 //=================================
 // included dependencies
 #include <fstream>
+#include <memory>
 #include <tuple>
 #include <vector>
 
+namespace integrate
+{
+typedef std::shared_ptr<rsvs3d::SnakeVelocityCalculator> RSVSCalculator;
+} // namespace integrate
 // ================================
 // declarations
 
@@ -116,13 +124,14 @@ void Exporting(RSVSclass &RSVSobj);
 namespace logging
 {
 // Log only convergence data
-void Log(std::ofstream &logFile, RSVScalc &calcObj, int loglvl);
+void Log(std::ofstream &logFile, RSVSCalculator &calcObj, int loglvl);
 // Store the Snake in a file
 void Snake(tecplotfile &outSnake, snake &rsvsSnake, mesh &voluMesh, double totT, int nVoluZone);
 // Store All the available information
 void FullTecplot(tecplotfile &outSnake, snake &rsvsSnake, triangulation &rsvsTri, mesh &voluMesh, double totT,
                  int nVoluZone, int stepNum);
-void Gradients(const RSVScalc &calcObj, const triangulation &rsvsTri, tecplotfile &outgradientsnake, double totT);
+void Gradients(const RSVSCalculator &calcObj, const triangulation &rsvsTri, tecplotfile &outgradientsnake, double totT,
+               const std::string &snakingEngine);
 void SnakeVectors(tecplotfile &outSnake, snake &rsvsSnake, double totT);
 void SnakePolyscope(polyscopersvs::PolyScopeRSVS &viewer, const snake &rsvsSnake);
 } // namespace logging
@@ -131,13 +140,14 @@ namespace postprocess
 {
 // Log only convergence data
 // Log only convergence data
-void Log(std::ofstream &logFile, RSVScalc &calcObj, int loglvl);
+void Log(std::ofstream &logFile, RSVSCalculator &calcObj, int loglvl);
 // Store the Snake in a file
 void Snake(snake &rsvsSnake, mesh &voluMesh, param::parameters &paramconf);
 // Store All the available information
 void FullTecplot(tecplotfile &outSnake, snake &rsvsSnake, triangulation &rsvsTri, mesh &voluMesh, double totT,
                  int nVoluZone, int stepNum);
-void Gradients(const RSVScalc &calcObj, const triangulation &rsvsTri, tecplotfile &outgradientsnake, double totT);
+void Gradients(const RSVSCalculator &calcObj, const triangulation &rsvsTri, tecplotfile &outgradientsnake, double totT,
+               const std::string &snakingEngine);
 } // namespace postprocess
 
 namespace exporting
