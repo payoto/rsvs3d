@@ -10,7 +10,7 @@ void VelocityFunction::setDevParameters(const param::dev::devparam &devparam)
     // For a function this is a no-op
 }
 
-void VelocityFunction::ConvergenceLog(std::ofstream &, int = 3) const
+void VelocityFunction::ConvergenceLog(std::ofstream &, int) const
 {
     // For a function this is a no-op
 }
