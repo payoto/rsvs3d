@@ -304,14 +304,7 @@ void integrate::Prepare(integrate::RSVSclass &RSVSobj)
 
     origconf = RSVSobj.paramconf;
     RSVSobj.paramconf.PrepareForUse();
-    if (origconf.snak.engine == "rsvs")
-    {
-        RSVSobj.calcObj = make_shared<RSVScalc>();
-    }
-    else
-    {
-        RSVS3D_ERROR_ARGUMENT("Unknown engine option pqssed to the RSVS");
-    }
+    RSVSobj.setVelocityEngine(origconf.snak.engine);
     integrate::ApplyDevSettings(RSVSobj);
 
     RSVSobj.rsvsSnake.clear();
@@ -643,6 +636,8 @@ integrate::iteratereturns integrate::execute::RSVSiterate(integrate::RSVSclass &
 
     auto start_s = clock();
     // for n Steps
+    RSVSobj.setVelocityEngine(RSVSobj.paramconf.snak.engine);
+    integrate::ApplyDevSettings(RSVSobj);
 
     RSVSobj.voluMesh.PrepareForUse();
     RSVSobj.outSnake.PrintMesh(RSVSobj.snakeMesh);

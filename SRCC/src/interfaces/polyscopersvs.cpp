@@ -13,6 +13,7 @@
 #include "polyscopersvs.hpp"
 #include "RSVSclass.hpp"
 #include "RSVSintegration.hpp"
+#include "imgui_stdlib.h"
 #include "meshprocessing.hpp"
 #include "parameters.hpp"
 #include "polyscope/polyscope.h"
@@ -293,7 +294,7 @@ void parameterConfigGui(param::voronoi &paramConf)
     ImGui::InputInt("Voronoi layers", &paramConf.vorosnakelayers);
     ImGui::InputDouble("Bounding box distance", &paramConf.distancebox, 0.0, 0.0, "%.2f");
     paramConf.pointfile.reserve(2048);
-    ImGui::InputText("Voronoi points file", paramConf.pointfile.data(), paramConf.pointfile.capacity());
+    ImGui::InputText("Voronoi points file", &paramConf.pointfile);
 
     if (ImGui::Button("Add Voronoi point"))
     {
@@ -404,7 +405,7 @@ void parameterConfigGui(param::rsvs &paramConf)
     }
     ImGui::SameLine();
     paramConf.filefill.fill.reserve(2048);
-    ImGui::InputText("##File value", paramConf.filefill.fill.data(), paramConf.filefill.fill.capacity());
+    ImGui::InputText("##File value", &paramConf.filefill.fill);
 
     change = ImGui::Checkbox("Auto", &paramConf.makefill.active);
     if (change && paramConf.makefill.active)
@@ -414,7 +415,7 @@ void parameterConfigGui(param::rsvs &paramConf)
     }
     ImGui::SameLine();
     paramConf.makefill.fill.reserve(2048);
-    ImGui::InputText("##Auto value", paramConf.makefill.fill.data(), paramConf.makefill.fill.capacity());
+    ImGui::InputText("##Auto value", &paramConf.makefill.fill);
 
     ImGui::InputInt("Linear solver (0-4)", &paramConf.solveralgorithm);
 }
@@ -430,7 +431,7 @@ void parameterConfigGui(param::snaking &paramConf)
 void parameterConfigGui(param::files &paramConf)
 {
     ImGui::InputInt("Logging level [0-7]", &paramConf.ioout.logginglvl);
-    ImGui::InputText("Case name", paramConf.ioin.casename.data(), paramConf.ioin.casename.capacity());
+    ImGui::InputText("Case name", &paramConf.ioin.casename);
     rsvsjson::json out;
     out = paramConf;
     std::ostringstream stream;
@@ -442,8 +443,7 @@ void parameterConfigGui(param::dev::devparam &paramConf)
 {
     ImGui::InputDouble("limitlagrangian", &paramConf.limitlagrangian, 0.0, 0.0, "%.2e");
     ImGui::InputInt("mindesvarsparse", &paramConf.mindesvarsparse);
-    ImGui::InputTextWithHint("smoothstepmethod", "Not sure what appropriate values are",
-                             paramConf.smoothstepmethod.data(), paramConf.smoothstepmethod.capacity());
+    ImGui::InputTextWithHint("smoothstepmethod", "Not sure what appropriate values are", &paramConf.smoothstepmethod);
     ImGui::Checkbox("snaxDistanceLimit_conserveShape", &paramConf.snaxDistanceLimit_conserveShape);
     ImGui::Checkbox("surfcentrehessian", &paramConf.surfcentrehessian);
     ImGui::Checkbox("surfcentrejacobian", &paramConf.surfcentrejacobian);
@@ -481,7 +481,7 @@ void parameterExportImportGui(param::parameters &paramConf)
 
     // Buttons to import and export parameters
     ImGui::PushItemWidth(200);
-    ImGui::InputTextWithHint("##Import-parameter", "import.json...", importFile.data(), fileNameCapacity);
+    ImGui::InputTextWithHint("##Import-parameter", "import.json...", &importFile);
     ImGui::PopItemWidth();
     ImGui::SameLine();
     if (ImGui::Button("Import"))
@@ -496,7 +496,7 @@ void parameterExportImportGui(param::parameters &paramConf)
         }
     }
     ImGui::PushItemWidth(200);
-    ImGui::InputTextWithHint("##Export-parameter", "export.json...", exportFile.data(), fileNameCapacity);
+    ImGui::InputTextWithHint("##Export-parameter", "export.json...", &exportFile);
     ImGui::PopItemWidth();
     ImGui::SameLine();
     if (ImGui::Button("Export"))
@@ -608,7 +608,7 @@ void vosExportImportGui(integrate::RSVSclass &RSVSobj)
     {
         // Buttons to import and export parameters
         ImGui::PushItemWidth(200);
-        ImGui::InputTextWithHint("##Import-vosfill", "import.fill...", importFile.data(), fileNameCapacity);
+        ImGui::InputTextWithHint("##Import-vosfill", "import.fill...", &importFile);
         ImGui::PopItemWidth();
         ImGui::SameLine();
         if (ImGui::Button("Import"))
@@ -623,7 +623,7 @@ void vosExportImportGui(integrate::RSVSclass &RSVSobj)
             }
         }
         ImGui::PushItemWidth(200);
-        ImGui::InputTextWithHint("##Export-vosfill", "export.fill...", exportFile.data(), fileNameCapacity);
+        ImGui::InputTextWithHint("##Export-vosfill", "export.fill...", &exportFile);
         ImGui::PopItemWidth();
         ImGui::SameLine();
         if (ImGui::Button("Export"))
@@ -712,17 +712,46 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
      */
     auto callback = [&] {
         bool runPreparation = false;
+        static bool safeToRun = true;
         ImGui::PushItemWidth(100);
 
         bool viewSurfaces = ImGui::Button("View surfaces");
+        if (!safeToRun)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button("Clear GUI Errors"))
+            {
+                safeToRun = true;
+            }
+        }
 
         if (ImGui::CollapsingHeader("RSVS Execution"))
         {
             ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
             if (ImGui::Button("Run"))
             {
-                // executes when button is pressed
-                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+                if (!safeToRun)
+                {
+                    polyscope::error("An error occurred during preparation, try resetting before iteration.");
+                }
+                else if (RSVSobj.rsvsSnake.snaxs.size() == 0)
+                {
+                    polyscope::error("There are no snakes on the plane; try resetting before iteration.");
+                }
+                else
+                {
+                    // executes when button is pressed
+                    try
+                    {
+                        iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+                    }
+                    catch (const std::invalid_argument &e)
+                    {
+                        std::cerr << e.what() << '\n';
+                        polyscope::error(e.what());
+                        safeToRun = false;
+                    }
+                }
             }
             ImGui::SameLine();
 
@@ -737,8 +766,21 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             runPreparation = ImGui::Button("Reset");
             if (runPreparation)
             {
-                integrate::Prepare(RSVSobj);
+                try
+                {
+                    integrate::Prepare(RSVSobj);
+                    safeToRun = true;
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    std::cerr << e.what() << '\n';
+                    polyscope::error(e.what());
+                    safeToRun = false;
+                }
             }
+
+            RSVSobj.paramconf.snak.engine.reserve(2048);
+            ImGui::InputText("Velocity Engine", &RSVSobj.paramconf.snak.engine);
         }
         if (viewSurfaces || runPreparation)
         {

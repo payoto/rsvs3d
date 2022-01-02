@@ -61,6 +61,7 @@ class RSVSclass
     RSVSclass(bool isHeadless = false) : viewer(isHeadless)
     {
     }
+    void setVelocityEngine(const std::string &engine);
 };
 } // namespace integrate
 
