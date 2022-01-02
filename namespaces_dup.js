@@ -12,6 +12,11 @@ var namespaces_dup =
       [ "limits", "mesh_8hpp.html#a18e45f4fddcc293b16e21ce47b7a16d8", null ],
       [ "transformation", "mesh_8hpp.html#a759e72dbe6e3b6e7549337c242057963", null ]
     ] ],
+    [ "ImGui", null, [
+      [ "InputText", "imgui__stdlib_8h.html#a1da680314eaf3f60ea2a42c76f3584b0", null ],
+      [ "InputTextMultiline", "imgui__stdlib_8h.html#a81dd8855d2cec99457d2339498cc3c4a", null ],
+      [ "InputTextWithHint", "imgui__stdlib_8h.html#a2c2b759553b77cfee680cf36bf0984f7", null ]
+    ] ],
     [ "integrate", null, [
       [ "constants", null, [
         [ "outputs", null, [

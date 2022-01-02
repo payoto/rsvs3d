@@ -45,8 +45,10 @@ var namespacersvs3d =
     [ "utils", null, [
       [ "IsAproxEqual", "rsvsutils_8hpp.html#a4c605a75a357799171fa697d19d47cee", null ]
     ] ],
+    [ "VelocityFunction", "classrsvs3d_1_1_velocity_function.html", "classrsvs3d_1_1_velocity_function" ],
     [ "SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", "classrsvs3d_1_1_snake_velocity_calculator" ],
     [ "rsvs_exception", "classrsvs3d_1_1rsvs__exception.html", null ],
+    [ "simplevelocity", "namespacersvs3d.html#a3f4d8fbfa63f11d4ecc6e41dd9e0f7b2", null ],
     [ "Clock2ms", "namespacersvs3d.html#a4b73dac0ba0ddf66a68690dcd059a3fd", null ],
     [ "error", "namespacersvs3d.html#afcf63d853114233f5eb705abc03ed337", null ],
     [ "sign", "namespacersvs3d.html#a0c4fd15c3019f33270d4e9c6526d820b", null ],

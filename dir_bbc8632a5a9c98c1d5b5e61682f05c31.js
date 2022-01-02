@@ -3,6 +3,7 @@ var dir_bbc8632a5a9c98c1d5b5e61682f05c31 =
     [ "arraystructures.hpp", "arraystructures_8hpp.html", "arraystructures_8hpp" ],
     [ "arraystructures_incl.cpp", "arraystructures__incl_8cpp_source.html", null ],
     [ "filesystem.hpp", "filesystem_8hpp.html", null ],
+    [ "imgui_stdlib.h", "imgui__stdlib_8h_source.html", null ],
     [ "main.hpp", "main_8hpp.html", "main_8hpp" ],
     [ "makeontargetchange.h", "makeontargetchange_8h_source.html", null ],
     [ "matrixtools.hpp", "matrixtools_8hpp.html", "matrixtools_8hpp" ],
@@ -23,6 +24,7 @@ var dir_bbc8632a5a9c98c1d5b5e61682f05c31 =
     [ "rsvsutils.hpp", "rsvsutils_8hpp.html", "rsvsutils_8hpp" ],
     [ "snake.hpp", "snake_8hpp.html", "snake_8hpp" ],
     [ "snakeengine.hpp", "snakeengine_8hpp.html", "snakeengine_8hpp" ],
+    [ "SnakeVelocities.hpp", "_snake_velocities_8hpp.html", "_snake_velocities_8hpp" ],
     [ "SnakeVelocityCalculator.hpp", "_snake_velocity_calculator_8hpp.html", [
       [ "SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", "classrsvs3d_1_1_snake_velocity_calculator" ]
     ] ],

@@ -30,6 +30,7 @@ var annotated_dup =
       [ "PolyScopeRSVS", "classpolyscopersvs_1_1_poly_scope_r_s_v_s.html", "classpolyscopersvs_1_1_poly_scope_r_s_v_s" ]
     ] ],
     [ "rsvs3d", "namespacersvs3d.html", [
+      [ "VelocityFunction", "classrsvs3d_1_1_velocity_function.html", "classrsvs3d_1_1_velocity_function" ],
       [ "SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", "classrsvs3d_1_1_snake_velocity_calculator" ],
       [ "rsvs_exception", "classrsvs3d_1_1rsvs__exception.html", null ]
     ] ],
@@ -53,6 +54,7 @@ var annotated_dup =
     [ "HashedVector", "class_hashed_vector.html", "class_hashed_vector" ],
     [ "HashedVectorPair", "class_hashed_vector_pair.html", "class_hashed_vector_pair" ],
     [ "HashedVectorSafe", "class_hashed_vector_safe.html", "class_hashed_vector_safe" ],
+    [ "InputTextCallback_UserData", "struct_input_text_callback___user_data.html", "struct_input_text_callback___user_data" ],
     [ "LengthEdge", "class_length_edge.html", "class_length_edge" ],
     [ "mesh", "classmesh.html", "classmesh" ],
     [ "meshdependence", "classmeshdependence.html", "classmeshdependence" ],

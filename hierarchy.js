@@ -73,6 +73,7 @@ var hierarchy =
     [ "HashedVector< T, Q, int >", "class_hashed_vector.html", [
       [ "HashedVectorSafe< T, Q, R >", "class_hashed_vector_safe.html", null ]
     ] ],
+    [ "InputTextCallback_UserData", "struct_input_text_callback___user_data.html", null ],
     [ "param::ioin", "classparam_1_1ioin.html", null ],
     [ "param::ioout", "classparam_1_1ioout.html", null ],
     [ "integrate::iteratereturns", "classintegrate_1_1iteratereturns.html", null ],
@@ -94,7 +95,8 @@ var hierarchy =
     [ "integrate::RSVStecplot", "classintegrate_1_1_r_s_v_stecplot.html", null ],
     [ "snake", "classsnake.html", null ],
     [ "rsvs3d::SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", [
-      [ "RSVScalc", "class_r_s_v_scalc.html", null ]
+      [ "RSVScalc", "class_r_s_v_scalc.html", null ],
+      [ "rsvs3d::VelocityFunction", "classrsvs3d_1_1_velocity_function.html", null ]
     ] ],
     [ "param::snaking", "classparam_1_1snaking.html", null ],
     [ "snakpart", "classsnakpart.html", [
