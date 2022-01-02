@@ -89,11 +89,13 @@ var hierarchy =
     [ "parse::ParserOutput", "classparse_1_1_parser_output.html", null ],
     [ "polyscopersvs::PolyScopeRSVS", "classpolyscopersvs_1_1_poly_scope_r_s_v_s.html", null ],
     [ "param::rsvs", "classparam_1_1rsvs.html", null ],
-    [ "RSVScalc", "class_r_s_v_scalc.html", null ],
     [ "integrate::RSVSclass", "classintegrate_1_1_r_s_v_sclass.html", null ],
     [ "param::dev::rsvseps", "classparam_1_1dev_1_1rsvseps.html", null ],
     [ "integrate::RSVStecplot", "classintegrate_1_1_r_s_v_stecplot.html", null ],
     [ "snake", "classsnake.html", null ],
+    [ "rsvs3d::SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", [
+      [ "RSVScalc", "class_r_s_v_scalc.html", null ]
+    ] ],
     [ "param::snaking", "classparam_1_1snaking.html", null ],
     [ "snakpart", "classsnakpart.html", [
       [ "snax", "classsnax.html", null ],

@@ -15,10 +15,7 @@ var dir_bbc8632a5a9c98c1d5b5e61682f05c31 =
     [ "RSVSalgorithm.hpp", "_r_s_v_salgorithm_8hpp.html", "_r_s_v_salgorithm_8hpp" ],
     [ "RSVScalc.hpp", "_r_s_v_scalc_8hpp.html", "_r_s_v_scalc_8hpp" ],
     [ "RSVScalctools.hpp", "_r_s_v_scalctools_8hpp.html", "_r_s_v_scalctools_8hpp" ],
-    [ "RSVSclass.hpp", "_r_s_v_sclass_8hpp.html", [
-      [ "RSVStecplot", "classintegrate_1_1_r_s_v_stecplot.html", "classintegrate_1_1_r_s_v_stecplot" ],
-      [ "RSVSclass", "classintegrate_1_1_r_s_v_sclass.html", "classintegrate_1_1_r_s_v_sclass" ]
-    ] ],
+    [ "RSVSclass.hpp", "_r_s_v_sclass_8hpp.html", "_r_s_v_sclass_8hpp" ],
     [ "RSVSintegration.hpp", "_r_s_v_sintegration_8hpp.html", "_r_s_v_sintegration_8hpp" ],
     [ "rsvsjson.hpp", "rsvsjson_8hpp.html", "rsvsjson_8hpp" ],
     [ "RSVSmath.hpp", "_r_s_v_smath_8hpp.html", "_r_s_v_smath_8hpp" ],
@@ -26,6 +23,9 @@ var dir_bbc8632a5a9c98c1d5b5e61682f05c31 =
     [ "rsvsutils.hpp", "rsvsutils_8hpp.html", "rsvsutils_8hpp" ],
     [ "snake.hpp", "snake_8hpp.html", "snake_8hpp" ],
     [ "snakeengine.hpp", "snakeengine_8hpp.html", "snakeengine_8hpp" ],
+    [ "SnakeVelocityCalculator.hpp", "_snake_velocity_calculator_8hpp.html", [
+      [ "SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", "classrsvs3d_1_1_snake_velocity_calculator" ]
+    ] ],
     [ "snakstruct_incl.cpp", "snakstruct__incl_8cpp.html", "snakstruct__incl_8cpp" ],
     [ "SQPstep.hpp", "_s_q_pstep_8hpp.html", "_s_q_pstep_8hpp" ],
     [ "test.hpp", "test_8hpp.html", "test_8hpp" ],

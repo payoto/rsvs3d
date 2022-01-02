@@ -30,6 +30,7 @@ var annotated_dup =
       [ "PolyScopeRSVS", "classpolyscopersvs_1_1_poly_scope_r_s_v_s.html", "classpolyscopersvs_1_1_poly_scope_r_s_v_s" ]
     ] ],
     [ "rsvs3d", "namespacersvs3d.html", [
+      [ "SnakeVelocityCalculator", "classrsvs3d_1_1_snake_velocity_calculator.html", "classrsvs3d_1_1_snake_velocity_calculator" ],
       [ "rsvs_exception", "classrsvs3d_1_1rsvs__exception.html", null ]
     ] ],
     [ "rsvstest", "namespacersvstest.html", [

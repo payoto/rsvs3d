@@ -4,6 +4,7 @@ var classparam_1_1snaking =
     [ "~snaking", "classparam_1_1snaking.html#aa2a708e969153698ed3a806640e1e42e", null ],
     [ "PrepareForUse", "classparam_1_1snaking.html#a8dc2e3ce8d93630a4a61cc718affd0ad", null ],
     [ "arrivaltolerance", "classparam_1_1snaking.html#ae4c072aa84082d18cada3a757d59c33c", null ],
+    [ "engine", "classparam_1_1snaking.html#ad38fc07225887a1bebadb984f0417e40", null ],
     [ "initboundary", "classparam_1_1snaking.html#a26dfb077ae8c8b1dbccf243bf7498cea", null ],
     [ "maxsteps", "classparam_1_1snaking.html#a6f7650459e9af6fe5d0ebb26114adb19", null ],
     [ "multiarrivaltolerance", "classparam_1_1snaking.html#ab27aea07bcb3faa6e33b8f97c149a75a", null ],

@@ -33,16 +33,16 @@ var namespaces_dup =
         ] ],
         [ "logging", null, [
           [ "FullTecplot", "_r_s_v_sintegration_8hpp.html#a01c7200a4b0ae9f590ac27cf5e4f8e23", null ],
-          [ "Gradients", "_r_s_v_sintegration_8hpp.html#aea0c50854573690bb8f95838ae9a4e37", null ],
-          [ "Log", "_r_s_v_sintegration_8hpp.html#acb66ce0cb5af136f6fb003105234cf51", null ],
+          [ "Gradients", "_r_s_v_sintegration_8hpp.html#af8ef4ce270eaea6bf542365a6aafc269", null ],
+          [ "Log", "_r_s_v_sintegration_8hpp.html#a37f5c594a791a342cada23af17842663", null ],
           [ "Snake", "_r_s_v_sintegration_8hpp.html#ae7876d189de32e4347074d0670491e84", null ],
           [ "SnakePolyscope", "_r_s_v_sintegration_8hpp.html#a541df444d44626ccdbae7f01a9914112", null ],
           [ "SnakeVectors", "_r_s_v_sintegration_8hpp.html#aee93305180f276eaee9fc52bbf12845d", null ]
         ] ],
         [ "postprocess", null, [
           [ "FullTecplot", "_r_s_v_sintegration_8hpp.html#a7bc084f0d778c572acb1b903a3764194", null ],
-          [ "Gradients", "_r_s_v_sintegration_8hpp.html#a2c99211a34d90576d38ece2333f8eb57", null ],
-          [ "Log", "_r_s_v_sintegration_8hpp.html#af76e8fee1a4770cb444ef9ef3b43419e", null ],
+          [ "Gradients", "_r_s_v_sintegration_8hpp.html#a98953a405cca15ff0e1e71112a797286", null ],
+          [ "Log", "_r_s_v_sintegration_8hpp.html#a6891b895bd20687eee9d7d855e03765e", null ],
           [ "Snake", "_r_s_v_sintegration_8hpp.html#a11b10b3915e9280a34203a9d871b6cda", null ]
         ] ],
         [ "All", "_r_s_v_sintegration_8hpp.html#a937c17494e1ac59f6ef7aa485fc101ac", null ],
@@ -81,6 +81,7 @@ var namespaces_dup =
       [ "RSVStecplot", "classintegrate_1_1_r_s_v_stecplot.html", "classintegrate_1_1_r_s_v_stecplot" ],
       [ "RSVSclass", "classintegrate_1_1_r_s_v_sclass.html", "classintegrate_1_1_r_s_v_sclass" ],
       [ "iteratereturns", "classintegrate_1_1iteratereturns.html", "classintegrate_1_1iteratereturns" ],
+      [ "RSVSCalculator", "_r_s_v_sclass_8hpp.html#adaf3e521bf6bbc58cc4b57bffa52ea63", null ],
       [ "ApplyDevSettings", "_r_s_v_sintegration_8hpp.html#a1b9fb1c1bef979604a1c9aa8d226e3eb", null ],
       [ "Prepare", "_r_s_v_sintegration_8hpp.html#a178b5ee13d71c5d1d2b4d8ac906fef54", null ]
     ] ],

@@ -97,6 +97,7 @@ $(document).ready(function(){initNavTree('_r_s_v_sintegration_8hpp.html',''); in
 <p>Integration into the full 3 dimensional Restricted Snake <a class="el" href="class_volume.html">Volume</a> of Solid method.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;fstream&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;tuple&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div>
@@ -109,6 +110,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
+<tr class="memitem:namespacersvs3d"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacersvs3d.html">rsvs3d</a></td></tr>
+<tr class="memdesc:namespacersvs3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace for general purpose tools of the RSVS project. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespaceparam"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceparam.html">param</a></td></tr>
 <tr class="memdesc:namespaceparam"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace containing the parameter classes used to control execution of the 3D-RSVS program. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,36 +185,36 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::P
 <tr class="memitem:afd66e7aa7cf523dce9ebb144242d9c5c"><td class="memItemLeft" align="right" valign="top"><a id="afd66e7aa7cf523dce9ebb144242d9c5c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::Exporting</b> (RSVSclass &amp;RSVSobj)</td></tr>
 <tr class="separator:afd66e7aa7cf523dce9ebb144242d9c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb66ce0cb5af136f6fb003105234cf51"><td class="memItemLeft" align="right" valign="top"><a id="acb66ce0cb5af136f6fb003105234cf51"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::Log</b> (std::ofstream &amp;logFile, <a class="el" href="class_r_s_v_scalc.html">RSVScalc</a> &amp;calcObj, int loglvl)</td></tr>
-<tr class="separator:acb66ce0cb5af136f6fb003105234cf51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37f5c594a791a342cada23af17842663"><td class="memItemLeft" align="right" valign="top"><a id="a37f5c594a791a342cada23af17842663"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::Log</b> (std::ofstream &amp;logFile, RSVSCalculator &amp;calcObj, int loglvl)</td></tr>
+<tr class="separator:a37f5c594a791a342cada23af17842663"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7876d189de32e4347074d0670491e84"><td class="memItemLeft" align="right" valign="top"><a id="ae7876d189de32e4347074d0670491e84"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::Snake</b> (<a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outSnake, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, <a class="el" href="classmesh.html">mesh</a> &amp;voluMesh, double totT, int nVoluZone)</td></tr>
 <tr class="separator:ae7876d189de32e4347074d0670491e84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01c7200a4b0ae9f590ac27cf5e4f8e23"><td class="memItemLeft" align="right" valign="top"><a id="a01c7200a4b0ae9f590ac27cf5e4f8e23"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::FullTecplot</b> (<a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outSnake, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classmesh.html">mesh</a> &amp;voluMesh, double totT, int nVoluZone, int stepNum)</td></tr>
 <tr class="separator:a01c7200a4b0ae9f590ac27cf5e4f8e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea0c50854573690bb8f95838ae9a4e37"><td class="memItemLeft" align="right" valign="top"><a id="aea0c50854573690bb8f95838ae9a4e37"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::Gradients</b> (const <a class="el" href="class_r_s_v_scalc.html">RSVScalc</a> &amp;calcObj, const <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outgradientsnake, double totT)</td></tr>
-<tr class="separator:aea0c50854573690bb8f95838ae9a4e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8ef4ce270eaea6bf542365a6aafc269"><td class="memItemLeft" align="right" valign="top"><a id="af8ef4ce270eaea6bf542365a6aafc269"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::Gradients</b> (const RSVSCalculator &amp;calcObj, const <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outgradientsnake, double totT, const std::string &amp;snakingEngine)</td></tr>
+<tr class="separator:af8ef4ce270eaea6bf542365a6aafc269"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee93305180f276eaee9fc52bbf12845d"><td class="memItemLeft" align="right" valign="top"><a id="aee93305180f276eaee9fc52bbf12845d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::SnakeVectors</b> (<a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outSnake, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, double totT)</td></tr>
 <tr class="separator:aee93305180f276eaee9fc52bbf12845d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a541df444d44626ccdbae7f01a9914112"><td class="memItemLeft" align="right" valign="top"><a id="a541df444d44626ccdbae7f01a9914112"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::logging::SnakePolyscope</b> (<a class="el" href="classpolyscopersvs_1_1_poly_scope_r_s_v_s.html">polyscopersvs::PolyScopeRSVS</a> &amp;viewer, const <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake)</td></tr>
 <tr class="separator:a541df444d44626ccdbae7f01a9914112"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af76e8fee1a4770cb444ef9ef3b43419e"><td class="memItemLeft" align="right" valign="top"><a id="af76e8fee1a4770cb444ef9ef3b43419e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Log</b> (std::ofstream &amp;logFile, <a class="el" href="class_r_s_v_scalc.html">RSVScalc</a> &amp;calcObj, int loglvl)</td></tr>
-<tr class="separator:af76e8fee1a4770cb444ef9ef3b43419e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6891b895bd20687eee9d7d855e03765e"><td class="memItemLeft" align="right" valign="top"><a id="a6891b895bd20687eee9d7d855e03765e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Log</b> (std::ofstream &amp;logFile, RSVSCalculator &amp;calcObj, int loglvl)</td></tr>
+<tr class="separator:a6891b895bd20687eee9d7d855e03765e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11b10b3915e9280a34203a9d871b6cda"><td class="memItemLeft" align="right" valign="top"><a id="a11b10b3915e9280a34203a9d871b6cda"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Snake</b> (<a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, <a class="el" href="classmesh.html">mesh</a> &amp;voluMesh, <a class="el" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf)</td></tr>
 <tr class="separator:a11b10b3915e9280a34203a9d871b6cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bc084f0d778c572acb1b903a3764194"><td class="memItemLeft" align="right" valign="top"><a id="a7bc084f0d778c572acb1b903a3764194"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::FullTecplot</b> (<a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outSnake, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classmesh.html">mesh</a> &amp;voluMesh, double totT, int nVoluZone, int stepNum)</td></tr>
 <tr class="separator:a7bc084f0d778c572acb1b903a3764194"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c99211a34d90576d38ece2333f8eb57"><td class="memItemLeft" align="right" valign="top"><a id="a2c99211a34d90576d38ece2333f8eb57"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Gradients</b> (const <a class="el" href="class_r_s_v_scalc.html">RSVScalc</a> &amp;calcObj, const <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outgradientsnake, double totT)</td></tr>
-<tr class="separator:a2c99211a34d90576d38ece2333f8eb57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98953a405cca15ff0e1e71112a797286"><td class="memItemLeft" align="right" valign="top"><a id="a98953a405cca15ff0e1e71112a797286"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::postprocess::Gradients</b> (const RSVSCalculator &amp;calcObj, const <a class="el" href="classtriangulation.html">triangulation</a> &amp;rsvsTri, <a class="el" href="classtecplotfile.html">tecplotfile</a> &amp;outgradientsnake, double totT, const std::string &amp;snakingEngine)</td></tr>
+<tr class="separator:a98953a405cca15ff0e1e71112a797286"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fc1a73443af0c9e121d93914ac3eb79"><td class="memItemLeft" align="right" valign="top"><a id="a5fc1a73443af0c9e121d93914ac3eb79"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::execute::exporting::SU2</b> (std::string exportStr, <a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, <a class="el" href="classparam_1_1parameters.html">param::parameters</a> &amp;paramconf)</td></tr>
 <tr class="separator:a5fc1a73443af0c9e121d93914ac3eb79"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -326,7 +330,7 @@ static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>i
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a file path by adding the root directory and the file pattern </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01092">1092</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01097">1097</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +384,7 @@ static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>i
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A string with a file path for RSVS output. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01098">1098</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_r_s_v_sintegration_8cpp_source.html#l01103">1103</a> of file <a class="el" href="_r_s_v_sintegration_8cpp_source.html">RSVSintegration.cpp</a>.</p>
 
 </div>
 </div>
