@@ -17,7 +17,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libclang-cpp9 libclang1-9
-          curl https://www.doxygen.nl/files/doxygen-1.9.1.linux.bin.tar.gz | tar -xvz
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-1.9.1/doxygen-1.9.1.linux.bin.tar.gz/download | tar -xvz
       - name: Install doxygen
         run: |
           sudo make install
