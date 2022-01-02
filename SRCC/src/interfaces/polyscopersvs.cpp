@@ -712,17 +712,46 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
      */
     auto callback = [&] {
         bool runPreparation = false;
+        static bool safeToRun = true;
         ImGui::PushItemWidth(100);
 
         bool viewSurfaces = ImGui::Button("View surfaces");
+        if (!safeToRun)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button("Clear GUI Errors"))
+            {
+                safeToRun = true;
+            }
+        }
 
         if (ImGui::CollapsingHeader("RSVS Execution"))
         {
             ImGui::InputInt("Number of steps", &RSVSobj.paramconf.snak.maxsteps);
             if (ImGui::Button("Run"))
             {
-                // executes when button is pressed
-                iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+                if (!safeToRun)
+                {
+                    polyscope::error("An error occurred during preparation, try resetting before iteration.");
+                }
+                else if (RSVSobj.rsvsSnake.snaxs.size() == 0)
+                {
+                    polyscope::error("There are no snakes on the plane; try resetting before iteration.");
+                }
+                else
+                {
+                    // executes when button is pressed
+                    try
+                    {
+                        iterateInfo = integrate::execute::RSVSiterate(RSVSobj);
+                    }
+                    catch (const std::invalid_argument &e)
+                    {
+                        std::cerr << e.what() << '\n';
+                        polyscope::error(e.what());
+                        safeToRun = false;
+                    }
+                }
             }
             ImGui::SameLine();
 
@@ -737,7 +766,17 @@ void polyscopersvs::PolyScopeRSVS::setInteractiveCallback(integrate::RSVSclass &
             runPreparation = ImGui::Button("Reset");
             if (runPreparation)
             {
-                integrate::Prepare(RSVSobj);
+                try
+                {
+                    integrate::Prepare(RSVSobj);
+                    safeToRun = true;
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    std::cerr << e.what() << '\n';
+                    polyscope::error(e.what());
+                    safeToRun = false;
+                }
             }
 
             RSVSobj.paramconf.snak.engine.reserve(2048);
