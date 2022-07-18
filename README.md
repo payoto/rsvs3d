@@ -2,6 +2,7 @@
 
 [![Linux build](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml)
 [![Windows build](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml)
+[![MacOS build](https://github.com/payoto/rsvs3d/actions/workflows/macos.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/macos.yml)
 [![Documentation](https://github.com/payoto/rsvs3d/actions/workflows/doxygen.yml/badge.svg)](https://payoto.github.io/rsvs3d/)
 [![pre-commit](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml)
 

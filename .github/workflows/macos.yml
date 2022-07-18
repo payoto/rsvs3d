@@ -1,0 +1,29 @@
+name: Linux build
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+
+      - name: install packages
+        run: sudo brew install --cask xquartz
+
+      - name: make
+        run: make all -j3
+        working-directory: SRCC/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: RSVS3D-macos
+          path: SRCC/RSVS3D
+      - name: run tests
+        run: ./RSVS3D --test --no-gui
+        working-directory: SRCC/
