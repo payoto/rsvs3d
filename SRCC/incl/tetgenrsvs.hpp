@@ -12,6 +12,8 @@
 // 		class foo; //when you only need a pointer not the actual object
 // 		and to avoid circular dependencies
 
+class snake;
+
 //=================================
 // included dependencies
 
