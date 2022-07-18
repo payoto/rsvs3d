@@ -22,6 +22,7 @@ SRCTREE = src
 DEPDIR := .d
 BINDIR = bin
 INCLPROJ= incl
+LDFLAGS =
 
 # Include directories
 SHAREINCLROOTDIR = ./modules/rsvs3d-externals

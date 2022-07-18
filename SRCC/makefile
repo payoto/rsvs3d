@@ -3,7 +3,11 @@
 ifeq ($(OS),Windows_NT)
 	include makewin.mk
 else
+ifeq ($(shell uname),Darwin)
+	include makemacos.mk
+else
 	include makelinux.mk
+endif
 endif
 
 # This flag is meant to be controlled from the command line and governs
@@ -90,8 +94,6 @@ POLYSCOPELIBFILE= $(LDPOLYSCOPE)/libpolyscope.a
 #------------------------------------------------------
 #            PARSE FLAGS BEFORE RECIPES
 #------------------------------------------------------
-
-LDFLAGS =
 
 # Compile list of flags
 CFLAGS=-c --std=c++$(CCPSTD) $(WARNFLAGS) -O$(OPTIMLVL)
