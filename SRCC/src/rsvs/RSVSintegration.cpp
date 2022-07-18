@@ -812,7 +812,7 @@ void integrate::execute::Exporting(integrate::RSVSclass &RSVSobj)
             tecsens.OpenFile(tecFileToOpen.c_str());
             if (RSVSobj.paramconf.snak.engine == "rsvs")
             {
-                RSVScalc *calcObj = dynamic_cast<RSVScalc*>(RSVSobj.calcObj.get());
+                RSVScalc *calcObj = dynamic_cast<RSVScalc *>(RSVSobj.calcObj.get());
                 calcObj->CalculateTriangulation(RSVSobj.rsvsTri);
                 calcObj->CheckAndCompute(RSVSobj.paramconf.rsvs.solveralgorithm, true);
                 RSVSobj.rsvsSnake.Scale(RSVSobj.paramconf.grid.physdomain);
@@ -910,7 +910,7 @@ void integrate::execute::logging::Gradients(const RSVSCalculator &calcObj, const
 {
     if (snakingEngine == "rsvs")
     {
-        const RSVScalc *calcObjChild = dynamic_cast<RSVScalc*>(calcObj.get());
+        const RSVScalc *calcObjChild = dynamic_cast<RSVScalc *>(calcObj.get());
         outgradientsnake.PrintSnakeGradients(rsvsTri, *calcObjChild, 1, totT);
     }
 }
