@@ -1194,3 +1194,20 @@ int integrate::test::All()
     std::cerr << " cerr Buffer restored" << std::endl;
     return 0;
 }
+
+bool integrate::constants::outputs::printBaseSnake(int lvl)
+{
+    return lvl == 2 || lvl == 5 || lvl == 7;
+};
+bool integrate::constants::outputs::printFullSnake(int lvl)
+{
+    return lvl == 3 || lvl == 4 || numberdefined < lvl;
+};
+bool integrate::constants::outputs::printGradientsSnake(int lvl)
+{
+    return lvl == 4 || lvl == 5 || lvl == 7 || numberdefined < lvl;
+};
+bool integrate::constants::outputs::printVectorSnake(int lvl)
+{
+    return lvl == 6 || lvl == 7 || numberdefined < lvl;
+};
