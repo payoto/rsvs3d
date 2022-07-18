@@ -1,4 +1,4 @@
-name: Linux build
+name: MacOS build
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
           submodules: "recursive"
 
       - name: install packages
-        run: sudo brew install --cask xquartz
+        run: brew install --cask xquartz
 
       - name: make
         run: make all -j3
