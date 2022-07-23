@@ -88,7 +88,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="title">3D-RSVS </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__home_runner_work_rsvs3d_rsvs3d_README"></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/linux.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/linux.yml/badge.svg" alt="Linux build" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/windows.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/windows.yml/badge.svg" alt="Windows build" style="pointer-events: none;" class="inline"/></a> <a href="https://payoto.github.io/rsvs3d/"><img src="https://github.com/payoto/rsvs3d/actions/workflows/doxygen.yml/badge.svg" alt="Documentation" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml/badge.svg" alt="pre-commit" style="pointer-events: none;" class="inline"/></a></p>
+<div class="textblock"><p><a class="anchor" id="md__home_runner_work_rsvs3d_rsvs3d_README"></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/linux.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/linux.yml/badge.svg" alt="Linux build" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/windows.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/windows.yml/badge.svg" alt="Windows build" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/macos.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/macos.yml/badge.svg" alt="MacOS build" style="pointer-events: none;" class="inline"/></a> <a href="https://payoto.github.io/rsvs3d/"><img src="https://github.com/payoto/rsvs3d/actions/workflows/doxygen.yml/badge.svg" alt="Documentation" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml"><img src="https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml/badge.svg" alt="pre-commit" style="pointer-events: none;" class="inline"/></a></p>
 <p><a href="https://github.com/payoto/rsvs3d/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="License" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" alt="pre-commit" class="inline"/></a> <a href="https://lgtm.com/projects/g/payoto/rsvs3d/alerts/"><img src="https://img.shields.io/lgtm/alerts/g/payoto/rsvs3d.svg?logo=lgtm&amp;logoWidth=18" alt="Total alerts" style="pointer-events: none;" class="inline"/></a> <a href="https://www.codefactor.io/repository/github/payoto/rsvs3d"><img src="https://www.codefactor.io/repository/github/payoto/rsvs3d/badge" alt="CodeFactor" class="inline"/></a></p>
 <p><a href="https://github.com/payoto/rsvs3d/releases"><img src="https://raw.githubusercontent.com/payoto/rsvs3d/master/SRCC/docs/3DRSVS_LR1.gif" alt="3D Restricted Snakes Volume of Solid Parameterisation" class="inline"/></a></p>
 <p>The 3D-RSVS is a geometry generation tool using volume specification to build smooth surfaces. Papers describing the method are available on <a href="https://www.researchgate.net/publication/330197375_Parametric_Surfaces_with_Volume_of_Solid_Control_for_Optimisation_of_Three_Dimensional_Aerodynamic_Topologies">researchgate</a> and <a href="https://www.sciencedirect.com/science/article/pii/S0045793018304730">ScienceDirect</a>.</p>
@@ -143,7 +143,7 @@ External libraries</h1>
 <li><a href="http://tetgen.org">Tetgen</a> : A Quality Tetrahedral Mesh Generator and a 3D Delaunay Triangulator. Download my modified version for this project <a href="https://github.com/payoto/tetgen">payoto/tetgen</a>.</li>
 </ul>
 <p>All dependencies are intended to be handled via git submodules, to install them using submodules, run <code>git submodule update --init --recursive</code>.</p>
-<h2>Running on WSL2</h2>
+<h2>Running on WSL2/Ubuntu</h2>
 <p>All these dependencies may not be needed but this is what it took:</p>
 <div class="fragment"><div class="line"> sudo apt-get install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev libgl1-mesa-glx libglfw3-dev</div>
 <div class="line"> </div>
@@ -151,7 +151,9 @@ External libraries</h1>
 <div class="line"># https://stackoverflow.com/a/66506098/15399205</div>
 <div class="line">export LIBGL_ALWAYS_INDIRECT=0</div>
 <div class="line">export DISPLAY=$(awk &#39;/nameserver / {print $2; exit}&#39; /etc/resolv.conf 2&gt;/dev/null):0 # in WSL 2</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><h2>Building on MACOS</h2>
+<p>In order to build on MACOS you will need an <code>X11</code> library, this can be installed with: <code>brew install --cask xquartz</code> using the brew package manager.</p>
+<h1><a class="anchor" id="autotoc_md6"></a>
 License</h1>
 <p>Any code using the Tetgen interface and functionalities is under the GNU Affero GPL license which is more restrictive than the LGPL of this project (this is not legal advice, but my understanding):</p>
 <ul>

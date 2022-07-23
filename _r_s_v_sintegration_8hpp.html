@@ -137,6 +137,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SnakeConnectivityUpda
 <tr class="memitem:ab969d36af08ff34eb80a4b3debc391d9"><td class="memItemLeft" align="right" valign="top"><a id="ab969d36af08ff34eb80a4b3debc391d9"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>SnakePositionUpdate</b> (<a class="el" href="classsnake.html">snake</a> &amp;rsvsSnake, std::vector&lt; double &gt; &amp;dt, double snaxtimestep, double snaxdiststep)</td></tr>
 <tr class="separator:ab969d36af08ff34eb80a4b3debc391d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7839eac60f1aa08a760c32844e5826d5"><td class="memItemLeft" align="right" valign="top"><a id="a7839eac60f1aa08a760c32844e5826d5"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printBaseSnake</b> (int lvl)</td></tr>
+<tr class="separator:a7839eac60f1aa08a760c32844e5826d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af04bab37578ef20ec7afa54f7c235a2c"><td class="memItemLeft" align="right" valign="top"><a id="af04bab37578ef20ec7afa54f7c235a2c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printFullSnake</b> (int lvl)</td></tr>
+<tr class="separator:af04bab37578ef20ec7afa54f7c235a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4527e0b5d54402af36d37ea08f6d34c"><td class="memItemLeft" align="right" valign="top"><a id="af4527e0b5d54402af36d37ea08f6d34c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printGradientsSnake</b> (int lvl)</td></tr>
+<tr class="separator:af4527e0b5d54402af36d37ea08f6d34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21d9b98e1827295cf877b24ce5907e7e"><td class="memItemLeft" align="right" valign="top"><a id="a21d9b98e1827295cf877b24ce5907e7e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printVectorSnake</b> (int lvl)</td></tr>
+<tr class="separator:a21d9b98e1827295cf877b24ce5907e7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a296a85a00c649de384a5fc54c3a0286f"><td class="memItemLeft" align="right" valign="top"><a id="a296a85a00c649de384a5fc54c3a0286f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::plotSnakeInPolyscope</b> (int lvl)</td></tr>
 <tr class="separator:a296a85a00c649de384a5fc54c3a0286f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -257,18 +269,6 @@ Variables</h2></td></tr>
 <tr class="memitem:af60585caca991b2938110791d460118d"><td class="memItemLeft" align="right" valign="top"><a id="af60585caca991b2938110791d460118d"></a>
 static const int&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::numberdefined</b> = 7</td></tr>
 <tr class="separator:af60585caca991b2938110791d460118d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f58d40708805576b4a731691208417d"><td class="memItemLeft" align="right" valign="top"><a id="a9f58d40708805576b4a731691208417d"></a>
-auto&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printBaseSnake</b> = [](int lvl) -&gt; bool { return lvl == 2 || lvl == 5 || lvl == 7; }</td></tr>
-<tr class="separator:a9f58d40708805576b4a731691208417d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3de95c67f80fef51b65d385300da0243"><td class="memItemLeft" align="right" valign="top"><a id="a3de95c67f80fef51b65d385300da0243"></a>
-auto&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printFullSnake</b> = [](int lvl) -&gt; bool { return lvl == 3 || lvl == 4 || numberdefined &lt; lvl; }</td></tr>
-<tr class="separator:a3de95c67f80fef51b65d385300da0243"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad232ee8623094e5f11b4194f9a82c424"><td class="memItemLeft" align="right" valign="top"><a id="ad232ee8623094e5f11b4194f9a82c424"></a>
-auto&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printGradientsSnake</b> = [](int lvl) -&gt; bool { return lvl == 4 || lvl == 5 || lvl == 7 || numberdefined &lt; lvl; }</td></tr>
-<tr class="separator:ad232ee8623094e5f11b4194f9a82c424"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a016bfa29a4d45bd4c8799335460879cd"><td class="memItemLeft" align="right" valign="top"><a id="a016bfa29a4d45bd4c8799335460879cd"></a>
-auto&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::outputs::printVectorSnake</b> = [](int lvl) -&gt; bool { return lvl == 6 || lvl == 7 || numberdefined &lt; lvl; }</td></tr>
-<tr class="separator:a016bfa29a4d45bd4c8799335460879cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82e50a59c2afa7c238c8bc9f42b7fdf5"><td class="memItemLeft" align="right" valign="top"><a id="a82e50a59c2afa7c238c8bc9f42b7fdf5"></a>
 static const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>integrate::constants::tecplotsnake</b> = &quot;rsvs3D_&quot;</td></tr>
 <tr class="separator:a82e50a59c2afa7c238c8bc9f42b7fdf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
