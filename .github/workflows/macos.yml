@@ -1,4 +1,4 @@
-name: Windows build
+name: MacOS build
 
 on:
   push:
@@ -7,21 +7,23 @@ on:
     branches: [develop]
 
 jobs:
-  build-windows:
-    runs-on: windows-2019
+  build-macos:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: "recursive"
-      - name: install dependencies
-        run: choco install make mingw
+
+      - name: install packages
+        run: brew install --cask xquartz
+
       - name: make
-        run: make all -j2
+        run: make all -j3
         working-directory: SRCC/
       - uses: actions/upload-artifact@v2
         with:
-          name: RSVS3D-windows
-          path: SRCC/RSVS3D*
+          name: RSVS3D-macos
+          path: SRCC/RSVS3D
       - name: run tests
-        run: bin/RSVS3D.exe --test --no-gui
+        run: ./RSVS3D --test --no-gui
         working-directory: SRCC/

@@ -2,6 +2,7 @@
 
 [![Linux build](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/linux.yml)
 [![Windows build](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/windows.yml)
+[![MacOS build](https://github.com/payoto/rsvs3d/actions/workflows/macos.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/macos.yml)
 [![Documentation](https://github.com/payoto/rsvs3d/actions/workflows/doxygen.yml/badge.svg)](https://payoto.github.io/rsvs3d/)
 [![pre-commit](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml/badge.svg)](https://github.com/payoto/rsvs3d/actions/workflows/precommit.yml)
 
@@ -99,7 +100,7 @@ Required 3rd party open source libraries for compilation
 
 All dependencies are intended to be handled via git submodules, to install them using submodules, run `git submodule update --init --recursive`.
 
-### Running on WSL2
+### Running on WSL2/Ubuntu
 
 All these dependencies may not be needed but this is what it took:
 
@@ -111,6 +112,10 @@ All these dependencies may not be needed but this is what it took:
 export LIBGL_ALWAYS_INDIRECT=0
 export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0 # in WSL 2
 ```
+
+### Building on MACOS
+
+In order to build on MACOS you will need an `X11` library, this can be installed with: `brew install --cask xquartz` using the brew package manager.
 
 ## License
 

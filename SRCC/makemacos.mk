@@ -3,9 +3,9 @@
 #                 TARGET COMPILER
 #------------------------------------------------------
 # Specify compiler (only g++ is supported)
-CC=g++-9
+CC=g++
 # Specify linker
-LINK=g++-9
+LINK=g++
 
 #------------------------------------------------------
 #                 DIRECTORIES and INCLUDES
@@ -22,7 +22,7 @@ SRCTREE = src
 DEPDIR := .d
 BINDIR = bin
 INCLPROJ= incl
-LDFLAGS =
+LDFLAGS = -framework OpenGL -framework CoreVideo -framework Cocoa -framework IOKit
 
 # Include directories
 SHAREINCLROOTDIR = ./modules/rsvs3d-externals
@@ -39,6 +39,8 @@ LDPOLYSCOPEDEPS= $(DIRPOLYSCOPE)/build/deps/stb
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glad/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/glfw/src
 LDPOLYSCOPEDEPS+= $(DIRPOLYSCOPE)/build/deps/imgui
+LDPOLYSCOPEDEPS+= /opt/X11/lib/
+POLYSCOPE_CMAKE_FLAG=-D CMAKE_C_COMPILER="gcc"
 
 ifeq ($(HEADLESS), true)
 # glad glfw3 may not be available in headless mode you may also need to

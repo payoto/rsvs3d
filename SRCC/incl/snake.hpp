@@ -47,6 +47,7 @@ class snax;
 class snaxedge;
 class snaxsurf;
 class snaxarray;
+class snake;
 
 typedef SnakStruct<snaxedge> snaxedgearray;
 typedef SnakStruct<snaxsurf> snaxsurfarray;
